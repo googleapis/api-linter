@@ -1,6 +1,8 @@
 package lint
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	// ErrDuplicateID is the returned error when a duplicated rule ID is
@@ -31,25 +33,43 @@ func (r *Rules) Register(rules ...Rule) error {
 	return nil
 }
 
-// FindRuleByID looks up any rule by its `ID`.
-// If not found, return (nil, ErrNotFound).
-func (r *Rules) FindRuleByID(id RuleID) (Rule, error) {
-	rl, found := r.ruleMap[id]
-	if !found {
-		return nil, ErrNotFound
-	}
-	return rl, nil
+// Merge merges another rule registry.
+// If any rule is found duplicate, returns `ErrDuplicateID`.
+func (r *Rules) Merge(other Rules) error {
+	return r.Register(other.AllRules()...)
 }
 
-// FindRulesBySet looks up a set of rules.
-func (r *Rules) FindRulesBySet(set string) []Rule {
-	res := []Rule{}
-	for _, rl := range r.ruleMap {
-		if rl.ID().Set == set {
-			res = append(res, rl)
+// FindRulesByConfig looks up sets of rules.
+func (r *Rules) FindRulesByConfig(cfg RulesConfig) []Rule {
+	rules := []Rule{}
+	for _, setConfig := range cfg.RuleSets {
+		rules = append(rules, r.findRulesBySet(setConfig)...)
+	}
+	return rules
+}
+
+// AllRules returns all rules.
+func (r Rules) AllRules() []Rule {
+	rules := []Rule{}
+	for _, r1 := range r.ruleMap {
+		rules = append(rules, r1)
+	}
+	return rules
+}
+
+func (r *Rules) findRulesBySet(s RuleSetConfig) []Rule {
+	excludedRules := make(map[string]bool)
+	for _, ruleName := range s.ExcludedRules {
+		excludedRules[ruleName] = true
+	}
+
+	rules := []Rule{}
+	for _, r1 := range r.ruleMap {
+		if r1.ID().Set == s.Set && !excludedRules[r1.ID().Name] {
+			rules = append(rules, r1)
 		}
 	}
-	return res
+	return rules
 }
 
 // NewRules returns a rule registry initialized with the given set of rules.

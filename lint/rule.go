@@ -85,3 +85,8 @@ type Request interface {
 type Response struct {
 	Problems []Problem
 }
+
+// Merge merges another response.
+func (resp *Response) Merge(other Response) {
+	resp.Problems = append(resp.Problems, other.Problems...)
+}
