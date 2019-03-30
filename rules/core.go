@@ -59,8 +59,8 @@ type ruleBase struct {
 	visitor  protoRuleVisitor
 }
 
-func (r ruleBase) ID() lint.ID {
-	return lint.ID{
+func (r ruleBase) ID() lint.RuleID {
+	return lint.RuleID{
 		Set:  r.metadata.Set,
 		Name: r.metadata.Name,
 	}
@@ -200,7 +200,7 @@ func (v *simpleVisitor) isRuleEnabled(d protoreflect.Descriptor) bool {
 	return isRuleEnabled(v.rule.ID(), d, v.ctx)
 }
 
-func isRuleEnabled(ruleID lint.ID, d protoreflect.Descriptor, ctx lint.Context) bool {
+func isRuleEnabled(ruleID lint.RuleID, d protoreflect.Descriptor, ctx lint.Context) bool {
 	descSource, err := ctx.DescriptorSource()
 	if err != nil {
 		return true
@@ -223,7 +223,7 @@ func stringsContains(comments []string, s string) bool {
 	return false
 }
 
-func ruleDisablingComment(id lint.ID) string {
+func ruleDisablingComment(id lint.RuleID) string {
 	name := id.Set + "." + id.Name
 	if id.Set == "" || id.Set == "core" {
 		name = id.Name

@@ -13,7 +13,7 @@ var (
 
 // Rules is a registry for looking up or iterating over rules.
 type Rules struct {
-	ruleMap map[ID]Rule
+	ruleMap map[RuleID]Rule
 }
 
 // Register registers the list of rules.
@@ -33,7 +33,7 @@ func (r *Rules) Register(rules ...Rule) error {
 
 // FindRuleByID looks up any rule by its `ID`.
 // If not found, return (nil, ErrNotFound).
-func (r *Rules) FindRuleByID(id ID) (Rule, error) {
+func (r *Rules) FindRuleByID(id RuleID) (Rule, error) {
 	rl, found := r.ruleMap[id]
 	if !found {
 		return nil, ErrNotFound
@@ -55,7 +55,7 @@ func (r *Rules) FindRulesBySet(set string) []Rule {
 // NewRules returns a rule registry initialized with the given set of rules.
 func NewRules(rules ...Rule) *Rules {
 	r := Rules{
-		ruleMap: make(map[ID]Rule),
+		ruleMap: make(map[RuleID]Rule),
 	}
 	r.Register(rules...)
 	return &r
