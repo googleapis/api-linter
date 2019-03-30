@@ -145,17 +145,14 @@ func (v *simpleVisitor) checkEnumValue(ev protoreflect.EnumValueDescriptor) {
 }
 
 func (v *simpleVisitor) checkOneof(o protoreflect.OneofDescriptor) {
-	if v.EnumCheck != nil && v.isRuleEnabled(o) {
+	if v.OneofCheck != nil && v.isRuleEnabled(o) {
 		v.addProblems(v.OneofCheck(o, v.ctx)...)
 	}
 }
 
 func (v *simpleVisitor) checkTopLevelEnums(f protoreflect.FileDescriptor) {
 	for i := 0; i < f.Enums().Len(); i++ {
-		e := f.Enums().Get(i)
-		if v.EnumCheck != nil && v.isRuleEnabled(e) {
-			v.addProblems(v.EnumCheck(e, v.ctx)...)
-		}
+		v.checkEnum(f.Enums().Get(i))
 	}
 }
 
