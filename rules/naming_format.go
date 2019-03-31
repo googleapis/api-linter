@@ -35,7 +35,7 @@ func checkNamingFormat(element string, desc protoreflect.Descriptor, example str
 	if name != suggestion {
 		return []lint.Problem{
 			{
-				Message:    element + " names should use " + example,
+				Message:    element + " name '" + name + "' should use " + example,
 				Suggestion: suggestion,
 				Descriptor: desc,
 			},
@@ -69,7 +69,7 @@ func checkServiceNamesUseUpperCamelCase(f protoreflect.ServiceDescriptor, ctx li
 }
 
 func upperCamelCase(s string) string {
-	return strings.ToUpper(strcase.ToCamel(s))
+	return strcase.ToCamel(s)
 }
 
 func upperSnakeCase(s string) string {

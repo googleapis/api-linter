@@ -1,0 +1,78 @@
+// DO NOT EDIT -- This is for `source_test.go`.
+
+syntax = "proto2";
+
+package api.linter.lint;
+
+// Outer
+message Outer {
+  // Middle
+  message Middle {
+    // Inner
+    message Inner {
+      // outer_middle_inner_field_one
+      optional string outer_middle_inner_field_one = 1;
+      // outer_middle_inner_field_two
+      optional string outer_middle_inner_field_two = 2;
+    }
+
+    // NestedNestedEnum
+    enum NestedNestedEnum {
+      // UNKNOWN
+      UNKNOWN = 0;
+      // BAR
+      BAR = 1;
+    }
+
+    // inner
+    optional Inner inner = 1;
+
+    // outer_middle_oneof_field
+    oneof outer_middle_oneof_field {
+      // outer_middle_oneof_field_name
+      string outer_middle_oneof_field_name = 4;
+      // outer_middle_oneof_inner
+      Inner outer_middle_oneof_inner = 5;
+    }
+  }
+
+  // outer_field_name
+  optional string outer_field_name = 1;
+  // outer_middle_field
+  optional Middle outer_middle_field = 2;
+
+  // NestedEnum
+  enum NestedEnum {
+    // UNKNOWN
+    UNKNOWN = 0;
+    // FOO
+    FOO = 1;
+  }
+  // outer_nested_enum
+  optional NestedEnum outer_nested_enum = 3;
+  // outer_oneof_field
+  oneof outer_oneof_field {
+      // outer_oneof_field_name
+    string outer_oneof_field_name = 4;
+    // outer_oneof_field_middle
+     Middle outer_oneof_field_middle = 5;
+  }
+}
+
+// FooRequest
+message FooRequest  {}
+// FooResponse
+message FooResponse {}
+
+// BarRequest
+message BarRequest {}
+// BarResponse
+message BarResponse{}
+
+// TestService
+service TestService {
+  // Foo
+  rpc Foo(FooRequest) returns (FooResponse);
+  // Bar
+  rpc Bar(BarRequest) returns (BarResponse);
+}

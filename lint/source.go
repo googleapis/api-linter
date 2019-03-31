@@ -73,11 +73,11 @@ type DescriptorSource struct {
 
 // NewDescriptorSource creates a new DescriptorSource from a FileDescriptorProto.
 // If source code information is not available, returns (nil, ErrSourceInfoNotAvailable).
-func NewDescriptorSource(f *dpb.FileDescriptorProto) (*DescriptorSource, error) {
+func NewDescriptorSource(f *dpb.FileDescriptorProto) (DescriptorSource, error) {
 	if f.GetSourceCodeInfo() == nil {
-		return nil, ErrSourceInfoNotAvailable
+		return DescriptorSource{}, ErrSourceInfoNotAvailable
 	}
-	return &DescriptorSource{m: buildLocPathMap(f.GetSourceCodeInfo())}, nil
+	return DescriptorSource{m: buildLocPathMap(f.GetSourceCodeInfo())}, nil
 }
 
 // FindLocationByPath returns a `Location` if found in the map,
@@ -141,16 +141,73 @@ func (s DescriptorSource) FindLocationByDescriptor(d protoreflect.Descriptor) (L
 }
 
 func getPath(d protoreflect.Descriptor) []int {
-	if d.Index() == 0 {
-		return []int{}
+	path := []int{}
+	for p := d; !isFileDescriptor(p); p, _ = p.Parent() {
+		path = append(path, p.Index(), getDescriptorTag(p))
 	}
-	path := []int{d.Index()}
-	p, found := d.Parent()
-	for found && p.Index() != 0 {
-		path = append(path, p.Index())
-		p, found = p.Parent()
+	reverseInts(path)
+	return path
+}
+
+var enumTagInFile = 5
+var enumTagInMessage = 4
+var enumValueTag = 2
+var fieldTag = 2
+var extensionTagInFile = 7
+var extensionTagInMessage = 6
+var messageTagInFile = 4
+var nestedMessageTag = 3
+var oneofTag = 8
+var serviceTag = 6
+var methodTag = 2
+
+func getDescriptorTag(d protoreflect.Descriptor) int {
+	switch d.(type) {
+	case protoreflect.EnumDescriptor:
+		if isTopLevelDescriptor(d) {
+			return enumTagInFile
+		}
+		return enumTagInMessage
+	case protoreflect.EnumValueDescriptor:
+		return enumValueTag
+	case protoreflect.FieldDescriptor:
+		if isFieldExtension(d) {
+			if isTopLevelDescriptor(d) {
+				return extensionTagInFile
+			}
+			return extensionTagInMessage
+		}
+		return fieldTag
+	case protoreflect.MessageDescriptor:
+		if isTopLevelDescriptor(d) {
+			return messageTagInFile
+		}
+		return nestedMessageTag
+	case protoreflect.MethodDescriptor:
+		return methodTag
+	case protoreflect.OneofDescriptor:
+		return oneofTag
+	case protoreflect.ServiceDescriptor:
+		return serviceTag
+	default:
+		return 0
 	}
-	return reverseInts(path)
+}
+
+func isFieldExtension(d protoreflect.Descriptor) bool {
+	f, ok := d.(protoreflect.FieldDescriptor)
+	return ok && f.ExtendedType() != nil
+}
+
+func isFileDescriptor(d protoreflect.Descriptor) bool {
+	_, ok := d.(protoreflect.FileDescriptor)
+	return ok
+}
+
+func isTopLevelDescriptor(d protoreflect.Descriptor) bool {
+	p, _ := d.Parent()
+	_, ok := p.(protoreflect.FileDescriptor)
+	return ok
 }
 
 // FindCommentsByDescriptor returns a `Comments` for the given descriptor.
@@ -159,10 +216,8 @@ func (s DescriptorSource) FindCommentsByDescriptor(d protoreflect.Descriptor) (C
 	return s.FindCommentsByPath(getPath(d))
 }
 
-func reverseInts(path []int) []int {
-	i, j := 0, len(path)-1
-	for i < j {
-		path[i], path[j] = path[j], path[i]
+func reverseInts(a []int) {
+	for left, right := 0, len(a)-1; left < right; left, right = left+1, right-1 {
+		a[left], a[right] = a[right], a[left]
 	}
-	return path
 }

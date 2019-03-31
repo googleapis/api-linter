@@ -198,12 +198,9 @@ func (v *simpleVisitor) isRuleEnabled(d protoreflect.Descriptor) bool {
 }
 
 func isRuleEnabled(ruleID lint.RuleID, d protoreflect.Descriptor, ctx lint.Context) bool {
-	descSource, err := ctx.DescriptorSource()
+	comments, err := ctx.DescriptorSource().FindCommentsByDescriptor(d)
 	if err != nil {
-		return true
-	}
-	comments, err := descSource.FindCommentsByDescriptor(d)
-	if err != nil {
+		log.Printf("FindCommentsByDescriptor for '%s' returned error: %v", d.FullName(), err)
 		return true
 	}
 
