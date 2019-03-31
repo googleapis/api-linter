@@ -3,7 +3,7 @@ package lint
 import (
 	"context"
 
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
 
 // Rule defines a lint rule that checks Google Protobuf APIs.

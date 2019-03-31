@@ -3,7 +3,7 @@ package rules
 import (
 	"strings"
 
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/iancoleman/strcase"
 	"github.com/jgeewax/api-linter/lint"
 )

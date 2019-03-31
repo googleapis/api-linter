@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/reflect/protoreflect"
-	dpb "github.com/golang/protobuf/types/descriptor"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
 var (
@@ -48,10 +48,10 @@ func newLocPath(p ...int) locPath {
 	return locPath(strings.Join(a, sep))
 }
 
-// buildLocPathMap creates a map of locPath to *dpb.SourceCodeInfo_Location
-// from *dpb.SourceCodeInfo.
-func buildLocPathMap(sci *dpb.SourceCodeInfo) map[locPath]*dpb.SourceCodeInfo_Location {
-	m := make(map[locPath]*dpb.SourceCodeInfo_Location)
+// buildLocPathMap creates a map of locPath to *descriptorpb.SourceCodeInfo_Location
+// from *descriptorpb.SourceCodeInfo.
+func buildLocPathMap(sci *descriptorpb.SourceCodeInfo) map[locPath]*descriptorpb.SourceCodeInfo_Location {
+	m := make(map[locPath]*descriptorpb.SourceCodeInfo_Location)
 	if sci == nil {
 		return m
 	}
@@ -66,14 +66,14 @@ func buildLocPathMap(sci *dpb.SourceCodeInfo) map[locPath]*dpb.SourceCodeInfo_Lo
 	return m
 }
 
-// DescriptorSource represents a map of locPath to *dpb.SourceCodeInfo_Location.
+// DescriptorSource represents a map of locPath to *descriptorpb.SourceCodeInfo_Location.
 type DescriptorSource struct {
-	m map[locPath]*dpb.SourceCodeInfo_Location
+	m map[locPath]*descriptorpb.SourceCodeInfo_Location
 }
 
 // NewDescriptorSource creates a new DescriptorSource from a FileDescriptorProto.
 // If source code information is not available, returns (nil, ErrSourceInfoNotAvailable).
-func NewDescriptorSource(f *dpb.FileDescriptorProto) (DescriptorSource, error) {
+func NewDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource, error) {
 	if f.GetSourceCodeInfo() == nil {
 		return DescriptorSource{}, ErrSourceInfoNotAvailable
 	}

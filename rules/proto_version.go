@@ -1,7 +1,7 @@
 package rules
 
 import (
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/jgeewax/api-linter/lint"
 )
 

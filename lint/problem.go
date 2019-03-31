@@ -1,7 +1,7 @@
 package lint
 
 import (
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
 
 // Problem contains information about a result produced by an API Linter.

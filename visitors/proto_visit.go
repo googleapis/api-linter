@@ -4,7 +4,7 @@ package visitors
 import (
 	"errors"
 
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
 
 // ErrSkip indicates that the encountered message is to be skipped.

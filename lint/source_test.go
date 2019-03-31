@@ -7,12 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/reflect/protoreflect"
+	"github.com/golang/protobuf/v2/proto"
+	"github.com/golang/protobuf/v2/reflect/protodesc"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	"github.com/jgeewax/api-linter/visitors"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/reflect/protodesc"
-	descriptorpb "github.com/golang/protobuf/types/descriptor"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/reflect/protodesc"
-	"github.com/golang/protobuf/reflect/protoreflect"
-	descriptorpb "github.com/golang/protobuf/types/descriptor"
+	"github.com/golang/protobuf/v2/proto"
+	"github.com/golang/protobuf/v2/reflect/protodesc"
+	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test.protoset --proto_path=testdata testdata/test.proto
