@@ -8,7 +8,7 @@ import (
 
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/jgeewax/api-linter/lint"
-	"github.com/jgeewax/api-linter/visitors"
+	"github.com/jgeewax/api-linter/protovisit"
 )
 
 var coreRules = lint.NewRules()
@@ -120,73 +120,60 @@ func (v *simpleVisitor) Walk(r lint.Rule, req lint.Request) (lint.Response, erro
 	return lint.Response{Problems: v.problems}, nil
 }
 
-func (v *simpleVisitor) checkMessage(m protoreflect.MessageDescriptor) {
+func (v *simpleVisitor) VisitMessage(m protoreflect.MessageDescriptor) {
 	if v.MessageCheck != nil && v.isRuleEnabled(m) {
 		v.addProblems(v.MessageCheck(m, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkField(f protoreflect.FieldDescriptor) {
+func (v *simpleVisitor) VisitField(f protoreflect.FieldDescriptor) {
 	if v.FieldCheck != nil && v.isRuleEnabled(f) {
 		v.addProblems(v.FieldCheck(f, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkEnum(e protoreflect.EnumDescriptor) {
+func (v *simpleVisitor) VisitEnum(e protoreflect.EnumDescriptor) {
 	if v.EnumCheck != nil && v.isRuleEnabled(e) {
 		v.addProblems(v.EnumCheck(e, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkEnumValue(ev protoreflect.EnumValueDescriptor) {
+func (v *simpleVisitor) VisitEnumValue(ev protoreflect.EnumValueDescriptor) {
 	if v.EnumValueCheck != nil && v.isRuleEnabled(ev) {
 		v.addProblems(v.EnumValueCheck(ev, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkOneof(o protoreflect.OneofDescriptor) {
+func (v *simpleVisitor) VisitExtension(e protoreflect.ExtensionDescriptor) {}
+
+func (v *simpleVisitor) VisitOneof(o protoreflect.OneofDescriptor) {
 	if v.OneofCheck != nil && v.isRuleEnabled(o) {
 		v.addProblems(v.OneofCheck(o, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkTopLevelEnums(f protoreflect.FileDescriptor) {
-	for i := 0; i < f.Enums().Len(); i++ {
-		v.checkEnum(f.Enums().Get(i))
-	}
-}
-
-func (v *simpleVisitor) checkAllMessages(f protoreflect.FileDescriptor) {
-	visitors.WalkMessage(f, &visitors.SimpleMessageVisitor{
-		Funcs: visitors.MessageVisitingFuncs{
-			MessageVisit:   v.checkMessage,
-			FieldVisit:     v.checkField,
-			EnumVisit:      v.checkEnum,
-			EnumValueVisit: v.checkEnumValue,
-			OneofVisit:     v.checkOneof,
-		},
-	})
-}
-
-func (v *simpleVisitor) checkAllServices(f protoreflect.FileDescriptor) {
-	visitors.WalkService(f, &visitors.SimpleServiceVisitor{
-		Funcs: visitors.ServiceVisitFuncs{
-			MethodVisit:  v.checkMethod,
-			ServiceVisit: v.checkService,
-		},
-	})
-}
-
-func (v *simpleVisitor) checkService(s protoreflect.ServiceDescriptor) {
+func (v *simpleVisitor) VisitService(s protoreflect.ServiceDescriptor) {
 	if v.ServiceCheck != nil && v.isRuleEnabled(s) {
 		v.addProblems(v.ServiceCheck(s, v.ctx)...)
 	}
 }
 
-func (v *simpleVisitor) checkMethod(m protoreflect.MethodDescriptor) {
+func (v *simpleVisitor) VisitMethod(m protoreflect.MethodDescriptor) {
 	if v.MethodCheck != nil && v.isRuleEnabled(m) {
 		v.addProblems(v.MethodCheck(m, v.ctx)...)
 	}
+}
+
+func (v *simpleVisitor) checkTopLevelEnums(f protoreflect.FileDescriptor) {
+	protovisit.WalkEnum(f, protovisit.SimpleEnumVisitor{}, v)
+}
+
+func (v *simpleVisitor) checkAllMessages(f protoreflect.FileDescriptor) {
+	protovisit.WalkMessage(f, protovisit.SimpleMessageVisitor{}, v)
+}
+
+func (v *simpleVisitor) checkAllServices(f protoreflect.FileDescriptor) {
+	protovisit.WalkService(f, protovisit.SimpleServiceVisitor{}, v)
 }
 
 func (v *simpleVisitor) addProblems(problems ...lint.Problem) {

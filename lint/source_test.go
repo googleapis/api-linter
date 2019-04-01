@@ -11,10 +11,52 @@ import (
 	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
-	"github.com/jgeewax/api-linter/visitors"
+	"github.com/jgeewax/api-linter/protovisit"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
+
+type testMessageVisitor struct {
+	descSource DescriptorSource
+	t          *testing.T
+}
+
+func (v testMessageVisitor) VisitEnum(f protoreflect.EnumDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testMessageVisitor) VisitEnumValue(f protoreflect.EnumValueDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testMessageVisitor) VisitField(f protoreflect.FieldDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testMessageVisitor) VisitOneof(f protoreflect.OneofDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testMessageVisitor) VisitMessage(f protoreflect.MessageDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testMessageVisitor) VisitExtension(f protoreflect.ExtensionDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+type testServiceVisitor struct {
+	descSource DescriptorSource
+	t          *testing.T
+}
+
+func (v testServiceVisitor) VisitService(f protoreflect.ServiceDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
+
+func (v testServiceVisitor) VisitMethod(f protoreflect.MethodDescriptor) {
+	checkLeadingComment(f, v.descSource, v.t)
+}
 
 func TestSourceDescriptor(t *testing.T) {
 	f1 := readProtoFile("test_source.protoset").GetFile()[0]
@@ -28,22 +70,9 @@ func TestSourceDescriptor(t *testing.T) {
 		t.Errorf("NewDescriptorSource: %v", err)
 	}
 
-	visitors.WalkMessage(fd1, &visitors.SimpleMessageVisitor{
-		Funcs: visitors.MessageVisitingFuncs{
-			EnumVisit:      func(f protoreflect.EnumDescriptor) { checkLeadingComment(f, descSource, t) },
-			EnumValueVisit: func(f protoreflect.EnumValueDescriptor) { checkLeadingComment(f, descSource, t) },
-			FieldVisit:     func(f protoreflect.FieldDescriptor) { checkLeadingComment(f, descSource, t) },
-			MessageVisit:   func(f protoreflect.MessageDescriptor) { checkLeadingComment(f, descSource, t) },
-			OneofVisit:     func(f protoreflect.OneofDescriptor) { checkLeadingComment(f, descSource, t) },
-		},
-	})
+	protovisit.WalkMessage(fd1, protovisit.SimpleMessageVisitor{}, testMessageVisitor{descSource, t})
 
-	visitors.WalkService(fd1, &visitors.SimpleServiceVisitor{
-		Funcs: visitors.ServiceVisitFuncs{
-			MethodVisit:  func(f protoreflect.MethodDescriptor) { checkLeadingComment(f, descSource, t) },
-			ServiceVisit: func(f protoreflect.ServiceDescriptor) { checkLeadingComment(f, descSource, t) },
-		},
-	})
+	protovisit.WalkService(fd1, protovisit.SimpleServiceVisitor{}, testServiceVisitor{descSource, t})
 
 	for i := 0; i < fd1.Enums().Len(); i++ {
 		e := fd1.Enums().Get(i)

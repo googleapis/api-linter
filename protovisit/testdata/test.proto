@@ -49,3 +49,11 @@ service TestService {
   // Bar method
   rpc Bar(BarRequest) returns (BarResponse);
 }
+
+enum TopEnum1 {
+  FOO = 1;
+}
+
+enum TopEnum2 {
+  BAR = 2;
+}
