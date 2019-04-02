@@ -3,14 +3,16 @@ package rules
 import (
 	"strings"
 
+	"github.com/jgeewax/api-linter/protovisit"
+
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/iancoleman/strcase"
 	"github.com/jgeewax/api-linter/lint"
 )
 
 func init() {
-	registerRuleWithVisitor(
-		ruleMetadata{
+	registerRule(
+		metadata{
 			Set:         "core",
 			Name:        "check_naming_formats",
 			Description: "check naming formats",
@@ -18,28 +20,27 @@ func init() {
 			FileTypes:   []lint.FileType{lint.ProtoFile},
 			Category:    lint.CategorySuggestion,
 		},
-		&simpleVisitor{
-			EnumCheck:      checkEnumNamesUseUpperCamelCase,
-			EnumValueCheck: checkEnumValueNamesUseUpperSnakeCase,
-			FieldCheck:     checkFieldNamesUseLowerSnakeCase,
-			MessageCheck:   checkMessageNamesUseUpperCamelCase,
-			MethodCheck:    checkMethodNamesUseUpperCamelCase,
-			ServiceCheck:   checkServiceNamesUseUpperCamelCase,
+		&checkers{
+			DescriptorVisitor: protovisit.SimpleDescriptorVisitor{},
+			DescriptorCheck:   checkDescriptor,
 		},
 	)
 }
 
-func checkNamingFormat(element string, desc protoreflect.Descriptor, example string, transform func(string) string) []lint.Problem {
-	name := string(desc.Name())
-	suggestion := transform(name)
-	if name != suggestion {
-		return []lint.Problem{
-			{
-				Message:    element + " name '" + name + "' should use " + example,
-				Suggestion: suggestion,
-				Descriptor: desc,
-			},
-		}
+func checkDescriptor(d protoreflect.Descriptor, ctx lint.Context) []lint.Problem {
+	switch d.(type) {
+	case protoreflect.EnumDescriptor:
+		return checkEnumNamesUseUpperCamelCase(d.(protoreflect.EnumDescriptor), ctx)
+	case protoreflect.EnumValueDescriptor:
+		return checkEnumValueNamesUseUpperSnakeCase(d.(protoreflect.EnumValueDescriptor), ctx)
+	case protoreflect.FieldDescriptor:
+		return checkFieldNamesUseLowerSnakeCase(d.(protoreflect.FieldDescriptor), ctx)
+	case protoreflect.MessageDescriptor:
+		return checkMessageNamesUseUpperCamelCase(d.(protoreflect.MessageDescriptor), ctx)
+	case protoreflect.MethodDescriptor:
+		return checkMethodNamesUseUpperCamelCase(d.(protoreflect.MethodDescriptor), ctx)
+	case protoreflect.ServiceDescriptor:
+		return checkServiceNamesUseUpperCamelCase(d.(protoreflect.ServiceDescriptor), ctx)
 	}
 	return []lint.Problem{}
 }
@@ -78,4 +79,19 @@ func upperSnakeCase(s string) string {
 
 func lowerSnakeCase(s string) string {
 	return strings.ToLower(strcase.ToSnake(s))
+}
+
+func checkNamingFormat(element string, desc protoreflect.Descriptor, example string, transform func(string) string) []lint.Problem {
+	name := string(desc.Name())
+	suggestion := transform(name)
+	if name != suggestion {
+		return []lint.Problem{
+			{
+				Message:    element + " name '" + name + "' should use " + example,
+				Suggestion: suggestion,
+				Descriptor: desc,
+			},
+		}
+	}
+	return []lint.Problem{}
 }

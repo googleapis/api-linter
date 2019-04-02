@@ -6,8 +6,8 @@ import (
 )
 
 func init() {
-	registerRuleWithLintFunc(
-		ruleMetadata{
+	registerRuleFunc(
+		metadata{
 			Set:         "core",
 			Name:        "check_proto_syntax",
 			Description: `Use "proto3" instead of "proto2"`,
