@@ -11,7 +11,7 @@ import (
 	"github.com/jgeewax/api-linter/protovisit"
 )
 
-var coreRules = lint.NewRules()
+var coreRules, _ = lint.NewRules()
 
 func registerRuleWithLintFunc(metadata ruleMetadata, lintFunc lintFuncType) {
 	r := ruleBase{
@@ -185,7 +185,7 @@ func (v *simpleVisitor) isRuleEnabled(d protoreflect.Descriptor) bool {
 }
 
 func isRuleEnabled(ruleID lint.RuleID, d protoreflect.Descriptor, ctx lint.Context) bool {
-	comments, err := ctx.DescriptorSource().FindCommentsByDescriptor(d)
+	comments, err := ctx.DescriptorSource().DescriptorComments(d)
 	if err != nil {
 		log.Printf("FindCommentsByDescriptor for '%s' returned error: %v", d.FullName(), err)
 		return true

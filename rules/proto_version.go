@@ -38,7 +38,7 @@ func checkProtoSyntax(req lint.Request) (lint.Response, error) {
 const syntaxTag = 12
 
 func findSyntaxLocation(ctx lint.Context) lint.Location {
-	if loc, err := ctx.DescriptorSource().FindLocationByPath([]int{syntaxTag}); err == nil {
+	if loc, err := ctx.DescriptorSource().SyntaxLocation(); err == nil {
 		return loc
 	}
 	return lint.StartLocation

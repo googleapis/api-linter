@@ -13,19 +13,17 @@ var (
 	ErrNotFound = errors.New("rule registry: rule is not found")
 )
 
-// Rules is a registry for looking up or iterating over rules.
+// Rules is a registry for registering and looking up rules.
 type Rules struct {
 	ruleMap map[RuleID]Rule
 }
 
 // Register registers the list of rules.
-// It returns `ErrDuplicateID` if any rule is found duplicate
+// It returns `ErrDuplicateID` if any of the rules is found duplicate
 // in the registry.
 func (r *Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
-		found := false
-		_, found = r.ruleMap[rl.ID()]
-		if found {
+		if _, found := r.ruleMap[rl.ID()]; found {
 			return ErrDuplicateID
 		}
 		r.ruleMap[rl.ID()] = rl
@@ -36,20 +34,20 @@ func (r *Rules) Register(rules ...Rule) error {
 // Merge merges another rule registry.
 // If any rule is found duplicate, returns `ErrDuplicateID`.
 func (r *Rules) Merge(other Rules) error {
-	return r.Register(other.AllRules()...)
+	return r.Register(other.All()...)
 }
 
-// FindRulesByConfig looks up sets of rules.
-func (r *Rules) FindRulesByConfig(cfg RulesConfig) []Rule {
+// FindByConfig looks up a list of rules by a RulesConfig
+func (r *Rules) FindByConfig(cfg RulesConfig) []Rule {
 	rules := []Rule{}
 	for _, setConfig := range cfg.RuleSets {
-		rules = append(rules, r.findRulesBySet(setConfig)...)
+		rules = append(rules, r.findBySet(setConfig)...)
 	}
 	return rules
 }
 
-// AllRules returns all rules.
-func (r Rules) AllRules() []Rule {
+// All returns all rules.
+func (r Rules) All() []Rule {
 	rules := []Rule{}
 	for _, r1 := range r.ruleMap {
 		rules = append(rules, r1)
@@ -57,7 +55,7 @@ func (r Rules) AllRules() []Rule {
 	return rules
 }
 
-func (r *Rules) findRulesBySet(s RuleSetConfig) []Rule {
+func (r *Rules) findBySet(s RuleSetConfig) []Rule {
 	excludedRules := make(map[string]bool)
 	for _, ruleName := range s.ExcludedRules {
 		excludedRules[ruleName] = true
@@ -73,10 +71,10 @@ func (r *Rules) findRulesBySet(s RuleSetConfig) []Rule {
 }
 
 // NewRules returns a rule registry initialized with the given set of rules.
-func NewRules(rules ...Rule) *Rules {
+func NewRules(rules ...Rule) (*Rules, error) {
 	r := Rules{
 		ruleMap: make(map[RuleID]Rule),
 	}
-	r.Register(rules...)
-	return &r
+	err := r.Register(rules...)
+	return &r, err
 }

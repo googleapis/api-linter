@@ -41,13 +41,13 @@ func TestSourceDescriptor(t *testing.T) {
 }
 
 func checkLeadingComment(f protoreflect.Descriptor, descSource DescriptorSource, t *testing.T) {
-	comments, err := descSource.FindCommentsByDescriptor(f)
+	comments, err := descSource.DescriptorComments(f)
 	if err != nil {
-		t.Errorf("FindCommentsByDescriptor for `%s`: %v", f.FullName(), err)
+		t.Errorf("DescriptorComments for `%s`: %v", f.FullName(), err)
 	}
 	leadingComment := strings.TrimSpace(comments.LeadingComments)
 	if leadingComment != string(f.Name()) {
-		t.Errorf("FindCommentsByDescriptor for `%s`: got '%s', but wanted '%s'", f.FullName(), leadingComment, f.Name())
+		t.Errorf("DescriptorComments for `%s`: got '%s', but wanted '%s'", f.FullName(), leadingComment, f.Name())
 	}
 }
 

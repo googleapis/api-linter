@@ -7,17 +7,28 @@ import (
 // DescriptorVisitor defines how to travel in a descriptor.
 // See MessageVisitor for more details.
 type DescriptorVisitor interface {
+	// PreVisit will be invoked when a descriptor is encountered
+	// before applying any visiting functions or traveling down
+	// to its nested ones. If an error is returned, the entire
+	// visiting stops -- expected that the special value ErrSkip
+	// is returned, which indicates that this descriptor will be
+	// skipped; or ErrSkipNested, which indicates that the nested
+	// ones will be skipped; or ErrSkipVisiting, which indicates
+	// that this descriptor will be skipped but visiting will
+	// continue to the nested ones.
 	PreVisit(protoreflect.Descriptor) error
+	// PostVisit will be invoked in the end of visiting. If an
+	// error is returned, the entire visiting stops.
 	PostVisit(protoreflect.Descriptor) error
 }
 
-// DescriptorVisiting defines a function to be applied to a descriptor.
+// DescriptorVisiting visits a descriptor.
 type DescriptorVisiting interface {
 	VisitDescriptor(protoreflect.Descriptor)
 }
 
-// WalkDescriptor uses the visitor to travel in the file and applies the visiting function
-// to the encountered descriptor.
+// WalkDescriptor uses the visitor to travel in the file,
+// and applies the visiting functions on each encountered descriptor.
 //
 // Note: it does not visit the FileDescriptor itself.
 func WalkDescriptor(f protoreflect.FileDescriptor, visitor DescriptorVisitor, visiting DescriptorVisiting) error {
@@ -110,8 +121,8 @@ func walkDescriptor(d protoreflect.Descriptor, visitor DescriptorVisitor, visiti
 // SimpleDescriptorVisitor visits all descriptors in a file.
 type SimpleDescriptorVisitor struct{}
 
-// PreVisit does nothing.
+// PreVisit does nothing and return nil.
 func (v SimpleDescriptorVisitor) PreVisit(protoreflect.Descriptor) error { return nil }
 
-// PostVisit does nothing.
+// PostVisit does nothing and return nil.
 func (v SimpleDescriptorVisitor) PostVisit(protoreflect.Descriptor) error { return nil }

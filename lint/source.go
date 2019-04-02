@@ -80,9 +80,9 @@ func NewDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource,
 	return DescriptorSource{m: buildLocPathMap(f.GetSourceCodeInfo())}, nil
 }
 
-// FindLocationByPath returns a `Location` if found in the map,
+// findLocationByPath returns a `Location` if found in the map,
 // and (nil, ErrLocationNotFound) if not found.
-func (s DescriptorSource) FindLocationByPath(path []int) (Location, error) {
+func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
 		return Location{}, ErrLocationNotFound
@@ -90,9 +90,9 @@ func (s DescriptorSource) FindLocationByPath(path []int) (Location, error) {
 	return newLocationFromSpan(l.GetSpan()), nil
 }
 
-// FindCommentsByPath returns a `Comments` for the path. If not found, returns
+// findCommentsByPath returns a `Comments` for the path. If not found, returns
 // (nil, ErrCommentsNotFound).
-func (s DescriptorSource) FindCommentsByPath(path []int) (Comments, error) {
+func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
 		return Comments{}, ErrCommentsNotFound
@@ -134,10 +134,20 @@ func newLocationFromSpan(span []int32) Location {
 	return Location{}
 }
 
-// FindLocationByDescriptor returns a `Location` for the given descriptor.
+// SyntaxLocation returns the location of the syntax definition.
+func (s DescriptorSource) SyntaxLocation() (Location, error) {
+	return s.findLocationByPath([]int{syntaxTag})
+}
+
+// SyntaxComments returns the comments of the syntax definition.
+func (s DescriptorSource) SyntaxComments() (Comments, error) {
+	return s.findCommentsByPath([]int{syntaxTag})
+}
+
+// DescriptorLocation returns a `Location` for the given descriptor.
 // If not found, returns (nil, ErrLocationNotFound).
-func (s DescriptorSource) FindLocationByDescriptor(d protoreflect.Descriptor) (Location, error) {
-	return s.FindLocationByPath(getPath(d))
+func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Location, error) {
+	return s.findLocationByPath(getPath(d))
 }
 
 func getPath(d protoreflect.Descriptor) []int {
@@ -148,6 +158,8 @@ func getPath(d protoreflect.Descriptor) []int {
 	reverseInts(path)
 	return path
 }
+
+const syntaxTag = 12
 
 var enumTagInFile = 5
 var enumTagInMessage = 4
@@ -210,10 +222,10 @@ func isTopLevelDescriptor(d protoreflect.Descriptor) bool {
 	return ok
 }
 
-// FindCommentsByDescriptor returns a `Comments` for the given descriptor.
+// DescriptorComments returns a `Comments` for the given descriptor.
 // If not found, returns (nil, ErrCommentsNotFound).
-func (s DescriptorSource) FindCommentsByDescriptor(d protoreflect.Descriptor) (Comments, error) {
-	return s.FindCommentsByPath(getPath(d))
+func (s DescriptorSource) DescriptorComments(d protoreflect.Descriptor) (Comments, error) {
+	return s.findCommentsByPath(getPath(d))
 }
 
 func reverseInts(a []int) {

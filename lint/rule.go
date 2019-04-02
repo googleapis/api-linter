@@ -1,11 +1,5 @@
 package lint
 
-import (
-	"context"
-
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
-)
-
 // Rule defines a lint rule that checks Google Protobuf APIs.
 type Rule interface {
 	// ID returns the unique `RuleID` for this rule.
@@ -54,51 +48,3 @@ const (
 	// CategorySuggestion indicates that in the API, something can be do better.
 	CategorySuggestion Category = "API-Linter-Suggestion"
 )
-
-// Context provides additional information for a rule to perform linting.
-type Context struct {
-	context    context.Context
-	descSource DescriptorSource
-}
-
-// NewContext creates a new `Context`.
-func NewContext(ctx context.Context) Context {
-	return Context{
-		context: ctx,
-	}
-}
-
-// NewContextWithDescriptorSource creates a new `Context` with the source.
-func NewContextWithDescriptorSource(ctx context.Context, source DescriptorSource) Context {
-	return Context{
-		context:    ctx,
-		descSource: source,
-	}
-}
-
-// DescriptorSource returns a `DescriptorSource` if available; otherwise,
-// returns (nil, ErrSourceInfoNotAvailable).
-//
-// The returned `DescriptorSource` contains additional information
-// about a protobuf descriptor, such as comments and location lookups.
-func (c Context) DescriptorSource() DescriptorSource {
-	return c.descSource
-}
-
-// Request defines input data for a rule to perform linting.
-type Request interface {
-	// ProtoFile returns a `FileDescriptor` when the rule's `FileTypes`
-	// contains `ProtoFile`.
-	ProtoFile() protoreflect.FileDescriptor
-	Context() Context
-}
-
-// Response describes the result returned by a rule.
-type Response struct {
-	Problems []Problem
-}
-
-// Merge merges another response.
-func (resp *Response) Merge(other Response) {
-	resp.Problems = append(resp.Problems, other.Problems...)
-}

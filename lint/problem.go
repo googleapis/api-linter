@@ -14,7 +14,7 @@ type Problem struct {
 	// `Location` and `Descriptor` are specified, the location
 	// is then used from `Location` instead of `Descriptor`.
 	Location Location
-	// Descriptor provides the protobuf descriptor related
+	// Descriptor provides the descriptor related
 	// to the problem. If present and `Location` is not
 	// specified, then the starting location of the descriptor
 	// is used as the location of the problem.
