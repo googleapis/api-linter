@@ -7,15 +7,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/jgeewax/api-linter/rules"
-
+	"github.com/golang/protobuf/v2/proto"
 	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/golang/protobuf/v2/reflect/protoregistry"
-
-	"github.com/golang/protobuf/v2/proto"
 	pluginpb "github.com/golang/protobuf/v2/types/plugin"
 	"github.com/jgeewax/api-linter/lint"
+	"github.com/jgeewax/api-linter/rules"
 )
 
 func main() {

@@ -16,46 +16,13 @@ import (
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
 
-type testMessageVisitor struct {
+type testDescriptorVisiting struct {
 	descSource DescriptorSource
 	t          *testing.T
 }
 
-func (v testMessageVisitor) VisitEnum(f protoreflect.EnumDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testMessageVisitor) VisitEnumValue(f protoreflect.EnumValueDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testMessageVisitor) VisitField(f protoreflect.FieldDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testMessageVisitor) VisitOneof(f protoreflect.OneofDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testMessageVisitor) VisitMessage(f protoreflect.MessageDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testMessageVisitor) VisitExtension(f protoreflect.ExtensionDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-type testServiceVisitor struct {
-	descSource DescriptorSource
-	t          *testing.T
-}
-
-func (v testServiceVisitor) VisitService(f protoreflect.ServiceDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
-}
-
-func (v testServiceVisitor) VisitMethod(f protoreflect.MethodDescriptor) {
-	checkLeadingComment(f, v.descSource, v.t)
+func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
+	checkLeadingComment(d, v.descSource, v.t)
 }
 
 func TestSourceDescriptor(t *testing.T) {
@@ -70,17 +37,7 @@ func TestSourceDescriptor(t *testing.T) {
 		t.Errorf("NewDescriptorSource: %v", err)
 	}
 
-	protovisit.WalkMessage(fd1, protovisit.SimpleMessageVisitor{}, testMessageVisitor{descSource, t})
-
-	protovisit.WalkService(fd1, protovisit.SimpleServiceVisitor{}, testServiceVisitor{descSource, t})
-
-	for i := 0; i < fd1.Enums().Len(); i++ {
-		e := fd1.Enums().Get(i)
-		checkLeadingComment(e, descSource, t)
-		for j := 0; j < e.Values().Len(); j++ {
-			checkLeadingComment(e.Values().Get(i), descSource, t)
-		}
-	}
+	protovisit.WalkDescriptor(fd1, protovisit.SimpleDescriptorVisitor{}, testDescriptorVisiting{descSource, t})
 }
 
 func checkLeadingComment(f protoreflect.Descriptor, descSource DescriptorSource, t *testing.T) {
