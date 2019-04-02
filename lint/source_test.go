@@ -15,29 +15,98 @@ import (
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
+//go:generate protoc --include_source_info --descriptor_set_out=testdata/test_rule_disable.protoset --proto_path=testdata testdata/test_rule_disable.proto
 
 type testDescriptorVisiting struct {
-	descSource DescriptorSource
-	t          *testing.T
+	visit func(d protoreflect.Descriptor)
 }
 
 func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
-	checkLeadingComment(d, v.descSource, v.t)
+	v.visit(d)
 }
 
 func TestSourceDescriptor(t *testing.T) {
-	f1 := readProtoFile("test_source.protoset").GetFile()[0]
-	fd1, err := protodesc.NewFile(f1, nil)
+	proto := readProtoFile("test_source.protoset").GetFile()[0]
+	f, err := protodesc.NewFile(proto, nil)
 	if err != nil {
 		t.Fatalf("protodesc.NewFile() error: %v", err)
 	}
 
-	descSource, err := NewDescriptorSource(f1)
+	s, err := NewDescriptorSource(proto)
 	if err != nil {
 		t.Errorf("NewDescriptorSource: %v", err)
 	}
 
-	protovisit.WalkDescriptor(fd1, protovisit.SimpleDescriptorVisitor{}, testDescriptorVisiting{descSource, t})
+	protovisit.WalkDescriptor(
+		f,
+		protovisit.SimpleDescriptorVisitor{},
+		testDescriptorVisiting{
+			visit: func(d protoreflect.Descriptor) {
+				checkLeadingComment(d, s, t)
+			},
+		},
+	)
+}
+
+func TestIsRuleDisabled(t *testing.T) {
+	proto := readProtoFile("test_rule_disable.protoset").GetFile()[0]
+	f, err := protodesc.NewFile(proto, nil)
+	if err != nil {
+		t.Fatalf("protodesc.NewFile() error: %v", err)
+	}
+
+	s, err := NewDescriptorSource(proto)
+	if err != nil {
+		t.Errorf("NewDescriptorSource: %v", err)
+	}
+
+	tests := []struct {
+		rule  RuleID
+		count int
+	}{
+		{
+			rule:  RuleID{Set: "core", Name: "rule_all_disabled"},
+			count: 2,
+		},
+		{
+			rule:  RuleID{Set: "core", Name: "rule_not_disabled"},
+			count: 0,
+		},
+		{
+			rule:  RuleID{Set: "other", Name: "rule_not_disabled"},
+			count: 0,
+		},
+		{
+			rule:  RuleID{Set: "core", Name: "rule_leading_disabled"},
+			count: 1,
+		},
+		{
+			rule:  RuleID{Set: "core", Name: "rule_trailing_disabled"},
+			count: 1,
+		},
+		{
+			rule:  RuleID{Set: "other", Name: "rule_leading_disabled"},
+			count: 1,
+		},
+	}
+
+	for _, test := range tests {
+		count := 0
+		protovisit.WalkDescriptor(
+			f,
+			protovisit.SimpleDescriptorVisitor{},
+			testDescriptorVisiting{
+				visit: func(d protoreflect.Descriptor) {
+					if s.IsRuleDisabled(test.rule, d) {
+						count++
+					}
+				},
+			},
+		)
+		if count != test.count {
+			t.Errorf("IsRuleDisabled: got %d for %s, but wanted %d", count, test.rule, test.count)
+		}
+	}
 }
 
 func checkLeadingComment(f protoreflect.Descriptor, descSource DescriptorSource, t *testing.T) {

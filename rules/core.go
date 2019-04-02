@@ -4,7 +4,6 @@ package rules
 
 import (
 	"log"
-	"strings"
 
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/jgeewax/api-linter/lint"
@@ -181,33 +180,5 @@ func (v *simpleVisitor) addProblems(problems ...lint.Problem) {
 }
 
 func (v *simpleVisitor) isRuleEnabled(d protoreflect.Descriptor) bool {
-	return isRuleEnabled(v.rule.ID(), d, v.ctx)
-}
-
-func isRuleEnabled(ruleID lint.RuleID, d protoreflect.Descriptor, ctx lint.Context) bool {
-	comments, err := ctx.DescriptorSource().DescriptorComments(d)
-	if err != nil {
-		log.Printf("FindCommentsByDescriptor for '%s' returned error: %v", d.FullName(), err)
-		return true
-	}
-
-	leadingAndInLineComments := []string{comments.LeadingComments, comments.TrailingComments}
-	return !stringsContains(leadingAndInLineComments, ruleDisablingComment(ruleID))
-}
-
-func stringsContains(comments []string, s string) bool {
-	for _, c := range comments {
-		if strings.Contains(c, s) {
-			return true
-		}
-	}
-	return false
-}
-
-func ruleDisablingComment(id lint.RuleID) string {
-	name := id.Set + "." + id.Name
-	if id.Set == "" || id.Set == "core" {
-		name = id.Name
-	}
-	return "(-- api-linter: " + name + "=disabled --)"
+	return !v.ctx.DescriptorSource().IsRuleDisabled(v.rule.ID(), d)
 }
