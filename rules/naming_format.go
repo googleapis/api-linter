@@ -22,27 +22,14 @@ func init() {
 		},
 		&checkers{
 			DescriptorVisitor: protovisit.SimpleDescriptorVisitor{},
-			DescriptorCheck:   checkDescriptor,
+			EnumCheck:         checkEnumNamesUseUpperCamelCase,
+			EnumValueCheck:    checkEnumValueNamesUseUpperSnakeCase,
+			FieldCheck:        checkFieldNamesUseLowerSnakeCase,
+			MessageCheck:      checkMessageNamesUseUpperCamelCase,
+			MethodCheck:       checkMethodNamesUseUpperCamelCase,
+			ServiceCheck:      checkServiceNamesUseUpperCamelCase,
 		},
 	)
-}
-
-func checkDescriptor(d protoreflect.Descriptor, ctx lint.Context) []lint.Problem {
-	switch d.(type) {
-	case protoreflect.EnumDescriptor:
-		return checkEnumNamesUseUpperCamelCase(d.(protoreflect.EnumDescriptor), ctx)
-	case protoreflect.EnumValueDescriptor:
-		return checkEnumValueNamesUseUpperSnakeCase(d.(protoreflect.EnumValueDescriptor), ctx)
-	case protoreflect.FieldDescriptor:
-		return checkFieldNamesUseLowerSnakeCase(d.(protoreflect.FieldDescriptor), ctx)
-	case protoreflect.MessageDescriptor:
-		return checkMessageNamesUseUpperCamelCase(d.(protoreflect.MessageDescriptor), ctx)
-	case protoreflect.MethodDescriptor:
-		return checkMethodNamesUseUpperCamelCase(d.(protoreflect.MethodDescriptor), ctx)
-	case protoreflect.ServiceDescriptor:
-		return checkServiceNamesUseUpperCamelCase(d.(protoreflect.ServiceDescriptor), ctx)
-	}
-	return []lint.Problem{}
 }
 
 func checkFieldNamesUseLowerSnakeCase(f protoreflect.FieldDescriptor, ctx lint.Context) []lint.Problem {

@@ -55,6 +55,28 @@ func (c *checkers) VisitDescriptor(d protoreflect.Descriptor) {
 	if c.DescriptorCheck != nil && c.isRuleEnabled(d) {
 		c.addProblems(c.DescriptorCheck(d, c.ctx)...)
 	}
+
+	switch d.(type) {
+	case protoreflect.EnumDescriptor:
+		c.VisitEnum(d.(protoreflect.EnumDescriptor))
+	case protoreflect.EnumValueDescriptor:
+		c.VisitEnumValue(d.(protoreflect.EnumValueDescriptor))
+	case protoreflect.MessageDescriptor:
+		c.VisitMessage(d.(protoreflect.MessageDescriptor))
+	case protoreflect.MethodDescriptor:
+		c.VisitMethod(d.(protoreflect.MethodDescriptor))
+	case protoreflect.ServiceDescriptor:
+		c.VisitService(d.(protoreflect.ServiceDescriptor))
+	case protoreflect.OneofDescriptor:
+		c.VisitOneof(d.(protoreflect.OneofDescriptor))
+	case protoreflect.FieldDescriptor:
+		f := d.(protoreflect.FieldDescriptor)
+		if f.ExtendedType() != nil {
+			c.VisitExtension(f)
+		} else {
+			c.VisitField(f)
+		}
+	}
 }
 
 func (c *checkers) VisitExtension(e protoreflect.ExtensionDescriptor) {
