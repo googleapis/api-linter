@@ -10,7 +10,7 @@ import (
 func TestRunAll(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
-	req := new(mocks.Request)
+	req := lint.Request{}
 
 	resp1 := lint.Response{
 		Problems: []lint.Problem{
@@ -43,7 +43,7 @@ func TestRunAll(t *testing.T) {
 func TestRunWithConfig(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
-	req := new(mocks.Request)
+	req := lint.Request{}
 
 	resp1 := lint.Response{
 		Problems: []lint.Problem{
