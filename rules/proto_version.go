@@ -27,7 +27,7 @@ func checkProtoSyntax(req lint.Request) (lint.Response, error) {
 				{
 					Message:    "Uses proto3",
 					Suggestion: "proto3",
-					Location:   findSyntaxLocation(req.Context()),
+					Location:   findSyntaxLocation(req.DescriptorSource()),
 				},
 			},
 		}, nil
@@ -37,8 +37,8 @@ func checkProtoSyntax(req lint.Request) (lint.Response, error) {
 
 const syntaxTag = 12
 
-func findSyntaxLocation(ctx lint.Context) lint.Location {
-	if loc, err := ctx.DescriptorSource().SyntaxLocation(); err == nil {
+func findSyntaxLocation(source lint.DescriptorSource) lint.Location {
+	if loc, err := source.SyntaxLocation(); err == nil {
 		return loc
 	}
 	return lint.StartLocation

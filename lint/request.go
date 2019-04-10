@@ -9,6 +9,13 @@ type Request struct {
 	descriptorSource DescriptorSource
 }
 
+func NewRequest(protoFile protoreflect.FileDescriptor, descriptorSource DescriptorSource) Request {
+	return Request{
+		protoFile: protoFile,
+		descriptorSource: descriptorSource,
+	}
+}
+
 // ProtoFile returns a `protoreflect.FileDescriptor`
 //
 // The `protoreflect.FileDescriptor` includes information about a protofile as well as methods to

@@ -32,27 +32,27 @@ func init() {
 	)
 }
 
-func checkFieldNamesUseLowerSnakeCase(f protoreflect.FieldDescriptor, ctx lint.Context) []lint.Problem {
+func checkFieldNamesUseLowerSnakeCase(f protoreflect.FieldDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("field", f, "lower_snake_case", lowerSnakeCase)
 }
 
-func checkEnumNamesUseUpperCamelCase(f protoreflect.EnumDescriptor, ctx lint.Context) []lint.Problem {
+func checkEnumNamesUseUpperCamelCase(f protoreflect.EnumDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("enum", f, "UpperCamelCase", upperCamelCase)
 }
 
-func checkEnumValueNamesUseUpperSnakeCase(f protoreflect.EnumValueDescriptor, ctx lint.Context) []lint.Problem {
+func checkEnumValueNamesUseUpperSnakeCase(f protoreflect.EnumValueDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("enum value", f, "UPPER_SNAKE_CASE", upperSnakeCase)
 }
 
-func checkMethodNamesUseUpperCamelCase(f protoreflect.MethodDescriptor, ctx lint.Context) []lint.Problem {
+func checkMethodNamesUseUpperCamelCase(f protoreflect.MethodDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("method", f, "UpperCamelCase", upperCamelCase)
 }
 
-func checkMessageNamesUseUpperCamelCase(f protoreflect.MessageDescriptor, ctx lint.Context) []lint.Problem {
+func checkMessageNamesUseUpperCamelCase(f protoreflect.MessageDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("message", f, "UpperCamelCase", upperCamelCase)
 }
 
-func checkServiceNamesUseUpperCamelCase(f protoreflect.ServiceDescriptor, ctx lint.Context) []lint.Problem {
+func checkServiceNamesUseUpperCamelCase(f protoreflect.ServiceDescriptor, descriptorSource lint.DescriptorSource) []lint.Problem {
 	return checkNamingFormat("service", f, "UpperCamelCase", upperCamelCase)
 }
 

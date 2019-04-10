@@ -70,30 +70,10 @@ func readLintRequest(r io.Reader) lint.Request {
 		log.Fatalf("Error when converting proto to descriptor: %v", err)
 	}
 
-	ctx := context.Background()
 	source, err := lint.NewDescriptorSource(fd)
 	if err != nil {
-		return lintRequest{
-			protoFile: f,
-			context:   lint.NewContext(ctx),
-		}
+		return lint.NewRequest(f, lint.DescriptorSource{})
 	}
 
-	return lintRequest{
-		protoFile: f,
-		context:   lint.NewContextWithDescriptorSource(ctx, source),
-	}
-}
-
-type lintRequest struct {
-	protoFile protoreflect.FileDescriptor
-	context   lint.Context
-}
-
-func (r lintRequest) ProtoFile() protoreflect.FileDescriptor {
-	return r.protoFile
-}
-
-func (r lintRequest) Context() lint.Context {
-	return r.context
+	return lint.NewRequest(f, source)
 }

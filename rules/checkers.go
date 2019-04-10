@@ -9,15 +9,15 @@ import (
 // checkers contains a collection of check functions for different descriptors and
 // a set of visitors, which can be used to travel in the protobuf file.
 type checkers struct {
-	DescriptorCheck func(protoreflect.Descriptor, lint.Context) []lint.Problem
-	EnumCheck       func(protoreflect.EnumDescriptor, lint.Context) []lint.Problem
-	EnumValueCheck  func(protoreflect.EnumValueDescriptor, lint.Context) []lint.Problem
-	ExtensionCheck  func(protoreflect.ExtensionDescriptor, lint.Context) []lint.Problem
-	FieldCheck      func(protoreflect.FieldDescriptor, lint.Context) []lint.Problem
-	MessageCheck    func(protoreflect.MessageDescriptor, lint.Context) []lint.Problem
-	MethodCheck     func(protoreflect.MethodDescriptor, lint.Context) []lint.Problem
-	OneofCheck      func(protoreflect.OneofDescriptor, lint.Context) []lint.Problem
-	ServiceCheck    func(protoreflect.ServiceDescriptor, lint.Context) []lint.Problem
+	DescriptorCheck func(protoreflect.Descriptor, lint.DescriptorSource) []lint.Problem
+	EnumCheck       func(protoreflect.EnumDescriptor, lint.DescriptorSource) []lint.Problem
+	EnumValueCheck  func(protoreflect.EnumValueDescriptor, lint.DescriptorSource) []lint.Problem
+	ExtensionCheck  func(protoreflect.ExtensionDescriptor, lint.DescriptorSource) []lint.Problem
+	FieldCheck      func(protoreflect.FieldDescriptor, lint.DescriptorSource) []lint.Problem
+	MessageCheck    func(protoreflect.MessageDescriptor, lint.DescriptorSource) []lint.Problem
+	MethodCheck     func(protoreflect.MethodDescriptor, lint.DescriptorSource) []lint.Problem
+	OneofCheck      func(protoreflect.OneofDescriptor, lint.DescriptorSource) []lint.Problem
+	ServiceCheck    func(protoreflect.ServiceDescriptor, lint.DescriptorSource) []lint.Problem
 
 	DescriptorVisitor protovisit.DescriptorVisitor
 	EnumVisitor       protovisit.EnumVisitor
@@ -26,12 +26,12 @@ type checkers struct {
 	ServiceVisitor    protovisit.ServiceVisitor
 
 	rule     lint.Rule
-	ctx      lint.Context
+	descriptorSource lint.DescriptorSource
 	problems []lint.Problem
 }
 
 func (c *checkers) Lint(rule lint.Rule, req lint.Request) (lint.Response, error) {
-	c.ctx = req.Context()
+	c.descriptorSource = req.DescriptorSource()
 	f := req.ProtoFile()
 	if c.DescriptorVisitor != nil {
 		protovisit.WalkDescriptor(f, c.DescriptorVisitor, c)
@@ -53,7 +53,7 @@ func (c *checkers) Lint(rule lint.Rule, req lint.Request) (lint.Response, error)
 
 func (c *checkers) VisitDescriptor(d protoreflect.Descriptor) {
 	if c.DescriptorCheck != nil && c.isRuleEnabled(d) {
-		c.addProblems(c.DescriptorCheck(d, c.ctx)...)
+		c.addProblems(c.DescriptorCheck(d, c.descriptorSource)...)
 	}
 
 	switch d.(type) {
@@ -81,49 +81,49 @@ func (c *checkers) VisitDescriptor(d protoreflect.Descriptor) {
 
 func (c *checkers) VisitExtension(e protoreflect.ExtensionDescriptor) {
 	if c.ExtensionCheck != nil && c.isRuleEnabled(e) {
-		c.addProblems(c.ExtensionCheck(e, c.ctx)...)
+		c.addProblems(c.ExtensionCheck(e, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitEnum(e protoreflect.EnumDescriptor) {
 	if c.EnumCheck != nil && c.isRuleEnabled(e) {
-		c.addProblems(c.EnumCheck(e, c.ctx)...)
+		c.addProblems(c.EnumCheck(e, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitEnumValue(ev protoreflect.EnumValueDescriptor) {
 	if c.EnumValueCheck != nil && c.isRuleEnabled(ev) {
-		c.addProblems(c.EnumValueCheck(ev, c.ctx)...)
+		c.addProblems(c.EnumValueCheck(ev, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitField(f protoreflect.FieldDescriptor) {
 	if c.FieldCheck != nil && c.isRuleEnabled(f) {
-		c.addProblems(c.FieldCheck(f, c.ctx)...)
+		c.addProblems(c.FieldCheck(f, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitMessage(m protoreflect.MessageDescriptor) {
 	if c.MessageCheck != nil && c.isRuleEnabled(m) {
-		c.addProblems(c.MessageCheck(m, c.ctx)...)
+		c.addProblems(c.MessageCheck(m, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitMethod(m protoreflect.MethodDescriptor) {
 	if c.MethodCheck != nil && c.isRuleEnabled(m) {
-		c.addProblems(c.MethodCheck(m, c.ctx)...)
+		c.addProblems(c.MethodCheck(m, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitOneof(o protoreflect.OneofDescriptor) {
 	if c.OneofCheck != nil && c.isRuleEnabled(o) {
-		c.addProblems(c.OneofCheck(o, c.ctx)...)
+		c.addProblems(c.OneofCheck(o, c.descriptorSource)...)
 	}
 }
 
 func (c *checkers) VisitService(s protoreflect.ServiceDescriptor) {
 	if c.ServiceCheck != nil && c.isRuleEnabled(s) {
-		c.addProblems(c.ServiceCheck(s, c.ctx)...)
+		c.addProblems(c.ServiceCheck(s, c.descriptorSource)...)
 	}
 }
 
@@ -132,5 +132,5 @@ func (c *checkers) addProblems(problems ...lint.Problem) {
 }
 
 func (c *checkers) isRuleEnabled(d protoreflect.Descriptor) bool {
-	return !c.ctx.DescriptorSource().IsRuleDisabled(c.rule.ID(), d)
+	return !c.descriptorSource.IsRuleDisabled(c.rule.ID(), d)
 }
