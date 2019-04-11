@@ -4,14 +4,13 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/golang/protobuf/v2/proto"
 	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
-	"github.com/jgeewax/api-linter/protovisit"
+	"github.com/google/go-cmp/cmp"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
@@ -25,102 +24,145 @@ func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
 	v.visit(d)
 }
 
-func TestSourceDescriptor(t *testing.T) {
-	proto := readProtoFile("test_source.protoset").GetFile()[0]
-	f, err := protodesc.NewFile(proto, nil)
-	if err != nil {
-		t.Fatalf("protodesc.NewFile() error: %v", err)
-	}
-
-	s, err := NewDescriptorSource(proto)
-	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
-	}
-
-	protovisit.WalkDescriptor(
-		f,
-		protovisit.SimpleDescriptorVisitor{},
-		testDescriptorVisiting{
-			visit: func(d protoreflect.Descriptor) {
-				checkLeadingComment(d, s, t)
-			},
-		},
-	)
-}
-
-func TestIsRuleDisabled(t *testing.T) {
-	proto := readProtoFile("test_rule_disable.protoset").GetFile()[0]
-	f, err := protodesc.NewFile(proto, nil)
-	if err != nil {
-		t.Fatalf("protodesc.NewFile() error: %v", err)
-	}
-
-	s, err := NewDescriptorSource(proto)
+func TestDescriptorLocation(t *testing.T) {
+	fileDesc, proto := readProtoFile("test_source.protoset")
+	descSource, err := NewDescriptorSource(proto)
 	if err != nil {
 		t.Errorf("NewDescriptorSource: %v", err)
 	}
 
 	tests := []struct {
-		rule  RuleID
-		count int
+		descriptor protoreflect.Descriptor
+		want       Location
 	}{
 		{
-			rule:  RuleID{Set: "core", Name: "rule_all_disabled"},
-			count: 2,
+			descriptor: fileDesc.Messages().Get(0),
+			want: Location{
+				Start: Position{
+					Line: 7, Column: 0,
+				},
+				End: Position{
+					Line: 59, Column: 1,
+				},
+			},
 		},
 		{
-			rule:  RuleID{Set: "core", Name: "rule_not_disabled"},
-			count: 0,
+			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
+			want: Location{
+				Start: Position{
+					Line: 44, Column: 2,
+				},
+				End: Position{
+					Line: 49, Column: 3,
+				},
+			},
 		},
 		{
-			rule:  RuleID{Set: "other", Name: "rule_not_disabled"},
-			count: 0,
-		},
-		{
-			rule:  RuleID{Set: "core", Name: "rule_leading_disabled"},
-			count: 1,
-		},
-		{
-			rule:  RuleID{Set: "core", Name: "rule_trailing_disabled"},
-			count: 1,
-		},
-		{
-			rule:  RuleID{Set: "other", Name: "rule_leading_disabled"},
-			count: 1,
+			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
+			want: Location{
+				Start: Position{
+					Line: 41, Column: 2,
+				},
+				End: Position{
+					Line: 41, Column: 41,
+				},
+			},
 		},
 	}
 
 	for _, test := range tests {
-		count := 0
-		protovisit.WalkDescriptor(
-			f,
-			protovisit.SimpleDescriptorVisitor{},
-			testDescriptorVisiting{
-				visit: func(d protoreflect.Descriptor) {
-					if s.IsRuleDisabled(test.rule, d) {
-						count++
-					}
-				},
-			},
-		)
-		if count != test.count {
-			t.Errorf("IsRuleDisabled: got %d for %s, but wanted %d", count, test.rule, test.count)
+		got, err := descSource.DescriptorLocation(test.descriptor)
+		if err != nil {
+			t.Errorf("DescriptorLocation(%s) error: %s", test.descriptor.FullName(), err)
+		}
+		if diff := cmp.Diff(test.want, got); diff != "" {
+			t.Errorf("DescriptorLocation(%s) mismatch (-want +got):\n%s", test.descriptor.FullName(), diff)
 		}
 	}
 }
 
-func checkLeadingComment(f protoreflect.Descriptor, descSource DescriptorSource, t *testing.T) {
-	comments, err := descSource.DescriptorComments(f)
+func TestDescriptorComments(t *testing.T) {
+	fileDesc, proto := readProtoFile("test_source.protoset")
+	descSource, err := NewDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("DescriptorComments for `%s`: %v", f.FullName(), err)
+		t.Errorf("NewDescriptorSource: %v", err)
 	}
-	leadingComment := strings.TrimSpace(comments.LeadingComments)
-	if leadingComment != string(f.Name()) {
-		t.Errorf("DescriptorComments for `%s`: got '%s', but wanted '%s'", f.FullName(), leadingComment, f.Name())
+
+	tests := []struct {
+		descriptor protoreflect.Descriptor
+		want       Comments
+	}{
+		{
+			descriptor: fileDesc.Messages().Get(0),
+			want: Comments{
+				LeadingComments: " Outer\n",
+			},
+		},
+		{
+			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
+			want: Comments{
+				LeadingComments: " NestedEnum\n",
+			},
+		},
+		{
+			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
+			want: Comments{
+				LeadingComments: " outer_middle_field\n",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		got, err := descSource.DescriptorComments(test.descriptor)
+		if err != nil {
+			t.Errorf("DescriptorComments(%s) error: %s", test.descriptor.FullName(), err)
+		}
+		if diff := cmp.Diff(test.want, got); diff != "" {
+			t.Errorf("DescriptorComments(%s) mismatch (-want +got):\n%s", test.descriptor.FullName(), diff)
+		}
 	}
 }
 
-func readProtoFile(fileName string) *descriptorpb.FileDescriptorSet {
+func TestSyntaxLocation(t *testing.T) {
+	_, proto := readProtoFile("test_source.protoset")
+	descSource, err := NewDescriptorSource(proto)
+	if err != nil {
+		t.Errorf("NewDescriptorSource: %v", err)
+	}
+
+	want := Location{
+		Start: Position{Line: 2, Column: 0},
+		End:   Position{Line: 2, Column: 18},
+	}
+	got, err := descSource.SyntaxLocation()
+	if err != nil {
+		t.Errorf("SyntaxLocation() error: %s", err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("SyntaxLocation() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestSyntaxComments(t *testing.T) {
+	_, proto := readProtoFile("test_source.protoset")
+	descSource, err := NewDescriptorSource(proto)
+	if err != nil {
+		t.Errorf("NewDescriptorSource: %v", err)
+	}
+
+	want := Comments{
+		LeadingDetachedComments: []string{" DO NOT EDIT -- This is for `source_test.go`.\n"},
+	}
+	got, err := descSource.SyntaxComments()
+	if err != nil {
+		t.Errorf("SyntaxComments() error: %s", err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("SyntaxComments() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func readProtoFile(fileName string) (protoreflect.FileDescriptor, *descriptorpb.FileDescriptorProto) {
 	path := filepath.Join("testdata", fileName)
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -130,5 +172,10 @@ func readProtoFile(fileName string) *descriptorpb.FileDescriptorSet {
 	if err := proto.Unmarshal(bs, protoset); err != nil {
 		log.Fatalf("Unable to parse %T from %s: %v", protoset, path, err)
 	}
-	return protoset
+	proto := protoset.GetFile()[0]
+	f, err := protodesc.NewFile(proto, nil)
+	if err != nil {
+		log.Fatalf("protodesc.NewFile() error: %v", err)
+	}
+	return f, proto
 }

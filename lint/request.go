@@ -3,9 +3,15 @@ package lint
 import "github.com/golang/protobuf/v2/reflect/protoreflect"
 
 // Request defines input data for a rule to perform linting.
-type Request interface {
-	// ProtoFile returns a `FileDescriptor` when the rule's `FileTypes`
-	// contains `ProtoFile`.
-	ProtoFile() protoreflect.FileDescriptor
-	Context() Context
+type Request struct {
+	protoFile  protoreflect.FileDescriptor
+	descSource DescriptorSource
+}
+
+// NewProtoFileRequest creates a linting request for a .proto file.
+func NewProtoFileRequest(protoFile protoreflect.FileDescriptor, descSource DescriptorSource) Request {
+	return Request{
+		protoFile:  protoFile,
+		descSource: descSource,
+	}
 }
