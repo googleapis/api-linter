@@ -22,8 +22,10 @@ func (p Position) IsValid() bool {
 	return p.Line > 0 && p.Column > 0
 }
 
-// StartLocation marks the very start position in a file.
-var StartLocation = Location{
-	Start: Position{1, 1},
-	End:   Position{1, 1},
+// `FileStartLocation` returns a `Location` representing the starting point of a file
+func FileStartLocation() Location {
+	return Location{
+		Start: Position{1, 1},
+		End:   Position{1, 1},
+	}
 }
