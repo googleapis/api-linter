@@ -1,0 +1,59 @@
+syntax = "proto2";
+
+package google.apis.tools.analyzer.testprotos;
+
+message Outer {
+  message Middle {
+    message Inner {
+      optional string outer_middle_inner_field_one = 1;
+      optional string outer_middle_inner_field_two = 2;
+    }
+
+    enum NestedNestedEnum {
+      UNKNOWN = 0;
+      BAR = 1;
+    }
+
+    optional Inner inner = 1;
+
+    oneof outer_middle_oneof_field {
+      string outer_middle_oneof_field_name = 4;
+      Inner outer_middle_oneof_inner = 5;
+    }
+  }
+
+  optional string outer_field_name = 1;
+  optional Middle outer_middle_field = 2;
+
+  enum NestedEnum {
+    UNKNOWN = 0;
+    FOO = 1;
+  }
+  optional NestedEnum outer_nested_enum = 3;
+  oneof outer_oneof_field {
+    string outer_oneof_field_name = 4;
+     Middle outer_oneof_field_middle = 5;
+  }
+}
+
+// Test that RPC services work.
+message FooRequest  {}
+message FooResponse {}
+
+message BarRequest {}
+message BarResponse{}
+
+service TestService {
+  // Foo method
+  rpc Foo(FooRequest) returns (FooResponse);
+  // Bar method
+  rpc Bar(BarRequest) returns (BarResponse);
+}
+
+enum TopEnum1 {
+  FOO = 1;
+}
+
+enum TopEnum2 {
+  BAR = 2;
+}
