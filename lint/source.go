@@ -10,10 +10,8 @@ import (
 )
 
 var (
-	// ErrLocationNotFound is the returned error when a location is not found.
-	ErrLocationNotFound = errors.New("source: location not found")
-	// ErrCommentsNotFound is the returned error when a comments is not found.
-	ErrCommentsNotFound = errors.New("source: comments not found")
+	// ErrPathNotFound is the returned error when a path is not found.
+	ErrPathNotFound = errors.New("source: path not found")
 	// ErrSourceInfoNotAvailable is the returned error when creating a source
 	// but the source information is not available.
 	ErrSourceInfoNotAvailable = errors.New("source: source information is not available")
@@ -81,11 +79,11 @@ func NewDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource,
 }
 
 // findLocationByPath returns a `Location` if found in the map,
-// and (nil, ErrLocationNotFound) if not found.
+// and (nil, ErrPathNotFound) if not found.
 func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
-		return Location{}, ErrLocationNotFound
+		return Location{}, ErrPathNotFound
 	}
 	return newLocationFromSpan(l.GetSpan()), nil
 }
@@ -95,7 +93,7 @@ func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
-		return Comments{}, ErrCommentsNotFound
+		return Comments{}, ErrPathNotFound
 	}
 	return Comments{
 		LeadingComments:         l.GetLeadingComments(),
@@ -145,7 +143,7 @@ func (s DescriptorSource) SyntaxComments() (Comments, error) {
 }
 
 // DescriptorLocation returns a `Location` for the given descriptor.
-// If not found, returns (nil, ErrLocationNotFound).
+// If not found, returns (nil, ErrPathNotFound).
 func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Location, error) {
 	return s.findLocationByPath(getPath(d))
 }
