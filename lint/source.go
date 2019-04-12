@@ -2,6 +2,7 @@ package lint
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -17,9 +18,6 @@ var (
 	// ErrSourceInfoNotAvailable is the returned error when creating a source
 	// but the source information is not available.
 	ErrSourceInfoNotAvailable = errors.New("source: source information is not available")
-	// ErrInvalidSpan is the returned error when a span is provided that cannot be mapped to
-	// a location (i.e. it does not have either 3 or 4 elmeents)
-	errInvalidSpan = errors.New("source: invalid span provided when creating Location")
 )
 
 // Comments describes a collection of comments associate with an element,
@@ -134,7 +132,7 @@ func newLocationFromSpan(span []int32) (Location, error) {
 		}, nil
 	}
 
-	return Location{}, errInvalidSpan
+	return Location{}, fmt.Errorf("source: %v is not a valid span to create a Location", span)
 }
 
 // SyntaxLocation returns the location of the syntax definition.
