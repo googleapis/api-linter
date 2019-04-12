@@ -5,7 +5,7 @@ type Response struct {
 	Problems []Problem
 }
 
-// mrge merges another response.
+// merge merges another response.
 func (resp *Response) merge(other Response) {
 	resp.Problems = append(resp.Problems, other.Problems...)
 }

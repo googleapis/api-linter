@@ -11,7 +11,8 @@ func (l Location) IsValid() bool {
 	return l.Start.IsValid() && l.End.IsValid()
 }
 
-// Position describes a one-based position in a source code file.
+// Position describes a zero-based position in a source code file.
+// Typically you will want to add 1 to each before displaying to a user.
 type Position struct {
 	Line, Column int
 }
@@ -19,13 +20,5 @@ type Position struct {
 // IsValid checks if the position struct is constructed properly and
 // returns true if it's valid.
 func (p Position) IsValid() bool {
-	return p.Line > 0 && p.Column > 0
-}
-
-// `FileStartLocation` returns a `Location` representing the starting point of a file
-func FileStartLocation() Location {
-	return Location{
-		Start: Position{1, 1},
-		End:   Position{1, 1},
-	}
+	return p.Line >= 0 && p.Column >= 0
 }
