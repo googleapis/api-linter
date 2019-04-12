@@ -26,9 +26,9 @@ func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
 
 func TestDescriptorLocation(t *testing.T) {
 	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	tests := []struct {
@@ -83,9 +83,9 @@ func TestDescriptorLocation(t *testing.T) {
 
 func TestDescriptorComments(t *testing.T) {
 	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	tests := []struct {
@@ -125,9 +125,9 @@ func TestDescriptorComments(t *testing.T) {
 
 func TestSyntaxLocation(t *testing.T) {
 	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	want := Location{
@@ -145,9 +145,9 @@ func TestSyntaxLocation(t *testing.T) {
 
 func TestSyntaxComments(t *testing.T) {
 	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	want := Comments{
