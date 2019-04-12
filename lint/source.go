@@ -17,6 +17,9 @@ var (
 	// ErrSourceInfoNotAvailable is the returned error when creating a source
 	// but the source information is not available.
 	ErrSourceInfoNotAvailable = errors.New("source: source information is not available")
+	// ErrInvalidSpan is the returned error when a span is provided that cannot be mapped to
+	// a location (i.e. it does not have either 3 or 4 elmeents)
+	ErrInvalidSpan = errors.New("source: invalid span")
 )
 
 // Comments describes a collection of comments associate with an element,
@@ -87,7 +90,7 @@ func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	if l == nil {
 		return Location{}, ErrLocationNotFound
 	}
-	return newLocationFromSpan(l.GetSpan()), nil
+	return newLocationFromSpan(l.GetSpan())
 }
 
 // findCommentsByPath returns a `Comments` for the path. If not found, returns
@@ -104,7 +107,7 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	}, nil
 }
 
-func newLocationFromSpan(span []int32) Location {
+func newLocationFromSpan(span []int32) (Location, error) {
 	if len(span) == 4 {
 		return Location{
 			Start: Position{
@@ -115,7 +118,7 @@ func newLocationFromSpan(span []int32) Location {
 				Line:   int(span[2]),
 				Column: int(span[3]),
 			},
-		}
+		}, nil
 	}
 
 	if len(span) == 3 {
@@ -128,10 +131,10 @@ func newLocationFromSpan(span []int32) Location {
 				Line:   int(span[0]),
 				Column: int(span[2]),
 			},
-		}
+		}, nil
 	}
 
-	return Location{}
+	return Location{}, ErrInvalidSpan
 }
 
 // SyntaxLocation returns the location of the syntax definition.
