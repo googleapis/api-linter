@@ -2,6 +2,7 @@ package lint
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -85,7 +86,7 @@ func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	if l == nil {
 		return Location{}, ErrPathNotFound
 	}
-	return newLocationFromSpan(l.GetSpan()), nil
+	return newLocationFromSpan(l.GetSpan())
 }
 
 // findCommentsByPath returns a `Comments` for the path. If not found, returns
@@ -102,7 +103,7 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	}, nil
 }
 
-func newLocationFromSpan(span []int32) Location {
+func newLocationFromSpan(span []int32) (Location, error) {
 	if len(span) == 4 {
 		return Location{
 			Start: Position{
@@ -113,7 +114,7 @@ func newLocationFromSpan(span []int32) Location {
 				Line:   int(span[2]),
 				Column: int(span[3]),
 			},
-		}
+		}, nil
 	}
 
 	if len(span) == 3 {
@@ -126,10 +127,10 @@ func newLocationFromSpan(span []int32) Location {
 				Line:   int(span[0]),
 				Column: int(span[2]),
 			},
-		}
+		}, nil
 	}
 
-	return Location{}
+	return Location{}, fmt.Errorf("source: %v is not a valid span to create a Location", span)
 }
 
 // SyntaxLocation returns the location of the syntax definition.
