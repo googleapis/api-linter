@@ -29,7 +29,7 @@ func NewProtoFileRequest(fd *descriptorpb.FileDescriptorProto) (Request, error) 
 	if err != nil {
 		return Request{}, err
 	}
-	s, err := NewDescriptorSource(fd)
+	s, err := newDescriptorSource(fd)
 	return Request{
 		fileDesc:   f,
 		descSource: s,

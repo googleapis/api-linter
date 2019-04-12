@@ -34,7 +34,7 @@ const sep = ","
 // cannot be map keys.
 // Representation: integers separated by commas. No spaces.
 // Example: [4, 3, 2, 7] --> "4,3,2,7"
-// See descriptor.proto for more explantion of semantics.
+// See descriptor.proto for more explanation of semantics.
 type locPath string
 
 // newLocPath return a locPath from a list of index.
@@ -69,9 +69,9 @@ type DescriptorSource struct {
 	m map[locPath]*descriptorpb.SourceCodeInfo_Location
 }
 
-// NewDescriptorSource creates a new DescriptorSource from a FileDescriptorProto.
+// newDescriptorSource creates a new DescriptorSource from a FileDescriptorProto.
 // If source code information is not available, returns (nil, ErrSourceInfoNotAvailable).
-func NewDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource, error) {
+func newDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource, error) {
 	if f.GetSourceCodeInfo() == nil {
 		return DescriptorSource{}, ErrSourceInfoNotAvailable
 	}

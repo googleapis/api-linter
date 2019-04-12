@@ -26,9 +26,9 @@ func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
 
 func TestDescriptorLocation(t *testing.T) {
 	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	tests := []struct {
@@ -36,13 +36,24 @@ func TestDescriptorLocation(t *testing.T) {
 		want       Location
 	}{
 		{
-			descriptor: fileDesc.Messages().Get(0),
+			descriptor: fileDesc.Messages().Get(0), // A top level message.
 			want: Location{
 				Start: Position{
 					Line: 7, Column: 0,
 				},
 				End: Position{
 					Line: 59, Column: 1,
+				},
+			},
+		},
+		{
+			descriptor: fileDesc.Messages().Get(0).Messages().Get(0), // A nested message.
+			want: Location{
+				Start: Position{
+					Line: 9, Column: 2,
+				},
+				End: Position{
+					Line: 36, Column: 3,
 				},
 			},
 		},
@@ -58,6 +69,17 @@ func TestDescriptorLocation(t *testing.T) {
 			},
 		},
 		{
+			descriptor: fileDesc.Messages().Get(0).Enums().Get(0).Values().Get(1),
+			want: Location{
+				Start: Position{
+					Line: 48, Column: 4,
+				},
+				End: Position{
+					Line: 48, Column: 12,
+				},
+			},
+		},
+		{
 			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
 			want: Location{
 				Start: Position{
@@ -65,6 +87,39 @@ func TestDescriptorLocation(t *testing.T) {
 				},
 				End: Position{
 					Line: 41, Column: 41,
+				},
+			},
+		},
+		{
+			descriptor: fileDesc.Messages().Get(0).Oneofs().Get(0),
+			want: Location{
+				Start: Position{
+					Line: 53, Column: 2,
+				},
+				End: Position{
+					Line: 58, Column: 3,
+				},
+			},
+		},
+		{
+			descriptor: fileDesc.Services().Get(0),
+			want: Location{
+				Start: Position{
+					Line: 72, Column: 0,
+				},
+				End: Position{
+					Line: 77, Column: 1,
+				},
+			},
+		},
+		{
+			descriptor: fileDesc.Services().Get(0).Methods().Get(0),
+			want: Location{
+				Start: Position{
+					Line: 74, Column: 2,
+				},
+				End: Position{
+					Line: 74, Column: 44,
 				},
 			},
 		},
@@ -83,9 +138,9 @@ func TestDescriptorLocation(t *testing.T) {
 
 func TestDescriptorComments(t *testing.T) {
 	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	tests := []struct {
@@ -125,9 +180,9 @@ func TestDescriptorComments(t *testing.T) {
 
 func TestSyntaxLocation(t *testing.T) {
 	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	want := Location{
@@ -145,9 +200,9 @@ func TestSyntaxLocation(t *testing.T) {
 
 func TestSyntaxComments(t *testing.T) {
 	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := NewDescriptorSource(proto)
+	descSource, err := newDescriptorSource(proto)
 	if err != nil {
-		t.Errorf("NewDescriptorSource: %v", err)
+		t.Errorf("newDescriptorSource: %v", err)
 	}
 
 	want := Comments{
