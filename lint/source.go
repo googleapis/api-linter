@@ -12,8 +12,6 @@ import (
 var (
 	// ErrLocationNotFound is the returned error when a location is not found.
 	ErrLocationNotFound = errors.New("source: location not found")
-	// ErrCommentsNotFound is the returned error when a comments is not found.
-	ErrCommentsNotFound = errors.New("source: comments not found")
 	// ErrSourceInfoNotAvailable is the returned error when creating a source
 	// but the source information is not available.
 	ErrSourceInfoNotAvailable = errors.New("source: source information is not available")
@@ -95,7 +93,7 @@ func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
-		return Comments{}, ErrCommentsNotFound
+		return Comments{}, ErrLocationNotFound
 	}
 	return Comments{
 		LeadingComments:         l.GetLeadingComments(),
