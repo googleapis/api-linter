@@ -17,6 +17,7 @@ import (
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/walk_file_test.protoset --proto_path=testdata testdata/walk_file_test.proto
 //go:generate mockery -name Consumer
+
 func TestWalkDescriptor(t *testing.T) {
 	consumer := new(mocks.Consumer)
 	f := readProtoFile("walk_file_test.protoset")
@@ -24,7 +25,6 @@ func TestWalkDescriptor(t *testing.T) {
 	// 15 = 1 file + 4 messages + 3 fields + 2 enums + 2 enum values + 1 oneof + 1 service + 1 method
 	numDescriptors := 15
 	consumer.On("Consume", mock.Anything).Return(nil).Times(numDescriptors)
-	consumer.On("Defer").Times(numDescriptors)
 
 	WalkFile(f, consumer)
 	consumer.AssertExpectations(t)
@@ -38,7 +38,6 @@ func TestWalkDescriptorWithErr(t *testing.T) {
 	// just the file descriptor itself.
 	numDescriptors := 1
 	consumer.On("Consume", mock.Anything).Return(errStop).Times(numDescriptors)
-	consumer.On("Defer").Times(numDescriptors)
 
 	WalkFile(f, consumer)
 	consumer.AssertExpectations(t)

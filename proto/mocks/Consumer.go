@@ -24,8 +24,3 @@ func (_m *Consumer) Consume(_a0 protoreflect.Descriptor) error {
 
 	return r0
 }
-
-// Defer provides a mock function with given fields:
-func (_m *Consumer) Defer() {
-	_m.Called()
-}

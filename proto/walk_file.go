@@ -5,11 +5,9 @@ import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
 
-// Consumer represents an operation that consumes a single Descriptor
-// and a defer function that will be called after consuming.
+// Consumer represents an operation that consumes a single Descriptor.
 type Consumer interface {
 	Consume(protoreflect.Descriptor) error
-	Defer()
 }
 
 // WalkFile travels in the FileDescriptor and applies the Consumer
@@ -22,7 +20,6 @@ func WalkFile(f protoreflect.FileDescriptor, c Consumer) error {
 }
 
 func walkDescriptor(d protoreflect.Descriptor, c Consumer) error {
-	defer c.Defer()
 	if err := c.Consume(d); err != nil {
 		return err
 	}
