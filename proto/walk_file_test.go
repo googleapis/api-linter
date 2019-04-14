@@ -33,7 +33,7 @@ func TestWalkDescriptor(t *testing.T) {
 	}{
 		{
 			descriptor: f,
-			num:        18, // 15 = 1 file + 5 messages + 3 fields + 2 enums + 2 enum values + 1 oneof + 1 service + 1 method + 2 extensions.
+			num:        18, // 18 = 1 file + 5 messages + 3 fields + 2 enums + 2 enum values + 1 oneof + 1 service + 1 method + 2 extensions.
 		},
 		{
 			descriptor: f.Enums().Get(0),
