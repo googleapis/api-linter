@@ -11,36 +11,71 @@ import (
 	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
-	"github.com/jgeewax/api-linter/proto/mocks"
-	"github.com/stretchr/testify/mock"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/walk_file_test.protoset --proto_path=testdata testdata/walk_file_test.proto
-//go:generate mockery -name Consumer
+
+type mockConsumer struct {
+	count int
+	err   error
+}
+
+func (m *mockConsumer) Consume(d protoreflect.Descriptor) error {
+	m.count++
+	return m.err
+}
 
 func TestWalkDescriptor(t *testing.T) {
-	consumer := new(mocks.Consumer)
 	f := readProtoFile("walk_file_test.protoset")
+	tests := []struct {
+		descriptor protoreflect.Descriptor
+		num        int
+	}{
+		{
+			descriptor: f,
+			num:        18, // 15 = 1 file + 5 messages + 3 fields + 2 enums + 2 enum values + 1 oneof + 1 service + 1 method + 2 extensions.
+		},
+		{
+			descriptor: f.Enums().Get(0),
+			num:        2, // 2 = 1 enum + 1 value
+		},
+		{
+			descriptor: f.Messages().Get(0),
+			num:        8, // 8 = 2 messages + 1 enum + 1 value + 1 oneof + 3 fields
+		},
+		{
+			descriptor: f.Services().Get(0),
+			num:        2, // 2 = 1 service + 1 method
+		},
+		{
+			descriptor: f.Messages().Get(0).Fields().Get(0),
+			num:        1, // 1 = 1 field
+		},
+		{
+			descriptor: f.Messages().Get(0).Oneofs().Get(0),
+			num:        1, // 1 = 1 oneof
+		},
+	}
+	for _, test := range tests {
+		consumer := new(mockConsumer)
 
-	// 15 = 1 file + 4 messages + 3 fields + 2 enums + 2 enum values + 1 oneof + 1 service + 1 method
-	numDescriptors := 15
-	consumer.On("Consume", mock.Anything).Return(nil).Times(numDescriptors)
-
-	WalkFile(f, consumer)
-	consumer.AssertExpectations(t)
+		Walk(test.descriptor, consumer)
+		if consumer.count != test.num {
+			t.Errorf("Walk(%s): Got %d desriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
+		}
+	}
 }
 
 func TestWalkDescriptorWithErr(t *testing.T) {
-	consumer := new(mocks.Consumer)
+	consumer := &mockConsumer{
+		err: errors.New("stop"),
+	}
 	f := readProtoFile("walk_file_test.protoset")
-	errStop := errors.New("stop")
 
-	// just the file descriptor itself.
-	numDescriptors := 1
-	consumer.On("Consume", mock.Anything).Return(errStop).Times(numDescriptors)
-
-	WalkFile(f, consumer)
-	consumer.AssertExpectations(t)
+	Walk(f, consumer)
+	if consumer.count != 1 {
+		t.Errorf("Walk(%s) with error: got %d descriptors, but wanted 1", f.FullName(), consumer.count)
+	}
 }
 
 func readProtoFile(fileName string) protoreflect.FileDescriptor {

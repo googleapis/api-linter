@@ -15,6 +15,18 @@ message Outer {
   oneof outer_oneof_field {
     string outer_oneof_field_name = 3;
   }
+
+  extensions 100 to 199;
+}
+
+message Outer2 {
+  extend Outer {
+    optional string outer_extended_field_2 = 151;
+  }
+}
+
+extend Outer {
+  optional string outer_extended_field = 150;
 }
 
 message FooRequest  {}

@@ -10,13 +10,13 @@ type Consumer interface {
 	Consume(protoreflect.Descriptor) error
 }
 
-// WalkFile travels in the FileDescriptor and applies the Consumer
-// on every encountered Descriptor, including the FileDescriptor itself,
-// until EOF or an error returned by the Consumer.
-//
-// Note: the traversal always starts with a descriptor followed by the nested types.
-func WalkFile(f protoreflect.FileDescriptor, c Consumer) error {
-	return walkDescriptor(f, c)
+// Walk travels in a Descriptor, such as FileDescriptor, MessageDescriptor, etc.
+// The travel will continue to the nested types. For example, starting from a
+// FileDescriptor, the visiting will continue to the nested Enum-, Extension-,
+// Message-, and ServiceDescriptors. It will apply a Consumer to each encountered
+// Descriptor until EOF or an error returned by the Consumer.
+func Walk(d protoreflect.Descriptor, c Consumer) error {
+	return walkDescriptor(d, c)
 }
 
 func walkDescriptor(d protoreflect.Descriptor, c Consumer) error {
@@ -56,7 +56,7 @@ func walkDescriptor(d protoreflect.Descriptor, c Consumer) error {
 			}
 		}
 		for i := 0; i < m.Extensions().Len(); i++ {
-			if err := walkDescriptor(m.Enums().Get(i), c); err != nil {
+			if err := walkDescriptor(m.Extensions().Get(i), c); err != nil {
 				return err
 			}
 		}
