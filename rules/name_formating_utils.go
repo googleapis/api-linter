@@ -27,7 +27,7 @@ func checkNameFormat(desc protoreflect.Descriptor) []lint.Problem {
 			},
 		}
 	}
-	return []lint.Problem{}
+	return nil
 }
 
 func getNameFormat(desc protoreflect.Descriptor) nameFormat {
