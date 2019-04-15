@@ -1,91 +1,87 @@
-// Package proto contains helper functions for visiting a .proto file.
+// Package proto contains helper functions for visiting a .proto fildesc.
 package proto
 
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
 
-// Consumer represents an operation that consumes a single Descriptor.
-type Consumer interface {
-	Consume(protoreflect.Descriptor) error
+// DescriptorConsumer represents an operation that consumes a single Descriptor.
+type DescriptorConsumer interface {
+	ConsumeDescriptor(protoreflect.Descriptor) error
 }
 
-// Walk travels in a Descriptor, such as FileDescriptor, MessageDescriptor, etc.
+// WalkDescriptor travels in a Descriptor, such as FileDescriptor, MessageDescriptor, etc.
 // The travel will continue to the nested types. For example, starting from a
 // FileDescriptor, the visiting will continue to the nested Enum-, Extension-,
-// Message-, and ServiceDescriptors. It will apply a Consumer to each encountered
-// Descriptor until EOF or an error returned by the Consumer.
-func Walk(d protoreflect.Descriptor, c Consumer) error {
+// Message-, and ServiceDescriptors. It will apply a DescriptorConsumer to each encountered
+// Descriptor until EOF or an error returned by the DescriptorConsumer.
+func WalkDescriptor(d protoreflect.Descriptor, c DescriptorConsumer) error {
 	return walkDescriptor(d, c)
 }
 
-func walkDescriptor(d protoreflect.Descriptor, c Consumer) error {
-	if err := c.Consume(d); err != nil {
+func walkDescriptor(d protoreflect.Descriptor, c DescriptorConsumer) error {
+	if err := c.ConsumeDescriptor(d); err != nil {
 		return err
 	}
 
 	// travel to the nested types.
-	switch d.(type) {
+	switch desc := d.(type) {
 	case protoreflect.FileDescriptor:
-		f := d.(protoreflect.FileDescriptor)
-		for i := 0; i < f.Enums().Len(); i++ {
-			if err := walkDescriptor(f.Enums().Get(i), c); err != nil {
+		for i := 0; i < desc.Enums().Len(); i++ {
+			if err := walkDescriptor(desc.Enums().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < f.Extensions().Len(); i++ {
-			if err := walkDescriptor(f.Extensions().Get(i), c); err != nil {
+		for i := 0; i < desc.Extensions().Len(); i++ {
+			if err := walkDescriptor(desc.Extensions().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < f.Messages().Len(); i++ {
-			if err := walkDescriptor(f.Messages().Get(i), c); err != nil {
+		for i := 0; i < desc.Messages().Len(); i++ {
+			if err := walkDescriptor(desc.Messages().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < f.Services().Len(); i++ {
-			if err := walkDescriptor(f.Services().Get(i), c); err != nil {
+		for i := 0; i < desc.Services().Len(); i++ {
+			if err := walkDescriptor(desc.Services().Get(i), c); err != nil {
 				return err
 			}
 		}
 	case protoreflect.MessageDescriptor:
-		m := d.(protoreflect.MessageDescriptor)
-		for i := 0; i < m.Enums().Len(); i++ {
-			if err := walkDescriptor(m.Enums().Get(i), c); err != nil {
+		for i := 0; i < desc.Enums().Len(); i++ {
+			if err := walkDescriptor(desc.Enums().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < m.Extensions().Len(); i++ {
-			if err := walkDescriptor(m.Extensions().Get(i), c); err != nil {
+		for i := 0; i < desc.Extensions().Len(); i++ {
+			if err := walkDescriptor(desc.Extensions().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < m.Fields().Len(); i++ {
-			if err := walkDescriptor(m.Fields().Get(i), c); err != nil {
+		for i := 0; i < desc.Fields().Len(); i++ {
+			if err := walkDescriptor(desc.Fields().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < m.Messages().Len(); i++ {
-			if err := walkDescriptor(m.Messages().Get(i), c); err != nil {
+		for i := 0; i < desc.Messages().Len(); i++ {
+			if err := walkDescriptor(desc.Messages().Get(i), c); err != nil {
 				return err
 			}
 		}
-		for i := 0; i < m.Oneofs().Len(); i++ {
-			if err := walkDescriptor(m.Oneofs().Get(i), c); err != nil {
+		for i := 0; i < desc.Oneofs().Len(); i++ {
+			if err := walkDescriptor(desc.Oneofs().Get(i), c); err != nil {
 				return err
 			}
 		}
 	case protoreflect.EnumDescriptor:
-		e := d.(protoreflect.EnumDescriptor)
-		for i := 0; i < e.Values().Len(); i++ {
-			if err := walkDescriptor(e.Values().Get(i), c); err != nil {
+		for i := 0; i < desc.Values().Len(); i++ {
+			if err := walkDescriptor(desc.Values().Get(i), c); err != nil {
 				return err
 			}
 		}
 	case protoreflect.ServiceDescriptor:
-		s := d.(protoreflect.ServiceDescriptor)
-		for i := 0; i < s.Methods().Len(); i++ {
-			if err := walkDescriptor(s.Methods().Get(i), c); err != nil {
+		for i := 0; i < desc.Methods().Len(); i++ {
+			if err := walkDescriptor(desc.Methods().Get(i), c); err != nil {
 				return err
 			}
 		}

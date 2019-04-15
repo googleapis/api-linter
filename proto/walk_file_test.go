@@ -20,7 +20,7 @@ type mockConsumer struct {
 	err   error
 }
 
-func (m *mockConsumer) Consume(d protoreflect.Descriptor) error {
+func (m *mockConsumer) ConsumeDescriptor(d protoreflect.Descriptor) error {
 	m.count++
 	return m.err
 }
@@ -59,7 +59,7 @@ func TestWalkDescriptor(t *testing.T) {
 	for _, test := range tests {
 		consumer := new(mockConsumer)
 
-		Walk(test.descriptor, consumer)
+		WalkDescriptor(test.descriptor, consumer)
 		if consumer.count != test.num {
 			t.Errorf("Walk(%s): Got %d desriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
 		}
@@ -72,7 +72,7 @@ func TestWalkDescriptorWithErr(t *testing.T) {
 	}
 	f := readProtoFile("walk_file_test.protoset")
 
-	Walk(f, consumer)
+	WalkDescriptor(f, consumer)
 	if consumer.count != 1 {
 		t.Errorf("Walk(%s) with error: got %d descriptors, but wanted 1", f.FullName(), consumer.count)
 	}
