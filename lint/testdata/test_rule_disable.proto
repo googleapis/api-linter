@@ -7,8 +7,7 @@ syntax = "proto2";
 package api.linter.lint;
 
 // Outer
-// (-- api-linter: rule_leading_disabled=disabled --)
-// (-- api-linter: other.rule_leading_disabled=disabled --)
+// (-- api-linter: rule_message_disabled_in_leading=disabled --)
 message Outer {
-  optional string name = 1; // (-- api-linter: rule_trailing_disabled=disabled --)
+  optional string name = 1; // (-- api-linter: rule_field_disabled_in_trailing=disabled --)
 }
