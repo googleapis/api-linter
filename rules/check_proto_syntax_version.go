@@ -19,14 +19,14 @@ func init() {
 				if f.Syntax() != protoreflect.Proto3 {
 					return []lint.Problem{
 						{
-							Message:    "uses proto3",
+							Message:    "Google APIs should use proto3",
 							Suggestion: "proto3",
 							Location:   location,
 						},
 					}, nil
 				}
 			}
-			return []lint.Problem{}, nil
+			return nil, nil
 		},
 	)
 }

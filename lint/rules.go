@@ -21,7 +21,7 @@ type Rules struct {
 // Copy returns a new copy of the rules.
 func (r *Rules) Copy() *Rules {
 	n := Rules{
-		ruleMap: make(map[string]Rule),
+		ruleMap: make(map[string]Rule, len(r.ruleMap)),
 	}
 	for k, v := range r.ruleMap {
 		n.ruleMap[k] = v

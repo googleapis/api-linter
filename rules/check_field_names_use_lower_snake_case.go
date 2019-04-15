@@ -15,7 +15,7 @@ func init() {
 		},
 		func(d protoreflect.Descriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
 			if _, ok := d.(protoreflect.FieldDescriptor); ok {
-				return checkNameFormate(d), nil
+				return checkNameFormat(d), nil
 			}
 			return []lint.Problem{}, nil
 		},

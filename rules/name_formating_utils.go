@@ -14,7 +14,7 @@ type nameFormat struct {
 	transform         func(string) string
 }
 
-func checkNameFormate(desc protoreflect.Descriptor) []lint.Problem {
+func checkNameFormat(desc protoreflect.Descriptor) []lint.Problem {
 	nf := getNameFormat(desc)
 	name := string(desc.Name())
 	want := nf.transform(name)
