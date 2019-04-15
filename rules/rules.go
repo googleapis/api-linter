@@ -13,22 +13,23 @@ var coreRules, _ = lint.NewRules()
 
 // Rules returns all rules registered in this package.
 func Rules() *lint.Rules {
-	return coreRules
+	return coreRules.Copy()
 }
 
-// DescriptorChecker defines an operation that checks a Descriptor
-// and returns a list of Problem and if applicable, an error.
-type DescriptorChecker interface {
-	Check(protoreflect.Descriptor) ([]lint.Problem, error)
-}
+type descCheckFunc func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.Problem, error)
 
-// RegisterRuleWithChecker registers a rule with rule information and
-// a descriptor checker for .proto files.
-func RegisterRuleWithChecker(i RuleInfo, c DescriptorChecker) {
-	r := ruleBase{
-		RuleInfo: i,
-		l:        newProtoLinter(i, c),
+// registerRuleWithDescCheckFunc registers a rule with rule information and
+// a descriptor check function for .proto files.
+func registerRuleWithDescCheckFunc(ri ruleInfo, c descCheckFunc) {
+	if len(ri.FileTypes) == 0 {
+		ri.FileTypes = []lint.FileType{lint.ProtoFile}
 	}
+
+	r := ruleBase{
+		ruleInfo: ri,
+		l:        newProtoLinter(ri, c),
+	}
+
 	registerRuleBase(r)
 }
 

@@ -4,36 +4,36 @@ import "github.com/jgeewax/api-linter/lint"
 
 // ruleBase implements lint.Rule.
 type ruleBase struct {
-	RuleInfo RuleInfo
-	l        Linter
+	ruleInfo ruleInfo
+	l        linter
 }
 
 func (r ruleBase) Name() string {
-	return r.RuleInfo.Name
+	return r.ruleInfo.Name
 }
 
 func (r ruleBase) Description() string {
-	return r.RuleInfo.Description
+	return r.ruleInfo.Description
 }
 
 func (r ruleBase) URL() string {
-	return r.RuleInfo.URL
+	return r.ruleInfo.URL
 }
 
 func (r ruleBase) FileTypes() []lint.FileType {
-	return r.RuleInfo.FileTypes
+	return r.ruleInfo.FileTypes
 }
 
 func (r ruleBase) Category() lint.Category {
-	return r.RuleInfo.Category
+	return r.ruleInfo.Category
 }
 
 func (r ruleBase) Lint(req lint.Request) (lint.Response, error) {
 	return r.l.Lint(req, r)
 }
 
-// RuleInfo stores information of a rule.
-type RuleInfo struct {
+// ruleInfo stores information of a rule.
+type ruleInfo struct {
 	Name        string          // rule name in the set.
 	Description string          // a short description of this rule.
 	URL         string          // a link to a document for more details.

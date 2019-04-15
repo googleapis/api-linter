@@ -22,3 +22,10 @@ type Position struct {
 func (p Position) IsValid() bool {
 	return p.Line >= 0 && p.Column >= 0
 }
+
+func invalidLocation() Location {
+	return Location{
+		Start: Position{-1, -1},
+		End:   Position{-1, -1},
+	}
+}

@@ -6,15 +6,15 @@ import (
 	"github.com/jgeewax/api-linter/proto"
 )
 
-// Linter defines an operation that checks a lint Request with a Rule,
+// linter defines an operation that checks a lint Request with a Rule,
 // and returns a Response and if applicable, an error.
-type Linter interface {
+type linter interface {
 	Lint(lint.Request, lint.Rule) (lint.Response, error)
 }
 
 type protoLinter struct {
-	checker  DescriptorChecker
-	info     RuleInfo
+	check    descCheckFunc
+	info     ruleInfo
 	problems []lint.Problem
 	source   lint.DescriptorSource
 }
@@ -28,7 +28,7 @@ func (l *protoLinter) ConsumeDescriptor(d protoreflect.Descriptor) error {
 		return nil
 	}
 
-	problems, err := l.checker.Check(d)
+	problems, err := l.check(d, l.source)
 	if err != nil {
 		return err
 	}
@@ -48,9 +48,9 @@ func (l *protoLinter) Lint(req lint.Request, rule lint.Rule) (lint.Response, err
 	}, nil
 }
 
-func newProtoLinter(info RuleInfo, checker DescriptorChecker) Linter {
+func newProtoLinter(info ruleInfo, check descCheckFunc) linter {
 	return &protoLinter{
-		checker: checker,
-		info:    info,
+		check: check,
+		info:  info,
 	}
 }
