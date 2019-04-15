@@ -41,14 +41,14 @@ func (l *protoLinter) Lint(req lint.Request, rule lint.Rule) (lint.Response, err
 	f := req.ProtoFile()
 	l.source = req.DescriptorSource()
 	if err := proto.WalkDescriptor(f, l); err != nil {
-		return lint.Response{}, nil
+		return lint.Response{}, err
 	}
 	return lint.Response{
 		Problems: l.problems,
 	}, nil
 }
 
-func newProtoLinter(info ruleInfo, check descCheckFunc) linter {
+func newProtoLinter(info ruleInfo, check descCheckFunc) *protoLinter {
 	return &protoLinter{
 		check: check,
 		info:  info,
