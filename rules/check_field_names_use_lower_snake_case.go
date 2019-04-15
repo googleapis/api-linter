@@ -8,10 +8,10 @@ import (
 func init() {
 	registerRuleWithDescCheckFunc(
 		ruleInfo{
-			Name:        "check_naming_formats.field",
-			Description: "check that field names use lower snake case",
-			URL:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head`,
-			Category:    lint.CategorySuggestion,
+			name:        "check_naming_formats.field",
+			description: "check that field names use lower snake case",
+			url:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head`,
+			category:    lint.CategorySuggestion,
 		},
 		func(d protoreflect.Descriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
 			if _, ok := d.(protoreflect.FieldDescriptor); ok {

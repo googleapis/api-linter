@@ -21,8 +21,8 @@ type descCheckFunc func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.
 // registerRuleWithDescCheckFunc registers a rule with rule information and
 // a descriptor check function for .proto files.
 func registerRuleWithDescCheckFunc(ri ruleInfo, c descCheckFunc) {
-	if len(ri.FileTypes) == 0 {
-		ri.FileTypes = []lint.FileType{lint.ProtoFile}
+	if len(ri.fileTypes) == 0 {
+		ri.fileTypes = []lint.FileType{lint.ProtoFile}
 	}
 
 	r := ruleBase{

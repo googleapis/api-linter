@@ -8,10 +8,10 @@ import (
 func init() {
 	registerRuleWithDescCheckFunc(
 		ruleInfo{
-			Name:        "check_proto_syntax_version",
-			Description: "check that syntax is proto3",
-			URL:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
-			Category:    lint.CategoryError,
+			name:        "check_proto_syntax_version",
+			description: "check that syntax is proto3",
+			url:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
+			category:    lint.CategoryError,
 		},
 		func(d protoreflect.Descriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
 			if f, ok := d.(protoreflect.FileDescriptor); ok {

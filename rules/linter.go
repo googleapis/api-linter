@@ -24,7 +24,7 @@ func (l *protoLinter) addProblems(p ...lint.Problem) {
 }
 
 func (l *protoLinter) ConsumeDescriptor(d protoreflect.Descriptor) error {
-	if l.source.IsRuleDisabled(l.info.Name, d) {
+	if l.source.IsRuleDisabled(l.info.Name(), d) {
 		return nil
 	}
 
