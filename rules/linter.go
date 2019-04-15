@@ -23,7 +23,7 @@ func (l *protoLinter) addProblems(p ...lint.Problem) {
 	l.problems = append(l.problems, p...)
 }
 
-func (l *protoLinter) Consume(d protoreflect.Descriptor) error {
+func (l *protoLinter) ConsumeDescriptor(d protoreflect.Descriptor) error {
 	if l.source.IsRuleDisabled(l.info.Name, d) {
 		return nil
 	}
@@ -39,7 +39,8 @@ func (l *protoLinter) Consume(d protoreflect.Descriptor) error {
 
 func (l *protoLinter) Lint(req lint.Request, rule lint.Rule) (lint.Response, error) {
 	f := req.ProtoFile()
-	if err := proto.Walk(f, l); err != nil {
+	l.source = req.DescriptorSource()
+	if err := proto.WalkDescriptor(f, l); err != nil {
 		return lint.Response{}, nil
 	}
 	return lint.Response{
