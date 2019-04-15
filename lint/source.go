@@ -235,7 +235,7 @@ func reverseInts(a []int) {
 
 // IsRuleDisabled check if a rule is disabled for a descriptor
 // in the comments.
-func (s DescriptorSource) IsRuleDisabled(id RuleID, d protoreflect.Descriptor) bool {
+func (s DescriptorSource) IsRuleDisabled(name string, d protoreflect.Descriptor) bool {
 	comments, err := s.DescriptorComments(d)
 	if err != nil {
 		return true
@@ -247,7 +247,7 @@ func (s DescriptorSource) IsRuleDisabled(id RuleID, d protoreflect.Descriptor) b
 	}
 	commentsToCheck = append(commentsToCheck, s.fileComments().LeadingDetachedComments...)
 
-	return stringsContains(commentsToCheck, ruleDisablingComment(id))
+	return stringsContains(commentsToCheck, ruleDisablingComment(name))
 }
 
 func stringsContains(comments []string, s string) bool {
@@ -259,11 +259,7 @@ func stringsContains(comments []string, s string) bool {
 	return false
 }
 
-func ruleDisablingComment(id RuleID) string {
-	name := id.Set + "." + id.Name
-	if id.Set == "" || id.Set == "core" {
-		name = id.Name
-	}
+func ruleDisablingComment(name string) string {
 	return "(-- api-linter: " + name + "=disabled --)"
 }
 

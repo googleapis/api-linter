@@ -54,20 +54,6 @@ func (_m *Rule) FileTypes() []lint.FileType {
 	return r0
 }
 
-// ID provides a mock function with given fields:
-func (_m *Rule) ID() lint.RuleID {
-	ret := _m.Called()
-
-	var r0 lint.RuleID
-	if rf, ok := ret.Get(0).(func() lint.RuleID); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(lint.RuleID)
-	}
-
-	return r0
-}
-
 // Lint provides a mock function with given fields: _a0
 func (_m *Rule) Lint(_a0 lint.Request) (lint.Response, error) {
 	ret := _m.Called(_a0)
@@ -87,6 +73,20 @@ func (_m *Rule) Lint(_a0 lint.Request) (lint.Response, error) {
 	}
 
 	return r0, r1
+}
+
+// Name provides a mock function with given fields:
+func (_m *Rule) Name() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
 }
 
 // URL provides a mock function with given fields:
