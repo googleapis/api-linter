@@ -217,6 +217,70 @@ func TestSyntaxComments(t *testing.T) {
 	}
 }
 
+func TestIsRuleDisabled(t *testing.T) {
+	fileDesc, proto := readProtoFile("test_rule_disable.protoset")
+	descSource, _ := newDescriptorSource(proto)
+
+	tests := []struct {
+		desc     protoreflect.Descriptor
+		rule     string
+		disabled bool
+	}{
+		{
+			desc:     fileDesc,
+			rule:     "rule_all_disabled",
+			disabled: true,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0),
+			rule:     "rule_all_disabled",
+			disabled: true,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
+			rule:     "rule_all_disabled",
+			disabled: true,
+		},
+		{
+			desc:     fileDesc,
+			rule:     "rule_not_disabled",
+			disabled: false,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0),
+			rule:     "rule_not_disabled",
+			disabled: false,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
+			rule:     "rule_not_disabled",
+			disabled: false,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0),
+			rule:     "rule_message_disabled_in_leading",
+			disabled: true,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
+			rule:     "rule_message_disabled_in_leading",
+			disabled: false,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
+			rule:     "rule_field_disabled_in_trailing",
+			disabled: true,
+		},
+	}
+
+	for _, test := range tests {
+		disabled := descSource.IsRuleDisabled(test.rule, test.desc)
+		if disabled != test.disabled {
+			t.Errorf("IsRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
+		}
+	}
+}
+
 func readProtoFile(fileName string) (protoreflect.FileDescriptor, *descriptorpb.FileDescriptorProto) {
 	path := filepath.Join("testdata", fileName)
 	bs, err := ioutil.ReadFile(path)
