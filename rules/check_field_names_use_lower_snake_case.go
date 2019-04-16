@@ -11,8 +11,8 @@ func init() {
 		&protohelpers.DescriptorCallbacks{
 			RuleInfo: protohelpers.NewRuleInfo(
 				"check_naming_formats.field",
-				"check_naming_formats.field",
 				"check that field names use lower snake case",
+				"https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
 				[]lint.FileType{lint.ProtoFile},
 				lint.CategorySuggestion,
 			),
