@@ -1,19 +1,9 @@
-package rules
+package protohelpers
 
 import "github.com/jgeewax/api-linter/lint"
 
-// protoRuleBase implements lint.Rule.
-type protoRuleBase struct {
-	ruleInfo
-	checkers protoCheckers
-}
-
-func (r protoRuleBase) Lint(req lint.Request) (lint.Response, error) {
-	return r.checkers.check(req, r.ruleInfo)
-}
-
 // ruleInfo stores information of a rule.
-type ruleInfo struct {
+type RuleInfo struct {
 	name        string          // rule name in the set.
 	description string          // a short description of this rule.
 	url         string          // a link to a document for more details.
@@ -21,22 +11,32 @@ type ruleInfo struct {
 	category    lint.Category   // category of problems this rule produces.
 }
 
-func (r ruleInfo) Name() string {
+func NewRuleInfo(name, description, url string, fileTypes []lint.FileType, category lint.Category) RuleInfo {
+	return RuleInfo{
+		name:        name,
+		description: description,
+		url:         url,
+		fileTypes:   fileTypes,
+		category:    category,
+	}
+}
+
+func (r RuleInfo) Name() string {
 	return r.name
 }
 
-func (r ruleInfo) Description() string {
+func (r RuleInfo) Description() string {
 	return r.description
 }
 
-func (r ruleInfo) URL() string {
+func (r RuleInfo) URL() string {
 	return r.url
 }
 
-func (r ruleInfo) FileTypes() []lint.FileType {
+func (r RuleInfo) FileTypes() []lint.FileType {
 	return r.fileTypes
 }
 
-func (r ruleInfo) Category() lint.Category {
+func (r RuleInfo) Category() lint.Category {
 	return r.category
 }
