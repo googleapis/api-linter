@@ -48,7 +48,6 @@ func (c *protoCheckers) ConsumeDescriptor(d protoreflect.Descriptor) error {
 			}
 			c.addProblems(problems...)
 		}
-
 	case protoreflect.EnumValueDescriptor:
 		if c.CheckEnumValueDescriptor != nil {
 			problems, err := c.CheckEnumValueDescriptor(desc, c.source)
@@ -73,17 +72,17 @@ func (c *protoCheckers) ConsumeDescriptor(d protoreflect.Descriptor) error {
 			}
 			c.addProblems(problems...)
 		}
-	case protoreflect.MessageDescriptor:
-		if c.CheckMessageDescriptor != nil {
-			problems, err := c.CheckMessageDescriptor(desc, c.source)
+	case protoreflect.MethodDescriptor:
+		if c.CheckMethodDescriptor != nil {
+			problems, err := c.CheckMethodDescriptor(desc, c.source)
 			if err != nil {
 				return err
 			}
 			c.addProblems(problems...)
 		}
-	case protoreflect.MethodDescriptor:
-		if c.CheckMethodDescriptor != nil {
-			problems, err := c.CheckMethodDescriptor(desc, c.source)
+	case protoreflect.MessageDescriptor:
+		if c.CheckMessageDescriptor != nil {
+			problems, err := c.CheckMessageDescriptor(desc, c.source)
 			if err != nil {
 				return err
 			}
