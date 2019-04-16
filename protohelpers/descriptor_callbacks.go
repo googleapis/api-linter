@@ -9,15 +9,16 @@ import (
 type DescriptorCallbacks struct {
 	RuleInfo
 
-	DescriptorCallback        func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	EnumDescriptorCallback    func(protoreflect.EnumDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	EnumValueCallback         func(protoreflect.EnumValueDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	FieldDescriptorCallback   func(protoreflect.FieldDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	FileDescriptorCallback    func(protoreflect.FileDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	MessageDescriptorCallback func(protoreflect.MessageDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	MethodDescriptorCallback  func(protoreflect.MethodDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	ServiceDescriptorCallback func(protoreflect.ServiceDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
-	OneofDescriptorCallback   func(protoreflect.OneofDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	DescriptorCallback          func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	EnumDescriptorCallback      func(protoreflect.EnumDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	EnumValueCallback           func(protoreflect.EnumValueDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	FieldDescriptorCallback     func(protoreflect.FieldDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	ExtensionDescriptorCallback func(protoreflect.ExtensionDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	FileDescriptorCallback      func(protoreflect.FileDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	MessageDescriptorCallback   func(protoreflect.MessageDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	MethodDescriptorCallback    func(protoreflect.MethodDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	ServiceDescriptorCallback   func(protoreflect.ServiceDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
+	OneofDescriptorCallback     func(protoreflect.OneofDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
 
 	problems []lint.Problem
 	source   lint.DescriptorSource
@@ -68,6 +69,13 @@ func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error
 			c.addProblems(problems...)
 		}
 	case protoreflect.FieldDescriptor:
+		if desc.ExtendedType() != nil {
+			problems, err := c.ExtensionDescriptorCallback(desc, c.source)
+			if err != nil {
+				return err
+			}
+			c.addProblems(problems...)
+		}
 		if c.FieldDescriptorCallback != nil {
 			problems, err := c.FieldDescriptorCallback(desc, c.source)
 			if err != nil {
