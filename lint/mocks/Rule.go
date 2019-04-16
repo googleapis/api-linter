@@ -10,45 +10,15 @@ type Rule struct {
 	mock.Mock
 }
 
-// Category provides a mock function with given fields:
-func (_m *Rule) Category() lint.Category {
+// Info provides a mock function with given fields:
+func (_m *Rule) Info() lint.RuleInfo {
 	ret := _m.Called()
 
-	var r0 lint.Category
-	if rf, ok := ret.Get(0).(func() lint.Category); ok {
+	var r0 lint.RuleInfo
+	if rf, ok := ret.Get(0).(func() lint.RuleInfo); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(lint.Category)
-	}
-
-	return r0
-}
-
-// Description provides a mock function with given fields:
-func (_m *Rule) Description() string {
-	ret := _m.Called()
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
-// FileTypes provides a mock function with given fields:
-func (_m *Rule) FileTypes() []lint.FileType {
-	ret := _m.Called()
-
-	var r0 []lint.FileType
-	if rf, ok := ret.Get(0).(func() []lint.FileType); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]lint.FileType)
-		}
+		r0 = ret.Get(0).(lint.RuleInfo)
 	}
 
 	return r0
@@ -73,32 +43,4 @@ func (_m *Rule) Lint(_a0 lint.Request) (lint.Response, error) {
 	}
 
 	return r0, r1
-}
-
-// Name provides a mock function with given fields:
-func (_m *Rule) Name() string {
-	ret := _m.Called()
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
-// URL provides a mock function with given fields:
-func (_m *Rule) URL() string {
-	ret := _m.Called()
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
 }
