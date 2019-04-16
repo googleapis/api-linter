@@ -2,19 +2,8 @@ package lint
 
 // Rule defines a lint rule that checks Google Protobuf APIs.
 type Rule interface {
-	// Name returns an unique name for this rule.
-	Name() string
-	// Description returns a short summary about this rule.
-	Description() string
-	// URL returns a link at which the full documentation
-	// about this rule can be accessed.
-	URL() string
-	// FileTypes returns the types of files that this rule is targeting to.
-	// E.g., `ProtoFile` for protobuf files.
-	FileTypes() []FileType
-	// Category returns the category of findings produced
-	// by this rule, e.g. Problem, Suggestion, etc.
-	Category() Category
+	// Info returns metadata about a rule.
+	Info() RuleInfo
 	// Lint performs the linting process.
 	Lint(Request) (Response, error)
 }

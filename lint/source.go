@@ -84,7 +84,7 @@ func newDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource,
 func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
-		return Location{}, ErrPathNotFound
+		return invalidLocation(), ErrPathNotFound
 	}
 	return newLocationFromSpan(l.GetSpan())
 }
@@ -130,7 +130,7 @@ func newLocationFromSpan(span []int32) (Location, error) {
 		}, nil
 	}
 
-	return Location{}, fmt.Errorf("source: %v is not a valid span to create a Location", span)
+	return invalidLocation(), fmt.Errorf("source: %v is not a valid span to create a Location", span)
 }
 
 // SyntaxLocation returns the location of the syntax definition.

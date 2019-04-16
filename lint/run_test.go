@@ -27,8 +27,8 @@ func TestRunAll(t *testing.T) {
 
 	r1.On("Lint", req).Return(resp1, nil)
 	r2.On("Lint", req).Return(resp2, nil)
-	r1.On("Name").Return("a")
-	r2.On("Name").Return("b")
+	r1.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
+	r2.On("Info").Return(lint.NewRuleInfo("b", "", "", nil, lint.CategorySuggestion))
 
 	rules, _ := lint.NewRules(r1, r2)
 	gotResp, err := lint.Run(*rules, req)

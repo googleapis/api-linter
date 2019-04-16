@@ -18,15 +18,26 @@ type Rules struct {
 	ruleMap map[string]Rule
 }
 
+// Copy returns a new copy of the rules.
+func (r *Rules) Copy() *Rules {
+	n := Rules{
+		ruleMap: make(map[string]Rule, len(r.ruleMap)),
+	}
+	for k, v := range r.ruleMap {
+		n.ruleMap[k] = v
+	}
+	return &n
+}
+
 // Register registers the list of rules.
 // It returns `ErrDuplicateName` if any of the rules is found duplicate
 // in the registry.
 func (r *Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.ruleMap[rl.Name()]; found {
+		if _, found := r.ruleMap[rl.Info().Name()]; found {
 			return ErrDuplicateName
 		}
-		r.ruleMap[rl.Name()] = rl
+		r.ruleMap[rl.Info().Name()] = rl
 	}
 	return nil
 }
