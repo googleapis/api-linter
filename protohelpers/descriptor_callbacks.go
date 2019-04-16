@@ -5,7 +5,9 @@ import (
 	"github.com/jgeewax/api-linter/lint"
 )
 
-// Descriptor callbacks implements both `Rule` and `DescriptorConsumer`.
+// DescriptorCallbacks implements both `Rule` and `DescriptorConsumer`. Set any of the Callback fields
+// to a non nil value, and that function will be called for every encountered instance of the relevant
+// descriptor.
 type DescriptorCallbacks struct {
 	RuleInfo lint.RuleInfo
 
@@ -24,10 +26,12 @@ type DescriptorCallbacks struct {
 	source   lint.DescriptorSource
 }
 
+// Info implements `lint.Rule`
 func (c *DescriptorCallbacks) Info() lint.RuleInfo {
 	return c.RuleInfo
 }
 
+// Lint implements `lint.Rule`
 func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
 	f := req.ProtoFile()
 
@@ -42,6 +46,7 @@ func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
 	}, nil
 }
 
+// ConsumeDescriptor implements `DescriptorConsumer`
 func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error {
 	if c.source.IsRuleDisabled(c.Info().Name(), d) {
 		return nil
