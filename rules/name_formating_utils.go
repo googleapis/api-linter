@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jgeewax/api-linter/lint"
@@ -21,7 +22,7 @@ func checkNameFormat(desc protoreflect.Descriptor) []lint.Problem {
 	if name != want {
 		return []lint.Problem{
 			{
-				Message:    nf.descType + " name '" + name + "' should use " + nf.example,
+				Message:    fmt.Sprintf("%s named %q should use %s", nf.descType, name, nf.example),
 				Suggestion: want,
 				Descriptor: desc,
 			},
