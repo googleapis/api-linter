@@ -74,13 +74,14 @@ func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error
 		}
 	case protoreflect.FieldDescriptor:
 		if desc.ExtendedType() != nil {
-			problems, err := c.ExtensionDescriptorCallback(desc, c.source)
-			if err != nil {
-				return err
+			if c.ExtensionDescriptorCallback != nil {
+				problems, err := c.ExtensionDescriptorCallback(desc, c.source)
+				if err != nil {
+					return err
+				}
+				c.addProblems(problems...)
 			}
-			c.addProblems(problems...)
-		}
-		if c.FieldDescriptorCallback != nil {
+		} else if c.FieldDescriptorCallback != nil {
 			problems, err := c.FieldDescriptorCallback(desc, c.source)
 			if err != nil {
 				return err
