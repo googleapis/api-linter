@@ -13,8 +13,8 @@ func TestRulesRegister(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
 
-	r1.On("Name").Return("a")
-	r2.On("Name").Return("b")
+	r1.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
+	r2.On("Info").Return(lint.NewRuleInfo("b", "", "", nil, lint.CategorySuggestion))
 
 	rules, _ := lint.NewRules()
 	err := rules.Register(r1, r2)
@@ -27,16 +27,16 @@ func TestRulesRegister(t *testing.T) {
 		t.Errorf("Register: got %d rules, but want %d", numRegistered, 2)
 	}
 
-	r1.AssertCalled(t, "Name")
-	r2.AssertCalled(t, "Name")
+	r1.AssertCalled(t, "Info")
+	r2.AssertCalled(t, "Info")
 }
 
 func TestRulesRegister_Duplicate(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
 
-	r1.On("Name").Return("a")
-	r2.On("Name").Return("a")
+	r1.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
+	r2.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
 
 	rules, _ := lint.NewRules()
 	err := rules.Register(r1, r2)
@@ -49,6 +49,6 @@ func TestRulesRegister_Duplicate(t *testing.T) {
 		t.Errorf("Register: got %d rules, but want %d", numRegistered, 1)
 	}
 
-	r1.AssertCalled(t, "Name")
-	r2.AssertCalled(t, "Name")
+	r1.AssertCalled(t, "Info")
+	r2.AssertCalled(t, "Info")
 }

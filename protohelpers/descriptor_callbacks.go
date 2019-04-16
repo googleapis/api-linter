@@ -7,7 +7,7 @@ import (
 
 // Descriptor callbacks implements both `Rule` and `DescriptorConsumer`.
 type DescriptorCallbacks struct {
-	lint.RuleInfo
+	RuleInfo lint.RuleInfo
 
 	DescriptorCallback          func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.Problem, error)
 	EnumDescriptorCallback      func(protoreflect.EnumDescriptor, lint.DescriptorSource) ([]lint.Problem, error)
@@ -22,6 +22,10 @@ type DescriptorCallbacks struct {
 
 	problems []lint.Problem
 	source   lint.DescriptorSource
+}
+
+func (c *DescriptorCallbacks) Info() lint.RuleInfo {
+	return c.RuleInfo
 }
 
 func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
@@ -39,7 +43,7 @@ func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
 }
 
 func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error {
-	if c.source.IsRuleDisabled(c.Name(), d) {
+	if c.source.IsRuleDisabled(c.Info().Name(), d) {
 		return nil
 	}
 
