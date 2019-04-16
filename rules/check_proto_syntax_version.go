@@ -9,7 +9,7 @@ import (
 func init() {
 	registerRule(
 		&protohelpers.DescriptorCallbacks{
-			RuleInfo: protohelpers.NewRuleInfo(
+			RuleInfo: lint.NewRuleInfo(
 				"check_proto_syntax_version",
 				"check that syntax is proto3",
 				`https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
