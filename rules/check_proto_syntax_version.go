@@ -6,15 +6,15 @@ import (
 )
 
 func init() {
-	registerRuleWithDescCheckFunc(
+	registerProtoRule(
 		ruleInfo{
 			name:        "check_proto_syntax_version",
 			description: "check that syntax is proto3",
 			url:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
 			category:    lint.CategoryError,
 		},
-		func(d protoreflect.Descriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
-			if f, ok := d.(protoreflect.FileDescriptor); ok {
+		protoCheckers{
+			CheckFileDescriptor: func(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
 				location, _ := s.SyntaxLocation()
 				if f.Syntax() != protoreflect.Proto3 {
 					return []lint.Problem{
@@ -25,8 +25,8 @@ func init() {
 						},
 					}, nil
 				}
-			}
-			return nil, nil
+				return nil, nil
+			},
 		},
 	)
 }

@@ -18,22 +18,22 @@ func Rules() *lint.Rules {
 
 type descCheckFunc func(protoreflect.Descriptor, lint.DescriptorSource) ([]lint.Problem, error)
 
-// registerRuleWithDescCheckFunc registers a rule with rule information and
+// registerProtoRule registers a rule with rule information and
 // a descriptor check function for .proto files.
-func registerRuleWithDescCheckFunc(ri ruleInfo, c descCheckFunc) {
+func registerProtoRule(ri ruleInfo, c protoCheckers) {
 	if len(ri.fileTypes) == 0 {
 		ri.fileTypes = []lint.FileType{lint.ProtoFile}
 	}
 
-	r := ruleBase{
+	r := protoRuleBase{
 		ruleInfo: ri,
-		l:        newProtoLinter(ri, c),
+		checkers: c,
 	}
 
 	registerRuleBase(r)
 }
 
-func registerRuleBase(r ruleBase) {
+func registerRuleBase(r protoRuleBase) {
 	if err := coreRules.Register(r); err != nil {
 		log.Fatalf("Error when registering rule '%s': %v", r.Name(), err)
 	}

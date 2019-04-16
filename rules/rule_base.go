@@ -2,14 +2,14 @@ package rules
 
 import "github.com/jgeewax/api-linter/lint"
 
-// ruleBase implements lint.Rule.
-type ruleBase struct {
+// protoRuleBase implements lint.Rule.
+type protoRuleBase struct {
 	ruleInfo
-	l linter
+	checkers protoCheckers
 }
 
-func (r ruleBase) Lint(req lint.Request) (lint.Response, error) {
-	return r.l.Lint(req, r)
+func (r protoRuleBase) Lint(req lint.Request) (lint.Response, error) {
+	return r.checkers.check(req, r.ruleInfo)
 }
 
 // ruleInfo stores information of a rule.
