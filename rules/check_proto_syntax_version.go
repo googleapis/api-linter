@@ -10,25 +10,27 @@ func init() {
 	registerRule(
 		&protohelpers.DescriptorCallbacks{
 			RuleInfo: lint.NewRuleInfo(
-				"check_proto_syntax_version",
+				"proto_syntax_version",
 				"check that syntax is proto3",
 				`https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
 				[]lint.FileType{lint.ProtoFile},
 				lint.CategoryError,
 			),
-			FileDescriptorCallback: func(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
-				location, _ := s.SyntaxLocation()
-				if f.Syntax() != protoreflect.Proto3 {
-					return []lint.Problem{
-						{
-							Message:    "Google APIs should use proto3",
-							Suggestion: "proto3",
-							Location:   location,
-						},
-					}, nil
-				}
-				return nil, nil
-			},
+			FileDescriptorCallback: checkProtoSyntaxVersion,
 		},
 	)
+}
+
+func checkProtoSyntaxVersion(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
+	location, _ := s.SyntaxLocation()
+	if f.Syntax() != protoreflect.Proto3 {
+		return []lint.Problem{
+			{
+				Message:    "Google APIs should use proto3",
+				Suggestion: "proto3",
+				Location:   location,
+			},
+		}, nil
+	}
+	return nil, nil
 }
