@@ -86,14 +86,16 @@ func (r *enforceProto3) Lint(req lint.Request, source lint.DescriptorSource) (li
 ```
 
 ### Helpers
+
 The [`protohelpers` package][proto_helpers] provides some abstractions that can make linting proto
 files easier in some cases.
 
 #### WalkDescriptor
+
 The `protohelpers.WalkDescriptor(protoreflect.Descriptor, protohelpers.DescriptorConsumer)` function
-allows you to implement a `DescriptorConsumer`, which receives each `protoreflect.Descriptor`, one
-at a time. If you have particular rules that you want to enforce, but don't want to deal with the
-logic of traversing a proto file, `WalkDescriptor` will recursively traverse nested messages, enums,
+allows you to pass a `DescriptorConsumer`, which receives each `protoreflect.Descriptor`, one at a
+time. If you have particular rules that you want to enforce, but don't want to deal with the logic
+of traversing a proto file, `WalkDescriptor` will recursively traverse nested messages, enums,
 fields, and any other `Descriptor` found in a proto file, and pass them to your `ConsumeDescriptor`
 method. You can use a [type switch][type_switch] to determine the type of descriptor being passed,
 and perform whatever other logic needed to implement your rule.
