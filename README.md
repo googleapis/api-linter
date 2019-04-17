@@ -86,10 +86,11 @@ func (r *enforceProto3) Lint(req lint.Request, source lint.DescriptorSource) (li
 ```
 
 ### Helpers
-
 The [`protohelpers` package][proto_helpers] provides some abstractions that can make linting proto
-files easier in some cases. The
-`protohelpers.WalkDescriptor(protoreflect.Descriptor, protohelpers.DescriptorConsumer)` function
+files easier in some cases.
+
+#### WalkDescriptor
+The `protohelpers.WalkDescriptor(protoreflect.Descriptor, protohelpers.DescriptorConsumer)` function
 allows you to implement a `DescriptorConsumer`, which receives each `protoreflect.Descriptor`, one
 at a time. If you have particular rules that you want to enforce, but don't want to deal with the
 logic of traversing a proto file, `WalkDescriptor` will recursively traverse nested messages, enums,
@@ -97,7 +98,27 @@ fields, and any other `Descriptor` found in a proto file, and pass them to your 
 method. You can use a [type switch][type_switch] to determine the type of descriptor being passed,
 and perform whatever other logic needed to implement your rule.
 
-TODO: decriptor_callbacks.go
+#### DescriptorCallbacks
+
+The [`DescriptorCallbacks` struct][descriptor_callbacks] allows you to implement callbacks for
+specific types of descriptors. For example if you want to write a `Rule` that only cares about the
+fields defined in a proto, you can write a function that will only receive `FieldDescriptor`s. For
+example, the variable `rule` here satisfies the `Rule` interface:
+
+```go
+rule := protohelpers.DescriptorCallbacks{
+  RuleInfo: lint.NewRuleInfo(
+    "check_naming_formats.field",
+    "check that field names use lower snake case",
+    "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
+    []lint.FileType{lint.ProtoFile},
+    lint.CategorySuggestion,
+  ),
+  FieldDescriptorCallback: func(d protoreflect.FieldDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
+    return checkNameFormat(d), nil
+  },
+}
+```
 
 
 [rule_interface]: https://github.com/jgeewax/api-linter/blob/master/lint/rule.go 
@@ -106,3 +127,4 @@ TODO: decriptor_callbacks.go
 [lint_response]: https://github.com/jgeewax/api-linter/blob/master/lint/response.go
 [proto_helpers]: https://github.com/jgeewax/api-linter/tree/master/protohelpers
 [type_switch]: https://tour.golang.org/methods/16
+[descriptor_callbacks]: https://github.com/jgeewax/api-linter/blob/master/protohelpers/descriptor_callbacks.go
