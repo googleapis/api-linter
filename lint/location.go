@@ -8,7 +8,19 @@ type Location struct {
 // IsValid checks if the location struct is constructed properly and
 // returns true if it's valid.
 func (l Location) IsValid() bool {
-	return l.Start.IsValid() && l.End.IsValid()
+	if !l.Start.IsValid() || !l.End.IsValid() {
+		return false
+	}
+
+	if l.Start.Line > l.End.Line {
+		return false
+	}
+
+	if l.Start.Line == l.End.Line && l.Start.Column > l.End.Column {
+		return false
+	}
+
+	return true
 }
 
 // Position describes a zero-based position in a source code file.
