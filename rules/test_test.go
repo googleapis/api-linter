@@ -20,16 +20,12 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 	}
 
 	defer func() {
-		err := closeAndRemoveFile(f)
-
-		if err != nil {
+		if err := closeAndRemoveFile(f); err != nil {
 			log.Fatalf("Error removing proto file: %v", err)
 		}
 	}()
 
-	_, err = f.Write([]byte(source))
-
-	if err != nil {
+	if _, err = f.Write([]byte(source)); err != nil {
 		return nil, err
 	}
 
@@ -40,9 +36,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 	}
 
 	defer func() {
-		err := closeAndRemoveFile(descSetF)
-
-		if err != nil {
+		if err := closeAndRemoveFile(descSetF); err != nil {
 			log.Fatalf("Error removing descriptor set file: %v", err)
 		}
 	}()
@@ -57,9 +51,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 
 	cmd.Stderr = os.Stderr
 
-	err = cmd.Run()
-
-	if err != nil {
+	if err = cmd.Run(); err != nil {
 		return nil, err
 	}
 
@@ -78,15 +70,11 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 }
 
 func closeAndRemoveFile(f *os.File) error {
-	err := f.Close()
-
-	if err != nil {
+	if err := f.Close(); err != nil {
 		return err
 	}
 
-	err = os.Remove(f.Name())
-
-	if err != nil {
+	if err := os.Remove(f.Name()); err != nil {
 		return err
 	}
 
