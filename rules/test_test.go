@@ -63,7 +63,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 
 	protoset := &descriptorpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(descSet, protoset); err != nil {
-		log.Fatalf("Unable to parse %T from source: %v.", protoset, err)
+		return nil, err
 	}
 
 	if len(protoset.GetFile()) == 0 {
