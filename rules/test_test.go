@@ -25,7 +25,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 		}
 	}()
 
-	if _, err = f.Write([]byte(source)); err != nil {
+	if _, err = f.WriteString(source); err != nil {
 		return nil, err
 	}
 
