@@ -34,10 +34,10 @@ func (r *Rules) Copy() *Rules {
 // in the registry.
 func (r *Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.ruleMap[rl.Info().Name()]; found {
+		if _, found := r.ruleMap[rl.Info().Name]; found {
 			return ErrDuplicateName
 		}
-		r.ruleMap[rl.Info().Name()] = rl
+		r.ruleMap[rl.Info().Name] = rl
 	}
 	return nil
 }
