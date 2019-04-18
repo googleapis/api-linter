@@ -1,40 +1,47 @@
 package rules
 
 import (
-	"github.com/jgeewax/api-linter/lint"
+	"fmt"
 	"testing"
+
+	"github.com/jgeewax/api-linter/lint"
+	"github.com/jgeewax/api-linter/rules/testdata"
 )
 
-func TestFieldNamesRule_ConformingFieldNames(t *testing.T) {
-	pd, err := protoDescriptorProtoFromSource(`syntax = "proto2";
+func TestFieldNamesUseLowerSnakeCase(t *testing.T) {
+	tmpl := testdata.MustCreateTemplate(`
+	syntax = "proto2";
+	message Foo {
+	  optional string {{.FieldName}} = 1;
+	}`)
 
-package google.apis.tools.analyzer.testprotos;
-
-message Foo {
-  optional string first_field_name = 1;
-
-  optional string another_field_name = 2;
-}`)
-
-	if err != nil {
-		t.Fatalf("Error generating proto descriptor: %v", err)
+	tests := []struct {
+		FieldName  string
+		numProblem int
+		suggestion string
+	}{
+		{"good_field_name", 0, ""},
+		{"badFieldName", 1, "bad_field_name"},
 	}
 
 	rules, err := lint.NewRules(checkNamingFormats())
-
 	if err != nil {
-		t.Errorf("Error returned when creating Rules: %v", err)
+		t.Errorf("lint.NewRules return error %v", err)
 	}
 
-	req, err := lint.NewProtoFileRequest(pd)
+	for _, test := range tests {
+		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
 
-	if err != nil {
-		t.Errorf("Error returned when creating ProtoFileRequest: %v", err)
-	}
-
-	resp, err := lint.Run(rules, req)
-
-	if len(resp.Problems) > 0 {
-		t.Errorf("Expecting no problems, got %d", len(resp.Problems))
+		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
+		resp, err := lint.Run(rules, req)
+		if err != nil {
+			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+		}
+		if len(resp.Problems) != test.numProblem {
+			t.Errorf("%s: got %d problems, but want %d", errPrefix, len(resp.Problems), test.numProblem)
+		}
+		if len(resp.Problems) > 0 && resp.Problems[0].Suggestion != test.suggestion {
+			t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, resp.Problems[0].Suggestion, test.suggestion)
+		}
 	}
 }
