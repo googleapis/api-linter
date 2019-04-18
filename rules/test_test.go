@@ -11,7 +11,9 @@ import (
 )
 
 func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptorProto, error) {
-	f, err := ioutil.TempFile(os.TempDir(), "proto*")
+	tmpDir := os.TempDir()
+
+	f, err := ioutil.TempFile(tmpDir, "proto*")
 
 	if err != nil {
 		return nil, err
@@ -31,7 +33,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 		return nil, err
 	}
 
-	descSetF, err := ioutil.TempFile(os.TempDir(), "descset*")
+	descSetF, err := ioutil.TempFile(tmpDir, "descset*")
 
 	if err != nil {
 		return nil, err
@@ -48,7 +50,7 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 	cmd := exec.Command(
 		"protoc",
 		"--include_source_info",
-		fmt.Sprintf("--proto_path=%s", os.TempDir()),
+		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
 		f.Name(),
 	)
