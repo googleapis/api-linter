@@ -82,6 +82,8 @@ func (r *enforceProto3) Lint(req lint.Request, source lint.DescriptorSource) (li
 	  	},
 	  }
 	}
+	
+	return lint.Response{}, nil
 }
 ```
 
