@@ -13,8 +13,8 @@ func TestRulesRegister(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
 
-	r1.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
-	r2.On("Info").Return(lint.NewRuleInfo("b", "", "", nil, lint.CategorySuggestion))
+	r1.On("Info").Return(lint.RuleInfo{Name: "a"})
+	r2.On("Info").Return(lint.RuleInfo{Name: "b"})
 
 	rules, _ := lint.NewRules()
 	err := rules.Register(r1, r2)
@@ -35,8 +35,8 @@ func TestRulesRegister_Duplicate(t *testing.T) {
 	r1 := new(mocks.Rule)
 	r2 := new(mocks.Rule)
 
-	r1.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
-	r2.On("Info").Return(lint.NewRuleInfo("a", "", "", nil, lint.CategorySuggestion))
+	r1.On("Info").Return(lint.RuleInfo{Name: "a"})
+	r2.On("Info").Return(lint.RuleInfo{Name: "a"})
 
 	rules, _ := lint.NewRules()
 	err := rules.Register(r1, r2)
