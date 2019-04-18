@@ -6,7 +6,7 @@ import (
 )
 
 func TestFieldNamesRule_ConformingFieldNames(t *testing.T) {
-	pd := protoDescriptorProtoFromSource([]byte(`syntax = "proto2";
+	pd, err := protoDescriptorProtoFromSource(`syntax = "proto2";
 
 package google.apis.tools.analyzer.testprotos;
 
@@ -25,7 +25,27 @@ message Outer {
   }
 
   extensions 100 to 199;
-}`))
+}`)
 
-	rules := lint.NewRules()
+	if err != nil {
+		t.Fatalf("Error generating proto descriptor: %v", err)
+	}
+
+	rules, err := lint.NewRules(checkNamingFormats())
+
+	if err != nil {
+		t.Errorf("Error returned when creating Rules: %v", err)
+	}
+
+	req, err := lint.NewProtoFileRequest(pd)
+
+	if err != nil {
+		t.Errorf("Error returned when creating ProtoFileRequest: %v", err)
+	}
+
+	resp, err := lint.Run(rules, req)
+
+	if len(resp.Problems) > 0 {
+		t.Errorf("Expecting no problems, got %d", len(resp.Problems))
+	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 // Run invokes all rules on the request.
-func Run(rules Rules, request Request) (Response, error) {
+func Run(rules *Rules, request Request) (Response, error) {
 	return run(rules.All(), request)
 }
 
