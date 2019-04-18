@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/golang/protobuf/v2/proto"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
@@ -49,10 +50,12 @@ func protoDescriptorProtoFromSource(source string) (*descriptorpb.FileDescriptor
 		f.Name(),
 	)
 
-	cmd.Stderr = os.Stderr
+	var stdErrBuf bytes.Buffer
+
+	cmd.Stderr = &stdErrBuf
 
 	if err = cmd.Run(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("protoc failed with %v and Stderr %q", err, stdErrBuf.String())
 	}
 
 	descSet, err := ioutil.ReadFile(descSetF.Name())
