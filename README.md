@@ -55,13 +55,13 @@ For example:
 type enforceProto3 struct {}
 
 func (r *enforceProto3) Info() lint.RuleInfo {
-	return lint.NewRuleInfo(
-		"enforce_proto_3",
-		`This rule enforces that all protofiles use syntax "proto3"`,
-		`http://example.com/foo/bar/`,
-		[]FileType{lint.ProtoFile},
-		lint.CategoryError,
-	)
+	return lint.RuleInfo{
+		Name:        "enforce_proto_3",
+		Description: `This rule enforces that all protofiles use syntax "proto3"`,
+		Url:         `http://example.com/foo/bar/`,
+		FileTypes:   []FileType{lint.ProtoFile},
+		Category:    lint.CategoryError,
+	}
 }
 
 func (r *enforceProto3) Lint(req lint.Request, source lint.DescriptorSource) (lint.Response, error) {
@@ -111,13 +111,13 @@ example, the variable `rule` here satisfies the `Rule` interface:
 
 ```go
 rule := protohelpers.DescriptorCallbacks{
-  RuleInfo: lint.NewRuleInfo(
-    "check_naming_formats.field",
-    "check that field names use lower snake case",
-    "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
-    []lint.FileType{lint.ProtoFile},
-    lint.CategorySuggestion,
-  ),
+  RuleInfo: lint.RuleInfo{
+    Name:        "check_naming_formats.field",
+    Description: "check that field names use lower snake case",
+    Url:         "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
+    FileTypes:   []lint.FileType{lint.ProtoFile},
+    Category:    lint.CategorySuggestion,
+  },
   FieldDescriptorCallback: func(d protoreflect.FieldDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
     return checkNameFormat(d), nil
   },
