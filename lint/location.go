@@ -19,18 +19,25 @@ func NewLocation(start, end *Position) *Location {
 
 // Start returns the start position.
 func (l *Location) Start() *Position {
+	if l == nil {
+		return nil
+	}
 	return l.start
 }
 
 // End returns the end position.
 func (l *Location) End() *Position {
+	if l == nil {
+		return nil
+	}
 	return l.end
 }
 
 // IsValid checks if the location is constructed properly and
 // returns true if so.
 func (l *Location) IsValid() bool {
-	return l.start.IsValid() &&
+	return l != nil &&
+		l.start.IsValid() &&
 		l.end.IsValid() &&
 		(l.end.Line() > l.start.Line() ||
 			l.end.Line() == l.start.Line() && l.end.Column() >= l.start.Column())
