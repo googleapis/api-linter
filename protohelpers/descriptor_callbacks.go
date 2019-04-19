@@ -139,6 +139,12 @@ func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error
 	return nil
 }
 
-func (c *DescriptorCallbacks) addProblems(p ...lint.Problem) {
-	c.problems = append(c.problems, p...)
+func (c *DescriptorCallbacks) addProblems(problems ...lint.Problem) {
+	for _, p := range problems {
+		if !p.Location.IsValid() {
+			loc, _ := c.source.DescriptorLocation(p.Descriptor)
+			p.Location = loc
+		}
+		c.problems = append(c.problems, p)
+	}
 }

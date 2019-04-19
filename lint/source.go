@@ -81,10 +81,10 @@ func newDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource,
 
 // findLocationByPath returns a `Location` if found in the map,
 // and (nil, ErrPathNotFound) if not found.
-func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
+func (s DescriptorSource) findLocationByPath(path []int) (*Location, error) {
 	l := s.m[newLocPath(path...)]
 	if l == nil {
-		return invalidLocation(), ErrPathNotFound
+		return nil, ErrPathNotFound
 	}
 	return newLocationFromSpan(l.GetSpan())
 }
@@ -103,38 +103,24 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 	}, nil
 }
 
-func newLocationFromSpan(span []int32) (Location, error) {
+func newLocationFromSpan(span []int32) (*Location, error) {
 	if len(span) == 4 {
-		return Location{
-			Start: Position{
-				Line:   int(span[0]),
-				Column: int(span[1]),
-			},
-			End: Position{
-				Line:   int(span[2]),
-				Column: int(span[3]),
-			},
-		}, nil
+		start := NewPosition(int(span[0]), int(span[1]))
+		end := NewPosition(int(span[2]), int(span[3]))
+		return NewLocation(start, end), nil
 	}
 
 	if len(span) == 3 {
-		return Location{
-			Start: Position{
-				Line:   int(span[0]),
-				Column: int(span[1]),
-			},
-			End: Position{
-				Line:   int(span[0]),
-				Column: int(span[2]),
-			},
-		}, nil
+		start := NewPosition(int(span[0]), int(span[1]))
+		end := NewPosition(int(span[0]), int(span[2]))
+		return NewLocation(start, end), nil
 	}
 
-	return invalidLocation(), fmt.Errorf("source: %v is not a valid span to create a Location", span)
+	return nil, fmt.Errorf("source: %v is not a valid span to create a Location", span)
 }
 
 // SyntaxLocation returns the location of the syntax definition.
-func (s DescriptorSource) SyntaxLocation() (Location, error) {
+func (s DescriptorSource) SyntaxLocation() (*Location, error) {
 	return s.findLocationByPath([]int{syntaxTag})
 }
 
@@ -145,7 +131,7 @@ func (s DescriptorSource) SyntaxComments() (Comments, error) {
 
 // DescriptorLocation returns a `Location` for the given descriptor.
 // If not found, returns (nil, ErrPathNotFound).
-func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Location, error) {
+func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (*Location, error) {
 	return s.findLocationByPath(getPath(d))
 }
 

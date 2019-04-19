@@ -7,36 +7,28 @@ import (
 	"github.com/jgeewax/api-linter/rules/testdata"
 )
 
-func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`
-	syntax = "proto2";
-	message Foo {
-	  optional string {{.FieldName}} = 1;
-	}`)
+func TestProtoVersionRule(t *testing.T) {
+	tmpl := testdata.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
 
 	tests := []struct {
-		FieldName  string
+		Syntax     string
 		numProblem int
 		suggestion string
 		startLine  int
 	}{
-		{"good_field_name", 0, "", -1},
-		{"BadFieldName", 1, "bad_field_name", 3},
-		{"badFieldName", 1, "bad_field_name", 3},
-		{"Bad_Field_Name", 1, "bad_field_name", 3},
-		{"bad_Field_Name", 1, "bad_field_name", 3},
-		{"badField_Name", 1, "bad_field_name", 3},
+		{"proto3", 0, "", 0},
+		{"proto2", 1, "proto3", 0},
 	}
 
-	rule := checkFieldNamesUseLowerSnakeCase()
-
+	rule := checkProtoVersion()
 	for _, test := range tests {
 		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
 
-		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
+		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
+
 		resp, err := rule.Lint(req)
 		if err != nil {
-			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+			t.Errorf("%s: Lint return error %v", errPrefix, err)
 		}
 
 		if got, want := len(resp.Problems), test.numProblem; got != want {
