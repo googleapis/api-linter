@@ -48,7 +48,7 @@ func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
 
 // ConsumeDescriptor implements `DescriptorConsumer`
 func (c *DescriptorCallbacks) ConsumeDescriptor(d protoreflect.Descriptor) error {
-	if c.source.IsRuleDisabled(c.Info().Name(), d) {
+	if c.source.IsRuleDisabled(c.Info().Name, d) {
 		return nil
 	}
 
