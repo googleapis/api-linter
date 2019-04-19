@@ -30,19 +30,10 @@ func (l *Location) End() *Position {
 // IsValid checks if the location is constructed properly and
 // returns true if so.
 func (l *Location) IsValid() bool {
-	if !l.start.IsValid() || !l.end.IsValid() {
-		return false
-	}
-
-	if l.start.Line() > l.end.Line() {
-		return false
-	}
-
-	if l.start.Line() == l.end.Line() && l.start.Column() > l.end.Column() {
-		return false
-	}
-
-	return true
+	return l.start.IsValid() &&
+		l.end.IsValid() &&
+		(l.end.Line() > l.start.Line() ||
+			l.end.Line() == l.start.Line() && l.end.Column() >= l.start.Column())
 }
 
 // String returns the string representation.
