@@ -8,5 +8,5 @@ type RuleInfo struct {
 	FileTypes   []FileType // types of files that this rule targets to.
 	Category    Category   // category of problems this rule produces.
 
-	noPositional bool // Prevent positional composite literal instantiation
+	noPositional struct{} // Prevent positional composite literal instantiation
 }

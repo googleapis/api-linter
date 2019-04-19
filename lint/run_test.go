@@ -31,7 +31,7 @@ func TestRunAll(t *testing.T) {
 	r2.On("Info").Return(lint.RuleInfo{Name: "b"})
 
 	rules, _ := lint.NewRules(r1, r2)
-	gotResp, err := lint.Run(*rules, req)
+	gotResp, err := lint.Run(rules, req)
 	if err != nil {
 		t.Errorf("Run: returns error %v, but wanted none", err)
 	}
