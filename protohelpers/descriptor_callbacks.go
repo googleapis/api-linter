@@ -36,6 +36,7 @@ func (c *DescriptorCallbacks) Lint(req lint.Request) (lint.Response, error) {
 	f := req.ProtoFile()
 
 	c.source = req.DescriptorSource()
+	c.problems = []lint.Problem{}
 
 	if err := WalkDescriptor(f, c); err != nil {
 		return lint.Response{}, err

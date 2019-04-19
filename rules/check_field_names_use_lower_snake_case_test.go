@@ -21,7 +21,11 @@ func TestFieldNamesUseLowerSnakeCase(t *testing.T) {
 		suggestion string
 	}{
 		{"good_field_name", 0, ""},
+		{"BadFieldName", 1, "bad_field_name"},
 		{"badFieldName", 1, "bad_field_name"},
+		{"Bad_Field_Name", 1, "bad_field_name"},
+		{"bad_Field_Name", 1, "bad_field_name"},
+		{"badField_Name", 1, "bad_field_name"},
 	}
 
 	rules, err := lint.NewRules(checkNamingFormats())
