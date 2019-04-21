@@ -4,8 +4,3 @@ package lint
 type Response struct {
 	Problems []Problem
 }
-
-// merge merges another response.
-func (resp *Response) merge(other Response) {
-	resp.Problems = append(resp.Problems, other.Problems...)
-}

@@ -14,12 +14,11 @@ func init() {
 // that checks if an API is using proto3.
 func checkProtoVersion() lint.Rule {
 	return &descriptor.CallbackRule{
-		RuleInfo: lint.RuleInfo{
+		RuleInfo: &lint.RuleInfo{
 			Name:        "proto_version",
 			Description: "APIs should use proto3",
 			URI:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
 			FileTypes:   []lint.FileType{lint.ProtoFile},
-			Category:    lint.CategoryError,
 		},
 		Callback: descriptor.Callbacks{
 			FileCallback: func(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {

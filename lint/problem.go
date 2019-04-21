@@ -19,4 +19,6 @@ type Problem struct {
 	// specified, then the starting location of the descriptor
 	// is used as the location of the problem.
 	Descriptor protoreflect.Descriptor
+	// Category of this problem, e.g., warning or error.
+	Category Category
 }

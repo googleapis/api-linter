@@ -1,16 +1,7 @@
 package lint
 
 import (
-	"errors"
-)
-
-var (
-	// ErrDuplicateName is the returned error when a duplicated rule ID is
-	// found in a rule registry.
-	ErrDuplicateName = errors.New("rule registry: found duplicate name")
-	// ErrNotFound is the returned error when a rule is not found in a
-	// rule registry
-	ErrNotFound = errors.New("rule registry: rule is not found")
+	"fmt"
 )
 
 // Rules is a registry for registering and looking up rules.
@@ -30,22 +21,25 @@ func (r *Rules) Copy() *Rules {
 }
 
 // Register registers the list of rules.
-// It returns `ErrDuplicateName` if any of the rules is found duplicate
+// It returns an error if any of the rules is found duplicate
 // in the registry.
 func (r *Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
 		if _, found := r.ruleMap[rl.Info().Name]; found {
-			return ErrDuplicateName
+			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
 		}
+
+		// set default category and status if they are empty.
+		if rl.Info().Category == "" {
+			rl.Info().Category = DefaultCategory
+		}
+		if rl.Info().Status == "" {
+			rl.Info().Status = DefaultStatus
+		}
+
 		r.ruleMap[rl.Info().Name] = rl
 	}
 	return nil
-}
-
-// Merge merges another rule registry.
-// If any rule is found duplicate, returns `ErrDuplicateName`.
-func (r *Rules) Merge(other Rules) error {
-	return r.Register(other.All()...)
 }
 
 // All returns all rules.
