@@ -15,7 +15,7 @@ func init() {
 func checkFieldNamesUseLowerSnakeCase() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: &lint.RuleInfo{
-			Name:        "naming_formats::field",
+			Name:        "naming_formats" + lint.NameSeparator + "field_names",
 			Description: "check that field names use lower snake case",
 			URI:         "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
 			FileTypes:   []lint.FileType{lint.ProtoFile},

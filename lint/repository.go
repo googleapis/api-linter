@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	// PathSeparator denotes the separator in the rule name.
-	PathSeparator string = "::"
+	// NameSeparator denotes the separator in the rule name.
+	NameSeparator string = "::"
 )
 
 // Repository stores a set of rules.
@@ -24,10 +24,11 @@ func NewRepository() *Repository {
 }
 
 // AddRule adds rules, of which the name will be added a prefix to
-// reduce name conflict, and it will be applied with a default config.
+// reduce conflict, and the status and category will be changed
+// by the given rule config.
 func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error {
 	for _, rl := range rule {
-		rl.Info().Name = prefix + PathSeparator + rl.Info().Name
+		rl.Info().Name = prefix + NameSeparator + rl.Info().Name
 		if cfg.Status != "" {
 			rl.Info().Status = cfg.Status
 		}
@@ -43,7 +44,13 @@ func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error 
 	return nil
 }
 
-// Run executes rules on the request after applying the config.
+// Run executes rules on the request when a config is found for the file path
+// of the request.
+//
+// If the found config contains rule configs for some rules, the status and
+// category of the affected rules will be updated accordingly. In other words,
+// rule configs can be used to turn on/off certain rules and change the category
+// of the returned problems.
 func (r *Repository) Run(req Request, configs Configs) (Response, error) {
 	cfg, err := configs.Search(req.ProtoFile().Path())
 	if err != nil {

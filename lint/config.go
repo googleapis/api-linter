@@ -36,15 +36,15 @@ func ReadConfigsJSON(f io.Reader) (Configs, error) {
 	return c, nil
 }
 
-// RuleConfig stores a configuration that can be used
-// to change a rule info.
+// RuleConfig stores the status and category of a rule,
+// which can be applied to a rule during runtime.
 type RuleConfig struct {
 	Status   Status   `json:"status"`
 	Category Category `json:"category"`
 }
 
-// Config stores rule configurations that should be applied to files
-// with a path that matches any of the included paths but none of
+// Config stores rule runtime configurations and file spec that
+// a path must match any of the included paths but none of
 // the excluded paths.
 type Config struct {
 	IncludedPaths []string              `json:"included_paths"`
