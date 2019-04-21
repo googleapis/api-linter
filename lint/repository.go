@@ -69,7 +69,12 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 		}
 		for prefix, c := range ruleCfgMap {
 			if strings.HasPrefix(name, prefix) {
-				ruleCfg = c
+				if c.Status != "" {
+					ruleCfg.Status = c.Status
+				}
+				if c.Category != "" {
+					ruleCfg.Category = c.Category
+				}
 				break
 			}
 		}
