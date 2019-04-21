@@ -1,4 +1,4 @@
-package protohelpers
+package descriptor
 
 import (
 	"errors"
@@ -13,20 +13,20 @@ import (
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
-//go:generate protoc --include_source_info --descriptor_set_out=testdata/walk_file_test.protoset --proto_path=testdata testdata/walk_file_test.proto
+//go:generate protoc --include_source_info --descriptor_set_out=testdata/test.protoset --proto_path=testdata testdata/test.proto
 
 type mockConsumer struct {
 	count int
 	err   error
 }
 
-func (m *mockConsumer) ConsumeDescriptor(d protoreflect.Descriptor) error {
+func (m *mockConsumer) Consume(d protoreflect.Descriptor) error {
 	m.count++
 	return m.err
 }
 
-func TestWalkDescriptor(t *testing.T) {
-	f := readProtoFile("walk_file_test.protoset")
+func TestWalk(t *testing.T) {
+	f := readProtoFile("test.protoset")
 	tests := []struct {
 		descriptor protoreflect.Descriptor
 		num        int
@@ -59,20 +59,20 @@ func TestWalkDescriptor(t *testing.T) {
 	for _, test := range tests {
 		consumer := new(mockConsumer)
 
-		WalkDescriptor(test.descriptor, consumer)
+		Walk(test.descriptor, consumer)
 		if consumer.count != test.num {
 			t.Errorf("Walk(%s): Got %d desriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
 		}
 	}
 }
 
-func TestWalkDescriptorWithErr(t *testing.T) {
+func TestWalkWithErr(t *testing.T) {
 	consumer := &mockConsumer{
 		err: errors.New("stop"),
 	}
-	f := readProtoFile("walk_file_test.protoset")
+	f := readProtoFile("test.protoset")
 
-	WalkDescriptor(f, consumer)
+	Walk(f, consumer)
 	if consumer.count != 1 {
 		t.Errorf("Walk(%s) with error: got %d descriptors, but wanted 1", f.FullName(), consumer.count)
 	}
