@@ -51,7 +51,7 @@ func TestRuleName_HasPrefix(t *testing.T) {
 		{"a::b::c", []string{"a"}, true},
 		{"a::b::c", []string{"a::b"}, true},
 		{"a::b::c::d", []string{"a::b", "c"}, true},
-		{"a::b::c", []string{"a::b::c"}, false},
+		{"a::b::c", []string{"a::b::c"}, true},
 		{"ab::b::c", []string{"a"}, false},
 	}
 

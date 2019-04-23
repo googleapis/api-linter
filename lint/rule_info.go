@@ -83,8 +83,8 @@ func (r RuleName) WithPrefix(prefix ...string) RuleName {
 //
 // r.HasPrefix("foo::bar")          == true
 // r.HasPrefix("foo", "bar")        == true
-// r.HasPrefix("foo", "bar", "baz") == false  // prefix cannot be the entire string
-// r.HasPrefix("foo", "ba")         == false  // prefix must match a full namespace
+// r.HasPrefix("foo", "bar", "baz") == true   // matches the entire string
+// r.HasPrefix("foo", "ba")         == false  // prefix must end on a delimiter
 func (r RuleName) HasPrefix(prefix ...string) bool {
 	prefixSegments := make([]string, 0, len(prefix))
 
@@ -92,5 +92,11 @@ func (r RuleName) HasPrefix(prefix ...string) bool {
 		prefixSegments = append(prefixSegments, strings.Split(prefixSegment, "::")...)
 	}
 
-	return strings.HasPrefix(string(r), strings.Join(prefixSegments, nameSeparator)+nameSeparator)
+	prefixStr := strings.Join(prefixSegments, nameSeparator)
+
+	if string(r) == prefixStr {
+		return true
+	}
+
+	return strings.HasPrefix(string(r), prefixStr+nameSeparator)
 }

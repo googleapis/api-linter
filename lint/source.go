@@ -246,7 +246,7 @@ func stringsContains(comments []string, s string) bool {
 }
 
 func ruleDisablingComment(name RuleName) string {
-	return fmt.Sprintf("(-- api-linter: %v =disabled --)", name)
+	return fmt.Sprintf("(-- api-linter: %s=disabled --)", name)
 }
 
 func (s DescriptorSource) fileComments() Comments {
