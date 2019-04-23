@@ -40,3 +40,27 @@ func TestNewRuleName(t *testing.T) {
 		}
 	}
 }
+
+func TestRuleName_HasPrefix(t *testing.T) {
+	tests := []struct {
+		r         RuleName
+		prefix    []string
+		hasPrefix bool
+	}{
+		{"a::b::c", []string{"a", "b"}, true},
+		{"a::b::c", []string{"a"}, true},
+		{"a::b::c", []string{"a::b"}, true},
+		{"a::b::c::d", []string{"a::b", "c"}, true},
+		{"a::b::c", []string{"a::b::c"}, false},
+		{"ab::b::c", []string{"a"}, false},
+	}
+
+	for _, test := range tests {
+		if test.r.HasPrefix(test.prefix...) != test.hasPrefix {
+			t.Errorf(
+				"%q.HasPrefix(%v)=%t; want %t",
+				test.r, test.prefix, test.r.HasPrefix(test.prefix...), test.hasPrefix,
+			)
+		}
+	}
+}

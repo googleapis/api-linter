@@ -31,7 +31,7 @@ func NewRepository() *Repository {
 func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error {
 	for _, rl := range rule {
 		e := ruleEntry{
-			name:            rl.Info().Name.WithPrefix(RuleName(prefix)),
+			name:            rl.Info().Name.WithPrefix(prefix),
 			rule:            rl,
 			defaultCategory: rl.Info().Category,
 			status:          Enabled,
@@ -75,7 +75,7 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 			Category: rl.defaultCategory,
 		}
 		for prefix, c := range ruleCfgMap {
-			if strings.HasPrefix(string(name), prefix) {
+			if name.HasPrefix(prefix) {
 				if c.Status != "" {
 					ruleCfg.Status = c.Status
 				}
