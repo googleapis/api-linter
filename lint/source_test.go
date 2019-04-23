@@ -194,7 +194,7 @@ func TestIsRuleDisabled(t *testing.T) {
 
 	tests := []struct {
 		desc     protoreflect.Descriptor
-		rule     string
+		rule     RuleName
 		disabled bool
 	}{
 		{

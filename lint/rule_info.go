@@ -1,8 +1,13 @@
 package lint
 
+import (
+	"regexp"
+	"strings"
+)
+
 // RuleInfo stores information of a rule.
 type RuleInfo struct {
-	Name        string     // rule name in the set.
+	Name        RuleName   // rule name in the set.
 	Description string     // a short description of this rule.
 	URI         string     // a link to a document for more details.
 	FileTypes   []FileType // types of files that this rule targets to.
@@ -45,3 +50,23 @@ const (
 	// DefaultStatus denotes the default value of Status.
 	DefaultStatus Status = Disabled
 )
+
+// RuleName is an identifier for a rule. Allowed characters include a-z, A-Z, 0-9, -, _. The
+// namespace separator :: is allowed between RuleName segments (for example, my_namespace::my_rule).
+type RuleName string
+
+const nameSeparator string = "::"
+
+var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::)?)+[a-zA-Z0-9-_]+$")
+
+func NewRuleName(segments ...string) RuleName {
+	return RuleName(strings.Join(segments, nameSeparator))
+}
+
+func (r RuleName) IsValid() bool {
+	return r != "" && ruleNameValidator.Match([]byte(r))
+}
+
+func (r RuleName) WithPrefix(prefix RuleName) RuleName {
+	return RuleName(string(prefix) + nameSeparator + string(r))
+}
