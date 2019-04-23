@@ -12,7 +12,6 @@ type RuleInfo struct {
 	URI         string     // a link to a document for more details.
 	FileTypes   []FileType // types of files that this rule targets to.
 	Category    Category   // category of problems this rule produces.
-	Status      Status     // status of this rule, either enabled, disabled, or deprecated.
 
 	noPositional struct{} // Prevent positional composite literal instantiation
 }

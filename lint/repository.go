@@ -8,13 +8,20 @@ import (
 
 // Repository stores a set of rules.
 type Repository struct {
-	ruleMap map[RuleName]Rule
+	ruleMap map[RuleName]ruleEntry
+}
+
+type ruleEntry struct {
+	name            RuleName
+	rule            Rule
+	defaultCategory Category
+	status          Status
 }
 
 // NewRepository creates a new Repository.
 func NewRepository() *Repository {
 	return &Repository{
-		ruleMap: make(map[RuleName]Rule),
+		ruleMap: make(map[RuleName]ruleEntry),
 	}
 }
 
@@ -23,18 +30,23 @@ func NewRepository() *Repository {
 // by the given rule config.
 func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error {
 	for _, rl := range rule {
-		rl.Info().Name = rl.Info().Name.WithPrefix(RuleName(prefix))
+		e := ruleEntry{
+			name:            rl.Info().Name.WithPrefix(RuleName(prefix)),
+			rule:            rl,
+			defaultCategory: rl.Info().Category,
+			status:          Enabled,
+		}
 		if cfg.Status != "" {
-			rl.Info().Status = cfg.Status
+			e.status = cfg.Status
 		}
 		if cfg.Category != "" {
-			rl.Info().Category = cfg.Category
+			e.defaultCategory = cfg.Category
 		}
 
-		if _, found := r.ruleMap[rl.Info().Name]; found {
-			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
+		if _, found := r.ruleMap[e.name]; found {
+			return fmt.Errorf("duplicate repository entry with name %q", e.name)
 		}
-		r.ruleMap[rl.Info().Name] = rl
+		r.ruleMap[e.name] = e
 	}
 	return nil
 }

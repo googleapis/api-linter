@@ -33,14 +33,6 @@ func (r *Rules) Register(rules ...Rule) error {
 			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
 		}
 
-		// set default category and status if they are empty.
-		if rl.Info().Category == "" {
-			rl.Info().Category = DefaultCategory
-		}
-		if rl.Info().Status == "" {
-			rl.Info().Status = DefaultStatus
-		}
-
 		r.ruleMap[rl.Info().Name] = rl
 	}
 	return nil
