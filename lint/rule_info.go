@@ -59,14 +59,17 @@ const nameSeparator string = "::"
 
 var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::)?)+[a-zA-Z0-9-_]+$")
 
+// NewRuleName creates a RuleName from segments. It will join the segments with the "::" separator.
 func NewRuleName(segments ...string) RuleName {
 	return RuleName(strings.Join(segments, nameSeparator))
 }
 
+// IsValid checks if a RuleName is syntactically valid
 func (r RuleName) IsValid() bool {
 	return r != "" && ruleNameValidator.Match([]byte(r))
 }
 
+// WithPrefix prepends a prefix to the RuleName, separating it with ::
 func (r RuleName) WithPrefix(prefix RuleName) RuleName {
 	if prefix == "" {
 		return r
