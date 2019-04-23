@@ -18,7 +18,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 		"test",
 		RuleConfig{Status: Enabled, Category: Warning},
 		&mockRule{
-			info: &RuleInfo{Name: "rule1"},
+			info: RuleInfo{Name: "rule1"},
 			lintResp: Response{
 				Problems: []Problem{{Message: "rule1_problem"}},
 			},
@@ -35,7 +35,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 				Config{IncludedPaths: []string{"*"}},
 			},
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: Warning}},
+				Problems: []Problem{{Message: "rule1_problem", category: Warning}},
 			},
 		},
 		{
@@ -59,7 +59,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 				},
 			},
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: Error}},
+				Problems: []Problem{{Message: "rule1_problem", category: Error}},
 			},
 		},
 	}
@@ -67,7 +67,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 	for _, test := range tests {
 		resp, _ := repo.Run(req, test.configs)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Repository.Run returns response `%s`, but want `%s` with configs `%v`", resp, test.resp, test.configs)
+			t.Errorf("Repository.Run returns response %q, but want %q with configs `%v`", resp, test.resp, test.configs)
 		}
 	}
 }

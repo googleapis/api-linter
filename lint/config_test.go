@@ -14,7 +14,7 @@ func TestConfigs_Search(t *testing.T) {
 	}{
 		{nil, "a", false},
 		{
-			Configs{{IncludedPaths: []string{"a/*.proto"}}},
+			Configs{{IncludedPaths: []string{"a/*/*.proto"}}},
 			"a/c/d.proto",
 			true,
 		},
@@ -37,7 +37,7 @@ func TestConfigs_Search(t *testing.T) {
 	for _, test := range tests {
 		_, err := test.configs.Search(test.path)
 		if found := err == nil; found != test.found {
-			t.Errorf("Configs.Search path `%s` returned error: %v, but expect found: %v", test.path, err, test.found)
+			t.Errorf("Configs.Search path %q returned error: %v, but expect found: %v", test.path, err, test.found)
 		}
 	}
 }
@@ -76,6 +76,6 @@ func TestReadConfigsJSON(t *testing.T) {
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
-		t.Errorf("ReadConfigsJSON returns `%s`, but want `%s`", configs, expected)
+		t.Errorf("ReadConfigsJSON returns %q, but want %q", configs, expected)
 	}
 }

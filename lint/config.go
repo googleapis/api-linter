@@ -20,7 +20,7 @@ func (c Configs) Search(path string) (*Config, error) {
 			return &cfg, nil
 		}
 	}
-	return nil, fmt.Errorf("no config matches path `%s`", path)
+	return nil, fmt.Errorf("no config matches path %q", path)
 }
 
 // ReadConfigsJSON reads Configs from a JSON file.

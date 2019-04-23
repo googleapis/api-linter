@@ -71,8 +71,8 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 	errMessages := []string{}
 	for name, rl := range r.ruleMap {
 		ruleCfg := RuleConfig{
-			Status:   rl.Info().Status,
-			Category: rl.Info().Category,
+			Status:   rl.status,
+			Category: rl.defaultCategory,
 		}
 		for prefix, c := range ruleCfgMap {
 			if strings.HasPrefix(string(name), prefix) {
@@ -86,9 +86,9 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 			}
 		}
 		if ruleCfg.Status == Enabled {
-			if resp, err := rl.Lint(req); err == nil {
+			if resp, err := rl.rule.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-					p.Category = ruleCfg.Category
+					p.category = ruleCfg.Category
 					finalResp.Problems = append(finalResp.Problems, p)
 				}
 			} else {
