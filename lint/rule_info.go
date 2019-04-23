@@ -78,6 +78,22 @@ func (r RuleName) WithPrefix(prefix RuleName) RuleName {
 	return RuleName(string(prefix) + nameSeparator + string(r))
 }
 
-func (r RuleName) HasPrefix(prefix string) bool {
-	return strings.HasPrefix(string(r), prefix+"::")
+// HasPrefix returns true if r contains prefix as a namespace. prefix parameters can be "::" delimited
+// or specified as independent parameters.
+// For example:
+//
+// r := NewRuleName("foo", "bar", "baz")   // string(r) == "foo::bar::baz"
+//
+// r.HasPrefix("foo::bar")          == true
+// r.HasPrefix("foo", "bar")        == true
+// r.HasPrefix("foo", "bar", "baz") == false  // prefix cannot be the entire string
+// r.HasPrefix("foo", "ba")         == false  // prefix must match a full namespace
+func (r RuleName) HasPrefix(prefix ...string) bool {
+	prefixSegments := make([]string, 0, len(prefix))
+
+	for _, prefixSegment := range prefix {
+		prefixSegments = append(prefixSegments, strings.Split(prefixSegment, "::")...)
+	}
+
+	return strings.HasPrefix(string(r), strings.Join(prefixSegments, nameSeparator)+nameSeparator)
 }
