@@ -95,9 +95,5 @@ func (r RuleName) HasPrefix(prefix ...string) bool {
 
 	prefixStr := strings.Join(prefixSegments, nameSeparator)
 
-	if string(r) == prefixStr {
-		return true
-	}
-
-	return strings.HasPrefix(string(r), prefixStr+nameSeparator)
+	return string(r) == prefixStr || strings.HasPrefix(string(r), prefixStr+nameSeparator)
 }
