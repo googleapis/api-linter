@@ -14,7 +14,7 @@ func TestConfigs_Search(t *testing.T) {
 	}{
 		{nil, "a", false},
 		{
-			Configs{{IncludedPaths: []string{"a/*.proto"}}},
+			Configs{{IncludedPaths: []string{"a/*/*.proto"}}},
 			"a/c/d.proto",
 			true,
 		},
