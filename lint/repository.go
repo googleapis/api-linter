@@ -23,7 +23,7 @@ func NewRepository() *Repository {
 // by the given rule config.
 func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error {
 	for _, rl := range rule {
-		rl.Info().Name = rl.Info().Name.WithPrefix(RuleName(prefix))
+		rl.Info().Name = rl.Info().Name.WithPrefix(prefix)
 		if cfg.Status != "" {
 			rl.Info().Status = cfg.Status
 		}

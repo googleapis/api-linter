@@ -70,12 +70,10 @@ func (r RuleName) IsValid() bool {
 }
 
 // WithPrefix prepends a prefix to the RuleName, separating it with ::
-func (r RuleName) WithPrefix(prefix RuleName) RuleName {
-	if prefix == "" {
-		return r
-	}
+func (r RuleName) WithPrefix(prefix ...string) RuleName {
+	fullPrefix := strings.Join(prefix, nameSeparator)
 
-	return RuleName(string(prefix) + nameSeparator + string(r))
+	return RuleName(fullPrefix + nameSeparator + string(r))
 }
 
 // HasPrefix returns true if r contains prefix as a namespace. prefix parameters can be "::" delimited
