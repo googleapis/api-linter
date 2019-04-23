@@ -56,7 +56,7 @@ type RuleName string
 
 const nameSeparator string = "::"
 
-var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::)?)+[a-zA-Z0-9-_]+$")
+var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::[a-zA-Z0-9-_]+)?)+$")
 
 // NewRuleName creates a RuleName from segments. It will join the segments with the "::" separator.
 func NewRuleName(segments ...string) RuleName {
