@@ -1,8 +1,13 @@
 package lint
 
+import (
+	"regexp"
+	"strings"
+)
+
 // RuleInfo stores information of a rule.
 type RuleInfo struct {
-	Name        string     // rule name in the set.
+	Name        RuleName   // rule name in the set.
 	Description string     // a short description of this rule.
 	URI         string     // a link to a document for more details.
 	FileTypes   []FileType // types of files that this rule targets to.
@@ -45,3 +50,50 @@ const (
 	// DefaultStatus denotes the default value of Status.
 	DefaultStatus Status = Disabled
 )
+
+// RuleName is an identifier for a rule. Allowed characters include a-z, A-Z, 0-9, -, _. The
+// namespace separator :: is allowed between RuleName segments (for example, my_namespace::my_rule).
+type RuleName string
+
+const nameSeparator string = "::"
+
+var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::[a-zA-Z0-9-_]+)?)+$")
+
+// NewRuleName creates a RuleName from segments. It will join the segments with the "::" separator.
+func NewRuleName(segments ...string) RuleName {
+	return RuleName(strings.Join(segments, nameSeparator))
+}
+
+// IsValid checks if a RuleName is syntactically valid
+func (r RuleName) IsValid() bool {
+	return r != "" && ruleNameValidator.Match([]byte(r))
+}
+
+// WithPrefix prepends a prefix to the RuleName, separating it with ::
+func (r RuleName) WithPrefix(prefix ...string) RuleName {
+	fullPrefix := NewRuleName(prefix...)
+
+	return RuleName(string(fullPrefix) + nameSeparator + string(r))
+}
+
+// HasPrefix returns true if r contains prefix as a namespace. prefix parameters can be "::" delimited
+// or specified as independent parameters.
+// For example:
+//
+// r := NewRuleName("foo", "bar", "baz")   // string(r) == "foo::bar::baz"
+//
+// r.HasPrefix("foo::bar")          == true
+// r.HasPrefix("foo", "bar")        == true
+// r.HasPrefix("foo", "bar", "baz") == true   // matches the entire string
+// r.HasPrefix("foo", "ba")         == false  // prefix must end on a delimiter
+func (r RuleName) HasPrefix(prefix ...string) bool {
+	prefixSegments := make([]string, 0, len(prefix))
+
+	for _, prefixSegment := range prefix {
+		prefixSegments = append(prefixSegments, strings.Split(prefixSegment, "::")...)
+	}
+
+	prefixStr := strings.Join(prefixSegments, nameSeparator)
+
+	return string(r) == prefixStr || strings.HasPrefix(string(r), prefixStr+nameSeparator)
+}

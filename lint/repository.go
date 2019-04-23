@@ -6,20 +6,15 @@ import (
 	"strings"
 )
 
-const (
-	// NameSeparator denotes the separator in the rule name.
-	NameSeparator string = "::"
-)
-
 // Repository stores a set of rules.
 type Repository struct {
-	ruleMap map[string]Rule
+	ruleMap map[RuleName]Rule
 }
 
 // NewRepository creates a new Repository.
 func NewRepository() *Repository {
 	return &Repository{
-		ruleMap: make(map[string]Rule),
+		ruleMap: make(map[RuleName]Rule),
 	}
 }
 
@@ -28,7 +23,7 @@ func NewRepository() *Repository {
 // by the given rule config.
 func (r *Repository) AddRule(prefix string, cfg RuleConfig, rule ...Rule) error {
 	for _, rl := range rule {
-		rl.Info().Name = prefix + NameSeparator + rl.Info().Name
+		rl.Info().Name = rl.Info().Name.WithPrefix(prefix)
 		if cfg.Status != "" {
 			rl.Info().Status = cfg.Status
 		}
@@ -68,7 +63,7 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 			Category: rl.Info().Category,
 		}
 		for prefix, c := range ruleCfgMap {
-			if strings.HasPrefix(name, prefix) {
+			if name.HasPrefix(prefix) {
 				if c.Status != "" {
 					ruleCfg.Status = c.Status
 				}
