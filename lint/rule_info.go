@@ -68,5 +68,9 @@ func (r RuleName) IsValid() bool {
 }
 
 func (r RuleName) WithPrefix(prefix RuleName) RuleName {
+	if prefix == "" {
+		return r
+	}
+
 	return RuleName(string(prefix) + nameSeparator + string(r))
 }
