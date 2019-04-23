@@ -77,3 +77,7 @@ func (r RuleName) WithPrefix(prefix RuleName) RuleName {
 
 	return RuleName(string(prefix) + nameSeparator + string(r))
 }
+
+func (r RuleName) HasPrefix(prefix string) bool {
+	return strings.HasPrefix(string(r), prefix+"::")
+}
