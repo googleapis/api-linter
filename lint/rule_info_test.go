@@ -8,6 +8,8 @@ func TestRuleName_IsValid(t *testing.T) {
 		valid bool
 	}{
 		{"", false},
+		{"a:::b", false},
+		{"a::::b", false},
 		{"a", true},
 		{"::my_rule", false},
 		{"my_namespace::", false},
