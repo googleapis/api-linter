@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 )
 
-// Configs stores a list of RuntimeConfig and supports config lookup
+// RuntimeConfigs stores a list of RuntimeConfig and supports config lookup
 // for a given path.
-type Configs []RuntimeConfig
+type RuntimeConfigs []RuntimeConfig
 
 // Search returns the first found config that matches the path
 // or an error if not found.
-func (c Configs) Search(path string) (*RuntimeConfig, error) {
+func (c RuntimeConfigs) Search(path string) (*RuntimeConfig, error) {
 	for _, cfg := range c {
 		if cfg.match(path) {
 			return &cfg, nil
@@ -23,13 +23,13 @@ func (c Configs) Search(path string) (*RuntimeConfig, error) {
 	return nil, fmt.Errorf("no config matches path %q", path)
 }
 
-// ReadConfigsJSON reads Configs from a JSON file.
-func ReadConfigsJSON(f io.Reader) (Configs, error) {
+// ReadConfigsJSON reads RuntimeConfigs from a JSON file.
+func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
-	var c Configs
+	var c RuntimeConfigs
 	if err := json.Unmarshal(b, &c); err != nil {
 		return nil, err
 	}

@@ -38,7 +38,7 @@ func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
 // category of the affected rules will be updated accordingly. In other words,
 // rule configs can be used to turn on/off certain rules and change the category
 // of the returned problems.
-func (r *Runtime) Run(req Request, configs Configs) (Response, error) {
+func (r *Runtime) Run(req Request, configs RuntimeConfigs) (Response, error) {
 	cfg, err := configs.Search(req.ProtoFile().Path())
 
 	if err != nil {

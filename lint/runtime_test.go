@@ -29,13 +29,13 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 	}
 
 	tests := []struct {
-		configs Configs
+		configs RuntimeConfigs
 		resp    Response
 	}{
-		{Configs{}, Response{}},
-		{Configs{RuntimeConfig{IncludedPaths: []string{"nofile"}}}, Response{}},
+		{RuntimeConfigs{}, Response{}},
+		{RuntimeConfigs{RuntimeConfig{IncludedPaths: []string{"nofile"}}}, Response{}},
 		{
-			Configs{
+			RuntimeConfigs{
 				RuntimeConfig{IncludedPaths: []string{"*"}},
 			},
 			Response{
@@ -43,7 +43,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 			},
 		},
 		{
-			Configs{
+			RuntimeConfigs{
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
@@ -54,7 +54,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 			Response{},
 		},
 		{
-			Configs{
+			RuntimeConfigs{
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
