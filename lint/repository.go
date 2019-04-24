@@ -67,6 +67,7 @@ func (r *Repository) Run(req Request, configs Configs) (Response, error) {
 }
 
 func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Response, error) {
+	disabledRules := newDisabledRuleFinder(req.ProtoFile(), req.DescriptorSource())
 	finalResp := Response{}
 	errMessages := []string{}
 	for name, rl := range r.ruleMap {
@@ -88,8 +89,17 @@ func (r *Repository) run(req Request, ruleCfgMap map[string]RuleConfig) (Respons
 		if ruleCfg.Status == Enabled {
 			if resp, err := rl.rule.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-					p.category = ruleCfg.Category
-					finalResp.Problems = append(finalResp.Problems, p)
+					ruleDisabled := false
+					if p.Location != nil {
+						ruleDisabled = disabledRules.isRuleDisabledAtLocation(name, p.Location)
+					} else {
+						ruleDisabled = disabledRules.isRuleDisabledAtDescriptor(name, p.Descriptor)
+					}
+
+					if !ruleDisabled {
+						p.category = ruleCfg.Category
+						finalResp.Problems = append(finalResp.Problems, p)
+					}
 				}
 			} else {
 				errMessages = append(errMessages, err.Error())

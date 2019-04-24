@@ -1,4 +1,5 @@
-package descriptor
+// Package protowalk contains functions that walks and consumes a proto descriptor.
+package protowalk
 
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"

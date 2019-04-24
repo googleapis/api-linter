@@ -1,4 +1,4 @@
-package descriptor
+package protowalk
 
 import (
 	"errors"

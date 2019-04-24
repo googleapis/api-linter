@@ -4,6 +4,7 @@ package descriptor
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/jgeewax/api-linter/lint"
+	"github.com/jgeewax/api-linter/lint/protowalk"
 )
 
 // Callback defines a callback that can be invoke on a descriptor
@@ -33,7 +34,7 @@ func (r *CallbackRule) Lint(req lint.Request) (lint.Response, error) {
 	r.source = req.DescriptorSource()
 	r.problems = []lint.Problem{}
 
-	if err := Walk(req.ProtoFile(), r); err != nil {
+	if err := protowalk.Walk(req.ProtoFile(), r); err != nil {
 		return lint.Response{}, err
 	}
 
@@ -42,10 +43,6 @@ func (r *CallbackRule) Lint(req lint.Request) (lint.Response, error) {
 
 // Consume implements `Consumer` that will check the given descriptor.
 func (r *CallbackRule) Consume(d protoreflect.Descriptor) error {
-	if r.source.IsRuleDisabled(r.Info().Name, d) {
-		return nil
-	}
-
 	problems, err := r.Callback.Apply(d, r.source)
 	if err != nil {
 		return err

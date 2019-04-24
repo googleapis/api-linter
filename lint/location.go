@@ -48,6 +48,13 @@ func (l *Location) String() string {
 	return fmt.Sprintf("{start: %s, end: %s}", l.Start(), l.End())
 }
 
+// contains returns true if `s` is in the range defined by `l`.
+func (l *Location) contains(s *Location) bool {
+	startBefore := l.Start().Line() < s.Start().Line() || (l.Start().Line() == s.Start().Line() && l.Start().Column() <= s.Start().Column())
+	endAfter := l.End().Line() > s.End().Line() || (l.End().Line() == s.End().Line() && l.End().Column() >= s.End().Column())
+	return startBefore && endAfter
+}
+
 // Position describes a zero-based position in a source code file.
 // Typically you will want to add 1 to each before displaying to a user.
 // Use `NewPosition` to create a new Position -- `Position{}` will be

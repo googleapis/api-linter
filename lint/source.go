@@ -3,11 +3,13 @@ package lint
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"github.com/jgeewax/api-linter/lint/protowalk"
 )
 
 var (
@@ -219,37 +221,68 @@ func reverseInts(a []int) {
 	}
 }
 
-// IsRuleDisabled check if a rule is disabled for a descriptor
-// in the comments.
-func (s DescriptorSource) IsRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
-	comments, err := s.DescriptorComments(d)
-	if err != nil {
-		return true
-	}
+var ruleDisabledPattern = fmt.Sprintf("\\(-- api-linter: (%s)=disabled --\\)", ruleNamePattern)
+var ruleDisabledRegexp = regexp.MustCompile(ruleDisabledPattern)
 
-	commentsToCheck := []string{
-		comments.LeadingComments,
-		comments.TrailingComments,
+func findDisabledRules(s string) []string {
+	match := ruleDisabledRegexp.FindAllStringSubmatch(s, -1)
+	results := make([]string, len(match))
+	for i, m := range match {
+		results[i] = m[1]
 	}
-	commentsToCheck = append(commentsToCheck, s.fileComments().LeadingDetachedComments...)
-
-	return stringsContains(commentsToCheck, ruleDisablingComment(name))
+	return results
 }
 
-func stringsContains(comments []string, s string) bool {
-	for _, c := range comments {
-		if strings.Contains(c, s) {
+type disabledRuleFinder struct {
+	ruleLocs map[string][]*Location
+	source   DescriptorSource
+}
+
+func (finder *disabledRuleFinder) isRuleDisabledAtLocation(name RuleName, loc *Location) bool {
+	for _, l := range finder.ruleLocs[string(name)] {
+		if l.contains(loc) {
 			return true
 		}
 	}
 	return false
 }
 
-func ruleDisablingComment(name RuleName) string {
-	return fmt.Sprintf("(-- api-linter: %s=disabled --)", name)
+func (finder *disabledRuleFinder) isRuleDisabledAtDescriptor(name RuleName, d protoreflect.Descriptor) bool {
+	loc, err := finder.source.DescriptorLocation(d)
+	if err != nil {
+		return false
+	}
+	return finder.isRuleDisabledAtLocation(name, loc)
 }
 
-func (s DescriptorSource) fileComments() Comments {
-	comments, _ := s.SyntaxComments()
-	return comments
+const uintSize = 32 << (^uint(0) >> 32 & 1) // 32 or 64
+
+const (
+	maxInt = 1<<(uintSize-1) - 1 // 1<<31 - 1 or 1<<63 - 1
+)
+
+func (finder *disabledRuleFinder) Consume(d protoreflect.Descriptor) error {
+	comments, _ := finder.source.DescriptorComments(d)
+	location, _ := finder.source.DescriptorLocation(d)
+	s := comments.LeadingComments + "\n" + comments.TrailingComments
+	if _, ok := d.(protoreflect.FileDescriptor); ok {
+		comments, _ = finder.source.SyntaxComments()
+		location = NewLocation(NewPosition(0, 0), NewPosition(maxInt, maxInt))
+		s = strings.Join(comments.LeadingDetachedComments, "")
+	}
+
+	rules := findDisabledRules(s)
+	for _, rl := range rules {
+		finder.ruleLocs[rl] = append(finder.ruleLocs[rl], location)
+	}
+	return nil
+}
+
+func newDisabledRuleFinder(f protoreflect.FileDescriptor, s DescriptorSource) *disabledRuleFinder {
+	finder := &disabledRuleFinder{
+		ruleLocs: make(map[string][]*Location),
+		source:   s,
+	}
+	protowalk.Walk(f, finder)
+	return finder
 }

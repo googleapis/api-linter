@@ -1,5 +1,5 @@
 // DO NOT EDIT -- This is for `source_test.go`.
-// (-- api-linter: rule_all_disabled=disabled --)
+// (-- api-linter: rule_disabled_in_file=disabled --)
 // (-- api-linter: rule_not_disabled=enabled --)
 
 syntax = "proto2";
@@ -7,7 +7,8 @@ syntax = "proto2";
 package api.linter.lint;
 
 // Outer
-// (-- api-linter: rule_message_disabled_in_leading=disabled --)
+// (-- api-linter: rule_disabled_in_message_leading_comment=disabled --)
 message Outer {
-  optional string name = 1; // (-- api-linter: rule_field_disabled_in_trailing=disabled --)
+  optional string name = 1; // (-- api-linter: rule_disabled_in_field_trailing_comment=disabled --)
+  optional string value = 2;
 }

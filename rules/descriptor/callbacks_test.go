@@ -1,10 +1,16 @@
 package descriptor
 
 import (
+	"io/ioutil"
+	"log"
+	"path/filepath"
 	"reflect"
 	"testing"
 
+	"github.com/golang/protobuf/v2/proto"
+	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	"github.com/jgeewax/api-linter/lint"
 )
 
@@ -133,4 +139,22 @@ func TestCallbacks_Apply_DescriptorCallback(t *testing.T) {
 			t.Errorf("Callbacks.Apply returns %d problems, but want %d", got, want)
 		}
 	}
+}
+
+func readProtoFile(fileName string) protoreflect.FileDescriptor {
+	path := filepath.Join("testdata", fileName)
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("Unable to open %s: %v", path, err)
+	}
+	protoset := &descriptorpb.FileDescriptorSet{}
+	if err := proto.Unmarshal(bs, protoset); err != nil {
+		log.Fatalf("Unable to parse %T from %s: %v", protoset, path, err)
+	}
+	f, err := protodesc.NewFile(protoset.GetFile()[0], nil)
+	if err != nil {
+		log.Fatalf("protodesc.NewFile() error: %v", err)
+	}
+	return f
+
 }
