@@ -83,7 +83,7 @@ func TestRepository_Run(t *testing.T) {
 		err := runtime.AddRules(
 			"test",
 			&mockRule{
-				info: RuleInfo{Name: "rule1", Category: Warning},
+				info: RuleInfo{Name: "rule1"},
 				lintResp: Response{
 					Problems: ruleProblems,
 				},

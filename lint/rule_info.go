@@ -11,7 +11,6 @@ type RuleInfo struct {
 	Description string     // a short description of this rule.
 	URI         string     // a link to a document for more details.
 	FileTypes   []FileType // types of files that this rule targets to.
-	Category    Category   // category of problems this rule produces.
 
 	noPositional struct{} // Prevent positional composite literal instantiation
 }
@@ -32,8 +31,6 @@ const (
 	Error Category = "error"
 	// Warning indicates that in the API, something can be do better.
 	Warning Category = "warning"
-	// DefaultCategory denotes the default value of Category
-	DefaultCategory Category = Warning
 )
 
 // Status defines whether a rule is enabled, disabled or deprecated.
@@ -46,8 +43,6 @@ const (
 	Disabled Status = "disabled"
 	// Deprecated indicates that a rule should be deprecated.
 	Deprecated Status = "Deprecated"
-	// DefaultStatus denotes the default value of Status.
-	DefaultStatus Status = Disabled
 )
 
 // RuleName is an identifier for a rule. Allowed characters include a-z, A-Z, 0-9, -, _. The
