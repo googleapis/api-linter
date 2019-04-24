@@ -14,8 +14,18 @@ func TestConfigs_Search(t *testing.T) {
 	}{
 		{nil, "a", false},
 		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/*/*.proto"}}},
+			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
 			"a/c/d.proto",
+			true,
+		},
+		{
+			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
+			"a/b/c/d/e.proto",
+			true,
+		},
+		{
+			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
+			"a/d.proto",
 			true,
 		},
 		{

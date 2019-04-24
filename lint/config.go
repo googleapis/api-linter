@@ -3,24 +3,29 @@ package lint
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bmatcuk/doublestar"
 	"io"
 	"io/ioutil"
-	"path/filepath"
 )
 
 // RuntimeConfigs stores a list of RuntimeConfig and supports config lookup
 // for a given path.
 type RuntimeConfigs []RuntimeConfig
 
-// Search returns the first found config that matches the path
-// or an error if not found.
-func (c RuntimeConfigs) Search(path string) (*RuntimeConfig, error) {
-	for _, cfg := range c {
-		if cfg.match(path) {
-			return &cfg, nil
-		}
-	}
-	return nil, fmt.Errorf("no config matches path %q", path)
+// RuntimeConfig stores rule runtime configurations and file spec that
+// a path must match any of the included paths but none of
+// the excluded paths.
+type RuntimeConfig struct {
+	IncludedPaths []string              `json:"included_paths"`
+	ExcludedPaths []string              `json:"excluded_paths"`
+	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
+}
+
+// RuleConfig stores the status and category of a rule,
+// which can be applied to a rule during runtime.
+type RuleConfig struct {
+	Status   Status   `json:"status"`
+	Category Category `json:"category"`
 }
 
 // ReadConfigsJSON reads RuntimeConfigs from a JSON file.
@@ -36,11 +41,15 @@ func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
 	return c, nil
 }
 
-// RuleConfig stores the status and category of a rule,
-// which can be applied to a rule during runtime.
-type RuleConfig struct {
-	Status   Status   `json:"status"`
-	Category Category `json:"category"`
+// Search returns the first found config that matches the path
+// or an error if not found.
+func (c RuntimeConfigs) Search(path string) (*RuntimeConfig, error) {
+	for _, cfg := range c {
+		if cfg.match(path) {
+			return &cfg, nil
+		}
+	}
+	return nil, fmt.Errorf("no config matches path %q", path)
 }
 
 // WithOverride returns a copy of r, overridden with non-zero values in r2
@@ -56,23 +65,14 @@ func (r RuleConfig) WithOverride(r2 RuleConfig) RuleConfig {
 	return r
 }
 
-// RuntimeConfig stores rule runtime configurations and file spec that
-// a path must match any of the included paths but none of
-// the excluded paths.
-type RuntimeConfig struct {
-	IncludedPaths []string              `json:"included_paths"`
-	ExcludedPaths []string              `json:"excluded_paths"`
-	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
-}
-
 func (c RuntimeConfig) match(path string) bool {
 	for _, pattern := range c.ExcludedPaths {
-		if matched, err := filepath.Match(pattern, path); matched || err != nil {
+		if matched, err := doublestar.Match(pattern, path); matched || err != nil {
 			return false
 		}
 	}
 	for _, pattern := range c.IncludedPaths {
-		if matched, err := filepath.Match(pattern, path); matched && err == nil {
+		if matched, err := doublestar.Match(pattern, path); matched && err == nil {
 			return true
 		}
 	}
