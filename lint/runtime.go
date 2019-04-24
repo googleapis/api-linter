@@ -40,18 +40,16 @@ func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
 // of the returned problems.
 func (r *Runtime) Run(req Request, configs Configs) (Response, error) {
 	cfg, err := configs.Search(req.ProtoFile().Path())
+
 	if err != nil {
 		return Response{}, err
 	}
-	return r.run(req, cfg.RuleConfigs)
-}
 
-func (r *Runtime) run(req Request, ruleCfgMap map[string]RuleConfig) (Response, error) {
 	finalResp := Response{}
 	var errMessages []string
 	for name, rl := range r.rules {
 		config := r.config
-		for prefix, c := range ruleCfgMap {
+		for prefix, c := range cfg.RuleConfigs {
 			if name.HasPrefix(prefix) {
 				config = config.WithOverride(c)
 				break
@@ -75,7 +73,6 @@ func (r *Runtime) run(req Request, ruleCfgMap map[string]RuleConfig) (Response, 
 		}
 	}
 
-	var err error
 	if len(errMessages) != 0 {
 		err = errors.New(strings.Join(errMessages, "; "))
 	}
