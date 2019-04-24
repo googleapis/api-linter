@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 )
 
-// Configs stores a list of Config and supports config lookup
+// Configs stores a list of RuntimeConfig and supports config lookup
 // for a given path.
-type Configs []Config
+type Configs []RuntimeConfig
 
 // Search returns the first found config that matches the path
 // or an error if not found.
-func (c Configs) Search(path string) (*Config, error) {
+func (c Configs) Search(path string) (*RuntimeConfig, error) {
 	for _, cfg := range c {
 		if cfg.match(path) {
 			return &cfg, nil
@@ -43,16 +43,29 @@ type RuleConfig struct {
 	Category Category `json:"category"`
 }
 
-// Config stores rule runtime configurations and file spec that
+// WithOverride returns a copy of r, overridden with non-zero values in r2
+func (r RuleConfig) WithOverride(r2 RuleConfig) RuleConfig {
+	if r2.Status != "" {
+		r.Status = r2.Status
+	}
+
+	if r.Category != "" {
+		r.Category = r2.Category
+	}
+
+	return r
+}
+
+// RuntimeConfig stores rule runtime configurations and file spec that
 // a path must match any of the included paths but none of
 // the excluded paths.
-type Config struct {
+type RuntimeConfig struct {
 	IncludedPaths []string              `json:"included_paths"`
 	ExcludedPaths []string              `json:"excluded_paths"`
 	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
 }
 
-func (c Config) match(path string) bool {
+func (c RuntimeConfig) match(path string) bool {
 	for _, pattern := range c.ExcludedPaths {
 		if matched, err := filepath.Match(pattern, path); matched || err != nil {
 			return false

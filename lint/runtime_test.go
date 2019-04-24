@@ -13,10 +13,9 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
 		})
-	repo := NewRepository()
-	repo.AddRule(
+	runtime := NewRuntime(RuleConfig{Status: Enabled, Category: Warning})
+	err := runtime.AddRules(
 		"test",
-		RuleConfig{Status: Enabled, Category: Warning},
 		&mockRule{
 			info: RuleInfo{Name: "rule1"},
 			lintResp: Response{
@@ -24,15 +23,20 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 			},
 		})
 
+	if err != nil {
+		t.Errorf("Runtime.AddRules(...)=%v; want nil", err)
+		return
+	}
+
 	tests := []struct {
 		configs Configs
 		resp    Response
 	}{
 		{Configs{}, Response{}},
-		{Configs{Config{IncludedPaths: []string{"nofile"}}}, Response{}},
+		{Configs{RuntimeConfig{IncludedPaths: []string{"nofile"}}}, Response{}},
 		{
 			Configs{
-				Config{IncludedPaths: []string{"*"}},
+				RuntimeConfig{IncludedPaths: []string{"*"}},
 			},
 			Response{
 				Problems: []Problem{{Message: "rule1_problem", category: Warning}},
@@ -40,7 +44,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 		},
 		{
 			Configs{
-				Config{
+				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Status: Disabled},
@@ -51,7 +55,7 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 		},
 		{
 			Configs{
-				Config{
+				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Category: Error},
@@ -65,9 +69,9 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		resp, _ := repo.Run(req, test.configs)
+		resp, _ := runtime.Run(req, test.configs)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Repository.Run returns response %q, but want %q with configs `%v`", resp, test.resp, test.configs)
+			t.Errorf("Runtime.Run returns response %q, but want %q with configs `%v`", resp, test.resp, test.configs)
 		}
 	}
 }
