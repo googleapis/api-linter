@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestConfigs_getRuleConfig(t *testing.T) {
+func TestRuleConfigs_getRuleConfig(t *testing.T) {
 	matchConfig := RuleConfig{Enabled, Warning}
 
 	tests := []struct {
