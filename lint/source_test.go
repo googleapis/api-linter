@@ -1,16 +1,17 @@
 package lint
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/golang/protobuf/v2/proto"
 	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
-	"github.com/google/go-cmp/cmp"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
@@ -33,105 +34,74 @@ func TestDescriptorLocation(t *testing.T) {
 
 	tests := []struct {
 		descriptor protoreflect.Descriptor
-		want       Location
+		want       *Location
 	}{
 		{
 			descriptor: fileDesc.Messages().Get(0), // A top level message.
-			want: Location{
-				Start: Position{
-					Line: 7, Column: 0,
-				},
-				End: Position{
-					Line: 59, Column: 1,
-				},
-			},
+			want: NewLocation(
+				NewPosition(7, 0),  // start
+				NewPosition(59, 1), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Messages().Get(0), // A nested message.
-			want: Location{
-				Start: Position{
-					Line: 9, Column: 2,
-				},
-				End: Position{
-					Line: 36, Column: 3,
-				},
-			},
+			want: NewLocation(
+				NewPosition(9, 2),  // start
+				NewPosition(36, 3), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
-			want: Location{
-				Start: Position{
-					Line: 44, Column: 2,
-				},
-				End: Position{
-					Line: 49, Column: 3,
-				},
-			},
+			want: NewLocation(
+				NewPosition(44, 2), // start
+				NewPosition(49, 3), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0).Values().Get(1),
-			want: Location{
-				Start: Position{
-					Line: 48, Column: 4,
-				},
-				End: Position{
-					Line: 48, Column: 12,
-				},
-			},
+			want: NewLocation(
+				NewPosition(48, 4),  // start
+				NewPosition(48, 12), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
-			want: Location{
-				Start: Position{
-					Line: 41, Column: 2,
-				},
-				End: Position{
-					Line: 41, Column: 41,
-				},
-			},
+			want: NewLocation(
+				NewPosition(41, 2),  // start
+				NewPosition(41, 41), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Oneofs().Get(0),
-			want: Location{
-				Start: Position{
-					Line: 53, Column: 2,
-				},
-				End: Position{
-					Line: 58, Column: 3,
-				},
-			},
+			want: NewLocation(
+				NewPosition(53, 2), // start
+				NewPosition(58, 3), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Services().Get(0),
-			want: Location{
-				Start: Position{
-					Line: 72, Column: 0,
-				},
-				End: Position{
-					Line: 77, Column: 1,
-				},
-			},
+			want: NewLocation(
+				NewPosition(72, 0), // start
+				NewPosition(77, 1), // end
+			),
 		},
 		{
 			descriptor: fileDesc.Services().Get(0).Methods().Get(0),
-			want: Location{
-				Start: Position{
-					Line: 74, Column: 2,
-				},
-				End: Position{
-					Line: 74, Column: 44,
-				},
-			},
+			want: NewLocation(
+				NewPosition(74, 2),  // start
+				NewPosition(74, 44), // end
+			),
 		},
 	}
 
 	for _, test := range tests {
 		got, err := descSource.DescriptorLocation(test.descriptor)
+		errPrefix := fmt.Sprintf("DescriptorLocation for %s", test.descriptor.FullName())
 		if err != nil {
-			t.Errorf("DescriptorLocation(%s) error: %s", test.descriptor.FullName(), err)
+			t.Errorf("%s returns error: %v", errPrefix, err)
 		}
-		if diff := cmp.Diff(test.want, got); diff != "" {
-			t.Errorf("DescriptorLocation(%s) mismatch (-want +got):\n%s", test.descriptor.FullName(), diff)
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("%s returns %s, but want %s", errPrefix, got, test.want)
 		}
 	}
 }
@@ -169,11 +139,12 @@ func TestDescriptorComments(t *testing.T) {
 
 	for _, test := range tests {
 		got, err := descSource.DescriptorComments(test.descriptor)
+		errPrefix := fmt.Sprintf("DescriptorComments for %s", test.descriptor.FullName())
 		if err != nil {
-			t.Errorf("DescriptorComments(%s) error: %s", test.descriptor.FullName(), err)
+			t.Errorf("%s returns error: %v", errPrefix, err)
 		}
-		if diff := cmp.Diff(test.want, got); diff != "" {
-			t.Errorf("DescriptorComments(%s) mismatch (-want +got):\n%s", test.descriptor.FullName(), diff)
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("%s returns %s, but want %s", errPrefix, got, test.want)
 		}
 	}
 }
@@ -185,16 +156,16 @@ func TestSyntaxLocation(t *testing.T) {
 		t.Errorf("newDescriptorSource: %v", err)
 	}
 
-	want := Location{
-		Start: Position{Line: 2, Column: 0},
-		End:   Position{Line: 2, Column: 18},
-	}
+	want := NewLocation(
+		NewPosition(2, 0),  // start
+		NewPosition(2, 18), // end
+	)
 	got, err := descSource.SyntaxLocation()
 	if err != nil {
 		t.Errorf("SyntaxLocation() error: %s", err)
 	}
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("SyntaxLocation() mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("SyntaxLocation() returns %s, but want %s", got, want)
 	}
 }
 
@@ -212,8 +183,8 @@ func TestSyntaxComments(t *testing.T) {
 	if err != nil {
 		t.Errorf("SyntaxComments() error: %s", err)
 	}
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("SyntaxComments() mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("SyntaxComments() returns %s, but want %s", got, want)
 	}
 }
 
@@ -223,7 +194,7 @@ func TestIsRuleDisabled(t *testing.T) {
 
 	tests := []struct {
 		desc     protoreflect.Descriptor
-		rule     string
+		rule     RuleName
 		disabled bool
 	}{
 		{

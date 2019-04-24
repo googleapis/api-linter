@@ -3,25 +3,30 @@ package rules
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/jgeewax/api-linter/lint"
-	"github.com/jgeewax/api-linter/protohelpers"
+	"github.com/jgeewax/api-linter/rules/descriptor"
 )
 
 func init() {
-	registerRule(
-		&protohelpers.DescriptorCallbacks{
-			RuleInfo: lint.NewRuleInfo(
-				"check_proto_syntax_version",
-				"check that syntax is proto3",
-				`https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
-				[]lint.FileType{lint.ProtoFile},
-				lint.CategoryError,
-			),
-			FileDescriptorCallback: func(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
+	registerRules(checkProtoVersion())
+}
+
+// checkProtoVersion returns a lint.Rule
+// that checks if an API is using proto3.
+func checkProtoVersion() lint.Rule {
+	return &descriptor.CallbackRule{
+		RuleInfo: lint.RuleInfo{
+			Name:        "proto_version",
+			Description: "APIs should use proto3",
+			URI:         `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
+			FileTypes:   []lint.FileType{lint.ProtoFile},
+		},
+		Callback: descriptor.Callbacks{
+			FileCallback: func(f protoreflect.FileDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
 				location, _ := s.SyntaxLocation()
 				if f.Syntax() != protoreflect.Proto3 {
 					return []lint.Problem{
 						{
-							Message:    "Google APIs should use proto3",
+							Message:    "APIs should use proto3",
 							Suggestion: "proto3",
 							Location:   location,
 						},
@@ -30,5 +35,5 @@ func init() {
 				return nil, nil
 			},
 		},
-	)
+	}
 }

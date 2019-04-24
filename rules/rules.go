@@ -11,12 +11,14 @@ import (
 var coreRules, _ = lint.NewRules()
 
 // Rules returns all rules registered in this package.
-func Rules() *lint.Rules {
+func Rules() lint.Rules {
 	return coreRules.Copy()
 }
 
-func registerRule(r lint.Rule) {
-	if err := coreRules.Register(r); err != nil {
-		log.Fatalf("Error when registering rule '%s': %v", r.Info().Name(), err)
+func registerRules(r ...lint.Rule) {
+	for _, rl := range r {
+		if err := coreRules.Register(rl); err != nil {
+			log.Fatalf("Error when registering rule '%s': %v", rl.Info().Name, err)
+		}
 	}
 }

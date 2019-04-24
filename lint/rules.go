@@ -1,67 +1,51 @@
 package lint
 
 import (
-	"errors"
-)
-
-var (
-	// ErrDuplicateName is the returned error when a duplicated rule ID is
-	// found in a rule registry.
-	ErrDuplicateName = errors.New("rule registry: found duplicate name")
-	// ErrNotFound is the returned error when a rule is not found in a
-	// rule registry
-	ErrNotFound = errors.New("rule registry: rule is not found")
+	"fmt"
 )
 
 // Rules is a registry for registering and looking up rules.
-type Rules struct {
-	ruleMap map[string]Rule
-}
+type Rules map[RuleName]Rule
 
 // Copy returns a new copy of the rules.
-func (r *Rules) Copy() *Rules {
-	n := Rules{
-		ruleMap: make(map[string]Rule, len(r.ruleMap)),
+func (r Rules) Copy() Rules {
+	n := make(Rules, len(r))
+	for k, v := range r {
+		n[k] = v
 	}
-	for k, v := range r.ruleMap {
-		n.ruleMap[k] = v
-	}
-	return &n
+	return n
 }
 
 // Register registers the list of rules.
-// It returns `ErrDuplicateName` if any of the rules is found duplicate
+// It returns an error if any of the rules is found duplicate
 // in the registry.
-func (r *Rules) Register(rules ...Rule) error {
+func (r Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.ruleMap[rl.Info().Name]; found {
-			return ErrDuplicateName
+		if !rl.Info().Name.IsValid() {
+			return fmt.Errorf("%v is not a valid RuleName", rl.Info().Name)
 		}
-		r.ruleMap[rl.Info().Name] = rl
+
+		if _, found := r[rl.Info().Name]; found {
+			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
+		}
+
+		r[rl.Info().Name] = rl
 	}
 	return nil
 }
 
-// Merge merges another rule registry.
-// If any rule is found duplicate, returns `ErrDuplicateName`.
-func (r *Rules) Merge(other Rules) error {
-	return r.Register(other.All()...)
-}
-
 // All returns all rules.
 func (r Rules) All() []Rule {
-	rules := []Rule{}
-	for _, r1 := range r.ruleMap {
+	rules := make([]Rule, 0, len(r))
+	for _, r1 := range r {
 		rules = append(rules, r1)
 	}
 	return rules
 }
 
 // NewRules returns a rule registry initialized with the given set of rules.
-func NewRules(rules ...Rule) (*Rules, error) {
-	r := Rules{
-		ruleMap: make(map[string]Rule),
-	}
+func NewRules(rules ...Rule) (Rules, error) {
+	r := make(Rules, len(rules))
 	err := r.Register(rules...)
-	return &r, err
+	return r, err
 }
