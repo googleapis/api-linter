@@ -38,7 +38,6 @@ func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
 // rule configs can be used to turn on/off certain rules and change the category
 // of the returned problems.
 func (r *Runtime) Run(req Request) (Response, error) {
-	defaultConfig := RuleConfig{Status: Enabled}
 	finalResp := Response{}
 	var errMessages []string
 
@@ -50,12 +49,11 @@ func (r *Runtime) Run(req Request) (Response, error) {
 			continue
 		}
 
-		config = defaultConfig.withOverride(config)
+		config = defaultRuleConfig.withOverride(config)
 
 		if config.Status == Enabled {
 			if resp, err := rl.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-					p.category = rl.Info().Category
 
 					if config.Category != "" {
 						p.category = config.Category
