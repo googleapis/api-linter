@@ -79,3 +79,54 @@ func TestReadConfigsJSON(t *testing.T) {
 		t.Errorf("ReadConfigsJSON returns %q, but want %q", configs, expected)
 	}
 }
+
+func TestRuleConfig_WithOverride(t *testing.T) {
+	tests := []struct {
+		original RuleConfig
+		override RuleConfig
+		result   RuleConfig
+	}{
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{},
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, ""},
+			RuleConfig{Disabled, Warning},
+			RuleConfig{Disabled, Warning},
+		},
+		{
+			RuleConfig{"", Warning},
+			RuleConfig{Disabled, Error},
+			RuleConfig{Disabled, Error},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{"", ""},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Disabled, ""},
+			RuleConfig{Disabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{"", Error},
+			RuleConfig{Enabled, Error},
+		},
+	}
+
+	for _, test := range tests {
+		result := test.original.WithOverride(test.override)
+		if result != test.result {
+			t.Errorf("%+v.WithOverride(%+v)=%+v; want %+v", test.original, test.override, result, test.result)
+		}
+	}
+}

@@ -49,7 +49,7 @@ func (r RuleConfig) WithOverride(r2 RuleConfig) RuleConfig {
 		r.Status = r2.Status
 	}
 
-	if r.Category != "" {
+	if r2.Category != "" {
 		r.Category = r2.Category
 	}
 
