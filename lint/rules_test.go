@@ -49,12 +49,3 @@ func TestRulesRegister_Duplicate(t *testing.T) {
 		t.Errorf("Register: got %d rules, but want %d", numRegistered, 1)
 	}
 }
-
-func TestRulesRegister_Default(t *testing.T) {
-	r1 := &mockRule{info: RuleInfo{Name: "a"}}
-
-	rules, _ := NewRules()
-	if err := rules.Register(r1); err != nil {
-		t.Errorf("Register: return error %v, but want nil", err)
-	}
-}
