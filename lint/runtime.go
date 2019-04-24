@@ -8,15 +8,15 @@ import (
 
 // Runtime stores a set of rules.
 type Runtime struct {
-	rules  Rules
-	config RuleConfig
+	rules   Rules
+	configs RuntimeConfigs
 }
 
 // NewRuntime creates a new Runtime.
-func NewRuntime(config RuleConfig) *Runtime {
+func NewRuntime(configs RuntimeConfigs) *Runtime {
 	return &Runtime{
-		rules:  make(Rules),
-		config: config,
+		rules:   make(Rules),
+		configs: configs,
 	}
 }
 
@@ -31,30 +31,26 @@ func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
 	return nil
 }
 
-// Run executes rules on the request when a config is found for the file path
-// of the request.
+// Run executes rules on the request when a config is found for the file path of the request.
 //
 // If the found config contains rule configs for some rules, the status and
 // category of the affected rules will be updated accordingly. In other words,
 // rule configs can be used to turn on/off certain rules and change the category
 // of the returned problems.
-func (r *Runtime) Run(req Request, configs RuntimeConfigs) (Response, error) {
-	cfg, err := configs.Search(req.ProtoFile().Path())
-
-	if err != nil {
-		return Response{}, err
-	}
-
+func (r *Runtime) Run(req Request) (Response, error) {
+	defaultConfig := RuleConfig{Status: Enabled}
 	finalResp := Response{}
 	var errMessages []string
+
 	for name, rl := range r.rules {
-		config := r.config
-		for prefix, c := range cfg.RuleConfigs {
-			if name.HasPrefix(prefix) {
-				config = config.WithOverride(c)
-				break
-			}
+		config, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name)
+
+		if err != nil {
+			errMessages = append(errMessages, err.Error())
+			continue
 		}
+
+		config = defaultConfig.withOverride(config)
 
 		if config.Status == Enabled {
 			if resp, err := rl.Lint(req); err == nil {
@@ -73,6 +69,7 @@ func (r *Runtime) Run(req Request, configs RuntimeConfigs) (Response, error) {
 		}
 	}
 
+	var err error
 	if len(errMessages) != 0 {
 		err = errors.New(strings.Join(errMessages, "; "))
 	}

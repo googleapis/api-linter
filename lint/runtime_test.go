@@ -7,61 +7,71 @@ import (
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
-func TestRepository_Run_NoFoundConfig(t *testing.T) {
+func TestRepository_Run(t *testing.T) {
 	fileName := "protofile"
 	req, _ := NewProtoFileRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
 		})
-	runtime := NewRuntime(RuleConfig{Status: Enabled, Category: Warning})
-	err := runtime.AddRules(
-		"test",
-		&mockRule{
-			info: RuleInfo{Name: "rule1"},
-			lintResp: Response{
-				Problems: []Problem{{Message: "rule1_problem"}},
-			},
-		})
 
-	if err != nil {
-		t.Errorf("Runtime.AddRules(...)=%v; want nil", err)
-		return
+	defaultConfigs := RuntimeConfigs{
+		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
 	}
 
+	ruleProblems := []Problem{{Message: "rule1_problem", category: Warning}}
+
 	tests := []struct {
+		desc    string
 		configs RuntimeConfigs
 		resp    Response
 	}{
-		{RuntimeConfigs{}, Response{}},
-		{RuntimeConfigs{RuntimeConfig{IncludedPaths: []string{"nofile"}}}, Response{}},
+		{"1. empty config empty response", RuntimeConfigs{}, Response{}},
 		{
-			RuntimeConfigs{
-				RuntimeConfig{IncludedPaths: []string{"*"}},
-			},
-			Response{
-				Problems: []Problem{{Message: "rule1_problem", category: Warning}},
-			},
+			"2. config with non-matching file has no effect",
+			append(
+				defaultConfigs,
+				RuntimeConfig{
+					IncludedPaths: []string{"nofile"},
+					RuleConfigs:   map[string]RuleConfig{"": {Status: Disabled}},
+				},
+			),
+			Response{Problems: ruleProblems},
 		},
 		{
-			RuntimeConfigs{
+			"3. config with non-matching rule has no effect",
+			append(
+				defaultConfigs,
+				RuntimeConfig{
+					IncludedPaths: []string{"*"},
+					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Status: Disabled}},
+				},
+			),
+			Response{Problems: ruleProblems},
+		},
+		{
+			"4. matching config can disable rule",
+			append(
+				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Status: Disabled},
 					},
 				},
-			},
+			),
 			Response{},
 		},
 		{
-			RuntimeConfigs{
+			"5. matching config can override Category",
+			append(
+				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Category: Error},
 					},
 				},
-			},
+			),
 			Response{
 				Problems: []Problem{{Message: "rule1_problem", category: Error}},
 			},
@@ -69,9 +79,24 @@ func TestRepository_Run_NoFoundConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		resp, _ := runtime.Run(req, test.configs)
+		runtime := NewRuntime(test.configs)
+		err := runtime.AddRules(
+			"test",
+			&mockRule{
+				info: RuleInfo{Name: "rule1", Category: Warning},
+				lintResp: Response{
+					Problems: ruleProblems,
+				},
+			})
+
+		if err != nil {
+			t.Errorf("Runtime.AddRules(...)=%v; want nil", err)
+			continue
+		}
+
+		resp, _ := runtime.Run(req)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Runtime.Run returns response %q, but want %q with configs `%v`", resp, test.resp, test.configs)
+			t.Errorf("(test %s): Runtime.Run()=%q; want %q", test.desc, resp, test.resp)
 		}
 	}
 }

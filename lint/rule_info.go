@@ -75,6 +75,16 @@ func (r RuleName) WithPrefix(prefix ...string) RuleName {
 	return RuleName(string(fullPrefix) + nameSeparator + string(r))
 }
 
+func (r RuleName) parent() RuleName {
+	lastSeparator := strings.LastIndex(string(r), nameSeparator)
+
+	if lastSeparator == -1 {
+		return ""
+	}
+
+	return r[:lastSeparator]
+}
+
 // HasPrefix returns true if r contains prefix as a namespace. prefix parameters can be "::" delimited
 // or specified as independent parameters.
 // For example:

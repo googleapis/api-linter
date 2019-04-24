@@ -6,48 +6,63 @@ import (
 	"testing"
 )
 
-func TestConfigs_Search(t *testing.T) {
+func TestConfigs_getRuleConfig(t *testing.T) {
+	matchConfig := RuleConfig{Enabled, Warning}
+
 	tests := []struct {
 		configs RuntimeConfigs
 		path    string
-		found   bool
+		rule    RuleName
+		result  RuleConfig
 	}{
-		{nil, "a", false},
+		{nil, "a", "b", RuleConfig{}},
 		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
-			"a/c/d.proto",
-			true,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":      {},
+						"testrule": matchConfig,
+					},
+				},
+			},
+			"a.proto",
+			"testrule",
+			matchConfig,
 		},
 		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
-			"a/b/c/d/e.proto",
-			true,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a/**/*.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":     {},
+						"a::b::c": matchConfig,
+					},
+				},
+			},
+			"a/with/long/sub/dir/ect/ory/e.proto",
+			"a::b::c",
+			matchConfig,
 		},
 		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/**/*.proto"}}},
-			"a/d.proto",
-			true,
-		},
-		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/*.proto"}}},
-			"ac/d.proto",
-			false,
-		},
-		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/*.proto"}, ExcludedPaths: []string{"a/b*.proto"}}},
-			"a/b.proto",
-			false, // not found as the path is excluded.
-		},
-		{
-			RuntimeConfigs{{IncludedPaths: []string{"a/*.proto"}, ExcludedPaths: []string{"a/b*.proto"}}},
-			"a/c.proto",
-			true,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a/**/*.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":       {},
+						"a::module": matchConfig,
+					},
+				},
+			},
+			"a/with/long/sub/dir/ect/ory/e.proto",
+			"a::module::test_rule",
+			matchConfig,
 		},
 	}
 	for _, test := range tests {
-		_, err := test.configs.Search(test.path)
-		if found := err == nil; found != test.found {
-			t.Errorf("RuntimeConfigs.Search path %q returned error: %v, but expect found: %v", test.path, err, test.found)
+		cfg, _ := test.configs.getRuleConfig(test.path, test.rule)
+		if cfg != test.result {
+			t.Errorf("%+v.getRuleConfig(%q, %q)=%+v; want %+v", test.configs, test.path, test.rule, cfg, test.result)
 		}
 	}
 }
@@ -134,7 +149,7 @@ func TestRuleConfig_WithOverride(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := test.original.WithOverride(test.override)
+		result := test.original.withOverride(test.override)
 		if result != test.result {
 			t.Errorf("%+v.WithOverride(%+v)=%+v; want %+v", test.original, test.override, result, test.result)
 		}

@@ -66,3 +66,20 @@ func TestRuleName_HasPrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestRuleName_parent(t *testing.T) {
+	tests := []struct {
+		r RuleName
+		p RuleName
+	}{
+		{"a::b::c", "a::b"},
+		{"a", ""},
+		{"foo::bar::baz::qux", "foo::bar::baz"},
+	}
+
+	for _, test := range tests {
+		if test.r.parent() != test.p {
+			t.Errorf("%q.parent()=%q; want %q", test.r, test.r.parent(), test.p)
+		}
+	}
+}
