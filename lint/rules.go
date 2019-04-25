@@ -17,8 +17,7 @@ func (r Rules) Copy() Rules {
 }
 
 // Register registers the list of rules.
-// It returns an error if any of the rules is found duplicate
-// in the registry.
+// Return an error if any of the rules is found duplicate in the registry.
 func (r Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
 		if !rl.Info().Name.IsValid() {

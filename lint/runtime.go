@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Runtime stores a set of rules.
+// Runtime stores a set of rules and configs.
 type Runtime struct {
 	rules   Rules
 	configs RuntimeConfigs
@@ -19,7 +19,9 @@ func NewRuntime(configs RuntimeConfigs) *Runtime {
 	}
 }
 
-// AddRules adds rules, of which the name will be added a prefix to reduce collisions
+// AddRules adds rules.
+//
+// Note: it will check name conflict.
 func (r *Runtime) AddRules(rules ...Rule) error {
 	for _, rl := range rules {
 		if err := r.rules.Register(rl); err != nil {
@@ -29,18 +31,17 @@ func (r *Runtime) AddRules(rules ...Rule) error {
 	return nil
 }
 
-// Run executes rules on the request when a config is found for the file path of the request.
+// Run executes rules on the request.
 //
-// If the found config contains rule configs for some rules, the status and
-// category of the affected rules will be updated accordingly. In other words,
-// rule configs can be used to turn on/off certain rules and change the category
-// of the returned problems.
+// It uses the proto file path to determine which rules will
+// be applied to the request, according to the list of runtime
+// configs.
 func (r *Runtime) Run(req Request) (Response, error) {
 	finalResp := Response{}
 	var errMessages []string
 
 	for name, rl := range r.rules {
-		config := defaultRuleConfig
+		config := getDefaultRuleConfig()
 
 		if c, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
 			config = config.withOverride(c)
