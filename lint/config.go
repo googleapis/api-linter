@@ -55,7 +55,7 @@ func (c RuntimeConfigs) getRuleConfig(path string, rule RuleName) (result RuleCo
 }
 
 func (c RuntimeConfig) getRuleConfig(rule RuleName) (RuleConfig, bool) {
-	for r := rule; true; r = r.parent() {
+	for r := rule; ; r = r.parent() {
 		if ruleConfig, ok := c.RuleConfigs[string(r)]; ok {
 			return ruleConfig, true
 		}
