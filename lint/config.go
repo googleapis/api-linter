@@ -25,7 +25,7 @@ import (
 //		}
 // ]
 //
-// that match path "/a/b.proto", the resulted config for rule "my::rule" will be {disabled, error}.
+// that match path "/a/b.proto", the resulted config for rule "my::rule" will be {enabled, error}.
 type RuntimeConfigs []RuntimeConfig
 
 // RuntimeConfig stores rule configurations for certain files
