@@ -89,7 +89,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 	for ind, test := range tests {
 		cfg, _ := test.configs.getRuleConfig(test.path, test.rule)
 		if cfg != test.result {
-			t.Errorf("Test #%d: %+v.getRuleConfig(%q, %q)=%+v; want %+v", ind, test.configs, test.path, test.rule, cfg, test.result)
+			t.Errorf("Test #%d: %+v.getRuleConfig(%q, %q)=%+v; want %+v", ind+1, test.configs, test.path, test.rule, cfg, test.result)
 		}
 	}
 }
