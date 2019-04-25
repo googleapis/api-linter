@@ -6,38 +6,90 @@ import (
 	"testing"
 )
 
-func TestConfigs_Search(t *testing.T) {
+func TestRuleConfigs_getRuleConfig(t *testing.T) {
+	matchConfig := RuleConfig{Enabled, Warning}
+
 	tests := []struct {
-		configs Configs
+		configs RuntimeConfigs
 		path    string
-		found   bool
+		rule    RuleName
+		result  RuleConfig
 	}{
-		{nil, "a", false},
+		{nil, "a", "b", RuleConfig{}},
 		{
-			Configs{{IncludedPaths: []string{"a/*/*.proto"}}},
-			"a/c/d.proto",
-			true,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":      {},
+						"testrule": matchConfig,
+					},
+				},
+			},
+			"b.proto",
+			"testrule",
+			RuleConfig{},
 		},
 		{
-			Configs{{IncludedPaths: []string{"a/*.proto"}}},
-			"ac/d.proto",
-			false,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo": matchConfig,
+					},
+				},
+			},
+			"a.proto",
+			"testrule",
+			RuleConfig{},
 		},
 		{
-			Configs{{IncludedPaths: []string{"a/*.proto"}, ExcludedPaths: []string{"a/b*.proto"}}},
-			"a/b.proto",
-			false, // not found as the path is excluded.
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":      {},
+						"testrule": matchConfig,
+					},
+				},
+			},
+			"a.proto",
+			"testrule",
+			matchConfig,
 		},
 		{
-			Configs{{IncludedPaths: []string{"a/*.proto"}, ExcludedPaths: []string{"a/b*.proto"}}},
-			"a/c.proto",
-			true,
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a/**/*.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":     {},
+						"a::b::c": matchConfig,
+					},
+				},
+			},
+			"a/with/long/sub/dir/ect/ory/e.proto",
+			"a::b::c",
+			matchConfig,
+		},
+		{
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a/**/*.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":       {},
+						"a::module": matchConfig,
+					},
+				},
+			},
+			"a/with/long/sub/dir/ect/ory/e.proto",
+			"a::module::test_rule",
+			matchConfig,
 		},
 	}
-	for _, test := range tests {
-		_, err := test.configs.Search(test.path)
-		if found := err == nil; found != test.found {
-			t.Errorf("Configs.Search path `%s` returned error: %v, but expect found: %v", test.path, err, test.found)
+	for ind, test := range tests {
+		cfg, _ := test.configs.getRuleConfig(test.path, test.rule)
+		if cfg != test.result {
+			t.Errorf("Test #%d: %+v.getRuleConfig(%q, %q)=%+v; want %+v", ind, test.configs, test.path, test.rule, cfg, test.result)
 		}
 	}
 }
@@ -63,7 +115,7 @@ func TestReadConfigsJSON(t *testing.T) {
 		t.Errorf("ReadConfigsJSON returns error: %v", err)
 	}
 
-	expected := Configs{
+	expected := RuntimeConfigs{
 		{
 			IncludedPaths: []string{"a"},
 			ExcludedPaths: []string{"b"},
@@ -76,6 +128,57 @@ func TestReadConfigsJSON(t *testing.T) {
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
-		t.Errorf("ReadConfigsJSON returns `%s`, but want `%s`", configs, expected)
+		t.Errorf("ReadConfigsJSON returns %q, but want %q", configs, expected)
+	}
+}
+
+func TestRuleConfig_WithOverride(t *testing.T) {
+	tests := []struct {
+		original RuleConfig
+		override RuleConfig
+		result   RuleConfig
+	}{
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{},
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, ""},
+			RuleConfig{Disabled, Warning},
+			RuleConfig{Disabled, Warning},
+		},
+		{
+			RuleConfig{"", Warning},
+			RuleConfig{Disabled, Error},
+			RuleConfig{Disabled, Error},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{"", ""},
+			RuleConfig{Enabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{Disabled, ""},
+			RuleConfig{Disabled, Warning},
+		},
+		{
+			RuleConfig{Enabled, Warning},
+			RuleConfig{"", Error},
+			RuleConfig{Enabled, Error},
+		},
+	}
+
+	for _, test := range tests {
+		result := test.original.withOverride(test.override)
+		if result != test.result {
+			t.Errorf("%+v.WithOverride(%+v)=%+v; want %+v", test.original, test.override, result, test.result)
+		}
 	}
 }

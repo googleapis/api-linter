@@ -14,7 +14,7 @@ type Callback interface {
 
 // CallbackRule is a lint.Rule with a Callback that checks descriptors.
 type CallbackRule struct {
-	RuleInfo *lint.RuleInfo
+	RuleInfo lint.RuleInfo
 	Callback Callback
 
 	problems []lint.Problem
@@ -22,7 +22,7 @@ type CallbackRule struct {
 }
 
 // Info returns a RuleInfo for this rule.
-func (r *CallbackRule) Info() *lint.RuleInfo {
+func (r *CallbackRule) Info() lint.RuleInfo {
 	return r.RuleInfo
 }
 
