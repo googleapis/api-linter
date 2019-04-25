@@ -2,7 +2,6 @@ package lint
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -23,10 +22,9 @@ func NewRuntime(configs RuntimeConfigs) *Runtime {
 // AddRules adds rules, of which the name will be added a prefix to reduce collisions
 func (r *Runtime) AddRules(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.rules[rl.Info().Name]; found {
-			return fmt.Errorf("duplicate repository entry with name %q", rl.Info().Name)
+		if err := r.rules.Register(rl); err != nil {
+			return err
 		}
-		r.rules[rl.Info().Name] = rl
 	}
 	return nil
 }
