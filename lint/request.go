@@ -12,7 +12,7 @@ type Request struct {
 	descSource DescriptorSource
 }
 
-// ProtoFile returns a FileDescriptor of the .proto file that will be linted.
+// ProtoRequest returns a FileDescriptor of the .proto file that will be linted.
 func (r Request) ProtoFile() protoreflect.FileDescriptor {
 	return r.fileDesc
 }
@@ -23,8 +23,8 @@ func (r Request) DescriptorSource() DescriptorSource {
 	return r.descSource
 }
 
-// NewProtoFileRequest creates a linting Request for a .proto file.
-func NewProtoFileRequest(fd *descriptorpb.FileDescriptorProto) (Request, error) {
+// NewProtoRequest creates a linting Request for a .proto file.
+func NewProtoRequest(fd *descriptorpb.FileDescriptorProto) (Request, error) {
 	f, err := protodesc.NewFile(fd, nil)
 	if err != nil {
 		return Request{}, err

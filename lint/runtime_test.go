@@ -9,7 +9,7 @@ import (
 
 func TestRepository_Run(t *testing.T) {
 	fileName := "protofile"
-	req, _ := NewProtoFileRequest(
+	req, _ := NewProtoRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
 		})
