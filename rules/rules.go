@@ -11,7 +11,7 @@ import (
 var coreRules, _ = lint.NewRules()
 
 // Rules returns all rules registered in this package.
-func Rules() *lint.Rules {
+func Rules() lint.Rules {
 	return coreRules.Copy()
 }
 

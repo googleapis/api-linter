@@ -97,9 +97,9 @@ func MustCreateRequestFromTemplate(tmpl *template.Template, testData interface{}
 		log.Fatalf("Error generating proto descriptor: %v", err)
 	}
 
-	req, err := lint.NewProtoFileRequest(pd)
+	req, err := lint.NewProtoRequest(pd)
 	if err != nil {
-		log.Fatalf("Error creating proto file request: %v", err)
+		log.Fatalf("Error creating proto request: %v", err)
 	}
 	return req
 }
