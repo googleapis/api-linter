@@ -42,23 +42,19 @@ func (r *Runtime) Run(req Request) (Response, error) {
 	var errMessages []string
 
 	for name, rl := range r.rules {
-		config, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name)
+		config := defaultRuleConfig
 
-		if err != nil {
+		if c, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
+			config = config.withOverride(c)
+		} else {
 			errMessages = append(errMessages, err.Error())
 			continue
 		}
 
-		config = defaultRuleConfig.withOverride(config)
-
 		if config.Status == Enabled {
 			if resp, err := rl.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-
-					if config.Category != "" {
-						p.category = config.Category
-					}
-
+					p.category = config.Category
 					finalResp.Problems = append(finalResp.Problems, p)
 				}
 			} else {
