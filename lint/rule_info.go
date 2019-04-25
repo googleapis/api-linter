@@ -58,7 +58,7 @@ func NewRuleName(segments ...string) RuleName {
 	return RuleName(strings.Join(segments, nameSeparator))
 }
 
-// IsValid checks if a RuleName is syntactically valid
+// IsValid checks if a RuleName is syntactically valid.
 func (r RuleName) IsValid() bool {
 	return r != "" && ruleNameValidator.Match([]byte(r))
 }
