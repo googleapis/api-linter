@@ -81,9 +81,8 @@ func TestRepository_Run(t *testing.T) {
 	for _, test := range tests {
 		runtime := NewRuntime(test.configs)
 		err := runtime.AddRules(
-			"test",
 			&mockRule{
-				info: RuleInfo{Name: "rule1"},
+				info: RuleInfo{Name: "test::rule1"},
 				lintResp: Response{
 					Problems: ruleProblems,
 				},

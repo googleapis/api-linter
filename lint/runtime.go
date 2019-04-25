@@ -21,12 +21,12 @@ func NewRuntime(configs RuntimeConfigs) *Runtime {
 }
 
 // AddRules adds rules, of which the name will be added a prefix to reduce collisions
-func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
+func (r *Runtime) AddRules(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.rules[rl.Info().Name.WithPrefix(prefix)]; found {
-			return fmt.Errorf("duplicate repository entry with name %q", rl.Info().Name.WithPrefix(prefix))
+		if _, found := r.rules[rl.Info().Name]; found {
+			return fmt.Errorf("duplicate repository entry with name %q", rl.Info().Name)
 		}
-		r.rules[rl.Info().Name.WithPrefix(prefix)] = rl
+		r.rules[rl.Info().Name] = rl
 	}
 	return nil
 }
