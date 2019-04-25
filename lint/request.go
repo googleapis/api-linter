@@ -12,7 +12,7 @@ type Request struct {
 	descSource DescriptorSource
 }
 
-// ProtoRequest returns a FileDescriptor of the .proto file that will be linted.
+// ProtoFile returns a FileDescriptor of the .proto file that will be linted.
 func (r Request) ProtoFile() protoreflect.FileDescriptor {
 	return r.fileDesc
 }
