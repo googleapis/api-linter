@@ -22,11 +22,11 @@ func (r Rules) Copy() Rules {
 func (r Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
 		if !rl.Info().Name.IsValid() {
-			return fmt.Errorf("%v is not a valid RuleName", rl.Info().Name)
+			return fmt.Errorf("%q is not a valid RuleName", rl.Info().Name)
 		}
 
 		if _, found := r[rl.Info().Name]; found {
-			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
+			return fmt.Errorf("duplicate rule name %q", rl.Info().Name)
 		}
 
 		r[rl.Info().Name] = rl
