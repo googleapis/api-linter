@@ -26,6 +26,34 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 					},
 				},
 			},
+			"b.proto",
+			"testrule",
+			RuleConfig{},
+		},
+		{
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":      matchConfig,
+						"testrule": {},
+					},
+				},
+			},
+			"a.proto",
+			"testrule",
+			RuleConfig{},
+		},
+		{
+			RuntimeConfigs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					RuleConfigs: map[string]RuleConfig{
+						"foo":      {},
+						"testrule": matchConfig,
+					},
+				},
+			},
 			"a.proto",
 			"testrule",
 			matchConfig,
