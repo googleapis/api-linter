@@ -14,9 +14,9 @@ type RuntimeConfigs []RuntimeConfig
 // RuntimeConfig stores rule runtime configurations and file spec that  a path must match any of the
 // included paths but none of the excluded paths.
 type RuntimeConfig struct {
-	IncludedPaths []string              `json:"included_paths"`
-	ExcludedPaths []string              `json:"excluded_paths"`
-	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
+	IncludedPaths []string                `json:"included_paths"`
+	ExcludedPaths []string                `json:"excluded_paths"`
+	RuleConfigs   map[RuleName]RuleConfig `json:"rule_configs"`
 }
 
 // RuleConfig stores the status and category of a rule, which can be applied to a rule during runtime.
@@ -56,7 +56,7 @@ func (c RuntimeConfigs) getRuleConfig(path string, rule RuleName) (result RuleCo
 
 func (c RuntimeConfig) getRuleConfig(rule RuleName) (RuleConfig, bool) {
 	for r := rule; true; r = r.parent() {
-		if ruleConfig, ok := c.RuleConfigs[string(r)]; ok {
+		if ruleConfig, ok := c.RuleConfigs[r]; ok {
 			return ruleConfig, true
 		}
 

@@ -15,7 +15,7 @@ func TestRepository_Run(t *testing.T) {
 		})
 
 	defaultConfigs := RuntimeConfigs{
-		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
+		{[]string{"**"}, []string{}, map[RuleName]RuleConfig{"": {Status: Enabled}}},
 	}
 
 	ruleProblems := []Problem{{Message: "rule1_problem", category: Warning}}
@@ -32,7 +32,7 @@ func TestRepository_Run(t *testing.T) {
 				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"nofile"},
-					RuleConfigs:   map[string]RuleConfig{"": {Status: Disabled}},
+					RuleConfigs:   map[RuleName]RuleConfig{"": {Status: Disabled}},
 				},
 			),
 			Response{Problems: ruleProblems},
@@ -43,7 +43,7 @@ func TestRepository_Run(t *testing.T) {
 				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
-					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Status: Disabled}},
+					RuleConfigs:   map[RuleName]RuleConfig{"foo::bar": {Status: Disabled}},
 				},
 			),
 			Response{Problems: ruleProblems},
@@ -54,7 +54,7 @@ func TestRepository_Run(t *testing.T) {
 				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
-					RuleConfigs: map[string]RuleConfig{
+					RuleConfigs: map[RuleName]RuleConfig{
 						"test::rule1": {Status: Disabled},
 					},
 				},
@@ -67,7 +67,7 @@ func TestRepository_Run(t *testing.T) {
 				defaultConfigs,
 				RuntimeConfig{
 					IncludedPaths: []string{"*"},
-					RuleConfigs: map[string]RuleConfig{
+					RuleConfigs: map[RuleName]RuleConfig{
 						"test::rule1": {Category: Error},
 					},
 				},

@@ -20,7 +20,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			RuntimeConfigs{
 				{
 					IncludedPaths: []string{"a.proto"},
-					RuleConfigs: map[string]RuleConfig{
+					RuleConfigs: map[RuleName]RuleConfig{
 						"foo":      {},
 						"testrule": matchConfig,
 					},
@@ -34,7 +34,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			RuntimeConfigs{
 				{
 					IncludedPaths: []string{"a/**/*.proto"},
-					RuleConfigs: map[string]RuleConfig{
+					RuleConfigs: map[RuleName]RuleConfig{
 						"foo":     {},
 						"a::b::c": matchConfig,
 					},
@@ -48,7 +48,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			RuntimeConfigs{
 				{
 					IncludedPaths: []string{"a/**/*.proto"},
-					RuleConfigs: map[string]RuleConfig{
+					RuleConfigs: map[RuleName]RuleConfig{
 						"foo":       {},
 						"a::module": matchConfig,
 					},
@@ -92,7 +92,7 @@ func TestReadConfigsJSON(t *testing.T) {
 		{
 			IncludedPaths: []string{"a"},
 			ExcludedPaths: []string{"b"},
-			RuleConfigs: map[string]RuleConfig{
+			RuleConfigs: map[RuleName]RuleConfig{
 				"rule_a": {
 					Status:   "enabled",
 					Category: "warning",
