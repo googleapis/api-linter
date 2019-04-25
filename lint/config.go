@@ -43,7 +43,9 @@ type RuleConfig struct {
 	Category Category `json:"category"`
 }
 
-var defaultRuleConfig = RuleConfig{Status: Disabled, Category: Warning}
+func getDefaultRuleConfig() RuleConfig {
+	return RuleConfig{Status: Disabled, Category: Warning}
+}
 
 // ReadConfigsJSON reads RuntimeConfigs from a JSON file.
 func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {

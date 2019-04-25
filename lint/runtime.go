@@ -41,7 +41,7 @@ func (r *Runtime) Run(req Request) (Response, error) {
 	var errMessages []string
 
 	for name, rl := range r.rules {
-		config := defaultRuleConfig
+		config := getDefaultRuleConfig()
 
 		if c, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
 			config = config.withOverride(c)
