@@ -84,12 +84,12 @@ func (r RuleConfig) withOverride(r2 RuleConfig) RuleConfig {
 // match returns if a RuntimeConfig matches path based on its included and excluded paths
 func (c RuntimeConfig) match(path string) bool {
 	for _, pattern := range c.ExcludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched || err != nil {
+		if matched, err := doublestar.PathMatch(pattern, path); matched || err != nil {
 			return false
 		}
 	}
 	for _, pattern := range c.IncludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched && err == nil {
+		if matched, err := doublestar.PathMatch(pattern, path); matched && err == nil {
 			return true
 		}
 	}
