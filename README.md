@@ -38,8 +38,7 @@ TODO once we have a `main` CLI package.
 In order to implement a new rule, you must satisfy the [`Rule` interface][rule_interface]. First,
 expose the metadata for your rule by implementing an `Info()` method which returns a
 [`RuleInfo` struct][rule_info]. You must give your rule a unique name, description, and URL, and
-define the types of files that the rule needs to see as well as the category of problems that it
-emits.
+define the types of files that the rule needs to see.
 
 Then, implement the `Lint` method, which takes a [`Request`][lint_request] and returns a
 [`Response`][lint_response] (or an error). The `Request` input contains methods that allow your
@@ -60,7 +59,6 @@ func (r *enforceProto3) Info() lint.RuleInfo {
 		Description: `This rule enforces that all protofiles use syntax "proto3"`,
 		Url:         `http://example.com/foo/bar/`,
 		FileTypes:   []FileType{lint.ProtoFile},
-		Category:    lint.CategoryError,
 	}
 }
 
@@ -89,6 +87,9 @@ func (r *enforceProto3) Lint(req lint.Request, source lint.DescriptorSource) (li
 
 ### Helpers
 
+TODO once location of helpers is finalized.
+
+<!--
 The [`protohelpers` package][proto_helpers] provides some abstractions that can make linting proto
 files easier in some cases.
 
@@ -116,13 +117,13 @@ rule := protohelpers.DescriptorCallbacks{
     Description: "check that field names use lower snake case",
     Url:         "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
     FileTypes:   []lint.FileType{lint.ProtoFile},
-    Category:    lint.CategorySuggestion,
   },
   FieldDescriptorCallback: func(d protoreflect.FieldDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
     return checkNameFormat(d), nil
   },
 }
 ```
+-->
 
 
 [rule_interface]: https://github.com/jgeewax/api-linter/blob/master/lint/rule.go 
