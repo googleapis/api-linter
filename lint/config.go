@@ -42,12 +42,12 @@ func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
 
 // getRuleConfig returns a RuleConfig matching path and rule
 func (c RuntimeConfigs) getRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
-	err = fmt.Errorf("failed to find a config matching path %q and rule %q", path, rule)
+	err = fmt.Errorf("failed to find a config for path %q", path)
 	for _, cfg := range c {
 		if cfg.match(path) {
+			err = nil
 			if r, ok := cfg.getRuleConfig(rule); ok {
 				result = result.withOverride(r)
-				err = nil
 			}
 		}
 	}

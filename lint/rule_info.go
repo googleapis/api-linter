@@ -63,13 +63,6 @@ func (r RuleName) IsValid() bool {
 	return r != "" && ruleNameValidator.Match([]byte(r))
 }
 
-// WithPrefix prepends a prefix to the RuleName, separating it with ::
-func (r RuleName) WithPrefix(prefix ...string) RuleName {
-	fullPrefix := NewRuleName(prefix...)
-
-	return RuleName(string(fullPrefix) + nameSeparator + string(r))
-}
-
 func (r RuleName) parent() RuleName {
 	lastSeparator := strings.LastIndex(string(r), nameSeparator)
 
