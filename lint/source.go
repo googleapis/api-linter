@@ -219,9 +219,9 @@ func reverseInts(a []int) {
 	}
 }
 
-// IsRuleDisabled check if a rule is disabled for a descriptor
+// isRuleDisabled check if a rule is disabled for a descriptor
 // in the comments.
-func (s DescriptorSource) IsRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
+func (s DescriptorSource) isRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
 	commentsToCheck := s.fileComments().LeadingDetachedComments
 
 	for d, ok := d, true; ok && d != nil; d, ok = d.Parent() {
@@ -235,6 +235,11 @@ func (s DescriptorSource) IsRuleDisabled(name RuleName, d protoreflect.Descripto
 	}
 
 	return stringsContains(commentsToCheck, ruleDisablingComment(name))
+}
+
+// isRuleDisabledInFile checks the proto file comments only to see if a rule named name is disabled.
+func (s DescriptorSource) isRuleDisabledInFile(name RuleName) bool {
+	return s.isRuleDisabled(name, nil)
 }
 
 func stringsContains(comments []string, s string) bool {

@@ -250,9 +250,9 @@ func TestIsRuleDisabled(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		disabled := descSource.IsRuleDisabled(test.rule, test.desc)
+		disabled := descSource.isRuleDisabled(test.rule, test.desc)
 		if disabled != test.disabled {
-			t.Errorf("IsRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
+			t.Errorf("isRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
 		}
 	}
 }
