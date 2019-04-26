@@ -7,20 +7,20 @@ import (
 
 // RuleInfo stores information of a rule.
 type RuleInfo struct {
-	Name        RuleName   // rule name in the set.
-	Description string     // a short description of this rule.
-	URI         string     // a link to a document for more details.
-	FileTypes   []FileType // types of files that this rule targets to.
+	Name         RuleName      // rule name in the set.
+	Description  string        // a short description of this rule.
+	URI          string        // a link to a document for more details.
+	RequestTypes []RequestType // types of requests that this rule should receive.
 
 	noPositional struct{} // Prevent positional composite literal instantiation
 }
 
-// FileType defines a file type that a rule is targeting to.
-type FileType string
+// RequestType defines a request type that can be passed into rules.
+type RequestType string
 
 const (
-	// ProtoFile indicates that the targeted file is a protobuf-definition file.
-	ProtoFile FileType = "proto-file"
+	// ProtoRequest indicates that the targeted request contains a protobuf-definition file.
+	ProtoRequest RequestType = "proto-request"
 )
 
 // Category defines the category of the findings produced by a rule.
@@ -58,16 +58,9 @@ func NewRuleName(segments ...string) RuleName {
 	return RuleName(strings.Join(segments, nameSeparator))
 }
 
-// IsValid checks if a RuleName is syntactically valid
+// IsValid checks if a RuleName is syntactically valid.
 func (r RuleName) IsValid() bool {
 	return r != "" && ruleNameValidator.Match([]byte(r))
-}
-
-// WithPrefix prepends a prefix to the RuleName, separating it with ::
-func (r RuleName) WithPrefix(prefix ...string) RuleName {
-	fullPrefix := NewRuleName(prefix...)
-
-	return RuleName(string(fullPrefix) + nameSeparator + string(r))
 }
 
 func (r RuleName) parent() RuleName {

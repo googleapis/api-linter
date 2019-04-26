@@ -17,16 +17,15 @@ func (r Rules) Copy() Rules {
 }
 
 // Register registers the list of rules.
-// It returns an error if any of the rules is found duplicate
-// in the registry.
+// Return an error if any of the rules is found duplicate in the registry.
 func (r Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
 		if !rl.Info().Name.IsValid() {
-			return fmt.Errorf("%v is not a valid RuleName", rl.Info().Name)
+			return fmt.Errorf("%q is not a valid RuleName", rl.Info().Name)
 		}
 
 		if _, found := r[rl.Info().Name]; found {
-			return fmt.Errorf("duplicate rule name `%s`", rl.Info().Name)
+			return fmt.Errorf("duplicate rule name %q", rl.Info().Name)
 		}
 
 		r[rl.Info().Name] = rl

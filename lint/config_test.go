@@ -35,8 +35,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 				{
 					IncludedPaths: []string{"a.proto"},
 					RuleConfigs: map[string]RuleConfig{
-						"foo":      matchConfig,
-						"testrule": {},
+						"foo": matchConfig,
 					},
 				},
 			},
@@ -87,10 +86,10 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			matchConfig,
 		},
 	}
-	for _, test := range tests {
+	for ind, test := range tests {
 		cfg, _ := test.configs.getRuleConfig(test.path, test.rule)
 		if cfg != test.result {
-			t.Errorf("%+v.getRuleConfig(%q, %q)=%+v; want %+v", test.configs, test.path, test.rule, cfg, test.result)
+			t.Errorf("Test #%d: %+v.getRuleConfig(%q, %q)=%+v; want %+v", ind+1, test.configs, test.path, test.rule, cfg, test.result)
 		}
 	}
 }

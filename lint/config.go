@@ -3,29 +3,49 @@ package lint
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bmatcuk/doublestar"
 	"io"
 	"io/ioutil"
+
+	"github.com/bmatcuk/doublestar"
 )
 
-// RuntimeConfigs stores a list of RuntimeConfig and supports config lookup for a given path.
+// RuntimeConfigs stores a list of RuntimeConfig.
+//
+// Note: for a path, if multiple runtime configs match it, the rule configs of the later one
+// will always override those in the former one. For example, given a list of runtime configs
+//
+// [
+//		{
+//			included_paths: ["/a/**/*.proto"],
+//			rule_configs: {"my::rule": {disabled, error}},
+//		},
+//		{
+//			included_paths: ["/a/b.proto"],
+//			rule_configs: {"my::rule": {enabled}},
+//		}
+// ]
+//
+// that match path "/a/b.proto", the resulted config for rule "my::rule" will be {enabled, error}.
 type RuntimeConfigs []RuntimeConfig
 
-// RuntimeConfig stores rule runtime configurations and file spec that  a path must match any of the
-// included paths but none of the excluded paths.
+// RuntimeConfig stores rule configurations for certain files
+// that the file path must match any of the included paths
+// but none of the excluded ones.
 type RuntimeConfig struct {
 	IncludedPaths []string              `json:"included_paths"`
 	ExcludedPaths []string              `json:"excluded_paths"`
 	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
 }
 
-// RuleConfig stores the status and category of a rule, which can be applied to a rule during runtime.
+// RuleConfig stores runtime-configurable status and category of a rule.
 type RuleConfig struct {
 	Status   Status   `json:"status"`
 	Category Category `json:"category"`
 }
 
-var defaultRuleConfig = RuleConfig{Status: Disabled, Category: Warning}
+func getDefaultRuleConfig() RuleConfig {
+	return RuleConfig{Status: Disabled, Category: Warning}
+}
 
 // ReadConfigsJSON reads RuntimeConfigs from a JSON file.
 func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
@@ -40,14 +60,15 @@ func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
 	return c, nil
 }
 
-// getRuleConfig returns a RuleConfig matching path and rule
+// getRuleConfig returns a RuleConfig that matches the given path and rule.
+// Returns an error if a config is not found for the path.
 func (c RuntimeConfigs) getRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
-	err = fmt.Errorf("failed to find a config matching path %q and rule %q", path, rule)
+	err = fmt.Errorf("failed to find a config for path %q", path)
 	for _, cfg := range c {
 		if cfg.match(path) {
+			err = nil
 			if r, ok := cfg.getRuleConfig(rule); ok {
 				result = result.withOverride(r)
-				err = nil
 			}
 		}
 	}
@@ -84,12 +105,12 @@ func (r RuleConfig) withOverride(r2 RuleConfig) RuleConfig {
 // match returns if a RuntimeConfig matches path based on its included and excluded paths
 func (c RuntimeConfig) match(path string) bool {
 	for _, pattern := range c.ExcludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched || err != nil {
+		if matched, err := doublestar.PathMatch(pattern, path); matched || err != nil {
 			return false
 		}
 	}
 	for _, pattern := range c.IncludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched && err == nil {
+		if matched, err := doublestar.PathMatch(pattern, path); matched && err == nil {
 			return true
 		}
 	}

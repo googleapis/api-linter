@@ -9,7 +9,7 @@ import (
 
 func TestRepository_Run(t *testing.T) {
 	fileName := "protofile"
-	req, _ := NewProtoFileRequest(
+	req, _ := NewProtoRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
 		})
@@ -25,9 +25,9 @@ func TestRepository_Run(t *testing.T) {
 		configs RuntimeConfigs
 		resp    Response
 	}{
-		{"1. empty config empty response", RuntimeConfigs{}, Response{}},
+		{"empty config empty response", RuntimeConfigs{}, Response{}},
 		{
-			"2. config with non-matching file has no effect",
+			"config with non-matching file has no effect",
 			append(
 				defaultConfigs,
 				RuntimeConfig{
@@ -38,7 +38,7 @@ func TestRepository_Run(t *testing.T) {
 			Response{Problems: ruleProblems},
 		},
 		{
-			"3. config with non-matching rule has no effect",
+			"config with non-matching rule has no effect",
 			append(
 				defaultConfigs,
 				RuntimeConfig{
@@ -49,7 +49,7 @@ func TestRepository_Run(t *testing.T) {
 			Response{Problems: ruleProblems},
 		},
 		{
-			"4. matching config can disable rule",
+			"matching config can disable rule",
 			append(
 				defaultConfigs,
 				RuntimeConfig{
@@ -62,7 +62,7 @@ func TestRepository_Run(t *testing.T) {
 			Response{},
 		},
 		{
-			"5. matching config can override Category",
+			"matching config can override Category",
 			append(
 				defaultConfigs,
 				RuntimeConfig{
@@ -78,12 +78,11 @@ func TestRepository_Run(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for ind, test := range tests {
 		runtime := NewRuntime(test.configs)
 		err := runtime.AddRules(
-			"test",
 			&mockRule{
-				info: RuleInfo{Name: "rule1"},
+				info: RuleInfo{Name: "test::rule1"},
 				lintResp: Response{
 					Problems: ruleProblems,
 				},
@@ -96,7 +95,7 @@ func TestRepository_Run(t *testing.T) {
 
 		resp, _ := runtime.Run(req)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("(test %s): Runtime.Run()=%q; want %q", test.desc, resp, test.resp)
+			t.Errorf("Test #%d (%s): Runtime.Run()=%q; want %q", ind+1, test.desc, resp, test.resp)
 		}
 	}
 }

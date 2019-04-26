@@ -2,11 +2,10 @@ package lint
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
-// Runtime stores a set of rules.
+// Runtime stores a set of rules and configs.
 type Runtime struct {
 	rules   Rules
 	configs RuntimeConfigs
@@ -20,45 +19,41 @@ func NewRuntime(configs RuntimeConfigs) *Runtime {
 	}
 }
 
-// AddRules adds rules, of which the name will be added a prefix to reduce collisions
-func (r *Runtime) AddRules(prefix string, rules ...Rule) error {
+// AddRules adds rules.
+//
+// Note: it will check name conflict.
+func (r *Runtime) AddRules(rules ...Rule) error {
 	for _, rl := range rules {
-		if _, found := r.rules[rl.Info().Name.WithPrefix(prefix)]; found {
-			return fmt.Errorf("duplicate repository entry with name %q", rl.Info().Name.WithPrefix(prefix))
+		if err := r.rules.Register(rl); err != nil {
+			return err
 		}
-		r.rules[rl.Info().Name.WithPrefix(prefix)] = rl
 	}
 	return nil
 }
 
-// Run executes rules on the request when a config is found for the file path of the request.
+// Run executes rules on the request.
 //
-// If the found config contains rule configs for some rules, the status and
-// category of the affected rules will be updated accordingly. In other words,
-// rule configs can be used to turn on/off certain rules and change the category
-// of the returned problems.
+// It uses the proto file path to determine which rules will
+// be applied to the request, according to the list of runtime
+// configs.
 func (r *Runtime) Run(req Request) (Response, error) {
 	finalResp := Response{}
 	var errMessages []string
 
 	for name, rl := range r.rules {
-		config, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name)
+		config := getDefaultRuleConfig()
 
-		if err != nil {
+		if c, err := r.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
+			config = config.withOverride(c)
+		} else {
 			errMessages = append(errMessages, err.Error())
 			continue
 		}
 
-		config = defaultRuleConfig.withOverride(config)
-
 		if config.Status == Enabled {
 			if resp, err := rl.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-
-					if config.Category != "" {
-						p.category = config.Category
-					}
-
+					p.category = config.Category
 					finalResp.Problems = append(finalResp.Problems, p)
 				}
 			} else {
