@@ -10,8 +10,8 @@ import (
 )
 
 var validVersionStrings = regexp.MustCompile(fmt.Sprintf(
-	"%c(alpha|beta|v[\\d]+)%c",
-	os.PathSeparator, os.PathSeparator,
+	"%s(alpha|beta|v[\\d]+)%s",
+	regexp.QuoteMeta(string(os.PathSeparator)), regexp.QuoteMeta(string(os.PathSeparator)),
 ))
 
 func protoFilesMustIncludeVersion() lint.Rule {
