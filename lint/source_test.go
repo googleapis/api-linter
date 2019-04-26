@@ -199,17 +199,17 @@ func TestIsRuleDisabled(t *testing.T) {
 	}{
 		{
 			desc:     fileDesc,
-			rule:     "rule_all_disabled",
+			rule:     "rule_disabled_in_file",
 			disabled: true,
 		},
 		{
 			desc:     fileDesc.Messages().Get(0),
-			rule:     "rule_all_disabled",
+			rule:     "rule_disabled_in_file",
 			disabled: true,
 		},
 		{
 			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
-			rule:     "rule_all_disabled",
+			rule:     "rule_disabled_in_file",
 			disabled: true,
 		},
 		{
@@ -229,25 +229,30 @@ func TestIsRuleDisabled(t *testing.T) {
 		},
 		{
 			desc:     fileDesc.Messages().Get(0),
-			rule:     "rule_message_disabled_in_leading",
+			rule:     "rule_disabled_in_message_leading_comment",
 			disabled: true,
 		},
 		{
 			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
-			rule:     "rule_message_disabled_in_leading",
+			rule:     "rule_disabled_in_message_leading_comment",
+			disabled: true, // this field is contained by the message, and therefore, the disabling applies here too.
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
+			rule:     "rule_disabled_in_field_trailing_comment",
+			disabled: true,
+		},
+		{
+			desc:     fileDesc.Messages().Get(0).Fields().Get(1), // another field
+			rule:     "rule_disabled_in_field_trailing_comment",
 			disabled: false,
-		},
-		{
-			desc:     fileDesc.Messages().Get(0).Fields().Get(0),
-			rule:     "rule_field_disabled_in_trailing",
-			disabled: true,
 		},
 	}
 
 	for _, test := range tests {
-		disabled := descSource.IsRuleDisabled(test.rule, test.desc)
+		disabled := descSource.isRuleDisabled(test.rule, test.desc)
 		if disabled != test.disabled {
-			t.Errorf("IsRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
+			t.Errorf("isRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
 		}
 	}
 }

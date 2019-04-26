@@ -50,11 +50,13 @@ func (r *Runtime) Run(req Request) (Response, error) {
 			continue
 		}
 
-		if config.Status == Enabled {
+		if config.Status == Enabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
 			if resp, err := rl.Lint(req); err == nil {
 				for _, p := range resp.Problems {
-					p.category = config.Category
-					finalResp.Problems = append(finalResp.Problems, p)
+					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
+						p.category = config.Category
+						finalResp.Problems = append(finalResp.Problems, p)
+					}
 				}
 			} else {
 				errMessages = append(errMessages, err.Error())

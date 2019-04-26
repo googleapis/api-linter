@@ -42,10 +42,6 @@ func (r *CallbackRule) Lint(req lint.Request) (lint.Response, error) {
 
 // Consume implements `Consumer` that will check the given descriptor.
 func (r *CallbackRule) Consume(d protoreflect.Descriptor) error {
-	if r.source.IsRuleDisabled(r.Info().Name, d) {
-		return nil
-	}
-
 	problems, err := r.Callback.Apply(d, r.source)
 	if err != nil {
 		return err
