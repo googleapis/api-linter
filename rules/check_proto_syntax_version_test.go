@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jgeewax/api-linter/rules/testdata"
+	"github.com/googleapis/api-linter/rules/testdata"
 )
 
 func TestProtoVersionRule(t *testing.T) {

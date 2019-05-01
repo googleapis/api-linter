@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jgeewax/api-linter/lint"
-
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	"github.com/googleapis/api-linter/lint"
 	"github.com/iancoleman/strcase"
 )
 

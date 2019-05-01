@@ -1,4 +1,4 @@
-module github.com/jgeewax/api-linter
+module github.com/googleapis/api-linter
 
 go 1.12
 

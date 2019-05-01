@@ -5,7 +5,7 @@ package rules
 import (
 	"log"
 
-	"github.com/jgeewax/api-linter/lint"
+	"github.com/googleapis/api-linter/lint"
 )
 
 var coreRules, _ = lint.NewRules()
