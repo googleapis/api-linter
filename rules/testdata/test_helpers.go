@@ -13,7 +13,7 @@ import (
 
 	"github.com/golang/protobuf/v2/proto"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
-	"github.com/jgeewax/api-linter/lint"
+	"github.com/googleapis/api-linter/lint"
 )
 
 var protoc = "protoc"
