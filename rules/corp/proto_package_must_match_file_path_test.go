@@ -18,6 +18,7 @@ func TestProtoPackageMustMatchFilePath(t *testing.T) {
 		{"google3/google/corp/a/b/c/d/e/f/alpha/foo.proto", "google.corp.a.b.c.d.e.f.alpha", 0},
 		{"google3/google/corp/a/b/c/d/e/f/beta/foo.proto", "google.corp.a.b.c.d.e.f.beta", 0},
 		{"google3/google/corp/a/b/c/foo.proto", "google.corp.a.b.c", 0},
+		{"/google3/google/corp/a/b/c/foo.proto", "google.corp.a.b.c", 0},
 
 		// The rule shouldn't break if someone decides to use a subdir named google3
 		{"google3/a/b/google3/foo.proto", "a.b.google3", 0},

@@ -44,7 +44,7 @@ func protoPackageMustMatchFilePath() lint.Rule {
 	}
 }
 
-var protoPathRegexp = regexp.MustCompile(`^(?:[^/]+/)*?google3/(.*)/[^/]+\.proto$`)
+var protoPathRegexp = regexp.MustCompile(`^/?(?:[^/]+/)*?google3/(.*)/[^/]+\.proto$`)
 
 func pathToPackage(path string) string {
 	extractedPath := protoPathRegexp.FindStringSubmatch(path)
