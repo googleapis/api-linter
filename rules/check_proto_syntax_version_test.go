@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testdata"
+	"github.com/googleapis/api-linter/rules/rulestest"
 )
 
 func TestProtoVersionRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
+	tmpl := rulestest.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
 
 	tests := []struct {
 		Syntax     string
@@ -22,7 +22,7 @@ func TestProtoVersionRule(t *testing.T) {
 
 	rule := checkProtoVersion()
 	for _, test := range tests {
-		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
+		req := rulestest.MustCreateRequestFromTemplate(tmpl, test, "")
 
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
 

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testdata"
+	"github.com/googleapis/api-linter/rules/rulestest"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`
+	tmpl := rulestest.MustCreateTemplate(`
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;
@@ -31,7 +31,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 	rule := checkFieldNamesUseLowerSnakeCase()
 
 	for _, test := range tests {
-		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
+		req := rulestest.MustCreateRequestFromTemplate(tmpl, test, "")
 
 		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
 		resp, err := rule.Lint(req)

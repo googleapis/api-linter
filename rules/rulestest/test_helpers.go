@@ -1,5 +1,5 @@
 // Package testdata provides testing helpers and data for rules.
-package testdata
+package rulestest
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ import (
 
 var protoc = "protoc"
 
-func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorProto, error) {
+func descriptorProtoFromSource(source io.Reader, depsDescSet string) (*descriptorpb.FileDescriptorProto, error) {
 	tmpDir := os.TempDir()
 
 	f, err := ioutil.TempFile(tmpDir, "proto*")
@@ -37,13 +37,19 @@ func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorPr
 	}
 	defer mustCloseAndRemoveFile(descSetF)
 
-	cmd := exec.Command(
-		protoc,
+	args := []string{
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
-		f.Name(),
-	)
+	}
+
+	if depsDescSet != "" {
+		args = append(args, fmt.Sprintf("--descriptor_set_in=%s", depsDescSet))
+	}
+
+	args = append(args, f.Name())
+
+	cmd := exec.Command(protoc, args...)
 
 	stderr := new(bytes.Buffer)
 	cmd.Stderr = stderr
@@ -86,13 +92,13 @@ func MustCreateTemplate(tmpl string) *template.Template {
 }
 
 // MustCreateRequestFromTemplate creates a lint.Request from the provided template and test data.
-func MustCreateRequestFromTemplate(tmpl *template.Template, testData interface{}) lint.Request {
+func MustCreateRequestFromTemplate(tmpl *template.Template, testData interface{}, depsDescriptorSet string) lint.Request {
 	b := new(bytes.Buffer)
 	if err := tmpl.Execute(b, testData); err != nil {
 		log.Fatalf("Error executing template %v", err)
 	}
 
-	pd, err := descriptorProtoFromSource(b)
+	pd, err := descriptorProtoFromSource(b, depsDescriptorSet)
 	if err != nil {
 		log.Fatalf("Error generating proto descriptor: %v", err)
 	}
