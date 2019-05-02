@@ -3,8 +3,8 @@ package corp
 import (
 	"fmt"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	"github.com/jgeewax/api-linter/lint"
-	"github.com/jgeewax/api-linter/rules/descriptor"
+	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/descriptor"
 	"os"
 	"regexp"
 	"strings"
