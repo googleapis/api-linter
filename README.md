@@ -20,13 +20,13 @@ to be useful across the organization.
    - If you have your workstation's SSH key linked to your GitHub account:
 
     ```
-    $ git clone git@github.com:jgeewax/api-linter.git
+    $ git clone git@github.com:googleapis/api-linter.git
     ```
 
    - Otherwise:
     
     ```
-    $ git clone https://github.com/jgeewax/api-linter.git
+    $ git clone https://github.com/googleapis/api-linter.git
     ```
     
 ## Running the linter
@@ -126,10 +126,10 @@ rule := protohelpers.DescriptorCallbacks{
 -->
 
 
-[rule_interface]: https://github.com/jgeewax/api-linter/blob/master/lint/rule.go 
-[rule_info]: https://github.com/jgeewax/api-linter/blob/master/lint/rule_info.go
-[lint_request]: https://github.com/jgeewax/api-linter/blob/master/lint/request.go
-[lint_response]: https://github.com/jgeewax/api-linter/blob/master/lint/response.go
-[proto_helpers]: https://github.com/jgeewax/api-linter/tree/master/protohelpers
+[rule_interface]: https://github.com/googleapis/api-linter/blob/master/lint/rule.go 
+[rule_info]: https://github.com/googleapis/api-linter/blob/master/lint/rule_info.go
+[lint_request]: https://github.com/googleapis/api-linter/blob/master/lint/request.go
+[lint_response]: https://github.com/googleapis/api-linter/blob/master/lint/response.go
+[proto_helpers]: https://github.com/googleapis/api-linter/tree/master/protohelpers
 [type_switch]: https://tour.golang.org/methods/16
-[descriptor_callbacks]: https://github.com/jgeewax/api-linter/blob/master/protohelpers/descriptor_callbacks.go
+[descriptor_callbacks]: https://github.com/googleapis/api-linter/blob/master/protohelpers/descriptor_callbacks.go
