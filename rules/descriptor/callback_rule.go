@@ -3,7 +3,7 @@ package descriptor
 
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	"github.com/jgeewax/api-linter/lint"
+	"github.com/googleapis/api-linter/lint"
 )
 
 // Callback defines a callback that can be invoke on a descriptor

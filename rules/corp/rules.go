@@ -1,6 +1,6 @@
 package corp
 
-import "github.com/jgeewax/api-linter/lint"
+import "github.com/googleapis/api-linter/lint"
 
 func Rules() (lint.Rules, error) {
 	return lint.NewRules([]lint.Rule{

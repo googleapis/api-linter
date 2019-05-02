@@ -2,7 +2,7 @@ package descriptor
 
 import (
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	"github.com/jgeewax/api-linter/lint"
+	"github.com/googleapis/api-linter/lint"
 )
 
 // Callbacks contains a collection of functions that will be called

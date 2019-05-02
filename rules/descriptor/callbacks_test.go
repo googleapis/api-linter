@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	"github.com/jgeewax/api-linter/lint"
+	"github.com/googleapis/api-linter/lint"
 )
 
 func TestCallbacks_Apply(t *testing.T) {
