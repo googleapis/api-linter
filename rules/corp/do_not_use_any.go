@@ -27,7 +27,6 @@ func doNotUseAny() lint.Rule {
 
 						if err != nil {
 							log.Printf("Failed to get Location for Descriptor because %s.", err)
-							return
 						}
 
 						problems = append(problems, lint.Problem{
