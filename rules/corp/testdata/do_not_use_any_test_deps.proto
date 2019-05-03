@@ -1,3 +1,12 @@
 syntax = "proto3";
 
+/*
+In order to generate the protoset for these dependencies, ensure that you have
+prodaccess, and run the following:
+
+protoc --include_source_info --include_imports -otest_deps.protoset \
+  -I$(p4 g4d -f testclient_golint_deps 2>/dev/null) -I$(pwd) test_deps.proto
+g4 citc -d testclient_golint_deps >/dev/null
+ */
+
 import "google/protobuf/any.proto";
