@@ -6,7 +6,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -45,5 +45,5 @@ func protoPackageMustMatchFilePath() lint.Rule {
 }
 
 func pathToPackage(descriptorPath string) string {
-	return strings.Replace(path.Dir(descriptorPath), string(os.PathSeparator), ".", -1)
+	return strings.Replace(filepath.Dir(descriptorPath), string(os.PathSeparator), ".", -1)
 }
