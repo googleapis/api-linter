@@ -6,7 +6,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
 	"os"
-	"regexp"
+	"path"
 	"strings"
 )
 
@@ -44,14 +44,6 @@ func protoPackageMustMatchFilePath() lint.Rule {
 	}
 }
 
-var protoPathRegexp = regexp.MustCompile(`^/?(?:[^/]+/)*?google3/(.*)/[^/]+\.proto$`)
-
-func pathToPackage(path string) string {
-	extractedPath := protoPathRegexp.FindStringSubmatch(path)
-
-	if len(extractedPath) < 2 {
-		return ""
-	}
-
-	return strings.Replace(extractedPath[1], string(os.PathSeparator), ".", -1)
+func pathToPackage(descriptorPath string) string {
+	return strings.Replace(path.Dir(descriptorPath), string(os.PathSeparator), ".", -1)
 }
