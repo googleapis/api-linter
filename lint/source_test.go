@@ -38,59 +38,35 @@ func TestDescriptorLocation(t *testing.T) {
 	}{
 		{
 			descriptor: fileDesc.Messages().Get(0), // A top level message.
-			want: NewLocation(
-				NewPosition(7, 0),  // start
-				NewPosition(59, 1), // end
-			),
+			want:       &Location{&Position{7, 0}, &Position{59, 1}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Messages().Get(0), // A nested message.
-			want: NewLocation(
-				NewPosition(9, 2),  // start
-				NewPosition(36, 3), // end
-			),
+			want:       &Location{&Position{9, 2}, &Position{36, 3}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
-			want: NewLocation(
-				NewPosition(44, 2), // start
-				NewPosition(49, 3), // end
-			),
+			want:       &Location{&Position{44, 2}, &Position{49, 3}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0).Values().Get(1),
-			want: NewLocation(
-				NewPosition(48, 4),  // start
-				NewPosition(48, 12), // end
-			),
+			want:       &Location{&Position{48, 4}, &Position{48, 12}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
-			want: NewLocation(
-				NewPosition(41, 2),  // start
-				NewPosition(41, 41), // end
-			),
+			want:       &Location{&Position{41, 2}, &Position{41, 41}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Oneofs().Get(0),
-			want: NewLocation(
-				NewPosition(53, 2), // start
-				NewPosition(58, 3), // end
-			),
+			want:       &Location{&Position{53, 2}, &Position{58, 3}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0),
-			want: NewLocation(
-				NewPosition(72, 0), // start
-				NewPosition(77, 1), // end
-			),
+			want:       &Location{&Position{72, 0}, &Position{77, 1}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0).Methods().Get(0),
-			want: NewLocation(
-				NewPosition(74, 2),  // start
-				NewPosition(74, 44), // end
-			),
+			want:       &Location{&Position{74, 2}, &Position{74, 44}},
 		},
 	}
 
@@ -101,7 +77,7 @@ func TestDescriptorLocation(t *testing.T) {
 			t.Errorf("%s returns error: %v", errPrefix, err)
 		}
 		if !reflect.DeepEqual(got, test.want) {
-			t.Errorf("%s returns %s, but want %s", errPrefix, got, test.want)
+			t.Errorf("%s returns %v, but want %v", errPrefix, got, test.want)
 		}
 	}
 }
@@ -155,17 +131,13 @@ func TestSyntaxLocation(t *testing.T) {
 	if err != nil {
 		t.Errorf("newDescriptorSource: %v", err)
 	}
-
-	want := NewLocation(
-		NewPosition(2, 0),  // start
-		NewPosition(2, 18), // end
-	)
+	want := &Location{&Position{2, 0}, &Position{2, 18}}
 	got, err := descSource.SyntaxLocation()
 	if err != nil {
 		t.Errorf("SyntaxLocation() error: %s", err)
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("SyntaxLocation() returns %s, but want %s", got, want)
+		t.Errorf("SyntaxLocation() returns %v, but want %v", got, want)
 	}
 }
 

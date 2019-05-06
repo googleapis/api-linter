@@ -18,7 +18,7 @@ func TestRepository_Run(t *testing.T) {
 		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
 	}
 
-	ruleProblems := []Problem{{Message: "rule1_problem", category: Warning}}
+	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1", FilePath: "protofile"}}
 
 	tests := []struct {
 		desc    string
@@ -73,13 +73,13 @@ func TestRepository_Run(t *testing.T) {
 				},
 			),
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", category: Error}},
+				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1", FilePath: "protofile"}},
 			},
 		},
 	}
 
 	for ind, test := range tests {
-		runtime := NewRuntime(test.configs)
+		runtime := NewRuntime(test.configs...)
 		err := runtime.AddRules(
 			&mockRule{
 				info: RuleInfo{Name: "test::rule1"},
@@ -95,7 +95,7 @@ func TestRepository_Run(t *testing.T) {
 
 		resp, _ := runtime.Run(req)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Test #%d (%s): Runtime.Run()=%q; want %q", ind+1, test.desc, resp, test.resp)
+			t.Errorf("Test #%d (%s): Runtime.Run()=%v; want %v", ind+1, test.desc, resp, test.resp)
 		}
 	}
 }

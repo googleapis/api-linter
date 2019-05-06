@@ -12,11 +12,17 @@ type Runtime struct {
 }
 
 // NewRuntime creates a new Runtime.
-func NewRuntime(configs RuntimeConfigs) *Runtime {
-	return &Runtime{
-		rules:   make(Rules),
-		configs: configs,
+func NewRuntime(c ...RuntimeConfig) *Runtime {
+	t := &Runtime{
+		rules: make(Rules),
 	}
+	t.AddConfigs(c...)
+	return t
+}
+
+// AddConfigs adds a runtime config.
+func (r *Runtime) AddConfigs(c ...RuntimeConfig) {
+	r.configs = append(r.configs, c...)
 }
 
 // AddRules adds rules.
@@ -54,7 +60,9 @@ func (r *Runtime) Run(req Request) (Response, error) {
 			if resp, err := rl.Lint(req); err == nil {
 				for _, p := range resp.Problems {
 					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
-						p.category = config.Category
+						p.RuleID = rl.Info().Name
+						p.FilePath = req.ProtoFile().Path()
+						p.Category = config.Category
 						finalResp.Problems = append(finalResp.Problems, p)
 					}
 				}

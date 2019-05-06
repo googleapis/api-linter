@@ -105,15 +105,29 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 
 func newLocationFromSpan(span []int32) (*Location, error) {
 	if len(span) == 4 {
-		start := NewPosition(int(span[0]), int(span[1]))
-		end := NewPosition(int(span[2]), int(span[3]))
-		return NewLocation(start, end), nil
+		return &Location{
+			Start: &Position{
+				Line:   int(span[0]),
+				Column: int(span[1]),
+			},
+			End: &Position{
+				Line:   int(span[2]),
+				Column: int(span[3]),
+			},
+		}, nil
 	}
 
 	if len(span) == 3 {
-		start := NewPosition(int(span[0]), int(span[1]))
-		end := NewPosition(int(span[0]), int(span[2]))
-		return NewLocation(start, end), nil
+		return &Location{
+			Start: &Position{
+				Line:   int(span[0]),
+				Column: int(span[1]),
+			},
+			End: &Position{
+				Line:   int(span[0]),
+				Column: int(span[2]),
+			},
+		}, nil
 	}
 
 	return nil, fmt.Errorf("source: %v is not a valid span to create a Location", span)

@@ -47,7 +47,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 			if got, want := resp.Problems[0].Suggestion, test.suggestion; got != want {
 				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
 			}
-			if got, want := resp.Problems[0].Location.Start().Line(), test.startLine; got != want {
+			if got, want := resp.Problems[0].Location.Start.Line, test.startLine; got != want {
 				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
 			}
 		}
