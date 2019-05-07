@@ -1,0 +1,11 @@
+[
+    {
+        "included_paths": ["**/*.proto"],
+        "rule_configs": {
+            "core::proto_version": {
+                "status": "enabled",
+                "category": "error"
+            }
+        }
+    }
+]

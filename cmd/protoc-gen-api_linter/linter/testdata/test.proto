@@ -1,0 +1,11 @@
+// DO_NOT_EDIT -- this file is for testing.
+syntax = "proto2";
+
+package google.api.linter.protogen.testdata;
+
+import "google/protobuf/timestamp.proto";
+
+message badMessage {
+    optional string badField = 1;
+    optional google.protobuf.Timestamp time = 2;
+}
