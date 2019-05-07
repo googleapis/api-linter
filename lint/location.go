@@ -4,8 +4,8 @@ import "fmt"
 
 // Location describes a location in a source code file.
 type Location struct {
-	Start *Position `json:"start_position" yaml:"start_position"`
-	End   *Position `json:"end_position" yaml:"end_position"`
+	Start Position `json:"start_position" yaml:"start_position"`
+	End   Position `json:"end_position" yaml:"end_position"`
 }
 
 // IsValid checks if the location is constructed properly and
@@ -32,11 +32,11 @@ type Position struct {
 
 // IsValid checks if the position is constructed properly and
 // returns true if so.
-func (p *Position) IsValid() bool {
-	return p != nil && p.Line >= 0 && p.Column >= 0
+func (p Position) IsValid() bool {
+	return p.Line >= 0 && p.Column >= 0
 }
 
 // String returns the string representation.
-func (p *Position) String() string {
+func (p Position) String() string {
 	return fmt.Sprintf("{line: %d, column: %d}", p.Line, p.Column)
 }

@@ -106,11 +106,11 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 func newLocationFromSpan(span []int32) (*Location, error) {
 	if len(span) == 4 {
 		return &Location{
-			Start: &Position{
+			Start: Position{
 				Line:   int(span[0]),
 				Column: int(span[1]),
 			},
-			End: &Position{
+			End: Position{
 				Line:   int(span[2]),
 				Column: int(span[3]),
 			},
@@ -119,11 +119,11 @@ func newLocationFromSpan(span []int32) (*Location, error) {
 
 	if len(span) == 3 {
 		return &Location{
-			Start: &Position{
+			Start: Position{
 				Line:   int(span[0]),
 				Column: int(span[1]),
 			},
-			End: &Position{
+			End: Position{
 				Line:   int(span[0]),
 				Column: int(span[2]),
 			},

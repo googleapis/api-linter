@@ -9,12 +9,12 @@ func TestLocation_IsValid(t *testing.T) {
 		l     *Location
 		valid bool
 	}{
-		{&Location{&Position{1, 2}, &Position{1, 2}}, true},
-		{&Location{&Position{-1, -1}, &Position{0, 0}}, false}, // invalid: start position is invalid
-		{&Location{&Position{0, 0}, &Position{-1, -2}}, false}, // invalid: end position is invalid
-		{&Location{&Position{1, 1}, &Position{0, 0}}, false},   // invalid: end line is before start line
-		{&Location{&Position{1, 1}, &Position{1, 0}}, false},   // invalid: end column is before start column in the same line
-		{&Location{&Position{1, 1}, &Position{1, 0}}, false},   // invalid: start position is not created properly
+		{&Location{Position{1, 2}, Position{1, 2}}, true},
+		{&Location{Position{-1, -1}, Position{0, 0}}, false}, // invalid: start position is invalid
+		{&Location{Position{0, 0}, Position{-1, -2}}, false}, // invalid: end position is invalid
+		{&Location{Position{1, 1}, Position{0, 0}}, false},   // invalid: end line is before start line
+		{&Location{Position{1, 1}, Position{1, 0}}, false},   // invalid: end column is before start column in the same line
+		{&Location{Position{1, 1}, Position{1, 0}}, false},   // invalid: start position is not created properly
 		{nil, false}, // invalid: nil
 	}
 
@@ -29,13 +29,12 @@ func TestLocation_IsValid(t *testing.T) {
 
 func TestPosition_IsValid(t *testing.T) {
 	tests := []struct {
-		p     *Position
+		p     Position
 		valid bool
 	}{
-		{&Position{0, 1}, true},
-		{&Position{-1, 0}, false},
-		{&Position{0, -1}, false},
-		{nil, false},
+		{Position{0, 1}, true},
+		{Position{-1, 0}, false},
+		{Position{0, -1}, false},
 	}
 
 	for _, test := range tests {
