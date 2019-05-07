@@ -1,3 +1,5 @@
+// Package linter provides an API linter that
+// can be run as a plugin in protoc.
 package linter
 
 import (
@@ -9,21 +11,40 @@ import (
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	"github.com/googleapis/api-linter/cmd/protoc-gen-api_linter/protogen"
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules"
 	"gopkg.in/yaml.v2"
 )
 
 // Linter is a protoc plugin that generates linting results for
 // API protobuf files.
+//
+// See github.com/googleapis/api-linter/protoc-gen-api_linter/main.go
+// for how to use it.
 type Linter struct {
 	params map[string]string
+	rt     *lint.Runtime
 }
 
-// New creates and returns a Linter.
-func New() *Linter {
-	return &Linter{
+// New creates and returns a Linter with the given rules and configs.
+func New(rules []lint.Rule, configs lint.RuntimeConfigs) *Linter {
+	l := &Linter{
 		params: make(map[string]string),
+		rt:     lint.NewRuntime(),
 	}
+	l.rt.AddRules(rules...)
+	l.rt.AddConfigs(configs...)
+	return l
+}
+
+func (linter *Linter) hasParam(name string) bool {
+	v, found := linter.params[name]
+	return found && v != ""
+}
+
+func (linter *Linter) getParam(name string) string {
+	if linter.hasParam(name) {
+		return linter.params[name]
+	}
+	return ""
 }
 
 func (linter *Linter) setParam(name, value string) error {
@@ -42,64 +63,45 @@ func (linter *Linter) Options() *protogen.Options {
 }
 
 // Generate generates linting results for the files in the Plugin
-// and write them to an output file, if exists, or os.Stderr.
+// and write them to an output file, if specified, or os.Stderr.
 func (linter *Linter) Generate(gen *protogen.Plugin) error {
-	rt, err := createLinterRuntime(linter.params["cfg_file"])
-	if err != nil {
-		return err
+	if linter.hasParam("cfg_file") {
+		configs, err := readConfigs(linter.getParam("cfg_file"))
+		if err != nil {
+			return err
+		}
+		linter.rt.AddConfigs(configs...)
 	}
-	problems, err := lintFiles(rt, gen.Files())
+
+	problems, err := checkFiles(linter.rt, gen.Files())
 	if err != nil {
 		return err
 	}
 	var w io.Writer = os.Stderr
-	if linter.params["out_file"] != "" {
-		w = gen.NewGeneratedFile(linter.params["out_file"])
+	if linter.hasParam("out_file") {
+		w = gen.NewGeneratedFile(linter.getParam("out_file"))
 	}
-	var format formatFunc
-	switch linter.params["out_format"] {
-	case "yaml":
-		format = yaml.Marshal
-	default:
-		format = json.Marshal
-	}
+	format := linter.getParam("out_fmt")
 	return writeProblems(w, problems, format)
 }
 
-type formatFunc func(interface{}) ([]byte, error)
-
-func writeProblems(w io.Writer, problems []lint.Problem, f formatFunc) error {
+func writeProblems(w io.Writer, problems []lint.Problem, format string) error {
+	var f func(interface{}) ([]byte, error)
+	switch format {
+	case "yaml":
+		f = yaml.Marshal
+	default:
+		f = json.Marshal
+	}
 	c, err := f(problems)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "%s\n", c)
-	return nil
+	_, err = w.Write(c)
+	return err
 }
 
-func createLinterRuntime(cfgFile string) (*lint.Runtime, error) {
-	defaultCfg := lint.RuntimeConfig{
-		IncludedPaths: []string{"**/*.proto"},
-		RuleConfigs: map[string]lint.RuleConfig{
-			"core": {
-				Status:   lint.Enabled,
-				Category: lint.Warning,
-			},
-		},
-	}
-	rt := lint.NewRuntime(defaultCfg)
-	if cfgFile != "" {
-		cfg, err := readRuntimeConfigs(cfgFile)
-		if err != nil {
-			return nil, err
-		}
-		rt.AddConfigs(cfg...)
-	}
-	rt.AddRules(rules.Rules().All()...)
-	return rt, nil
-}
-
-func lintFiles(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]lint.Problem, error) {
+func checkFiles(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]lint.Problem, error) {
 	var problems []lint.Problem
 	for _, proto := range files {
 		req, err := lint.NewProtoRequest(proto)
@@ -117,8 +119,8 @@ func lintFiles(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]l
 	return problems, nil
 }
 
-func readRuntimeConfigs(cfgFile string) (lint.RuntimeConfigs, error) {
-	f, err := os.Open(cfgFile)
+func readConfigs(file string) (lint.RuntimeConfigs, error) {
+	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}

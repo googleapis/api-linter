@@ -1,6 +1,7 @@
 package linter_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -10,29 +11,50 @@ import (
 
 	"github.com/googleapis/api-linter/cmd/protoc-gen-api_linter/linter"
 	"github.com/googleapis/api-linter/cmd/protoc-gen-api_linter/protogen"
+	"github.com/googleapis/api-linter/lint"
+	corerules "github.com/googleapis/api-linter/rules"
 )
 
-func TestAPILinter_OutputToFile(t *testing.T) {
+func TestAPILinter_WithConfigFile(t *testing.T) {
 	workdir, err := ioutil.TempDir("", "test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(workdir)
 
-	tempfile := filepath.Join(workdir, "lint_test_out.json")
-	runLinter(t, workdir, "out_file="+filepath.Base(tempfile), "testdata/test.proto")
+	tests := []struct {
+		cfgfile string
+		want    string
+	}{
+		{
+			// By default, category is "warning".
+			"",
+			`"category":"warning"`,
+		},
+		{
+			// Category will be overrode to "error".
+			"testdata/test_rule_configs.json",
+			`"category":"error"`,
+		},
+	}
+	for _, test := range tests {
+		outfile := "test.out"
+		params := fmt.Sprintf("out_file=%s,cfg_file=%s", outfile, test.cfgfile)
+		runLinter(t, workdir, params, "testdata/test.proto")
 
-	f, err := os.Open(tempfile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-	content, err := ioutil.ReadAll(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(string(content), "message") {
-		t.Errorf("Linting result: %q does not contains linting results with 'message'", content)
+		f, err := os.Open(filepath.Join(workdir, outfile))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer f.Close()
+		content, err := ioutil.ReadAll(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !strings.Contains(string(content), test.want) {
+			t.Errorf("Linting result: %q does not contain linting results with %q", content, test.want)
+		}
 	}
 }
 
@@ -54,7 +76,20 @@ func runLinter(t *testing.T, workdir, params string, args ...string) {
 
 func init() {
 	if os.Getenv("RUN_AS_PROTOC_PLUGIN") != "" {
-		protogen.Run(linter.New())
+		defaultConfigs := lint.RuntimeConfigs{
+			lint.RuntimeConfig{
+				IncludedPaths: []string{"**/*.proto"},
+				RuleConfigs: map[string]lint.RuleConfig{
+					"core": {
+						Status:   lint.Enabled,
+						Category: lint.Warning,
+					},
+				},
+			},
+		}
+		var rules []lint.Rule
+		rules = append(rules, corerules.Rules().All()...)
+		protogen.Run(linter.New(rules, defaultConfigs))
 		os.Exit(0)
 	}
 }
