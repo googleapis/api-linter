@@ -46,28 +46,28 @@ type Plugin struct {
 func NewPlugin(req *pluginpb.CodeGeneratorRequest, opts *Options) (*Plugin, error) {
 	gen := &Plugin{req: req}
 
-	gen.extractFilesToGenerate(req)
-	if err := gen.extractParameters(req, opts); err != nil {
+	gen.extractFilesToGenerate()
+	if err := gen.extractParameters(opts); err != nil {
 		return nil, err
 	}
 
 	return gen, nil
 }
 
-func (gen *Plugin) extractFilesToGenerate(req *pluginpb.CodeGeneratorRequest) {
+func (gen *Plugin) extractFilesToGenerate() {
 	filesToGenerate := make(map[string]bool)
-	for _, f := range req.GetFileToGenerate() {
+	for _, f := range gen.req.GetFileToGenerate() {
 		filesToGenerate[f] = true
 	}
-	for _, f := range req.GetProtoFile() {
+	for _, f := range gen.req.GetProtoFile() {
 		if filesToGenerate[f.GetName()] {
 			gen.filesToGenerate = append(gen.filesToGenerate, f)
 		}
 	}
 }
 
-func (gen *Plugin) extractParameters(req *pluginpb.CodeGeneratorRequest, opts *Options) error {
-	for _, param := range strings.Split(req.GetParameter(), ",") {
+func (gen *Plugin) extractParameters(opts *Options) error {
+	for _, param := range strings.Split(gen.req.GetParameter(), ",") {
 		var value string
 		if i := strings.Index(param, "="); i >= 0 {
 			value = param[i+1:]
