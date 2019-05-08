@@ -229,7 +229,10 @@ func runProtoC(t *testing.T, workdir, params string, args ...string) {
 
 func init() {
 	if os.Getenv("RUN_AS_PROTOC_PLUGIN") != "" {
-		run()
+		if err := run(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %v\n", filepath.Base(os.Args[0]), err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 }
