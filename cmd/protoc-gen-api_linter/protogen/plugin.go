@@ -6,11 +6,9 @@ package protogen
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -143,11 +141,8 @@ type Generator interface {
 //
 // If a failure occurs while reading or writing, Run prints an error to
 // os.Stderr and calls os.Exit(1).
-func Run(g Generator) {
-	if err := run(g); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", filepath.Base(os.Args[0]), err)
-		os.Exit(1)
-	}
+func Run(g Generator) error {
+	return run(g)
 }
 
 func run(g Generator) error {
