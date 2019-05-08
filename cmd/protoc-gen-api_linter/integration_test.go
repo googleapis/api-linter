@@ -15,6 +15,7 @@ type testFile struct {
 }
 
 type testCase struct {
+	description           string
 	ruleID                string
 	protoFile, configFile testFile
 	negative              bool
@@ -22,14 +23,16 @@ type testCase struct {
 
 var testCases = []testCase{
 	{
-		ruleID: "core::proto_version",
+		description: "positive case",
+		ruleID:      "core::proto_version",
 		protoFile: testFile{
 			path:    "proto_version_test.proto",
 			content: `syntax = "proto2";`,
 		},
 	},
 	{
-		ruleID: "core::proto_version",
+		description: "negative case",
+		ruleID:      "core::proto_version",
 		protoFile: testFile{
 			path:    "proto_version_negative_test.proto",
 			content: `syntax = "proto3";`,
@@ -37,7 +40,28 @@ var testCases = []testCase{
 		negative: true,
 	},
 	{
-		ruleID: "core::naming_formats::field_names",
+		description: "disabled in config",
+		ruleID:      "core::proto_version",
+		protoFile: testFile{
+			path:    "proto_version_test.proto",
+			content: `syntax = "proto2";`,
+		},
+		configFile: testFile{
+			path: "proto_version_config.json",
+			content: `[{
+				"included_paths": ["**/*.proto"],
+				"rule_configs": {
+					"core::proto_version": {
+						"status": "disabled"
+					}
+				}
+			}]`,
+		},
+		negative: true,
+	},
+	{
+		description: "positive case",
+		ruleID:      "core::naming_formats::field_names",
 		protoFile: testFile{
 			path: "field_names_test.proto",
 			content: `
@@ -49,7 +73,8 @@ var testCases = []testCase{
 		},
 	},
 	{
-		ruleID: "core::naming_formats::field_names",
+		description: "negative case",
+		ruleID:      "core::naming_formats::field_names",
 		protoFile: testFile{
 			path: "field_names_test.proto",
 			content: `
@@ -62,7 +87,8 @@ var testCases = []testCase{
 		negative: true,
 	},
 	{
-		ruleID: "core::naming_formats::field_names",
+		description: "disabled by in file comment",
+		ruleID:      "core::naming_formats::field_names",
 		protoFile: testFile{
 			path: "field_names_test.proto",
 			content: `
@@ -72,6 +98,31 @@ var testCases = []testCase{
 					string good_name = 1;
 				}
 			`,
+		},
+		negative: true,
+	},
+	{
+		description: "disabled by config",
+		ruleID:      "core::naming_formats::field_names",
+		protoFile: testFile{
+			path: "field_names_test.proto",
+			content: `
+				syntax = "proto3";
+				message Test {
+					string badName = 1;
+				}
+			`,
+		},
+		configFile: testFile{
+			path: "field_names_config.json",
+			content: `[{
+				"included_paths": ["**/*.proto"],
+				"rule_configs": {
+					"core::naming_formats::field_names": {
+						"status": "disabled"
+					}
+				}
+			}]`,
 		},
 		negative: true,
 	},
@@ -97,8 +148,8 @@ func TestRules(t *testing.T) {
 	for _, test := range testCases {
 		result := runLinter(t, test.protoFile, test.configFile)
 		if got, want := strings.Contains(result, test.ruleID), !test.negative; got != want {
-			t.Errorf("check proto file %q, result %q contains rule %q: %v, but want %v",
-				test.protoFile.content, result, test.ruleID, got, want)
+			t.Errorf("%s: rule %q in linting result %q: %v, but want %v -- proto %q, config %q",
+				test.description, test.ruleID, result, got, want, test.protoFile.content, test.configFile.content)
 		}
 	}
 }
