@@ -237,6 +237,7 @@ func reverseInts(a []int) {
 // in the comments.
 func (s DescriptorSource) isRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
 	commentsToCheck := s.fileComments().LeadingDetachedComments
+	commentsToCheck = append(commentsToCheck, s.fileComments().LeadingComments)
 
 	for d, ok := d, true; ok && d != nil; d, ok = d.Parent() {
 		comments, err := s.DescriptorComments(d)

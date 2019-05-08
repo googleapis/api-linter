@@ -44,5 +44,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Usage: protoc --api_linter_out=cfg_file=my_cfg_file,out_file=my_lint_output_file:. my_proto_file")
 		os.Exit(1)
 	}
+	run()
+}
+
+func run() {
 	protogen.Run(linter.New(getRules(), getConfigs()))
 }
