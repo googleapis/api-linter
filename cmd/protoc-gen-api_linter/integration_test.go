@@ -10,182 +10,185 @@ import (
 	"testing"
 )
 
-type testFile struct {
-	path, content string
-}
-
-type testCase struct {
-	description           string
-	ruleID                string
-	protoFile, configFile testFile
-	negative              bool
-}
-
-var testCases = []testCase{
+// Each rule must have a testing case stored here.
+// Each case must be positive when the rule in test
+// is enabled. It must also contain a "disable-me-here"
+// comment at the place where you want the rule to be
+// disabled.
+var testCases = []struct {
+	rule, proto string
+}{
 	{
-		description: "positive case",
-		ruleID:      "core::proto_version",
-		protoFile: testFile{
-			path:    "proto_version_test.proto",
-			content: `syntax = "proto2";`,
-		},
+		rule: "core::proto_version",
+		proto: `
+		// disable-me-here
+		syntax = "proto2";
+		`,
 	},
 	{
-		description: "negative case",
-		ruleID:      "core::proto_version",
-		protoFile: testFile{
-			path:    "proto_version_negative_test.proto",
-			content: `syntax = "proto3";`,
-		},
-		negative: true,
-	},
-	{
-		description: "disabled in config",
-		ruleID:      "core::proto_version",
-		protoFile: testFile{
-			path:    "proto_version_test.proto",
-			content: `syntax = "proto2";`,
-		},
-		configFile: testFile{
-			path: "proto_version_config.json",
-			content: `[{
-				"included_paths": ["**/*.proto"],
-				"rule_configs": {
-					"core::proto_version": {
-						"status": "disabled"
-					}
-				}
-			}]`,
-		},
-		negative: true,
-	},
-	{
-		description: "positive case",
-		ruleID:      "core::naming_formats::field_names",
-		protoFile: testFile{
-			path: "field_names_test.proto",
-			content: `
+		rule: "core::naming_formats::field_names",
+		proto: `
 				syntax = "proto3";
 				message Test {
+					// disable-me-here
 					string badName = 1;
 				}
 			`,
-		},
-	},
-	{
-		description: "negative case",
-		ruleID:      "core::naming_formats::field_names",
-		protoFile: testFile{
-			path: "field_names_test.proto",
-			content: `
-				syntax = "proto3";
-				message Test {
-					string good_name = 1;
-				}
-			`,
-		},
-		negative: true,
-	},
-	{
-		description: "disabled by in file comment",
-		ruleID:      "core::naming_formats::field_names",
-		protoFile: testFile{
-			path: "field_names_test.proto",
-			content: `
-				syntax = "proto3";
-				message Test {
-					// (--api-linter core::naming_formats::field_names=disabled --)
-					string good_name = 1;
-				}
-			`,
-		},
-		negative: true,
-	},
-	{
-		description: "disabled by config",
-		ruleID:      "core::naming_formats::field_names",
-		protoFile: testFile{
-			path: "field_names_test.proto",
-			content: `
-				syntax = "proto3";
-				message Test {
-					string badName = 1;
-				}
-			`,
-		},
-		configFile: testFile{
-			path: "field_names_config.json",
-			content: `[{
-				"included_paths": ["**/*.proto"],
-				"rule_configs": {
-					"core::naming_formats::field_names": {
-						"status": "disabled"
-					}
-				}
-			}]`,
-		},
-		negative: true,
 	},
 }
 
-func TestEveryRuleHasPositiveTestCase(t *testing.T) {
-	rules := getRules()
-	positiveTests := make(map[string]testCase)
+func TestEveryRuleHasATestCase(t *testing.T) {
+	tests := make(map[string]bool)
 	for _, test := range testCases {
-		if !test.negative {
-			positiveTests[test.ruleID] = test
-		}
+		tests[test.rule] = true
 	}
+	rules := getRules()
 	for _, rl := range rules {
 		ruleID := string(rl.Info().Name)
-		if _, found := positiveTests[ruleID]; !found {
-			t.Errorf("%s does not have a positive test case", ruleID)
+		if _, found := tests[ruleID]; !found {
+			t.Errorf("%s does not have a test case", ruleID)
 		}
 	}
 }
 
-func TestRules(t *testing.T) {
+func TestRules_DisabledByDefault(t *testing.T) {
 	for _, test := range testCases {
-		result := runLinter(t, test.protoFile, test.configFile)
-		if got, want := strings.Contains(result, test.ruleID), !test.negative; got != want {
-			t.Errorf("%s: rule %q in linting result %q: %v, but want %v -- proto %q, config %q",
-				test.description, test.ruleID, result, got, want, test.protoFile.content, test.configFile.content)
+		result := runLinter(t, test.proto, "[]")
+		if strings.Contains(result, test.rule) {
+			t.Errorf("Rule %q should be disabled by default", test.rule)
 		}
 	}
 }
 
-func TestRulesDisabledInFile(t *testing.T) {
+func TestRules_Enabled(t *testing.T) {
+	config := `
+	[
+		{
+			"included_paths": ["**/*.proto"],
+			"rule_configs": {
+				"": {
+					"status": "enabled",
+					"category": "warning"
+				}
+			}
+		}
+	]
+	`
+
 	for _, test := range testCases {
-		disableComment := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.ruleID)
-		test.protoFile.content = "//" + disableComment + "\n" + test.protoFile.content
-		result := runLinter(t, test.protoFile, test.configFile)
-		if strings.Contains(result, test.ruleID) {
-			t.Errorf("rule %q is disabled on %q, but got result %q", test.ruleID, test.protoFile.content, result)
+		proto := test.proto
+		result := runLinter(t, proto, config)
+		if !strings.Contains(result, test.rule) {
+			t.Errorf("Rule %q should be enabled by the user config: %q", test.rule, config)
 		}
 	}
 }
 
-func runLinter(t *testing.T, protoFile, configFile testFile) string {
+func TestRules_DisabledByFileComments(t *testing.T) {
+	config := `
+	[
+		{
+			"included_paths": ["**/*.proto"],
+			"rule_configs": {
+				"": {
+					"status": "enabled",
+					"category": "warning"
+				}
+			}
+		}
+	]
+	`
+
+	for _, test := range testCases {
+		disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
+		proto := disableInFile + "\n" + test.proto
+		result := runLinter(t, proto, config)
+		if strings.Contains(result, test.rule) {
+			t.Errorf("Rule %q should be disabled by file comments", test.rule)
+		}
+	}
+}
+
+func TestRules_DisabledByInlineComments(t *testing.T) {
+	config := `
+	[
+		{
+			"included_paths": ["**/*.proto"],
+			"rule_configs": {
+				"": {
+					"status": "enabled",
+					"category": "warning"
+				}
+			}
+		}
+	]
+	`
+
+	for _, test := range testCases {
+		disableInline := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
+		proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+		result := runLinter(t, proto, config)
+		if strings.Contains(result, test.rule) {
+			t.Errorf("Rule %q should be disabled by in-line comments", test.rule)
+		}
+	}
+}
+
+func TestRules_DisabledByConfig(t *testing.T) {
+	config := `
+	[
+		{
+			"included_paths": ["**/*.proto"],
+			"rule_configs": {
+				"": {
+					"status": "enabled",
+					"category": "warning"
+				}
+			}
+		},
+		{
+			"included_paths": ["**/*.proto"],
+			"rule_configs": {
+				"replace-me-here": {
+					"status": "disabled"
+				}
+			}
+		}
+	]
+	`
+
+	for _, test := range testCases {
+		c := strings.Replace(config, "replace-me-here", test.rule, -1)
+		result := runLinter(t, test.proto, c)
+		if strings.Contains(result, test.rule) {
+			t.Errorf("Rule %q should be disabled by the user config: %q", test.rule, c)
+		}
+	}
+}
+
+func runLinter(t *testing.T, proto, config string) string {
 	workdir, err := ioutil.TempDir("", "test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(workdir)
 
-	if err := writeFile(workdir, protoFile); err != nil {
+	protoPath := filepath.Join(workdir, "test.proto")
+	configPath := filepath.Join(workdir, "test_config.json")
+	outPath := filepath.Join(workdir, "test.out")
+
+	if err := writeFile(protoPath, proto); err != nil {
 		t.Fatal(err)
 	}
-	if err := writeFile(workdir, configFile); err != nil {
+	if err := writeFile(configPath, config); err != nil {
 		t.Fatal(err)
 	}
 
-	params := "out_file=test.out"
-	if configFile.path != "" {
-		params += ",cfg_file=" + filepath.Join(workdir, configFile.path)
-	}
-	runProtoC(t, workdir, params, filepath.Join(workdir, protoFile.path))
+	params := "out_file=" + filepath.Base(outPath)
+	params += ",cfg_file=" + filepath.Join(workdir, "test_config.json")
+	runProtoC(t, workdir, params, protoPath)
 
-	f, err := os.Open(filepath.Join(workdir, "test.out"))
+	f, err := os.Open(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,16 +200,15 @@ func runLinter(t *testing.T, protoFile, configFile testFile) string {
 	return string(content)
 }
 
-func writeFile(rootDir string, file testFile) error {
-	if file.path == "" {
+func writeFile(path, content string) error {
+	if path == "" {
 		return nil
 	}
-	path := filepath.Join(rootDir, file.path)
 	err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(path, []byte(file.content), 0644)
+	return ioutil.WriteFile(path, []byte(content), 0644)
 }
 
 func runProtoC(t *testing.T, workdir, params string, args ...string) {

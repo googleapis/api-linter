@@ -22,10 +22,6 @@ func getConfigs() lint.RuntimeConfigs {
 					Status:   lint.Disabled,
 					Category: lint.Warning,
 				},
-				"core": {
-					Status:   lint.Enabled,
-					Category: lint.Warning,
-				},
 			},
 		},
 	}
