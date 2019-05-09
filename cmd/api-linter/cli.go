@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/urfave/cli"
@@ -65,7 +63,7 @@ func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error
 				}
 
 				if c.String("cfg") != "" {
-					userConfigs, err := readConfigs(c.String("cfg"))
+					userConfigs, err := lint.ReadConfigsFromFile(c.String("cfg"))
 					if err != nil {
 						return err
 					}
@@ -107,19 +105,4 @@ func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error
 	}
 
 	return app.Run(args)
-}
-
-func readConfigs(path string) (lint.RuntimeConfigs, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("readConfig: %s", err.Error())
-	}
-	defer f.Close()
-
-	parse := lint.ReadConfigsJSON
-	switch filepath.Ext(path) {
-	case ".yaml":
-		parse = lint.ReadConfigsYAML
-	}
-	return parse(f)
 }

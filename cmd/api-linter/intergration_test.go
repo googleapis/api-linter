@@ -176,6 +176,7 @@ func runLinter(t *testing.T, proto, config string) string {
 
 	args := []string{
 		"api-linter-test",
+		"checkproto",
 		"--cfg=" + configPath,
 		"--out=" + outPath,
 		"--import_path=" + workdir,

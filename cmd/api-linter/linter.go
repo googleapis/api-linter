@@ -5,11 +5,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-// protoParser is an interface wrapping the ParseProto method.
-type protoParser interface {
-	ParseProto(filenames ...string) ([]*descriptorpb.FileDescriptorProto, error)
-}
-
 // linter is an API linter.
 type linter struct {
 	rt *lint.Runtime
