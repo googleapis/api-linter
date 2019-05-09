@@ -29,7 +29,7 @@ func compileProto(protoc, importPath string, filenames ...string) ([]*descriptor
 
 	cmd := exec.Command(protoc, "--descriptor_set_out="+outfile.Name())
 	cmd.Args = append(cmd.Args, "--include_source_info")
-	cmd.Args = append(cmd.Args, "-I="+importPath)
+	cmd.Args = append(cmd.Args, "--proto_path="+importPath)
 	cmd.Args = append(cmd.Args, filenames...)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return nil, fmt.Errorf("Running %s: %s, %v", strings.Join(cmd.Args, " "), string(out), err)

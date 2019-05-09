@@ -42,9 +42,9 @@ func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error
 					Usage: "protocol compiler path",
 				},
 				cli.StringFlag{
-					Name:  "import_path",
+					Name:  "proto_path",
 					Value: ".",
-					Usage: "protoc import path",
+					Usage: "the directory in which for protoc to search for imports",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -54,7 +54,7 @@ func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error
 				}
 
 				p := protocParser{
-					importPath: c.String("import_path"),
+					importPath: c.String("proto_path"),
 					protoc:     c.String("protoc"),
 				}
 				files, err := p.ParseProto(filenames...)

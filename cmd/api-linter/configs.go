@@ -6,7 +6,7 @@ import "github.com/googleapis/api-linter/lint"
 func configs() lint.RuntimeConfigs {
 	configs := lint.RuntimeConfigs{
 		lint.RuntimeConfig{
-			IncludedPaths: []string{"*.proto"},
+			IncludedPaths: []string{"**/*.proto"},
 			RuleConfigs: map[string]lint.RuleConfig{
 				"core": {
 					Status:   lint.Enabled,

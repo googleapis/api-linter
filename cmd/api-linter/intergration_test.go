@@ -179,7 +179,7 @@ func runLinter(t *testing.T, proto, config string) string {
 		"checkproto",
 		"--cfg=" + configPath,
 		"--out=" + outPath,
-		"--import_path=" + workdir,
+		"--proto_path=" + workdir,
 		protoPath}
 	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)
