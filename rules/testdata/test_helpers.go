@@ -10,10 +10,12 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 
 	"github.com/golang/protobuf/v2/proto"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/lithammer/dedent"
 )
 
 var protoc = "protoc"
@@ -80,9 +82,19 @@ func mustCloseAndRemoveFile(f *os.File) {
 }
 
 // MustCreateTemplate creates a template with name "test" from
-// the provided template string.
-func MustCreateTemplate(tmpl string) *template.Template {
-	return template.Must(template.New("test").Parse(tmpl))
+// text.
+func MustCreateTemplate(text string) *template.Template {
+	return template.Must(template.New("test").Parse(text))
+}
+
+var leadingBlankLine = regexp.MustCompile("^\n")
+
+// MustCreateTemplateWithDedent removes any leading black line and
+// any common leading whitespace from every line in text before
+// creating the template.
+func MustCreateTemplateWithDedent(text string) *template.Template {
+	text = leadingBlankLine.ReplaceAllString(text, "")
+	return MustCreateTemplate(dedent.Dedent(text))
 }
 
 // MustCreateRequestFromTemplate creates a lint.Request from the provided template and test data.

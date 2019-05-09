@@ -4,28 +4,30 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/testdata"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`
+	tmpl := testdata.MustCreateTemplateWithDedent(`
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;
 	}`)
 
+	wantPosition := lint.Position{Line: 3, Column: 3}
 	tests := []struct {
 		FieldName  string
 		numProblem int
 		suggestion string
-		startLine  int
+		start      lint.Position
 	}{
-		{"good_field_name", 0, "", -1},
-		{"BadFieldName", 1, "bad_field_name", 4},
-		{"badFieldName", 1, "bad_field_name", 4},
-		{"Bad_Field_Name", 1, "bad_field_name", 4},
-		{"bad_Field_Name", 1, "bad_field_name", 4},
-		{"badField_Name", 1, "bad_field_name", 4},
+		{"good_field_name", 0, "", lint.Position{}},
+		{"BadFieldName", 1, "bad_field_name", wantPosition},
+		{"badFieldName", 1, "bad_field_name", wantPosition},
+		{"Bad_Field_Name", 1, "bad_field_name", wantPosition},
+		{"bad_Field_Name", 1, "bad_field_name", wantPosition},
+		{"badField_Name", 1, "bad_field_name", wantPosition},
 	}
 
 	rule := checkFieldNamesUseLowerSnakeCase()
@@ -47,7 +49,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 			if got, want := resp.Problems[0].Suggestion, test.suggestion; got != want {
 				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
 			}
-			if got, want := resp.Problems[0].Location.Start.Line, test.startLine; got != want {
+			if got, want := resp.Problems[0].Location.Start, test.start; got != want {
 				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
 			}
 		}
