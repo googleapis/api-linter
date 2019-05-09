@@ -35,7 +35,7 @@ See this [example](cmd/api-linter/examples/example.sh).
 ## Rule Configuration
 The linter contains a list of [core rules](rules), and by default, they are all enabled. However, one can disable a rule by using a configuration file or in-file(line) comments.
 
-### Disable a rule using a configuration file. 
+### Disable a rule using a configuration file
 
 Example:
 
@@ -52,7 +52,7 @@ Disable rule `core::proto_version` for any `.proto` files.
 ```
 
 
-### Disable a rule using in-file(line) comments.
+### Disable a rule using in-file(line) comments
 
 Example:
 
