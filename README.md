@@ -1,5 +1,5 @@
 # API Linter
-API-linter is a linter for APIs defined in protobuf files.
+API linter checks APIs defined in protobuf files. It follows [Google API Design Guide](https://cloud.google.com/apis/design/).
 
 ## Requirements
 * Install `git` from [https://git-scm.com](https://git-scm.com/);
@@ -11,7 +11,7 @@ API-linter is a linter for APIs defined in protobuf files.
 ```sh
 go get -u github.com/googleapis/api-linter/cmd/api-linter
 ```
-* Update the `$APTH` environment to include `$HOME/go/bin`.
+* Update the `PATH` environment to include `$HOME/go/bin`.
 
 ## Usage
 Run `api-linter help` to see the usage. Or run `api-linter help checkproto` to see how to check API protobuf files:
