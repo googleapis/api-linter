@@ -16,7 +16,7 @@ type Problem struct {
 	// Location provides the location of the problem. If both
 	// `Location` and `Descriptor` are specified, the location
 	// is then used from `Location` instead of `Descriptor`.
-	Location *Location `json:"location" yaml:"location"`
+	Location Location `json:"location" yaml:"location"`
 	// Descriptor provides the descriptor related
 	// to the problem. If present and `Location` is not
 	// specified, then the starting location of the descriptor

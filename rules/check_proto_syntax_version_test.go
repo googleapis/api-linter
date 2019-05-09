@@ -16,8 +16,8 @@ func TestProtoVersionRule(t *testing.T) {
 		suggestion string
 		startLine  int
 	}{
-		{"proto3", 0, "", 0},
-		{"proto2", 1, "proto3", 0},
+		{"proto3", 0, "", 1},
+		{"proto2", 1, "proto3", 1},
 	}
 
 	rule := checkProtoVersion()

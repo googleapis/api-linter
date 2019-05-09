@@ -12,21 +12,19 @@ type Location struct {
 
 // IsValid checks if the location is constructed properly and
 // returns true if so.
-func (l *Location) IsValid() bool {
-	return l != nil &&
-		l.Start.IsValid() &&
+func (l Location) IsValid() bool {
+	return l.Start.IsValid() &&
 		l.End.IsValid() &&
 		(l.End.Line > l.Start.Line ||
 			l.End.Line == l.Start.Line && l.End.Column >= l.Start.Column)
 }
 
 // String returns the string representation.
-func (l *Location) String() string {
+func (l Location) String() string {
 	return fmt.Sprintf("{start: %s, end: %s}", l.Start, l.End)
 }
 
-// Position describes a zero-based position in a source code file.
-// Typically you will want to add 1 to each before displaying to a user.
+// Position describes a one-based position in a source code file.
 type Position struct {
 	Line   int `json:"line_number" yaml:"line_number"`
 	Column int `json:"column_number" yaml:"column_number"`
@@ -35,7 +33,7 @@ type Position struct {
 // IsValid checks if the position is constructed properly and
 // returns true if so.
 func (p Position) IsValid() bool {
-	return p.Line >= 0 && p.Column >= 0
+	return p.Line >= 1 && p.Column >= 1
 }
 
 // String returns the string representation.

@@ -21,11 +21,11 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 		startLine  int
 	}{
 		{"good_field_name", 0, "", -1},
-		{"BadFieldName", 1, "bad_field_name", 3},
-		{"badFieldName", 1, "bad_field_name", 3},
-		{"Bad_Field_Name", 1, "bad_field_name", 3},
-		{"bad_Field_Name", 1, "bad_field_name", 3},
-		{"badField_Name", 1, "bad_field_name", 3},
+		{"BadFieldName", 1, "bad_field_name", 4},
+		{"badFieldName", 1, "bad_field_name", 4},
+		{"Bad_Field_Name", 1, "bad_field_name", 4},
+		{"bad_Field_Name", 1, "bad_field_name", 4},
+		{"badField_Name", 1, "bad_field_name", 4},
 	}
 
 	rule := checkFieldNamesUseLowerSnakeCase()

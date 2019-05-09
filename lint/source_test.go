@@ -34,39 +34,39 @@ func TestDescriptorLocation(t *testing.T) {
 
 	tests := []struct {
 		descriptor protoreflect.Descriptor
-		want       *Location
+		want       Location
 	}{
 		{
 			descriptor: fileDesc.Messages().Get(0), // A top level message.
-			want:       &Location{Position{7, 0}, Position{59, 1}},
+			want:       Location{Position{8, 1}, Position{60, 2}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Messages().Get(0), // A nested message.
-			want:       &Location{Position{9, 2}, Position{36, 3}},
+			want:       Location{Position{10, 3}, Position{37, 4}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
-			want:       &Location{Position{44, 2}, Position{49, 3}},
+			want:       Location{Position{45, 3}, Position{50, 4}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0).Values().Get(1),
-			want:       &Location{Position{48, 4}, Position{48, 12}},
+			want:       Location{Position{49, 5}, Position{49, 13}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
-			want:       &Location{Position{41, 2}, Position{41, 41}},
+			want:       Location{Position{42, 3}, Position{42, 42}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Oneofs().Get(0),
-			want:       &Location{Position{53, 2}, Position{58, 3}},
+			want:       Location{Position{54, 3}, Position{59, 4}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0),
-			want:       &Location{Position{72, 0}, Position{77, 1}},
+			want:       Location{Position{73, 1}, Position{78, 2}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0).Methods().Get(0),
-			want:       &Location{Position{74, 2}, Position{74, 44}},
+			want:       Location{Position{75, 3}, Position{75, 45}},
 		},
 	}
 
@@ -131,7 +131,7 @@ func TestSyntaxLocation(t *testing.T) {
 	if err != nil {
 		t.Errorf("newDescriptorSource: %v", err)
 	}
-	want := &Location{Position{2, 0}, Position{2, 18}}
+	want := Location{Position{3, 1}, Position{3, 19}}
 	got, err := descSource.SyntaxLocation()
 	if err != nil {
 		t.Errorf("SyntaxLocation() error: %s", err)
