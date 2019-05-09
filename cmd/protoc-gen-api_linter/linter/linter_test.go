@@ -89,7 +89,10 @@ func init() {
 		}
 		var rules []lint.Rule
 		rules = append(rules, corerules.Rules().All()...)
-		protogen.Run(linter.New(rules, defaultConfigs))
+		if err := protogen.Run(linter.New(rules, defaultConfigs)); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %v\n", filepath.Base(os.Args[0]), err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 }

@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/googleapis/api-linter/cmd/protoc-gen-api_linter/linter"
 	"github.com/googleapis/api-linter/cmd/protoc-gen-api_linter/protogen"
@@ -44,5 +45,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Usage: protoc --api_linter_out=cfg_file=my_cfg_file,out_file=my_lint_output_file:. my_proto_file")
 		os.Exit(1)
 	}
-	protogen.Run(linter.New(getRules(), getConfigs()))
+	if err := protogen.Run(linter.New(getRules(), getConfigs())); err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", filepath.Base(os.Args[0]), err)
+		os.Exit(1)
+	}
 }
