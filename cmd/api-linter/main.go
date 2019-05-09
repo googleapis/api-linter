@@ -55,7 +55,7 @@ func main() {
 			return err
 		}
 
-		w := os.Stderr
+		w := os.Stdout
 		if c.String("out") != "" {
 			var err error
 			w, err = os.Create(c.String("out"))
