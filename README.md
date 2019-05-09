@@ -1,5 +1,5 @@
 # API Linter
-API-linter is a linter for APIs defined in protobuf files.
+API linter checks APIs defined in protobuf files. It follows [Google API Design Guide](https://cloud.google.com/apis/design/).
 
 ## Requirements
 * Install `git` from [https://git-scm.com](https://git-scm.com/);
