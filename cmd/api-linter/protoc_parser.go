@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -23,14 +22,13 @@ func (p *protocParser) ParseProto(filenames ...string) ([]*descriptorpb.FileDesc
 }
 
 func compileProto(importPath string, filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
-	workdir, err := ioutil.TempDir("", "test")
+	outfile, err := ioutil.TempFile("", "desc.pb")
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(workdir)
+	defer os.Remove(outfile.Name())
 
-	outfile := filepath.Join(workdir, "desc.proto")
-	cmd := exec.Command(protoc, "--descriptor_set_out="+outfile)
+	cmd := exec.Command(protoc, "--descriptor_set_out="+outfile.Name())
 	cmd.Args = append(cmd.Args, "--include_source_info")
 	cmd.Args = append(cmd.Args, "-I="+importPath)
 	cmd.Args = append(cmd.Args, filenames...)
@@ -38,7 +36,7 @@ func compileProto(importPath string, filenames ...string) ([]*descriptorpb.FileD
 		return nil, fmt.Errorf("Running %s: %s, %v", strings.Join(cmd.Args, " "), string(out), err)
 	}
 
-	b, err := ioutil.ReadFile(outfile)
+	b, err := ioutil.ReadFile(outfile.Name())
 	if err != nil {
 		return nil, err
 	}
