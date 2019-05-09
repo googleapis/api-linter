@@ -9,5 +9,6 @@ require (
 	github.com/google/go-cmp v0.2.1-0.20181101181452-745b8ec83783
 	github.com/iancoleman/strcase v0.0.0-20180726023541-3605ed457bf7
 	github.com/stretchr/testify v1.3.0
+	github.com/urfave/cli v1.20.0
 	gopkg.in/yaml.v2 v2.2.2
 )
