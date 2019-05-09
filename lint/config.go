@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/bmatcuk/doublestar"
+	"gopkg.in/yaml.v2"
 )
 
 // RuntimeConfigs stores a list of RuntimeConfig.
@@ -32,15 +33,15 @@ type RuntimeConfigs []RuntimeConfig
 // that the file path must match any of the included paths
 // but none of the excluded ones.
 type RuntimeConfig struct {
-	IncludedPaths []string              `json:"included_paths"`
-	ExcludedPaths []string              `json:"excluded_paths"`
-	RuleConfigs   map[string]RuleConfig `json:"rule_configs"`
+	IncludedPaths []string              `json:"included_paths" yaml:"included_paths"`
+	ExcludedPaths []string              `json:"excluded_paths" yaml:"excluded_paths"`
+	RuleConfigs   map[string]RuleConfig `json:"rule_configs" yaml:"rule_configs"`
 }
 
 // RuleConfig stores runtime-configurable status and category of a rule.
 type RuleConfig struct {
-	Status   Status   `json:"status"`
-	Category Category `json:"category"`
+	Status   Status   `json:"status" yaml:"status"`
+	Category Category `json:"category" yaml:"category"`
 }
 
 func getDefaultRuleConfig() RuleConfig {
@@ -55,6 +56,19 @@ func ReadConfigsJSON(f io.Reader) (RuntimeConfigs, error) {
 	}
 	var c RuntimeConfigs
 	if err := json.Unmarshal(b, &c); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// ReadConfigsYAML reads RuntimeConfigs from a JSON file.
+func ReadConfigsYAML(f io.Reader) (RuntimeConfigs, error) {
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	var c RuntimeConfigs
+	if err := yaml.Unmarshal(b, &c); err != nil {
 		return nil, err
 	}
 	return c, nil
