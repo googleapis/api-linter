@@ -32,6 +32,59 @@ OPTIONS:
 
 See this [example](cmd/api-linter/examples/example.sh).
 
+## Rule Configuration
+The linter contains a list of [core rules](rules), and by default, they are all enabled. However, one can disable a rule by using a configuration file or in-file(line) comments.
+
+### Disable a rule using a configuration file. 
+
+Example:
+
+Disable rule `core::proto_version` for any `.proto` files.
+```json
+[
+   {
+      "included_paths": ["**/*.proto"],
+      "rule_configs": {
+         "core::proto_version": {"status": "disabled"}
+      }
+   }
+]
+```
+
+
+### Disable a rule using in-file(line) comments.
+
+Example:
+
+1. Disable rule `core::naming_formats::field_names` entirely for a file in the file comments.
+```
+// file comments
+// (-- api-linter: core::naming_formats::field_names=disabled --)
+
+syntax = "proto3";
+
+package google.api.linter.examples;
+
+message Example {
+    string badFieldName = 1;
+    string anotherBadFieldName = 2;
+}
+```
+
+2. Disable rule `core::naming_formats::field_names` only for a field in its leading or trailing comments.
+```
+syntax = "proto3";
+
+package google.api.linter.examples;
+
+message Example {
+    string badFieldName = 1;
+    // leading comments for field `anotherBadFieldName`
+    // (-- api-linter: core::naming_formats::field_names=disabled --)
+    string anotherBadFieldName = 2; // trailing comments (-- api-linter: core::naming_formats::field_names=disabled --)
+}
+```
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
