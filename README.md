@@ -1,5 +1,41 @@
-# Google API Linter
+# API Linter
+API-linter is a linter for APIs defined in protobuf files.
 
-Google API Linter is a tool to enforce [API Design Guide](https://cloud.google.com/apis/design/) on API Protobuf definitions by checking `.proto` files.
+## Requirements
+* Install `git` from [https://git-scm.com](https://git-scm.com/);
+* Install `go` from [https://golang.org/doc/install](https://golang.org/doc/install);
+* Install `protoc` by following this [guide](http://google.github.io/proto-lens/installing-protoc.html);
 
-It differs from other Protobuf linters in that it looks at your protobuf files from a higher level and expects that the files define an API to be consumed by people not on your team (e.g., for Google Cloud Platform). For example, the API Linter will check whether your `update` methods follow the conventions defined at [API Design Guide -- Standard Methods](https://cloud.google.com/apis/design/standard_methods#update), which is out of scope for other standard Protobuf linters.
+## Installation
+* Install `api-linter` using `go get`:
+```sh
+go get -u github.com/googleapis/api-linter/cmd/api-linter
+```
+* Update the `$APTH` environment to include `$HOME/go/bin`.
+
+## Usage
+Run `api-linter help` to see the usage. Or run `api-linter help checkproto` to see how to check API protobuf files:
+```sh
+NAME:
+   api-linter checkproto - Check protobuf files that define an API
+
+USAGE:
+   api-linter checkproto [command options] files...
+
+OPTIONS:
+   --cfg value          configuration file path
+   --out value          output file path (default: stdout)
+   --fmt value          output format (default: "yaml")
+   --protoc value       protocol compiler path (default: "protoc")
+   --import_path value  protoc import path (default: ".")
+```
+
+See this [example](cmd/api-linter/examples/example.sh).
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+[MIT](LICENSE)

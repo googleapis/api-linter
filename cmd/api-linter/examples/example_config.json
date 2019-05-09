@@ -1,0 +1,11 @@
+[
+  {
+    "included_paths": ["**/*.proto"],
+    "rule_configs": {
+      "": {
+        "status": "enabled",
+        "category": "warning"
+      }
+    }
+  }
+]
