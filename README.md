@@ -27,7 +27,7 @@ OPTIONS:
    --out value          output file path (default: stdout)
    --fmt value          output format (default: "yaml")
    --protoc value       protocol compiler path (default: "protoc")
-   --import_path value  protoc import path (default: ".")
+   --proto_path value   the directory in which for protoc to search for imports (default: ".")
 ```
 
 See this [example](cmd/api-linter/examples/example.sh).
