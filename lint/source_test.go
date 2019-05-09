@@ -34,63 +34,39 @@ func TestDescriptorLocation(t *testing.T) {
 
 	tests := []struct {
 		descriptor protoreflect.Descriptor
-		want       *Location
+		want       Location
 	}{
 		{
 			descriptor: fileDesc.Messages().Get(0), // A top level message.
-			want: NewLocation(
-				NewPosition(7, 0),  // start
-				NewPosition(59, 1), // end
-			),
+			want:       Location{Position{8, 1}, Position{60, 2}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Messages().Get(0), // A nested message.
-			want: NewLocation(
-				NewPosition(9, 2),  // start
-				NewPosition(36, 3), // end
-			),
+			want:       Location{Position{10, 3}, Position{37, 4}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0),
-			want: NewLocation(
-				NewPosition(44, 2), // start
-				NewPosition(49, 3), // end
-			),
+			want:       Location{Position{45, 3}, Position{50, 4}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Enums().Get(0).Values().Get(1),
-			want: NewLocation(
-				NewPosition(48, 4),  // start
-				NewPosition(48, 12), // end
-			),
+			want:       Location{Position{49, 5}, Position{49, 13}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Fields().Get(1),
-			want: NewLocation(
-				NewPosition(41, 2),  // start
-				NewPosition(41, 41), // end
-			),
+			want:       Location{Position{42, 3}, Position{42, 42}},
 		},
 		{
 			descriptor: fileDesc.Messages().Get(0).Oneofs().Get(0),
-			want: NewLocation(
-				NewPosition(53, 2), // start
-				NewPosition(58, 3), // end
-			),
+			want:       Location{Position{54, 3}, Position{59, 4}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0),
-			want: NewLocation(
-				NewPosition(72, 0), // start
-				NewPosition(77, 1), // end
-			),
+			want:       Location{Position{73, 1}, Position{78, 2}},
 		},
 		{
 			descriptor: fileDesc.Services().Get(0).Methods().Get(0),
-			want: NewLocation(
-				NewPosition(74, 2),  // start
-				NewPosition(74, 44), // end
-			),
+			want:       Location{Position{75, 3}, Position{75, 45}},
 		},
 	}
 
@@ -101,7 +77,7 @@ func TestDescriptorLocation(t *testing.T) {
 			t.Errorf("%s returns error: %v", errPrefix, err)
 		}
 		if !reflect.DeepEqual(got, test.want) {
-			t.Errorf("%s returns %s, but want %s", errPrefix, got, test.want)
+			t.Errorf("%s returns %v, but want %v", errPrefix, got, test.want)
 		}
 	}
 }
@@ -155,17 +131,13 @@ func TestSyntaxLocation(t *testing.T) {
 	if err != nil {
 		t.Errorf("newDescriptorSource: %v", err)
 	}
-
-	want := NewLocation(
-		NewPosition(2, 0),  // start
-		NewPosition(2, 18), // end
-	)
+	want := Location{Position{3, 1}, Position{3, 19}}
 	got, err := descSource.SyntaxLocation()
 	if err != nil {
 		t.Errorf("SyntaxLocation() error: %s", err)
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("SyntaxLocation() returns %s, but want %s", got, want)
+		t.Errorf("SyntaxLocation() returns %v, but want %v", got, want)
 	}
 }
 
