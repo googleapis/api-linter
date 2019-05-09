@@ -11,17 +11,16 @@ import (
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
-var protoc = "protoc"
-
 type protocParser struct {
+	protoc     string
 	importPath string
 }
 
 func (p *protocParser) ParseProto(filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
-	return compileProto(p.importPath, filenames...)
+	return compileProto(p.protoc, p.importPath, filenames...)
 }
 
-func compileProto(importPath string, filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
+func compileProto(protoc, importPath string, filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
 	outfile, err := ioutil.TempFile("", "desc.pb")
 	if err != nil {
 		return nil, err

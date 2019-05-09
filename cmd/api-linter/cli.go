@@ -11,28 +11,36 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func run(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error {
+func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error {
 	app := cli.NewApp()
+	app.Name = "api-linter"
+	app.Usage = "A linter for APIs defined in protocol buffer"
+	app.Version = "0.1"
 	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "cfg",
+			Value: "",
+			Usage: "configuration file path",
+		},
+		cli.StringFlag{
+			Name:  "out",
+			Value: "",
+			Usage: "output file path (default: stdout)",
+		},
 		cli.StringFlag{
 			Name:  "fmt",
 			Value: "yaml",
 			Usage: "output format",
 		},
 		cli.StringFlag{
-			Name:  "cfg",
-			Value: "",
-			Usage: "configuration file",
+			Name:  "protoc",
+			Value: "protoc",
+			Usage: "protocol compiler path",
 		},
 		cli.StringFlag{
 			Name:  "import_path",
 			Value: ".",
 			Usage: "protoc import path",
-		},
-		cli.StringFlag{
-			Name:  "out",
-			Value: "",
-			Usage: "output file",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -43,17 +51,21 @@ func run(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error {
 
 		p := protocParser{
 			importPath: c.String("import_path"),
+			protoc:     c.String("protoc"),
 		}
 		files, err := p.ParseProto(filenames...)
 		if err != nil {
 			return err
 		}
 
-		userConfigs, err := readConfigs(c.String("cfg"))
-		if err != nil {
-			return err
+		if c.String("cfg") != "" {
+			userConfigs, err := readConfigs(c.String("cfg"))
+			if err != nil {
+				return err
+			}
+			configs = append(configs, userConfigs...)
 		}
-		configs = append(configs, userConfigs...)
+
 		l := newLinter(rules, configs)
 		problems, err := l.LintProto(files)
 		if err != nil {
