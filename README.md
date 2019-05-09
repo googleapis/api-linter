@@ -7,9 +7,17 @@ API linter checks APIs defined in protobuf files. It follows [Google API Design 
 * Install `protoc` by following this [guide](http://google.github.io/proto-lens/installing-protoc.html);
 
 ## Installation
-* Install `api-linter` using `go get`:
+* Download `api-linter` using `git`:
 ```sh
-go get -u github.com/googleapis/api-linter/cmd/api-linter
+git clone git@github.com:googleapis/api-linter.git ~/Downloads/api-linter
+```
+or
+```
+git clone https://github.com/googleapis/api-linter.git ~/Downloads/api-linter
+```
+* Install `api-linter` using `go install`:
+```sh
+cd ~/Downloads/api-linter/cmd/api-linter && go install
 ```
 * Update the `PATH` environment to include `$HOME/go/bin`.
 
