@@ -7,65 +7,65 @@ import (
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
-func TestRepository_Run(t *testing.T) {
+func TestLinter_run(t *testing.T) {
 	fileName := "protofile"
 	req, _ := NewProtoRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
 		})
 
-	defaultConfigs := RuntimeConfigs{
+	defaultConfigs := Configs{
 		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
 	}
 
-	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1", FilePath: "protofile"}}
+	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1"}}
 
 	tests := []struct {
 		desc    string
-		configs RuntimeConfigs
+		configs Configs
 		resp    Response
 	}{
-		{"empty config empty response", RuntimeConfigs{}, Response{}},
+		{"empty config empty response", Configs{}, Response{FilePath: req.ProtoFile().Path()}},
 		{
 			"config with non-matching file has no effect",
 			append(
 				defaultConfigs,
-				RuntimeConfig{
+				Config{
 					IncludedPaths: []string{"nofile"},
 					RuleConfigs:   map[string]RuleConfig{"": {Status: Disabled}},
 				},
 			),
-			Response{Problems: ruleProblems},
+			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"config with non-matching rule has no effect",
 			append(
 				defaultConfigs,
-				RuntimeConfig{
+				Config{
 					IncludedPaths: []string{"*"},
 					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Status: Disabled}},
 				},
 			),
-			Response{Problems: ruleProblems},
+			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"matching config can disable rule",
 			append(
 				defaultConfigs,
-				RuntimeConfig{
+				Config{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Status: Disabled},
 					},
 				},
 			),
-			Response{},
+			Response{FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"matching config can override Category",
 			append(
 				defaultConfigs,
-				RuntimeConfig{
+				Config{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
 						"test::rule1": {Category: Error},
@@ -73,29 +73,25 @@ func TestRepository_Run(t *testing.T) {
 				},
 			),
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1", FilePath: "protofile"}},
+				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1"}},
+				FilePath: req.ProtoFile().Path(),
 			},
 		},
 	}
 
 	for ind, test := range tests {
-		runtime := NewRuntime(test.configs...)
-		err := runtime.AddRules(
-			&mockRule{
-				info: RuleInfo{Name: "test::rule1"},
-				lintResp: Response{
-					Problems: ruleProblems,
-				},
-			})
-
+		rules, err := NewRules(&mockRule{
+			info:     RuleInfo{Name: "test::rule1"},
+			lintResp: ruleProblems,
+		})
 		if err != nil {
-			t.Errorf("Runtime.AddRules(...)=%v; want nil", err)
-			continue
+			t.Fatal(err)
 		}
+		l := New(rules, test.configs)
 
-		resp, _ := runtime.Run(req)
+		resp, _ := l.run(req)
 		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Test #%d (%s): Runtime.Run()=%v; want %v", ind+1, test.desc, resp, test.resp)
+			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp, test.resp)
 		}
 	}
 }

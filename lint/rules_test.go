@@ -7,7 +7,7 @@ import (
 type mockRule struct {
 	info       RuleInfo
 	lintCalled int
-	lintResp   Response
+	lintResp   []Problem
 	err        error
 }
 
@@ -15,7 +15,7 @@ func (r *mockRule) Info() RuleInfo {
 	return r.info
 }
 
-func (r *mockRule) Lint(Request) (Response, error) {
+func (r *mockRule) Lint(Request) ([]Problem, error) {
 	r.lintCalled++
 	return r.lintResp, r.err
 }

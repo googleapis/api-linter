@@ -6,8 +6,7 @@ import (
 )
 
 // Register rules.
-func rules() []lint.Rule {
-	var rules []lint.Rule
-	rules = append(rules, core.Rules().All()...)
+func rules() lint.Rules {
+	rules := core.Rules().Copy()
 	return rules
 }
