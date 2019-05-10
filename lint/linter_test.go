@@ -15,7 +15,7 @@ func TestLinter_run(t *testing.T) {
 		})
 
 	defaultConfigs := Configs{
-		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
+		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
 	}
 
 	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1"}}
@@ -32,7 +32,7 @@ func TestLinter_run(t *testing.T) {
 				defaultConfigs,
 				Config{
 					IncludedPaths: []string{"nofile"},
-					RuleConfigs:   map[string]RuleConfig{"": {Status: Disabled}},
+					RuleConfigs:   map[string]RuleConfig{"": {Disabled: true}},
 				},
 			),
 			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
@@ -43,7 +43,7 @@ func TestLinter_run(t *testing.T) {
 				defaultConfigs,
 				Config{
 					IncludedPaths: []string{"*"},
-					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Status: Disabled}},
+					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Disabled: true}},
 				},
 			),
 			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
@@ -55,7 +55,7 @@ func TestLinter_run(t *testing.T) {
 				Config{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
-						"test::rule1": {Status: Disabled},
+						"test::rule1": {Disabled: true},
 					},
 				},
 			),

@@ -42,12 +42,12 @@ type Config struct {
 
 // RuleConfig stores configurable status and category of a rule.
 type RuleConfig struct {
-	Status   Status   `json:"status" yaml:"status"`
+	Disabled bool     `json:"disabled" yaml:"disabled"`
 	Category Category `json:"category" yaml:"category"`
 }
 
 func getDefaultRuleConfig() RuleConfig {
-	return RuleConfig{Status: Disabled, Category: Warning}
+	return RuleConfig{Category: Warning}
 }
 
 // ReadConfigsFromFile reads Configs from a file.
@@ -130,9 +130,7 @@ func (c Config) getRuleConfig(rule RuleName) (RuleConfig, bool) {
 
 // withOverride returns a copy of r, overridden with non-zero values in r2
 func (r RuleConfig) withOverride(r2 RuleConfig) RuleConfig {
-	if r2.Status != "" {
-		r.Status = r2.Status
-	}
+	r.Disabled = r2.Disabled
 
 	if r2.Category != "" {
 		r.Category = r2.Category

@@ -131,7 +131,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"": {
-					"status": "enabled",
+					"disabled": false,
 					"category": "warning"
 				}
 			}
@@ -140,7 +140,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"replace-me-here": {
-					"status": "disabled"
+					"disabled": true
 				}
 			}
 		}

@@ -9,7 +9,7 @@ func configs() lint.Configs {
 			IncludedPaths: []string{"**/*.proto"},
 			RuleConfigs: map[string]lint.RuleConfig{
 				"core": {
-					Status:   lint.Enabled,
+					Disabled: false,
 					Category: lint.Warning,
 				},
 			},
