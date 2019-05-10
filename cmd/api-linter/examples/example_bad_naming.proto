@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package google.api.linter.examples;
+
+message bad_message_name {
+    string badFieldName = 1;
+    // (-- api-linter: core::naming_formats::field_names=disabled --)
+    string badButDoNotCheckField = 2;
+}
