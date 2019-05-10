@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error {
+func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 	app := cli.NewApp()
 	app.Name = "api-linter"
 	app.Usage = "A linter for APIs"
@@ -70,8 +70,8 @@ func runCLI(rules []lint.Rule, configs lint.RuntimeConfigs, args []string) error
 					configs = append(configs, userConfigs...)
 				}
 
-				l := newLinter(rules, configs)
-				problems, err := l.LintProto(files)
+				l := lint.New(rules, configs)
+				problems, err := l.LintProtos(files)
 				if err != nil {
 					return err
 				}

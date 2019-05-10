@@ -10,14 +10,14 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 	matchConfig := RuleConfig{Enabled, Warning}
 
 	tests := []struct {
-		configs RuntimeConfigs
+		configs Configs
 		path    string
 		rule    RuleName
 		result  RuleConfig
 	}{
 		{nil, "a", "b", RuleConfig{}},
 		{
-			RuntimeConfigs{
+			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
 					RuleConfigs: map[string]RuleConfig{
@@ -31,7 +31,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			RuleConfig{},
 		},
 		{
-			RuntimeConfigs{
+			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
 					RuleConfigs: map[string]RuleConfig{
@@ -44,7 +44,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			RuleConfig{},
 		},
 		{
-			RuntimeConfigs{
+			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
 					RuleConfigs: map[string]RuleConfig{
@@ -58,7 +58,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			matchConfig,
 		},
 		{
-			RuntimeConfigs{
+			Configs{
 				{
 					IncludedPaths: []string{"a/**/*.proto"},
 					RuleConfigs: map[string]RuleConfig{
@@ -72,7 +72,7 @@ func TestRuleConfigs_getRuleConfig(t *testing.T) {
 			matchConfig,
 		},
 		{
-			RuntimeConfigs{
+			Configs{
 				{
 					IncludedPaths: []string{"a/**/*.proto"},
 					RuleConfigs: map[string]RuleConfig{
@@ -115,7 +115,7 @@ func TestReadConfigsJSON(t *testing.T) {
 		t.Errorf("ReadConfigsJSON returns error: %v", err)
 	}
 
-	expected := RuntimeConfigs{
+	expected := Configs{
 		{
 			IncludedPaths: []string{"a"},
 			ExcludedPaths: []string{"b"},
