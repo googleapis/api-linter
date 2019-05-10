@@ -35,7 +35,7 @@ go install
 
 Run `api-linter help` to see usage details. Or run `api-linter help check` to see how to check API protobuf files:
 
-```sh
+```text
 NAME:
    api-linter check - Check protobuf files that define an API
 
