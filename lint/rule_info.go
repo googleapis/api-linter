@@ -7,10 +7,10 @@ import (
 
 // RuleInfo stores information of a rule.
 type RuleInfo struct {
-	Name         RuleName      // rule name in the set.
-	Description  string        // a short description of this rule.
-	URI          string        // a link to a document for more details.
-	RequestTypes []RequestType // types of requests that this rule should receive.
+	Name         RuleName      `json:"name" yaml:"name"`                                   // rule name in the set.
+	Description  string        `json:"description,omitempty" yaml:"description,omitempty"` // a short description of this rule.
+	URI          string        `json:"uri,omitempty" yaml:"uri,omitempty"`                 // a link to a document for more details.
+	RequestTypes []RequestType `json:"-" yaml:"-"`                                         // types of requests that this rule should receive.
 
 	noPositional struct{} // Prevent positional composite literal instantiation
 }

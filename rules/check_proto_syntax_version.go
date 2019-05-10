@@ -17,7 +17,6 @@ func checkProtoVersion() lint.Rule {
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "proto_version"),
 			Description:  "APIs should use proto3",
-			URI:          `https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/proto-version.md?cl=head`,
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
 		},
 		Callback: descriptor.Callbacks{
