@@ -9,7 +9,7 @@ import (
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplateWithDedent(`
+	tmpl := testdata.MustCreateDedentTemplate(`
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;

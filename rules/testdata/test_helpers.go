@@ -89,10 +89,10 @@ func MustCreateTemplate(text string) *template.Template {
 
 var leadingBlankLine = regexp.MustCompile("^\n")
 
-// MustCreateTemplateWithDedent removes any leading black line and
+// MustCreateDedentTemplate removes any leading black line and
 // any common leading whitespace from every line in text before
 // creating the template.
-func MustCreateTemplateWithDedent(text string) *template.Template {
+func MustCreateDedentTemplate(text string) *template.Template {
 	text = leadingBlankLine.ReplaceAllString(text, "")
 	return MustCreateTemplate(dedent.Dedent(text))
 }
