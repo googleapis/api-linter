@@ -28,16 +28,16 @@ func (r *CallbackRule) Info() lint.RuleInfo {
 
 // Lint accepts a lint.Request, then walks in the proto file
 // by applying the Callback on each encountered descriptor,
-// and finally returns a lint.Response or an error.
-func (r *CallbackRule) Lint(req lint.Request) (lint.Response, error) {
+// and finally returns a list of problems or an error.
+func (r *CallbackRule) Lint(req lint.Request) ([]lint.Problem, error) {
 	r.source = req.DescriptorSource()
 	r.problems = []lint.Problem{}
 
 	if err := Walk(req.ProtoFile(), r); err != nil {
-		return lint.Response{}, err
+		return nil, err
 	}
 
-	return lint.Response{Problems: r.problems}, nil
+	return r.problems, nil
 }
 
 // Consume implements `Consumer` that will check the given descriptor.

@@ -18,14 +18,14 @@ func TestRepository_Run(t *testing.T) {
 		{[]string{"**"}, []string{}, map[string]RuleConfig{"": {Status: Enabled}}},
 	}
 
-	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1", FilePath: "protofile"}}
+	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1"}}
 
 	tests := []struct {
 		desc    string
 		configs RuntimeConfigs
 		resp    Response
 	}{
-		{"empty config empty response", RuntimeConfigs{}, Response{}},
+		{"empty config empty response", RuntimeConfigs{}, Response{FilePath: req.ProtoFile().Path()}},
 		{
 			"config with non-matching file has no effect",
 			append(
@@ -35,7 +35,7 @@ func TestRepository_Run(t *testing.T) {
 					RuleConfigs:   map[string]RuleConfig{"": {Status: Disabled}},
 				},
 			),
-			Response{Problems: ruleProblems},
+			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"config with non-matching rule has no effect",
@@ -46,7 +46,7 @@ func TestRepository_Run(t *testing.T) {
 					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Status: Disabled}},
 				},
 			),
-			Response{Problems: ruleProblems},
+			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"matching config can disable rule",
@@ -59,7 +59,7 @@ func TestRepository_Run(t *testing.T) {
 					},
 				},
 			),
-			Response{},
+			Response{FilePath: req.ProtoFile().Path()},
 		},
 		{
 			"matching config can override Category",
@@ -73,7 +73,8 @@ func TestRepository_Run(t *testing.T) {
 				},
 			),
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1", FilePath: "protofile"}},
+				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1"}},
+				FilePath: req.ProtoFile().Path(),
 			},
 		},
 	}
@@ -82,10 +83,8 @@ func TestRepository_Run(t *testing.T) {
 		runtime := NewRuntime(test.configs...)
 		err := runtime.AddRules(
 			&mockRule{
-				info: RuleInfo{Name: "test::rule1"},
-				lintResp: Response{
-					Problems: ruleProblems,
-				},
+				info:     RuleInfo{Name: "test::rule1"},
+				lintResp: ruleProblems,
 			})
 
 		if err != nil {

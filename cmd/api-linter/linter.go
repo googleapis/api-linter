@@ -21,12 +21,12 @@ func newLinter(rules []lint.Rule, configs lint.RuntimeConfigs) *linter {
 }
 
 // LintProto checks protobuf files and returns a list of problems or an error.
-func (l *linter) LintProto(files []*descriptorpb.FileDescriptorProto) ([]lint.Problem, error) {
+func (l *linter) LintProto(files []*descriptorpb.FileDescriptorProto) ([]lint.Response, error) {
 	return checkProto(l.rt, files)
 }
 
-func checkProto(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]lint.Problem, error) {
-	var problems []lint.Problem
+func checkProto(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]lint.Response, error) {
+	var responses []lint.Response
 	for _, proto := range files {
 		req, err := lint.NewProtoRequest(proto)
 		if err != nil {
@@ -36,9 +36,7 @@ func checkProto(rt *lint.Runtime, files []*descriptorpb.FileDescriptorProto) ([]
 		if err != nil {
 			return nil, err
 		}
-		for _, prob := range resp.Problems {
-			problems = append(problems, prob)
-		}
+		responses = append(responses, resp)
 	}
-	return problems, nil
+	return responses, nil
 }

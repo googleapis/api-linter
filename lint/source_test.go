@@ -3,13 +3,11 @@ package lint
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/golang/protobuf/v2/proto"
-	"github.com/golang/protobuf/v2/reflect/protodesc"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
@@ -26,11 +24,9 @@ func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
 }
 
 func TestDescriptorLocation(t *testing.T) {
-	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := newDescriptorSource(proto)
-	if err != nil {
-		t.Errorf("newDescriptorSource: %v", err)
-	}
+	req := readProtoFile(t, "test_source.protoset")
+	fileDesc := req.ProtoFile()
+	descSource := req.DescriptorSource()
 
 	tests := []struct {
 		descriptor protoreflect.Descriptor
@@ -83,11 +79,9 @@ func TestDescriptorLocation(t *testing.T) {
 }
 
 func TestDescriptorComments(t *testing.T) {
-	fileDesc, proto := readProtoFile("test_source.protoset")
-	descSource, err := newDescriptorSource(proto)
-	if err != nil {
-		t.Errorf("newDescriptorSource: %v", err)
-	}
+	req := readProtoFile(t, "test_source.protoset")
+	fileDesc := req.ProtoFile()
+	descSource := req.DescriptorSource()
 
 	tests := []struct {
 		descriptor protoreflect.Descriptor
@@ -126,11 +120,8 @@ func TestDescriptorComments(t *testing.T) {
 }
 
 func TestSyntaxLocation(t *testing.T) {
-	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := newDescriptorSource(proto)
-	if err != nil {
-		t.Errorf("newDescriptorSource: %v", err)
-	}
+	req := readProtoFile(t, "test_source.protoset")
+	descSource := req.DescriptorSource()
 	want := Location{Position{3, 1}, Position{3, 19}}
 	got, err := descSource.SyntaxLocation()
 	if err != nil {
@@ -142,11 +133,8 @@ func TestSyntaxLocation(t *testing.T) {
 }
 
 func TestSyntaxComments(t *testing.T) {
-	_, proto := readProtoFile("test_source.protoset")
-	descSource, err := newDescriptorSource(proto)
-	if err != nil {
-		t.Errorf("newDescriptorSource: %v", err)
-	}
+	req := readProtoFile(t, "test_source.protoset")
+	descSource := req.DescriptorSource()
 
 	want := Comments{
 		LeadingDetachedComments: []string{" DO NOT EDIT -- This is for `source_test.go`.\n"},
@@ -161,8 +149,9 @@ func TestSyntaxComments(t *testing.T) {
 }
 
 func TestIsRuleDisabled(t *testing.T) {
-	fileDesc, proto := readProtoFile("test_rule_disable.protoset")
-	descSource, _ := newDescriptorSource(proto)
+	req := readProtoFile(t, "test_rule_disable.protoset")
+	fileDesc := req.ProtoFile()
+	descSource := req.DescriptorSource()
 
 	tests := []struct {
 		desc     protoreflect.Descriptor
@@ -229,20 +218,20 @@ func TestIsRuleDisabled(t *testing.T) {
 	}
 }
 
-func readProtoFile(fileName string) (protoreflect.FileDescriptor, *descriptorpb.FileDescriptorProto) {
+func readProtoFile(t *testing.T, fileName string) Request {
 	path := filepath.Join("testdata", fileName)
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Fatalf("Unable to open %s: %v", path, err)
+		t.Fatalf("Unable to open %s: %v", path, err)
 	}
 	protoset := &descriptorpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(bs, protoset); err != nil {
-		log.Fatalf("Unable to parse %T from %s: %v", protoset, path, err)
+		t.Fatalf("Unable to parse %T from %s: %v", protoset, path, err)
 	}
 	proto := protoset.GetFile()[0]
-	f, err := protodesc.NewFile(proto, nil)
+	req, err := NewProtoRequest(proto)
 	if err != nil {
-		log.Fatalf("protodesc.NewFile() error: %v", err)
+		t.Fatal(err)
 	}
-	return f, proto
+	return req
 }

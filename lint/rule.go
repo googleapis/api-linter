@@ -5,5 +5,5 @@ type Rule interface {
 	// Info returns metadata about a rule.
 	Info() RuleInfo
 	// Lint performs the linting process.
-	Lint(Request) (Response, error)
+	Lint(Request) ([]Problem, error)
 }

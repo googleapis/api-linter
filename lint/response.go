@@ -4,7 +4,8 @@ import "github.com/golang/protobuf/v2/reflect/protoreflect"
 
 // Response describes the result returned by a rule.
 type Response struct {
-	Problems []Problem
+	FilePath string    `json:"file_path" yaml:"file_path"`
+	Problems []Problem `json:"problems" yaml:"problems"`
 }
 
 // Problem contains information about a result produced by an API Linter.
@@ -26,5 +27,4 @@ type Problem struct {
 	// The following fields will be set by Runtime.
 	Category Category `json:"category" yaml:"category"`
 	RuleID   RuleName `json:"rule_id" yaml:"rule_id"`
-	FilePath string   `json:"file_path" yaml:"file_path"`
 }

@@ -43,7 +43,9 @@ func (r *Runtime) AddRules(rules ...Rule) error {
 // be applied to the request, according to the list of runtime
 // configs.
 func (r *Runtime) Run(req Request) (Response, error) {
-	finalResp := Response{}
+	resp := Response{
+		FilePath: req.ProtoFile().Path(),
+	}
 	var errMessages []string
 
 	for name, rl := range r.rules {
@@ -57,13 +59,12 @@ func (r *Runtime) Run(req Request) (Response, error) {
 		}
 
 		if config.Status == Enabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
-			if resp, err := rl.Lint(req); err == nil {
-				for _, p := range resp.Problems {
+			if problems, err := rl.Lint(req); err == nil {
+				for _, p := range problems {
 					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
 						p.RuleID = rl.Info().Name
-						p.FilePath = req.ProtoFile().Path()
 						p.Category = config.Category
-						finalResp.Problems = append(finalResp.Problems, p)
+						resp.Problems = append(resp.Problems, p)
 					}
 				}
 			} else {
@@ -77,5 +78,5 @@ func (r *Runtime) Run(req Request) (Response, error) {
 		err = errors.New(strings.Join(errMessages, "; "))
 	}
 
-	return finalResp, err
+	return resp, err
 }

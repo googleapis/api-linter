@@ -1,9 +1,10 @@
 package corp
 
 import (
+	"testing"
+
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	"github.com/googleapis/api-linter/lint"
-	"testing"
 )
 
 func TestProtoFilesMustIncludeVersion(t *testing.T) {
@@ -36,10 +37,10 @@ func TestProtoFilesMustIncludeVersion(t *testing.T) {
 			t.Errorf("Lint() on file %q returned an error: %v", test.path, err)
 		}
 
-		if len(p.Problems) != test.numProblems {
+		if len(p) != test.numProblems {
 			t.Errorf(
 				"Lint() on file %q returned %d problems; want %d. Problems: %+v",
-				test.path, len(p.Problems), test.numProblems, p.Problems,
+				test.path, len(p), test.numProblems, p,
 			)
 		}
 	}
