@@ -41,7 +41,7 @@ func TestEveryRuleHasATestCase(t *testing.T) {
 	for _, test := range testCases {
 		tests[test.rule] = true
 	}
-	rules := getRules()
+	rules := rules()
 	for _, rl := range rules {
 		ruleID := string(rl.Info().Name)
 		if _, found := tests[ruleID]; !found {
@@ -54,7 +54,7 @@ func TestRules_Enabled(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["**/*.proto"],
+			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"": {
 					"status": "enabled",
@@ -78,7 +78,7 @@ func TestRules_DisabledByFileComments(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["**/*.proto"],
+			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"": {
 					"status": "enabled",
@@ -103,7 +103,7 @@ func TestRules_DisabledByInlineComments(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["**/*.proto"],
+			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"": {
 					"status": "enabled",
@@ -128,7 +128,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["**/*.proto"],
+			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"": {
 					"status": "enabled",
@@ -137,7 +137,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 			}
 		},
 		{
-			"included_paths": ["**/*.proto"],
+			"included_paths": ["*.proto"],
 			"rule_configs": {
 				"replace-me-here": {
 					"status": "disabled"
@@ -176,11 +176,12 @@ func runLinter(t *testing.T, proto, config string) string {
 
 	args := []string{
 		"api-linter-test",
+		"checkproto",
 		"--cfg=" + configPath,
 		"--out=" + outPath,
-		"--import_path=" + workdir,
+		"--proto_path=" + workdir,
 		protoPath}
-	if err := run(getRules(), getConfigs(), args); err != nil {
+	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)
 	}
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/bmatcuk/doublestar"
 	"gopkg.in/yaml.v2"
@@ -46,6 +48,29 @@ type RuleConfig struct {
 
 func getDefaultRuleConfig() RuleConfig {
 	return RuleConfig{Status: Disabled, Category: Warning}
+}
+
+// ReadConfigsFromFile reads RuntimeConfigs from a file.
+// It supports JSON(.json) and YAML(.yaml or .yml) files.
+func ReadConfigsFromFile(path string) (RuntimeConfigs, error) {
+	var parse func(io.Reader) (RuntimeConfigs, error)
+	switch filepath.Ext(path) {
+	case ".json":
+		parse = ReadConfigsJSON
+	case ".yaml", ".yml":
+		parse = ReadConfigsYAML
+	}
+	if parse == nil {
+		return nil, fmt.Errorf("Reading RuntimeConfigs: unsupported format `%q` with file path `%q`", filepath.Ext(path), path)
+	}
+
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("readConfig: %s", err.Error())
+	}
+	defer f.Close()
+
+	return parse(f)
 }
 
 // ReadConfigsJSON reads RuntimeConfigs from a JSON file.
@@ -119,12 +144,12 @@ func (r RuleConfig) withOverride(r2 RuleConfig) RuleConfig {
 // match returns if a RuntimeConfig matches path based on its included and excluded paths
 func (c RuntimeConfig) match(path string) bool {
 	for _, pattern := range c.ExcludedPaths {
-		if matched, err := doublestar.PathMatch(pattern, path); matched || err != nil {
+		if matched, err := doublestar.Match(pattern, path); matched || err != nil {
 			return false
 		}
 	}
 	for _, pattern := range c.IncludedPaths {
-		if matched, err := doublestar.PathMatch(pattern, path); matched && err == nil {
+		if matched, err := doublestar.Match(pattern, path); matched && err == nil {
 			return true
 		}
 	}

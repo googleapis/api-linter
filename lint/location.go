@@ -3,6 +3,8 @@ package lint
 import "fmt"
 
 // Location describes a location in a source code file.
+//
+// Note: positions are one-based.
 type Location struct {
 	Start Position `json:"start_position" yaml:"start_position"`
 	End   Position `json:"end_position" yaml:"end_position"`
