@@ -55,7 +55,7 @@ func (l *Linter) run(req Request) (Response, error) {
 	var errMessages []string
 
 	for name, rl := range l.rules {
-		config := getDefaultRuleConfig()
+		var config RuleConfig
 
 		if c, err := l.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
 			config = config.withOverride(c)

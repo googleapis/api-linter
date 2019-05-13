@@ -42,12 +42,8 @@ type Config struct {
 
 // RuleConfig stores configurable status and category of a rule.
 type RuleConfig struct {
-	Disabled bool     `json:"disabled" yaml:"disabled"`
-	Category Category `json:"category" yaml:"category"`
-}
-
-func getDefaultRuleConfig() RuleConfig {
-	return RuleConfig{Category: Warning}
+	Disabled bool   `json:"disabled" yaml:"disabled"`
+	Category string `json:"category" yaml:"category"`
 }
 
 // ReadConfigsFromFile reads Configs from a file.

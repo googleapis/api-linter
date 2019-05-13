@@ -23,16 +23,6 @@ const (
 	ProtoRequest RequestType = "proto-request"
 )
 
-// Category defines the category of the findings produced by a rule.
-type Category string
-
-const (
-	// Error indicates that in the API, something will cause errors.
-	Error Category = "error"
-	// Warning indicates that in the API, something can be do better.
-	Warning Category = "warning"
-)
-
 // Status defines whether a rule is enabled, disabled or deprecated.
 type Status string
 

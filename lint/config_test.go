@@ -7,7 +7,7 @@ import (
 )
 
 func TestRuleConfigs_getRuleConfig(t *testing.T) {
-	matchConfig := RuleConfig{Disabled: false, Category: Warning}
+	matchConfig := RuleConfig{Disabled: false, Category: "warning"}
 
 	tests := []struct {
 		configs Configs
@@ -139,39 +139,39 @@ func TestRuleConfig_WithOverride(t *testing.T) {
 		result   RuleConfig
 	}{
 		{
-			RuleConfig{Disabled: false, Category: Warning},
-			RuleConfig{Disabled: false, Category: Warning},
-			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: "warning"},
+			RuleConfig{Disabled: false, Category: "warning"},
+			RuleConfig{Disabled: false, Category: "warning"},
 		},
 		{
 			RuleConfig{},
-			RuleConfig{Disabled: false, Category: Warning},
-			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: "warning"},
+			RuleConfig{Disabled: false, Category: "warning"},
 		},
 		{
 			RuleConfig{Category: ""},
-			RuleConfig{Disabled: true, Category: Warning},
-			RuleConfig{Disabled: true, Category: Warning},
+			RuleConfig{Disabled: true, Category: "warning"},
+			RuleConfig{Disabled: true, Category: "warning"},
 		},
 		{
-			RuleConfig{Disabled: false, Category: Warning},
-			RuleConfig{Disabled: true, Category: Error},
-			RuleConfig{Disabled: true, Category: Error},
+			RuleConfig{Disabled: false, Category: "warning"},
+			RuleConfig{Disabled: true, Category: "error"},
+			RuleConfig{Disabled: true, Category: "error"},
 		},
 		{
-			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: "warning"},
 			RuleConfig{Category: ""},
-			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: "warning"},
 		},
 		{
-			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: "warning"},
 			RuleConfig{Disabled: true, Category: ""},
-			RuleConfig{Disabled: true, Category: Warning},
+			RuleConfig{Disabled: true, Category: "warning"},
 		},
 		{
-			RuleConfig{Disabled: false, Category: Warning},
-			RuleConfig{Category: Error},
-			RuleConfig{Disabled: false, Category: Error},
+			RuleConfig{Disabled: false, Category: "warning"},
+			RuleConfig{Category: "error"},
+			RuleConfig{Disabled: false, Category: "error"},
 		},
 	}
 
