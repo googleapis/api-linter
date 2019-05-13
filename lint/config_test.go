@@ -7,7 +7,7 @@ import (
 )
 
 func TestRuleConfigs_getRuleConfig(t *testing.T) {
-	matchConfig := RuleConfig{Enabled, Warning}
+	matchConfig := RuleConfig{Disabled: false, Category: Warning}
 
 	tests := []struct {
 		configs Configs
@@ -121,14 +121,14 @@ func TestReadConfigsJSON(t *testing.T) {
 			ExcludedPaths: []string{"b"},
 			RuleConfigs: map[string]RuleConfig{
 				"rule_a": {
-					Status:   "enabled",
+					Disabled: false,
 					Category: "warning",
 				},
 			},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
-		t.Errorf("ReadConfigsJSON returns %q, but want %q", configs, expected)
+		t.Errorf("ReadConfigsJSON returns %v, but want %v", configs, expected)
 	}
 }
 
@@ -139,39 +139,39 @@ func TestRuleConfig_WithOverride(t *testing.T) {
 		result   RuleConfig
 	}{
 		{
-			RuleConfig{Enabled, Warning},
-			RuleConfig{Enabled, Warning},
-			RuleConfig{Enabled, Warning},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: Warning},
 		},
 		{
 			RuleConfig{},
-			RuleConfig{Enabled, Warning},
-			RuleConfig{Enabled, Warning},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: false, Category: Warning},
 		},
 		{
-			RuleConfig{Enabled, ""},
-			RuleConfig{Disabled, Warning},
-			RuleConfig{Disabled, Warning},
+			RuleConfig{Category: ""},
+			RuleConfig{Disabled: true, Category: Warning},
+			RuleConfig{Disabled: true, Category: Warning},
 		},
 		{
-			RuleConfig{"", Warning},
-			RuleConfig{Disabled, Error},
-			RuleConfig{Disabled, Error},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: true, Category: Error},
+			RuleConfig{Disabled: true, Category: Error},
 		},
 		{
-			RuleConfig{Enabled, Warning},
-			RuleConfig{"", ""},
-			RuleConfig{Enabled, Warning},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Category: ""},
+			RuleConfig{Disabled: false, Category: Warning},
 		},
 		{
-			RuleConfig{Enabled, Warning},
-			RuleConfig{Disabled, ""},
-			RuleConfig{Disabled, Warning},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Disabled: true, Category: ""},
+			RuleConfig{Disabled: true, Category: Warning},
 		},
 		{
-			RuleConfig{Enabled, Warning},
-			RuleConfig{"", Error},
-			RuleConfig{Enabled, Error},
+			RuleConfig{Disabled: false, Category: Warning},
+			RuleConfig{Category: Error},
+			RuleConfig{Disabled: false, Category: Error},
 		},
 	}
 

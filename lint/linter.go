@@ -64,7 +64,7 @@ func (l *Linter) run(req Request) (Response, error) {
 			continue
 		}
 
-		if config.Status == Enabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
+		if !config.Disabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
 			if problems, err := rl.Lint(req); err == nil {
 				for _, p := range problems {
 					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
