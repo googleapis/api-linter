@@ -20,7 +20,8 @@ git clone https://github.com/googleapis/api-linter.git $HOME/Downloads/api-linte
 cd $HOME/Downloads/api-linter/cmd/api-linter
 go install
 ```
-* Update the `PATH` environment to include `$HOME/go/bin`.
+* Ensure that your operating system's `PATH` contains `go install`ed binaries, as described in the
+  [Go install guide](https://golang.org/doc/install#install).
 
 ## Usage
 Run `api-linter help` to see the usage. Or run `api-linter help checkproto` to see how to check API protobuf files:
