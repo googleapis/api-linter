@@ -1,9 +1,13 @@
 package rules
 
 import (
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	"fmt"
+	"strings"
+
+	pref "github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
+	"github.com/iancoleman/strcase"
 )
 
 func init() {
@@ -17,13 +21,26 @@ func checkFieldNamesUseLowerSnakeCase() lint.Rule {
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "naming_formats", "field_names"),
 			Description:  "check that field names use lower snake case",
-			URI:          "https://g3doc.corp.google.com/google/api/tools/linter/g3doc/rules/naming-format.md?cl=head",
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
 		},
 		Callback: descriptor.Callbacks{
-			FieldCallback: func(d protoreflect.FieldDescriptor, s lint.DescriptorSource) ([]lint.Problem, error) {
-				return checkNameFormat(d), nil
+			FieldCallback: func(d pref.FieldDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+				fieldName := string(d.Name())
+				suggestion := toLowerSnakeCase(fieldName)
+				if fieldName != suggestion {
+					problems = append(problems, lint.Problem{
+						Message:    fmt.Sprintf("field named %q should use lower_snake_case", fieldName),
+						Suggestion: suggestion,
+						Descriptor: d,
+					})
+				}
+				return
 			},
 		},
 	}
+}
+
+// toLowerSnakeCase converts s to lower_snake_case.
+func toLowerSnakeCase(s string) string {
+	return strings.ToLower(strcase.ToSnake(s))
 }
