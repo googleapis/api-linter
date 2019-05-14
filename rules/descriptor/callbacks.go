@@ -50,7 +50,7 @@ func (c Callbacks) Apply(d protoreflect.Descriptor, src lint.DescriptorSource) (
 			return c.EnumValueCallback(desc, src)
 		}
 	case protoreflect.FieldDescriptor:
-		if desc.ExtendedType() != nil && c.ExtensionCallback != nil {
+		if desc.Extendee() != nil && c.ExtensionCallback != nil {
 			return c.ExtensionCallback(desc, src)
 		}
 		if c.FieldCallback != nil {
