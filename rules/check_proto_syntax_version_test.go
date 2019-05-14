@@ -22,7 +22,7 @@ import (
 )
 
 func TestProtoVersionRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
+	tmpl := testutil.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
 
 	tests := []struct {
 		Syntax     string
@@ -36,7 +36,7 @@ func TestProtoVersionRule(t *testing.T) {
 
 	rule := checkProtoVersion()
 	for _, test := range tests {
-		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
+		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
 
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
 

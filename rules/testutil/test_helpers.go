@@ -1,5 +1,5 @@
 // Package testdata provides testing helpers and data for rules.
-package testdata
+package testutil
 
 import (
 	"bytes"
