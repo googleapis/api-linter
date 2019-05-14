@@ -221,7 +221,7 @@ func getDescriptorTag(d protoreflect.Descriptor) int {
 
 func isFieldExtension(d protoreflect.Descriptor) bool {
 	f, ok := d.(protoreflect.FieldDescriptor)
-	return ok && f.ExtendedType() != nil
+	return ok && f.Extendee() != nil
 }
 
 func isFileDescriptor(d protoreflect.Descriptor) bool {
