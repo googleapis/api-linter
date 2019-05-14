@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testdata"
+	"github.com/googleapis/api-linter/rules/testutil"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
