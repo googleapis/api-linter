@@ -22,7 +22,7 @@ import (
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`
+	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;
@@ -45,7 +45,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 	rule := checkFieldNamesUseLowerSnakeCase()
 
 	for _, test := range tests {
-		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
+		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
 
 		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
 		resp, err := rule.Lint(req)
