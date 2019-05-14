@@ -16,12 +16,12 @@ package rules
 
 import (
 	"fmt"
+	"github.com/stoewer/go-strcase"
 	"strings"
 
 	pref "github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
-	"github.com/iancoleman/strcase"
 )
 
 func init() {
@@ -56,5 +56,5 @@ func checkFieldNamesUseLowerSnakeCase() lint.Rule {
 
 // toLowerSnakeCase converts s to lower_snake_case.
 func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.ToSnake(s))
+	return strings.ToLower(strcase.SnakeCase(s))
 }
