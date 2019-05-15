@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Api-lint is an extendable and configurable .proto file linter that allows developers to provide
+// custom rules, allows the user to configure which rules to run, and reports findings to the user.
 package main
 
 import (

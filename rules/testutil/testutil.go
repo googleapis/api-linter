@@ -1,4 +1,4 @@
-// Package testdata provides testing helpers and data for rules.
+// Package testutil provides helpers for testing the linter and rules.
 package testutil
 
 import (

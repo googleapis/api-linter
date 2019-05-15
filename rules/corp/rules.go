@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package corp provides implementations of corp-specific proto rules.
 package corp
 
 import "github.com/googleapis/api-linter/lint"

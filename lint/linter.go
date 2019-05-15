@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package lint provides the core implementation of the linter. The extendable `Linter` allows a
+// user to register custom rules before passing proto descriptors into it.
 package lint
 
 import (

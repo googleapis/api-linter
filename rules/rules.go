@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rules contains rules that checks API styles
-// in Google Protobuf APIs.
+// Package rules contains the implementations of custom rules for the linter.
 package rules
 
 import (
