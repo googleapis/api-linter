@@ -16,11 +16,12 @@ package corp
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
-	"os"
-	"regexp"
 )
 
 var validVersionStrings = regexp.MustCompile(fmt.Sprintf(
