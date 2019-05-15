@@ -16,7 +16,9 @@ import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-var protoc = "protoc"
+var protocPath = func() string {
+	return "protoc"
+}
 
 func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorProto, error) {
 	tmpDir := os.TempDir()
@@ -38,7 +40,7 @@ func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorPr
 	defer mustCloseAndRemoveFile(descSetF)
 
 	cmd := exec.Command(
-		protoc,
+		protocPath(),
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
