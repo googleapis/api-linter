@@ -4,12 +4,12 @@ package testutil
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"text/template"
 
 	"github.com/golang/protobuf/v2/proto"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
