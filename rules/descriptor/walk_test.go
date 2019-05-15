@@ -75,7 +75,7 @@ func TestWalk(t *testing.T) {
 
 		Walk(test.descriptor, consumer)
 		if consumer.count != test.num {
-			t.Errorf("Walk(%s): Got %d desriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
+			t.Errorf("Walk(%s): Got %d descriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
 		}
 	}
 }
