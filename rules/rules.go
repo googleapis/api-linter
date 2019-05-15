@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rules contains rules that checks API styles
-// in Google Protobuf APIs.
+// Package rules contains implementations of rules that apply to all Google APIs.
 package rules
 
 import (

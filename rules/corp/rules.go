@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package corp contains implementations of rules that apply to Google Corp Eng APIs
 package corp
 
 import "github.com/googleapis/api-linter/lint"

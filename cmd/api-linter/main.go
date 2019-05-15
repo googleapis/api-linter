@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Binary api-linter is a linter that checks Google APIs according to the API Improvement Proposals
+// defined in https://aip.dev
 package main
 
 import (
