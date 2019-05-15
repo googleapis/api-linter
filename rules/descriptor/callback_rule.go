@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package descriptor contains functions that walks, consumes and checks a proto descriptor.
+// Package descriptor provides helper utilities for linting proto files.
 package descriptor
 
 import (

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Api-lint is an extendable and configurable .proto file linter that allows developers to provide
-// custom rules, allows the user to configure which rules to run, and reports findings to the user.
+// Binary api-linter is a linter that checks Google APIs according to the API Improvement Proposals
+// defined in https://aip.dev
 package main
 
 import (

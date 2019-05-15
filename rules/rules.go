@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rules contains the implementations of custom rules for the linter.
+// Package rules contains implementations of rules that apply to all Google APIs.
 package rules
 
 import (

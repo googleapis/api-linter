@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package lint provides the core implementation of the linter. The extendable `Linter` allows a
-// user to register custom rules before passing proto descriptors into it.
+// Package lint provides lint functions for Google APIs that register rules and user configurations,
+// apply those rules to a lint request, and produce lint results.
 package lint
 
 import (
