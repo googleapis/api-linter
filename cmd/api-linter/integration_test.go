@@ -23,6 +23,10 @@ import (
 	"testing"
 )
 
+var protocPath = func() string {
+	return "protoc"
+}
+
 // Each rule must have a testing case stored here.
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
@@ -194,6 +198,7 @@ func runLinter(t *testing.T, proto, config string) string {
 		"--cfg=" + configPath,
 		"--out=" + outPath,
 		"--proto_path=" + workdir,
+		"--protoc=" + protocPath(),
 		protoPath}
 	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)
