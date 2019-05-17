@@ -15,9 +15,9 @@
 package lint
 
 import (
-	"github.com/golang/protobuf/v2/reflect/protodesc"
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // Request defines input data for a rule to perform linting.

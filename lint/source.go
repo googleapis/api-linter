@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var (

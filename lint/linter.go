@@ -20,7 +20,7 @@ import (
 	"errors"
 	"strings"
 
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // Linter checks API files and returns a list of detected problems.

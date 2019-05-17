@@ -18,7 +18,7 @@ import (
 	"reflect"
 	"testing"
 
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestLinter_run(t *testing.T) {
