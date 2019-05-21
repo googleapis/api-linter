@@ -39,8 +39,10 @@ type Problem struct {
 	Descriptor protoreflect.Descriptor `json:"-" yaml:"-"`
 
 	// RuleID provides the ID of the rule that this problem belongs to.
+	// DO NOT SET: this field will be set by the linter based on rule info
+	// and user configs.
 	RuleID RuleName `json:"rule_id" yaml:"rule_id"`
 
-	// The following fields will be set by users.
+	// DO NOT SET:  this field will be set by the linter based on user configs.
 	Category string `json:"category,omitempty" yaml:"category,omitempty"`
 }
