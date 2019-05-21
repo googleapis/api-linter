@@ -14,7 +14,7 @@
 
 package lint
 
-import "github.com/golang/protobuf/v2/reflect/protoreflect"
+import "google.golang.org/protobuf/reflect/protoreflect"
 
 // Response describes the result returned by a rule.
 type Response struct {

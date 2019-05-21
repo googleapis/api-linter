@@ -21,9 +21,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/golang/protobuf/v2/proto"
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto

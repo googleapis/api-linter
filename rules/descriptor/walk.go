@@ -15,7 +15,7 @@
 package descriptor
 
 import (
-	"github.com/golang/protobuf/v2/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Consumer represents an operation that consumes a single Descriptor.

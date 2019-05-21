@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	pref "github.com/golang/protobuf/v2/reflect/protoreflect"
+	pref "google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
 	"github.com/stoewer/go-strcase"

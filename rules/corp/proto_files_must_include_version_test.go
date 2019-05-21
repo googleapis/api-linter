@@ -17,7 +17,7 @@ package corp
 import (
 	"testing"
 
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"github.com/googleapis/api-linter/lint"
 )
 
