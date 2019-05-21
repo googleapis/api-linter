@@ -1,3 +1,17 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
@@ -8,6 +22,10 @@ import (
 	"strings"
 	"testing"
 )
+
+var protocPath = func() string {
+	return "protoc"
+}
 
 // Each rule must have a testing case stored here.
 // Each case must be positive when the rule in test
@@ -180,6 +198,7 @@ func runLinter(t *testing.T, proto, config string) string {
 		"--cfg=" + configPath,
 		"--out=" + outPath,
 		"--proto_path=" + workdir,
+		"--protoc=" + protocPath(),
 		protoPath}
 	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)

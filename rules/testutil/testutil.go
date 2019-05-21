@@ -1,22 +1,24 @@
-// Package testdata provides testing helpers and data for rules.
-package testdata
+// Package testutil provides helpers for testing the linter and rules.
+package testutil
 
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"text/template"
 
-	"github.com/golang/protobuf/v2/proto"
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"github.com/googleapis/api-linter/lint"
 )
 
-var protoc = "protoc"
+var protocPath = func() string {
+	return "protoc"
+}
 
 func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorProto, error) {
 	tmpDir := os.TempDir()
@@ -38,7 +40,7 @@ func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorPr
 	defer mustCloseAndRemoveFile(descSetF)
 
 	cmd := exec.Command(
-		protoc,
+		protocPath(),
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),

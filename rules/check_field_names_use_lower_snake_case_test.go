@@ -1,14 +1,28 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rules
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testdata"
+	"github.com/googleapis/api-linter/rules/testutil"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testdata.MustCreateTemplate(`
+	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;
@@ -31,7 +45,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 	rule := checkFieldNamesUseLowerSnakeCase()
 
 	for _, test := range tests {
-		req := testdata.MustCreateRequestFromTemplate(tmpl, test)
+		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
 
 		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
 		resp, err := rule.Lint(req)

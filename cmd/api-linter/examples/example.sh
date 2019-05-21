@@ -1,2 +1,2 @@
 #!/bin/bash
-api-linter checkproto example_bad_naming.proto
+api-linter check --cfg ./example_config.json example_bad_naming.proto
