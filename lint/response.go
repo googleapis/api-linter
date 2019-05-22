@@ -27,7 +27,7 @@ type Problem struct {
 	// Message provides a short description of the problem.
 	Message string `json:"message" yaml:"message"`
 	// Suggestion provides a suggested fix, if applicable.
-	Suggestion string `json:"suggestion" yaml:"suggestion"`
+	Suggestion string `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
 	// Location provides the location of the problem. If both
 	// `Location` and `Descriptor` are specified, the location
 	// is then used from `Location` instead of `Descriptor`.
@@ -38,7 +38,11 @@ type Problem struct {
 	// is used as the location of the problem.
 	Descriptor protoreflect.Descriptor `json:"-" yaml:"-"`
 
-	// The following fields will be set by Runtime.
-	Category Category `json:"category" yaml:"category"`
-	RuleID   RuleName `json:"rule_id" yaml:"rule_id"`
+	// RuleID provides the ID of the rule that this problem belongs to.
+	// DO NOT SET: this field will be set by the linter based on rule info
+	// and user configs.
+	RuleID RuleName `json:"rule_id" yaml:"rule_id"`
+
+	// DO NOT SET:  this field will be set by the linter based on user configs.
+	Category string `json:"category,omitempty" yaml:"category,omitempty"`
 }

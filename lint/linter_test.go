@@ -32,7 +32,7 @@ func TestLinter_run(t *testing.T) {
 		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
 	}
 
-	ruleProblems := []Problem{{Message: "rule1_problem", Category: Warning, RuleID: "test::rule1"}}
+	ruleProblems := []Problem{{Message: "rule1_problem", Category: "", RuleID: "test::rule1"}}
 
 	tests := []struct {
 		desc    string
@@ -82,12 +82,12 @@ func TestLinter_run(t *testing.T) {
 				Config{
 					IncludedPaths: []string{"*"},
 					RuleConfigs: map[string]RuleConfig{
-						"test::rule1": {Category: Error},
+						"test::rule1": {Category: "error"},
 					},
 				},
 			),
 			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: Error, RuleID: "test::rule1"}},
+				Problems: []Problem{{Message: "rule1_problem", Category: "error", RuleID: "test::rule1"}},
 				FilePath: req.ProtoFile().Path(),
 			},
 		},
