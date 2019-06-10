@@ -243,7 +243,7 @@ func readProtoFile(t *testing.T, fileName string) Request {
 		t.Fatalf("Unable to parse %T from %s: %v", protoset, path, err)
 	}
 	proto := protoset.GetFile()[0]
-	req, err := NewProtoRequest(proto)
+	req, err := NewProtoRequest(proto, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -18,6 +18,7 @@ package lint
 
 import (
 	"errors"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"strings"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -39,14 +40,10 @@ func New(rules Rules, configs Configs) *Linter {
 }
 
 // LintProtos checks protobuf files and returns a list of problems or an error.
-func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
-	return l.lintProtos(files)
-}
-
-func (l *Linter) lintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
+func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto, db *protoregistry.Files) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
-		req, err := NewProtoRequest(proto)
+		req, err := NewProtoRequest(proto, db)
 		if err != nil {
 			return nil, err
 		}

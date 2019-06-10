@@ -16,17 +16,18 @@ package rules
 
 import (
 	"fmt"
+	"github.com/googleapis/api-linter/lint"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/testutil"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`
+	tmpl := `
 	syntax = "proto2";
 	message Foo {
 	  optional string {{.FieldName}} = 1;
-	}`)
+	}`
 
 	tests := []struct {
 		FieldName  string
@@ -45,9 +46,13 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 	rule := checkFieldNamesUseLowerSnakeCase()
 
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
+
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate("", tmpl, test, nil), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)

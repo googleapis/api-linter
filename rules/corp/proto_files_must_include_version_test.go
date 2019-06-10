@@ -17,8 +17,8 @@ package corp
 import (
 	"testing"
 
-	"google.golang.org/protobuf/types/descriptorpb"
 	"github.com/googleapis/api-linter/lint"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestProtoFilesMustIncludeVersion(t *testing.T) {
@@ -39,7 +39,7 @@ func TestProtoFilesMustIncludeVersion(t *testing.T) {
 		req, err := lint.NewProtoRequest(&descriptorpb.FileDescriptorProto{
 			Name:           &test.path,
 			SourceCodeInfo: &descriptorpb.SourceCodeInfo{},
-		})
+		}, nil)
 
 		if err != nil {
 			t.Errorf("Failed to create proto request because %v", err)

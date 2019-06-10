@@ -15,6 +15,10 @@
 package lint
 
 import (
+	"github.com/googleapis/api-linter/rules/testutil"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"reflect"
 	"testing"
 
@@ -26,7 +30,7 @@ func TestLinter_run(t *testing.T) {
 	req, _ := NewProtoRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
-		})
+		}, nil)
 
 	defaultConfigs := Configs{
 		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
@@ -107,5 +111,73 @@ func TestLinter_run(t *testing.T) {
 		if !reflect.DeepEqual(resp, test.resp) {
 			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp, test.resp)
 		}
+	}
+}
+
+func TestNewProtoRequest(t *testing.T) {
+	depFileDescProto := testutil.MustCreateFileDescriptorProtoFromTemplate(
+		"foo.proto",
+		`syntax = "proto3";
+
+message Foo {
+	string foo_str = 1;
+}`,
+		nil,
+		nil,
+	)
+
+	depFileDesc, err := protodesc.NewFile(depFileDescProto, nil)
+
+	if err != nil {
+		t.Fatal("Failed to create FileDescriptor: ", err)
+	}
+
+	registry := protoregistry.NewFiles(depFileDesc)
+
+	f := testutil.MustCreateFileDescriptorProtoFromTemplate("testfile.proto", `syntax = "proto3";
+
+import "foo.proto";
+
+message Bar {
+  Foo foo = 1;
+}
+`, nil, []*descriptorpb.FileDescriptorProto{depFileDescProto})
+
+	r, err := NewProtoRequest(f, registry)
+
+	if err != nil {
+		t.Fatal("NewProtoRequest() returned non nil error: ", err)
+	}
+
+	if r.ProtoFile() == nil {
+		t.Fatal("r.ProtoFile() = nil; want non-nil protoreflect.FileDescriptor")
+	}
+
+	if r.ProtoFile().Messages().Len() != 1 {
+		t.Fatalf("r.ProtoFile().Messages().Len()=%d; want 1", r.ProtoFile().Messages().Len())
+	}
+
+	barMsg := r.ProtoFile().Messages().Get(0)
+
+	if barMsg.Fields().Len() != 1 {
+		t.Fatalf("barMsg.Fields().Len()=%d; want 1", barMsg.Fields().Len())
+	}
+
+	fooField := barMsg.Fields().Get(0)
+
+	if fooField.Kind() != protoreflect.MessageKind {
+		t.Fatalf("fooField.Kind()=%d; want %d", fooField.Kind(), protoreflect.MessageKind)
+	}
+
+	fooMsg := fooField.Message()
+
+	if fooMsg.Fields().Len() != 1 {
+		t.Fatalf("fooMsg.Fields().Len()=%d; want 1", fooMsg.Fields().Len())
+	}
+
+	fooStrField := fooMsg.Fields().Get(0)
+
+	if fooStrField.Name() != "foo_str" {
+		t.Fatalf("fooStrField.Name()=%q; want %q", fooStrField.Name(), "foo_str")
 	}
 }

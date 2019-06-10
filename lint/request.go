@@ -17,6 +17,7 @@ package lint
 import (
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -38,8 +39,8 @@ func (r Request) DescriptorSource() DescriptorSource {
 }
 
 // NewProtoRequest creates a linting Request for a .proto file.
-func NewProtoRequest(fd *descriptorpb.FileDescriptorProto) (Request, error) {
-	f, err := protodesc.NewFile(fd, nil)
+func NewProtoRequest(fd *descriptorpb.FileDescriptorProto, files *protoregistry.Files) (Request, error) {
+	f, err := protodesc.NewFile(fd, files)
 	if err != nil {
 		return Request{}, err
 	}
