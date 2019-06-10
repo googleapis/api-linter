@@ -85,7 +85,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				}
 
 				l := lint.New(rules, configs)
-				problems, err := l.LintProtos(files)
+				problems, err := l.LintProtos(files, nil)
 				if err != nil {
 					return err
 				}
