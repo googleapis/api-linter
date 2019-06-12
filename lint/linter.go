@@ -40,10 +40,10 @@ func New(rules Rules, configs Configs) *Linter {
 }
 
 // LintProtos checks protobuf files and returns a list of problems or an error.
-func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto, db *protoregistry.Files) ([]Response, error) {
+func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto, reg *protoregistry.Files) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
-		req, err := NewProtoRequest(proto, db)
+		req, err := NewProtoRequest(proto, reg)
 		if err != nil {
 			return nil, err
 		}

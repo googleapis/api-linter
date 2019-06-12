@@ -39,8 +39,8 @@ func (r Request) DescriptorSource() DescriptorSource {
 }
 
 // NewProtoRequest creates a linting Request for a .proto file.
-func NewProtoRequest(fd *descriptorpb.FileDescriptorProto, files *protoregistry.Files) (Request, error) {
-	f, err := protodesc.NewFile(fd, files)
+func NewProtoRequest(fd *descriptorpb.FileDescriptorProto, reg *protoregistry.Files) (Request, error) {
+	f, err := protodesc.NewFile(fd, reg)
 	if err != nil {
 		return Request{}, err
 	}
