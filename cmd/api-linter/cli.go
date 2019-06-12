@@ -84,8 +84,14 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					configs = append(configs, userConfigs...)
 				}
 
+				db, err := lint.MakeRegistryFromAllFiles(files)
+
+				if err != nil {
+					return err
+				}
+
 				l := lint.New(rules, configs)
-				problems, err := l.LintProtos(files, nil)
+				problems, err := l.LintProtos(files, db)
 				if err != nil {
 					return err
 				}
