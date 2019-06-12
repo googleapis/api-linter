@@ -57,6 +57,7 @@ func (f *files) register(path string) error {
 	}
 
 	if e.registering {
+		// this should never happen, because protoc doesn't allow cyclic imports
 		return fmt.Errorf("cyclic dependency found on import of %q", path)
 	}
 

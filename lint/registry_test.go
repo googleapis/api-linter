@@ -45,3 +45,25 @@ message Foo {
 		t.Fatalf("foo.Fields().Get(0).Message().Name() = %q; want %q", foo.Fields().Get(0).Message().Name(), "Bar")
 	}
 }
+
+func TestMakeRegistryFromAllFiles_MissingImports(t *testing.T) {
+	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate("bar.proto", `syntax = "proto3";
+
+message Bar {
+  string baz = 1;
+}`, nil, nil)
+
+	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate("foo.proto", `syntax = "proto3";
+
+import "bar.proto";
+
+message Foo {
+  Bar bar = 1;
+}`, nil, []*descriptorpb.FileDescriptorProto{barProto})
+
+	_, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
+
+	if err == nil {
+		t.Fatalf("MakeRegistryFromAllFiles() returned nil error, but there were missing imports.")
+	}
+}
