@@ -18,6 +18,7 @@ package lint
 
 import (
 	"errors"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"strings"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -46,6 +47,10 @@ func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto) ([]Respon
 		return nil, err
 	}
 
+	return l.LintProtosWithRegistry(files, reg)
+}
+
+func (l *Linter) LintProtosWithRegistry(files []*descriptorpb.FileDescriptorProto, reg *protoregistry.Files) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
 		req, err := NewProtoRequest(proto, reg)
