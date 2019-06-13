@@ -157,6 +157,16 @@ func (s DescriptorSource) SyntaxComments() (Comments, error) {
 	return s.findCommentsByPath([]int{syntaxTag})
 }
 
+// PackageLocation returns the location of the package definition.
+func (s DescriptorSource) PackageLocation() (Location, error) {
+	return s.findLocationByPath([]int{packageTag})
+}
+
+// PackageComments returns the comments of the package definition.
+func (s DescriptorSource) PackageComments() (Comments, error) {
+	return s.findCommentsByPath([]int{packageTag})
+}
+
 // DescriptorLocation returns a `Location` for the given descriptor.
 // If not found, returns (nil, ErrPathNotFound).
 func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Location, error) {
@@ -173,6 +183,7 @@ func getPath(d protoreflect.Descriptor) []int {
 }
 
 const syntaxTag = 12
+const packageTag = 2
 
 var enumTagInFile = 5
 var enumTagInMessage = 4

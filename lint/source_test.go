@@ -162,6 +162,35 @@ func TestSyntaxComments(t *testing.T) {
 	}
 }
 
+func TestPackageLocation(t *testing.T) {
+	req := readProtoFile(t, "test_source.protoset")
+	descSource := req.DescriptorSource()
+	want := Location{Position{5, 1}, Position{5, 25}}
+	got, err := descSource.PackageLocation()
+	if err != nil {
+		t.Errorf("PackageLocation() error: %s", err)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("PackageLocation() returns %v, but want %v", got, want)
+	}
+}
+
+func TestPackageComments(t *testing.T) {
+	req := readProtoFile(t, "test_source.protoset")
+	descSource := req.DescriptorSource()
+
+	want := Comments{
+		TrailingComments: "package comment\n",
+	}
+	got, err := descSource.PackageComments()
+	if err != nil {
+		t.Errorf("PackageComments() error: %s", err)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("PackageComments() returns %s, but want %s", got, want)
+	}
+}
+
 func TestIsRuleDisabled(t *testing.T) {
 	req := readProtoFile(t, "test_rule_disable.protoset")
 	fileDesc := req.ProtoFile()

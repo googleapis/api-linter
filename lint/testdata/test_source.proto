@@ -2,7 +2,7 @@
 
 syntax = "proto2";
 
-package api.linter.lint;
+package api.linter.lint; //package comment
 
 // Outer
 message Outer {
