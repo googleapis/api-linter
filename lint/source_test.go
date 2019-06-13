@@ -184,10 +184,10 @@ func TestPackageComments(t *testing.T) {
 	}
 	got, err := descSource.PackageComments()
 	if err != nil {
-		t.Errorf("SyntaxComments() error: %s", err)
+		t.Errorf("PackageComments() error: %s", err)
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("SyntaxComments() returns %s, but want %s", got, want)
+		t.Errorf("PackageComments() returns %s, but want %s", got, want)
 	}
 }
 
