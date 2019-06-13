@@ -73,7 +73,7 @@ func (l *Linter) run(req Request) (Response, error) {
 	for name, rl := range l.rules {
 		var config RuleConfig
 
-		if c, err := l.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
+		if c, err := l.configs.GetRuleConfig(req.ProtoFile().Path(), name); err == nil {
 			config = config.withOverride(c)
 		} else {
 			errMessages = append(errMessages, err.Error())
