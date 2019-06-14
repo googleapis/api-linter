@@ -63,7 +63,7 @@ message Foo {
 
 	_, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
 
-	if err == nil {
-		t.Fatalf("MakeRegistryFromAllFiles() returned nil error, but there were missing imports.")
+	if err != nil {
+		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 }

@@ -9,19 +9,20 @@ import (
 )
 
 // MakeRegistryFromAllFiles creates a *protoregistry.Files with all dependencies resolved, provided that
-// any import in any FileDescriptorProto in files is contained in files.
+// any import in any FileDescriptorProto in descs is also contained in descs. Missing dependencies will
+// be filled with placeholders
 //
-// In other words, if for any i, files[i] imports "a.proto", then the FileDescriptorProto for "a.proto"
-// must also be present in files.
+// In other words, if for any i, descs[i] imports "a.proto", then the FileDescriptorProto for "a.proto"
+// must also be present in files. If a dependency is missing from descs,
 func MakeRegistryFromAllFiles(descs []*descriptorpb.FileDescriptorProto) (*protoregistry.Files, error) {
-	fileMap, err := makeFileMap(descs)
+	filesSet, err := makeFilesSet(descs)
 	if err != nil {
 		return nil, err
 	}
 
 	f := files{
 		reg:      new(protoregistry.Files),
-		filesSet: fileMap,
+		filesSet: filesSet,
 	}
 
 	for _, desc := range descs {
@@ -40,19 +41,17 @@ type files struct {
 }
 
 type entry struct {
+	descProto   *descriptorpb.FileDescriptorProto
 	desc        protoreflect.FileDescriptor
-	registered  bool
 	registering bool
 }
 
 func (f *files) register(path string) error {
 	e, ok := f.filesSet[path]
 
-	if !ok {
-		return fmt.Errorf("%q not found in provided FileDescriptorProtos", path)
-	}
-
-	if e.registered {
+	// if it's already been registered (from another import) do nothing. if it doesn't exist,
+	// also do nothing, and a placeholder will be filled in for those that import it
+	if !ok || e.desc != nil {
 		return nil
 	}
 
@@ -63,38 +62,30 @@ func (f *files) register(path string) error {
 
 	e.registering = true
 
-	for i := 0; i < e.desc.Imports().Len(); i++ {
-		dep := e.desc.Imports().Get(i).Path()
-
-		err := f.register(dep)
-
-		if err != nil {
+	for _, dep := range e.descProto.GetDependency() {
+		if err := f.register(dep); err != nil {
 			return err
 		}
 	}
 
-	if err := f.reg.Register(e.desc); err != nil {
+	var err error
+	if e.desc, err = protodesc.NewFile(e.descProto, f.reg); err != nil {
 		return err
 	}
-
+	if err = f.reg.Register(e.desc); err != nil {
+		return err
+	}
 	e.registering = false
-	e.registered = true
 
 	return nil
 }
 
-func makeFileMap(files []*descriptorpb.FileDescriptorProto) (map[string]*entry, error) {
-	fileMap := make(map[string]*entry, len(files))
+func makeFilesSet(files []*descriptorpb.FileDescriptorProto) (map[string]*entry, error) {
+	filesSet := make(map[string]*entry, len(files))
 
 	for _, f := range files {
-		fd, err := protodesc.NewFile(f, nil)
-
-		if err != nil {
-			return nil, err
-		}
-
-		fileMap[f.GetName()] = &entry{desc: fd}
+		filesSet[f.GetName()] = &entry{descProto: f}
 	}
 
-	return fileMap, nil
+	return filesSet, nil
 }
