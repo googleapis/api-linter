@@ -25,19 +25,58 @@ import (
 
 func init() {
 	registerRules(
-		checkGetMethodNameField(),
 		checkRequestMessageName(),
-		checkUnknownFields(),
+		checkRequestMessageNameField(),
+		checkRequestMessageUnknownFields(),
 	)
 }
 
-// The Get standard method should only have expected fields.
-func checkGetMethodNameField() lint.Rule {
+// Get messages should have a properly named Request message.
+func checkRequestMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
-			Name:         lint.NewRuleName("core", "0131", "name_field"),
+			Name:         lint.NewRuleName("core", "0131", "request_message", "name"),
+			Description:  "check that Get RPCs have appropriate request messages",
+			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#guidance",
+		},
+		Callback: descriptor.Callbacks{
+			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+				// We only care about Get- methods for the purpose of this rule;
+				// ignore everything else.
+				methodName := string(m.Name())
+				if !strings.HasPrefix(methodName, "Get") {
+					return
+				}
+
+				// Rule check: Establish that for methods such as `GetFoo`, the request
+				// message is named `GetFooRequest`.
+				requestMessageName := string(m.Input().Name())
+				if requestMessageName != methodName+"Request" {
+					problems = append(problems, lint.Problem{
+						Message: fmt.Sprintf(
+							"Get RPCs should have a request message named after the RPC, such as %q.",
+							methodName+"Request",
+						),
+						Suggestion: methodName + "Request",
+						Descriptor: m,
+					})
+				}
+
+				return problems, nil
+			},
+		},
+	}
+}
+
+// The Get standard method should only have expected fields.
+func checkRequestMessageNameField() lint.Rule {
+	return &descriptor.CallbackRule{
+		RuleInfo: lint.RuleInfo{
+			Name:         lint.NewRuleName("core", "0131", "request_message", "name_field"),
 			Description:  "check that a name field is present",
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#request-message",
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
@@ -71,12 +110,14 @@ func checkGetMethodNameField() lint.Rule {
 	}
 }
 
-func checkUnknownFields() lint.Rule {
+// Get methods should not have unrecognized fields.
+func checkRequestMessageUnknownFields() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
-			Name:         lint.NewRuleName("core", "0131", "unknown_fields"),
+			Name:         lint.NewRuleName("core", "0131", "request_message", "unknown_fields"),
 			Description:  "check that there are no unknown fields",
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#request-message",
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
@@ -90,45 +131,12 @@ func checkUnknownFields() lint.Rule {
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
 					field := fields.Get(i)
-					if field.Name() != "name" {
+					if string(field.Name()) != "name" {
 						problems = append(problems, lint.Problem{
 							Message:    "Get RPCs should not have fields other than `name`.",
 							Descriptor: field,
 						})
 					}
-				}
-
-				return problems, nil
-			},
-		},
-	}
-}
-
-func checkRequestMessageName() lint.Rule {
-	return &descriptor.CallbackRule{
-		RuleInfo: lint.RuleInfo{
-			Name:         lint.NewRuleName("core", "0131", "request_message_name"),
-			Description:  "check that Get RPCs have appropriate request messages",
-			RequestTypes: []lint.RequestType{lint.ProtoRequest},
-		},
-		Callback: descriptor.Callbacks{
-			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
-				// We only care about Get- methods for the purpose of this rule;
-				// ignore everything else.
-				methodName := string(m.Name())
-				if !strings.HasPrefix(methodName, "Get") {
-					return
-				}
-
-				// Rule check: Establish that for methods such as `GetFoo`, the request
-				// message is named `GetFooRequest`.
-				requestMessageName := string(m.Input().Name())
-				if requestMessageName != methodName+"Request" {
-					problems = append(problems, lint.Problem{
-						Message:    fmt.Sprintf("Get RPCs should have a request message named after the RPC, such as %q.", methodName+"Request"),
-						Suggestion: methodName + "Request",
-						Descriptor: m,
-					})
 				}
 
 				return problems, nil
