@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		https://www.apache.org/licenses/LICENSE-2.0
+//     https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ func checkGetMethodNameField() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if strings.HasPrefix(string(m.Name()), "Get") {
+				if !strings.HasPrefix(string(m.Name()), "Get") {
 					return
 				}
 
@@ -54,7 +54,7 @@ func checkGetMethodNameField() lint.Rule {
 						Message:    fmt.Sprintf("method %q has no `name` field", m.Name()),
 						Descriptor: m.Input(),
 					})
-					return
+					return problems, nil
 				}
 
 				// Rule check: Establish that the name field is a string.
@@ -65,7 +65,7 @@ func checkGetMethodNameField() lint.Rule {
 					})
 				}
 
-				return
+				return problems, nil
 			},
 		},
 	}
@@ -82,7 +82,7 @@ func checkUnknownFields() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if strings.HasPrefix(string(m.Name()), "Get") {
+				if !strings.HasPrefix(string(m.Name()), "Get") {
 					return
 				}
 
@@ -98,7 +98,7 @@ func checkUnknownFields() lint.Rule {
 					}
 				}
 
-				return
+				return problems, nil
 			},
 		},
 	}
@@ -115,15 +115,15 @@ func checkRequestMessageName() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if strings.HasPrefix(string(m.Name()), "Get") {
+				methodName := string(m.Name())
+				if !strings.HasPrefix(methodName, "Get") {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// message is named `GetFooRequest`.
-				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
-				if methodName != requestMessageName+"Request" {
+				if requestMessageName != methodName+"Request" {
 					problems = append(problems, lint.Problem{
 						Message:    fmt.Sprintf("Get RPCs should have a request message named after the RPC, such as %q.", methodName+"Request"),
 						Suggestion: methodName + "Request",
@@ -131,7 +131,7 @@ func checkRequestMessageName() lint.Rule {
 					})
 				}
 
-				return
+				return problems, nil
 			},
 		},
 	}
