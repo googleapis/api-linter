@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/bmatcuk/doublestar v1.1.1
+	github.com/golang/protobuf v1.2.1-0.20190516215712-ae2eaafab405
 	github.com/google/go-cmp v0.3.0
 	github.com/stoewer/go-strcase v1.0.2
 	github.com/stretchr/testify v1.3.0

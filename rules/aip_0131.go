@@ -18,10 +18,9 @@ import (
 	"fmt"
 	"strings"
 
-	p "google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/golang/protobuf/proto"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
+	p "google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func init() {
@@ -44,34 +43,33 @@ func checkGetMethodNameField() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if string(m.Name()).HasPrefix("Get") {
+				if strings.HasPrefix(string(m.Name()), "Get") {
 					return
 				}
 
 				// Rule check: Establish that a name field is present.
-				nameField := m.GetInputType().FindFieldByName("name")
+				nameField := m.Input().Fields().ByName("name")
 				if nameField == nil {
 					problems = append(problems, lint.Problem{
 						Message:    fmt.Sprintf("method %q has no `name` field", m.Name()),
-						Suggestion: nil,
-						Descriptor: m.GetInputType(),
+						Descriptor: m.Input(),
 					})
 					return
 				}
 
 				// Rule check: Establish that the name field is a string.
-				if nameField.GetType() != proto.FieldDescriptorProto_TYPE_STRING {
+				if nameField.Kind() != p.StringKind {
 					problems = append(problems, lint.Problem{
 						Message:    "`name` field on Get RPCs should be a string",
-						Suggestion: nil,
 						Descriptor: nameField,
 					})
 				}
+
+				return
 			},
 		},
 	}
 }
-
 
 func checkUnknownFields() lint.Rule {
 	return &descriptor.CallbackRule{
@@ -84,25 +82,27 @@ func checkUnknownFields() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if string(m.Name()).HasPrefix("Get") {
+				if strings.HasPrefix(string(m.Name()), "Get") {
 					return
 				}
 
 				// Rule check: Establish that there are no other fields besides `name`.
-				for _, field := range m.GetInputType().GetFields() {
+				fields := m.Input().Fields()
+				for i := 0; i < fields.Len(); i++ {
+					field := fields.Get(i)
 					if field.Name() != "name" {
 						problems = append(problems, lint.Problem{
 							Message:    "Get RPCs should not have fields other than `name`.",
-							Suggestion: nil,
 							Descriptor: field,
 						})
 					}
 				}
+
+				return
 			},
 		},
 	}
 }
-
 
 func checkRequestMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
@@ -112,25 +112,27 @@ func checkRequestMessageName() lint.Rule {
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
 		},
 		Callback: descriptor.Callbacks{
-			MethodCallback: func(m proto.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get- methods for the purpose of this rule;
 				// ignore everything else.
-				if string(m.Name()).HasPrefix("Get") {
+				if strings.HasPrefix(string(m.Name()), "Get") {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// message is named `GetFooRequest`.
-				methodName := m.Name()
-				requestMessageName := m.GetInputType().Name()
-				if methodName != requestMessageName + "Request" {
+				methodName := string(m.Name())
+				requestMessageName := string(m.Input().Name())
+				if methodName != requestMessageName+"Request" {
 					problems = append(problems, lint.Problem{
-						Message:    fmt.Sprintf("Get RPCs should have a request message named after the RPC, such as %q.", methodName + "Request"),
+						Message:    fmt.Sprintf("Get RPCs should have a request message named after the RPC, such as %q.", methodName+"Request"),
 						Suggestion: methodName + "Request",
 						Descriptor: m,
 					})
 				}
-			}
-		}
+
+				return
+			},
+		},
 	}
 }
