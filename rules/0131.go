@@ -28,6 +28,7 @@ func init() {
 		checkRequestMessageName(),
 		checkRequestMessageNameField(),
 		checkRequestMessageUnknownFields(),
+		checkResponseMessageName(),
 	)
 }
 
@@ -137,6 +138,44 @@ func checkRequestMessageUnknownFields() lint.Rule {
 							Descriptor: field,
 						})
 					}
+				}
+
+				return problems, nil
+			},
+		},
+	}
+}
+
+// Get messages should use the resource as the respose message
+func checkResponseMessageName() lint.Rule {
+	return &descriptor.CallbackRule{
+		RuleInfo: lint.RuleInfo{
+			Name:         lint.NewRuleName("core", "0131", "response_message", "name"),
+			Description:  "check that Get RPCs have appropriate response messages",
+			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#guidance",
+		},
+		Callback: descriptor.Callbacks{
+			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+				// We only care about Get- methods for the purpose of this rule;
+				// ignore everything else.
+				methodName := string(m.Name())
+				if !strings.HasPrefix(methodName, "Get") {
+					return
+				}
+
+				// Rule check: Establish that for methods such as `GetFoo`, the response
+				// message is named `Foo`.
+				responseMessageName := string(m.Output().Name())
+				if methodName != "Get"+responseMessageName {
+					problems = append(problems, lint.Problem{
+						Message: fmt.Sprintf(
+							"Get RPCs should have the corresponding resource as the response message, such as %q.",
+							methodName[3:],
+						),
+						Suggestion: methodName[3:],
+						Descriptor: m,
+					})
 				}
 
 				return problems, nil

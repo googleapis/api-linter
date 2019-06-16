@@ -170,3 +170,54 @@ func TestRequestMessageUnknownFields(t *testing.T) {
 		}
 	}
 }
+
+func TestResponseMessageName(t *testing.T) {
+	tmpl := testutil.MustCreateTemplate(`
+	syntax = "proto3";
+
+	service Aip131 {
+		rpc GetFoo(GetFooRequest) returns ({{ .ResponseName }});
+	}
+
+	message GetFooRequest {
+		string name = 1;
+	}
+
+	message {{ .ResponseName }} {}
+	`)
+
+	tests := []struct {
+		ResponseName string
+		problemCount int
+		suggestion   string
+		startLine    int
+	}{
+		{"Foo", 0, "", -1},
+		{"NotFoo", 1, "Foo", 5},
+	}
+
+	rule := checkResponseMessageName()
+
+	for _, test := range tests {
+		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
+
+		errPrefix := "AIP-131 Response Message Name"
+		resp, err := rule.Lint(req)
+		if err != nil {
+			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+		}
+
+		if got, want := len(resp), test.problemCount; got != want {
+			t.Errorf("%s: got %d problems, but want %d", errPrefix, got, want)
+		}
+
+		if len(resp) > 0 {
+			if got, want := resp[0].Suggestion, test.suggestion; got != want {
+				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
+			}
+			if got, want := resp[0].Location.Start.Line, test.startLine; got != want {
+				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
+			}
+		}
+	}
+}
