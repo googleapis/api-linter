@@ -8,12 +8,9 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-// MakeRegistryFromAllFiles creates a *protoregistry.Files with all dependencies resolved, provided that
-// any import in any FileDescriptorProto in descs is also contained in descs. Missing dependencies will
-// be filled with placeholders
-//
-// In other words, if for any i, descs[i] imports "a.proto", then the FileDescriptorProto for "a.proto"
-// must also be present in files. If a dependency is missing from descs,
+// MakeRegistryFromAllFiles creates a *protoregistry.Files with all dependencies present in descs resolved.
+// Missing dependencies will be filled with placeholders. If there are cyclic dependencies, an error will
+// be returned.
 func MakeRegistryFromAllFiles(descs []*descriptorpb.FileDescriptorProto) (*protoregistry.Files, error) {
 	filesSet, err := makeFilesSet(descs)
 	if err != nil {
