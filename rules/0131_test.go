@@ -121,6 +121,8 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto3";
 
+	import "google/protobuf/field_mask.proto";
+
 	service Aip131 {
 		rpc GetFoo(GetFooRequest) returns (Foo);
 	}
@@ -133,6 +135,10 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 	}
 
 	message Foo {}
+
+	enum FooView {
+		FOO_VIEW_UNSPECIFIED = 0;
+	}
 	`)
 
 	tests := []struct {
@@ -141,11 +147,13 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 		startLine    int
 	}{
 		{problemCount: 0, startLine: -1},
-		{ExtraFields: []string{"string application_id = 2;"}, problemCount: 1, startLine: 10},
+		{ExtraFields: []string{"FooView view = 2;"}, problemCount: 0, startLine: -1},
+		{ExtraFields: []string{"google.protobuf.FieldMask read_mask = 2;"}, problemCount: 0, startLine: -1},
+		{ExtraFields: []string{"string application_id = 2;"}, problemCount: 1, startLine: 12},
 		{ExtraFields: []string{
 			"string application_id = 2;",
 			"Foo foo = 3;",
-		}, problemCount: 2, startLine: 10},
+		}, problemCount: 2, startLine: 12},
 	}
 
 	rule := checkGetRequestMessageUnknownFields()
@@ -153,7 +161,7 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
 
-		errPrefix := "AIP-131 Request Name Unknown Fields"
+		errPrefix := "AIP-131 Request Unknown Fields"
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
@@ -161,6 +169,9 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 
 		if got, want := len(resp), test.problemCount; got != want {
 			t.Errorf("%s: got %d problems, but want %d", errPrefix, got, want)
+			for _, problem := range resp {
+				t.Errorf(problem.Message)
+			}
 		}
 
 		if len(resp) > 0 {

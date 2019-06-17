@@ -128,13 +128,21 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 					return
 				}
 
-				// Rule check: Establish that there are no other fields besides `name`.
+				// Rule check: Establish that there are no unexpected fields.
+				allowedFields := map[string]struct{}{
+					"name":      struct{}{}, // AIP-131
+					"read_mask": struct{}{}, // AIP-158
+					"view":      struct{}{}, // AIP-158
+				}
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
 					field := fields.Get(i)
-					if string(field.Name()) != "name" {
+					if _, ok := allowedFields[string(field.Name())]; !ok {
 						problems = append(problems, lint.Problem{
-							Message:    "Get RPCs should not have fields other than `name`.",
+							Message: fmt.Sprintf(
+								"Get RPCs should only only contain fields explicitly described in AIPs, not %q.",
+								string(field.Name()),
+							),
 							Descriptor: field,
 						})
 					}
