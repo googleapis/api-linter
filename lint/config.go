@@ -109,6 +109,16 @@ func ReadConfigsYAML(f io.Reader) (Configs, error) {
 	return c, nil
 }
 
+// MakeConfigsForAllPaths takes an input RuleConfig and applies it to all Rules and all file paths.
+func MakeConfigsForAllRulesAndPaths(rc RuleConfig) Configs {
+	return []Config{{
+		IncludedPaths: []string{"**"},
+		RuleConfigs: map[string]RuleConfig{
+			"": rc,
+		},
+	}}
+}
+
 // getRuleConfig returns a RuleConfig that matches the given path and rule.
 // Returns an error if a config is not found for the path.
 func (c Configs) getRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
