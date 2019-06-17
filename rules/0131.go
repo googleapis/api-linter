@@ -146,7 +146,7 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 	}
 }
 
-// Get messages should use the resource as the respose message
+// Get messages should use the resource as the response message
 func checkGetResponseMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
