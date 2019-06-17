@@ -43,15 +43,15 @@ func checkGetRequestMessageName() lint.Rule {
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
-				// We only care about Get- methods for the purpose of this rule;
+				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				methodName := string(m.Name())
-				if !strings.HasPrefix(methodName, "Get") {
+				if !isGetMethod(m) {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// message is named `GetFooRequest`.
+				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
 				if requestMessageName != methodName+"Request" {
 					problems = append(problems, lint.Problem{
@@ -81,9 +81,9 @@ func checkGetRequestMessageNameField() lint.Rule {
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
-				// We only care about Get- methods for the purpose of this rule;
+				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				if !strings.HasPrefix(string(m.Name()), "Get") {
+				if !isGetMethod(m) {
 					return
 				}
 
@@ -122,9 +122,9 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
-				// We only care about Get- methods for the purpose of this rule;
+				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				if !strings.HasPrefix(string(m.Name()), "Get") {
+				if !isGetMethod(m) {
 					return
 				}
 
@@ -165,16 +165,16 @@ func checkGetResponseMessageName() lint.Rule {
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
-				// We only care about Get- methods for the purpose of this rule;
+				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				methodName := string(m.Name())
-				if !strings.HasPrefix(methodName, "Get") {
+				if !isGetMethod(m) {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `GetFoo`, the response
 				// message is named `Foo`.
 				responseMessageName := string(m.Output().Name())
+				methodName := string(m.Name())
 				if methodName != "Get"+responseMessageName {
 					problems = append(problems, lint.Problem{
 						Message: fmt.Sprintf(
@@ -190,4 +190,13 @@ func checkGetResponseMessageName() lint.Rule {
 			},
 		},
 	}
+}
+
+// Return true if this is a AIP-131 Get method, false otherwise.
+func isGetMethod(m p.MethodDescriptor) bool {
+	methodName := string(m.Name())
+	if methodName == "GetIamPolicy" {
+		return false
+	}
+	return strings.HasPrefix(methodName, "Get")
 }
