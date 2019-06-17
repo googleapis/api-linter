@@ -125,7 +125,14 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	fd := new(descriptorpb.FileDescriptorProto)
 	fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
 
-	l := New(r, MakeConfigsForAllRulesAndPaths(RuleConfig{}))
+	// linter with only one rule, and a default configuration which enables all rules for all files
+	l := New(r, []Config{{
+		IncludedPaths: []string{"**"},
+		RuleConfigs: map[string]RuleConfig{
+			"": {},
+		},
+	}})
+
 	_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
 	if err == nil || !strings.Contains(err.Error(), "panic") {
 		t.Fatalf("Expected error with panic, got %q", err)
