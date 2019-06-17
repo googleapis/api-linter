@@ -25,15 +25,15 @@ import (
 
 func init() {
 	registerRules(
-		checkRequestMessageName(),
-		checkRequestMessageNameField(),
-		checkRequestMessageUnknownFields(),
-		checkResponseMessageName(),
+		checkGetRequestMessageName(),
+		checkGetRequestMessageNameField(),
+		checkGetRequestMessageUnknownFields(),
+		checkGetResponseMessageName(),
 	)
 }
 
 // Get messages should have a properly named Request message.
-func checkRequestMessageName() lint.Rule {
+func checkGetRequestMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "0131", "request_message", "name"),
@@ -71,7 +71,7 @@ func checkRequestMessageName() lint.Rule {
 }
 
 // The Get standard method should only have expected fields.
-func checkRequestMessageNameField() lint.Rule {
+func checkGetRequestMessageNameField() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "0131", "request_message", "name_field"),
@@ -112,7 +112,7 @@ func checkRequestMessageNameField() lint.Rule {
 }
 
 // Get methods should not have unrecognized fields.
-func checkRequestMessageUnknownFields() lint.Rule {
+func checkGetRequestMessageUnknownFields() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "0131", "request_message", "unknown_fields"),
@@ -147,7 +147,7 @@ func checkRequestMessageUnknownFields() lint.Rule {
 }
 
 // Get messages should use the resource as the respose message
-func checkResponseMessageName() lint.Rule {
+func checkGetResponseMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
 			Name:         lint.NewRuleName("core", "0131", "response_message", "name"),

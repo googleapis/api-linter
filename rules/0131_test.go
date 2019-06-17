@@ -18,7 +18,7 @@ import (
 	"github.com/googleapis/api-linter/rules/testutil"
 )
 
-func TestRequestMessageName(t *testing.T) {
+func TestGetRequestMessageName(t *testing.T) {
 	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto3";
 
@@ -43,7 +43,7 @@ func TestRequestMessageName(t *testing.T) {
 		{"GetFooReq", 1, "GetFooRequest", 5},
 	}
 
-	rule := checkRequestMessageName()
+	rule := checkGetRequestMessageName()
 
 	for _, test := range tests {
 		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
@@ -69,7 +69,7 @@ func TestRequestMessageName(t *testing.T) {
 	}
 }
 
-func TestRequestMessageNameField(t *testing.T) {
+func TestGetRequestMessageNameField(t *testing.T) {
 	tmpl := testutil.MustCreateTemplate(`syntax = "proto3";
 
 	service Aip131 {
@@ -94,7 +94,7 @@ func TestRequestMessageNameField(t *testing.T) {
 		{"bytes", "name", 1, 8},
 	}
 
-	rule := checkRequestMessageNameField()
+	rule := checkGetRequestMessageNameField()
 
 	for _, test := range tests {
 		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
@@ -117,7 +117,7 @@ func TestRequestMessageNameField(t *testing.T) {
 	}
 }
 
-func TestRequestMessageUnknownFields(t *testing.T) {
+func TestGetRequestMessageUnknownFields(t *testing.T) {
 	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto3";
 
@@ -148,7 +148,7 @@ func TestRequestMessageUnknownFields(t *testing.T) {
 		}, problemCount: 2, startLine: 10},
 	}
 
-	rule := checkRequestMessageUnknownFields()
+	rule := checkGetRequestMessageUnknownFields()
 
 	for _, test := range tests {
 		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
@@ -171,7 +171,7 @@ func TestRequestMessageUnknownFields(t *testing.T) {
 	}
 }
 
-func TestResponseMessageName(t *testing.T) {
+func TestGetResponseMessageName(t *testing.T) {
 	tmpl := testutil.MustCreateTemplate(`
 	syntax = "proto3";
 
@@ -196,7 +196,7 @@ func TestResponseMessageName(t *testing.T) {
 		{"NotFoo", 1, "Foo", 5},
 	}
 
-	rule := checkResponseMessageName()
+	rule := checkGetResponseMessageName()
 
 	for _, test := range tests {
 		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
