@@ -128,9 +128,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	// linter with only one rule, and a default configuration which enables all rules for all files
 	l := New(r, []Config{{
 		IncludedPaths: []string{"**"},
-		RuleConfigs: map[string]RuleConfig{
-			"": {},
-		},
+		RuleConfigs:   map[string]RuleConfig{"": {}},
 	}})
 
 	_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
