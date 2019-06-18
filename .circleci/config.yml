@@ -29,7 +29,7 @@ jobs:
 
             curl -OL https://github.com/google/protobuf/releases/download/v3.7.1/$PROTOC_ZIP
 
-            sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
+            sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc include/*
 
             rm -f $PROTOC_ZIP
       - run: go test -mod=readonly ./...
