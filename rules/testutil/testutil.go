@@ -9,11 +9,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"text/template"
 
+	"github.com/googleapis/api-linter/lint"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
-	"github.com/googleapis/api-linter/lint"
 )
 
 var protocPath = func() string {
@@ -39,13 +41,18 @@ func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorPr
 	}
 	defer mustCloseAndRemoveFile(descSetF)
 
+	_, thisFilePath, _, _ := runtime.Caller(0)
+
 	cmd := exec.Command(
 		protocPath(),
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
+		fmt.Sprintf("--proto_path=%s/%s", filepath.Dir(thisFilePath), "api-common-protos"),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
 		f.Name(),
 	)
+
+	fmt.Println(fmt.Sprintf("--proto_path=%s/%s", filepath.Dir(thisFilePath), "api-common-protos"))
 
 	stderr := new(bytes.Buffer)
 	cmd.Stderr = stderr
