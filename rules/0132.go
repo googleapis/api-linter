@@ -45,13 +45,13 @@ func checkListRequestMessageName() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				methodName := string(m.Name())
-				if !strings.HasPrefix(methodName, "List") {
+				if !isListMethod(m) {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// message is named `GetFooRequest`.
+				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
 				if requestMessageName != methodName+"Request" {
 					problems = append(problems, lint.Problem{
@@ -83,7 +83,7 @@ func checkListRequestMessageParentField() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				if !strings.HasPrefix(string(m.Name()), "List") {
+				if !isListMethod(m) {
 					return
 				}
 
@@ -124,25 +124,26 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				if !strings.HasPrefix(string(m.Name()), "List") {
+				if !isListMethod(m) {
 					return
 				}
 
 				// Rule check: Establish that there are no unexpected fields.
-				allowedFields := []string{
-					"parent", "page_size", "page_token",
-					"filter", "order_by", "group_by", "show_deleted",
+				allowedFields := map[string]struct{}{
+					"parent":       struct{}{}, // AIP-131
+					"page_size":    struct{}{}, // AIP-158
+					"page_token":   struct{}{}, // AIP-158
+					"filter":       struct{}{}, // AIP-132
+					"order_by":     struct{}{}, // AIP-132
+					"group_by":     struct{}{}, // Nowhere yet, but permitted
+					"show_deleted": struct{}{}, // AIP-135
+					"read_mask":    struct{}{}, // AIP-157
+					"view":         struct{}{}, // AIP-157
 				}
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
 					field := fields.Get(i)
-					allowed := false
-					for _, allowedField := range allowedFields {
-						if string(field.Name()) == allowedField {
-							allowed = true
-						}
-					}
-					if !allowed {
+					if _, ok := allowedFields[string(field.Name())]; !ok {
 						problems = append(problems, lint.Problem{
 							Message:    "List RPCs should only contain fields explicitly described in AIPs.",
 							Descriptor: field,
@@ -169,13 +170,13 @@ func checkListResponseMessageName() lint.Rule {
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				methodName := string(m.Name())
-				if !strings.HasPrefix(methodName, "List") {
+				if !isListMethod(m) {
 					return
 				}
 
 				// Rule check: Establish that for methods such as `ListFoos`, the response
 				// message is named `ListFoosResponse`.
+				methodName := string(m.Name())
 				responseMessageName := string(m.Output().Name())
 				if responseMessageName != methodName+"Response" {
 					problems = append(problems, lint.Problem{
@@ -192,4 +193,9 @@ func checkListResponseMessageName() lint.Rule {
 			},
 		},
 	}
+}
+
+// Return true if this is a List method, false otherwise.
+func isListMethod(m p.MethodDescriptor) bool {
+	return strings.HasPrefix(string(m.Name()), "List")
 }
