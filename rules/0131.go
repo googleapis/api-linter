@@ -53,13 +53,14 @@ func checkGetRequestMessageName() lint.Rule {
 				// message is named `GetFooRequest`.
 				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
-				if requestMessageName != methodName+"Request" {
+				correctRequestMessageName := methodName + "Request"
+				if requestMessageName != correctRequestMessageName {
 					problems = append(problems, lint.Problem{
 						Message: fmt.Sprintf(
 							"Get RPCs should have a request message named after the RPC, such as %q.",
-							methodName+"Request",
+							correctRequestMessageName,
 						),
-						Suggestion: methodName + "Request",
+						Suggestion: correctRequestMessageName,
 						Descriptor: m,
 					})
 				}
@@ -131,8 +132,8 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 				// Rule check: Establish that there are no unexpected fields.
 				allowedFields := map[string]struct{}{
 					"name":      struct{}{}, // AIP-131
-					"read_mask": struct{}{}, // AIP-158
-					"view":      struct{}{}, // AIP-158
+					"read_mask": struct{}{}, // AIP-157
+					"view":      struct{}{}, // AIP-157
 				}
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
@@ -175,13 +176,13 @@ func checkGetResponseMessageName() lint.Rule {
 				// message is named `Foo`.
 				responseMessageName := string(m.Output().Name())
 				methodName := string(m.Name())
-				if methodName != "Get"+responseMessageName {
+				if correctResponseMessageName := methodName[3:]; correctResponseMessageName != responseMessageName {
 					problems = append(problems, lint.Problem{
 						Message: fmt.Sprintf(
 							"Get RPCs should have the corresponding resource as the response message, such as %q.",
-							methodName[3:],
+							correctResponseMessageName,
 						),
-						Suggestion: methodName[3:],
+						Suggestion: correctResponseMessageName,
 						Descriptor: m,
 					})
 				}
