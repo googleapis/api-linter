@@ -21,10 +21,10 @@ message Foo {
   Bar bar = 1;
 }`, nil, []*descriptorpb.FileDescriptorProto{barProto})
 
-	reg, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto})
+	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto})
 
 	if err != nil {
-		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
 	foo, err := reg.FindMessageByName("Foo")
@@ -72,10 +72,10 @@ message Baz {
 }
 `, nil, []*descriptorpb.FileDescriptorProto{barProto, fooProto})
 
-	reg, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto, bazProto})
+	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto, bazProto})
 
 	if err != nil {
-		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
 	foo, err := reg.FindMessageByName("Foo")
@@ -138,9 +138,9 @@ message Foo {
   Bar bar = 1;
 }`, nil, []*descriptorpb.FileDescriptorProto{barProto})
 
-	_, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
+	_, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
 
 	if err != nil {
-		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 }

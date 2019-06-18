@@ -8,10 +8,10 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-// MakeRegistryFromAllFiles creates a *protoregistry.Files with all dependencies present in descs resolved.
+// makeRegistryFromAllFiles creates a *protoregistry.Files with all dependencies present in descs resolved.
 // Missing dependencies will be filled with placeholders. If there are cyclic dependencies, an error will
 // be returned.
-func MakeRegistryFromAllFiles(descs []*descriptorpb.FileDescriptorProto) (*protoregistry.Files, error) {
+func makeRegistryFromAllFiles(descs []*descriptorpb.FileDescriptorProto) (*protoregistry.Files, error) {
 	filesSet, err := makeFilesSet(descs)
 	if err != nil {
 		return nil, err
@@ -53,11 +53,13 @@ func (f *files) register(path string) error {
 	}
 
 	if e.registering {
-		// this should never happen, because protoc doesn't allow cyclic imports
 		return fmt.Errorf("cyclic dependency found on import of %q", path)
 	}
 
 	e.registering = true
+	defer func() {
+		e.registering = false
+	}()
 
 	for _, dep := range e.descProto.GetDependency() {
 		if err := f.register(dep); err != nil {
@@ -72,7 +74,6 @@ func (f *files) register(path string) error {
 	if err = f.reg.Register(e.desc); err != nil {
 		return err
 	}
-	e.registering = false
 
 	return nil
 }
