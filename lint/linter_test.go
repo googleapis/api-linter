@@ -15,6 +15,7 @@
 package lint
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -116,23 +117,33 @@ type panickingRule struct{}
 func (r *panickingRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
 func (r *panickingRule) Lint(_ Request) ([]Problem, error) { panic("panic") }
 
+type panickingErrorRule struct{}
+
+func (r *panickingErrorRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
+func (r *panickingErrorRule) Lint(_ Request) ([]Problem, error) { panic(fmt.Errorf("panic")) }
+
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
-	r, err := NewRules(&panickingRule{})
-	if err != nil {
-		t.Fatalf("Failed to create Rules: %q", err)
-	}
+	tests := []struct {
+		rule Rule
+	}{{&panickingRule{}}, {&panickingErrorRule{}}}
 
-	fd := new(descriptorpb.FileDescriptorProto)
-	fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
+	for _, test := range tests {
+		r, err := NewRules(test.rule)
+		if err != nil {
+			t.Fatalf("Failed to create Rules: %q", err)
+		}
 
-	// linter with only one rule, and a default configuration which enables all rules for all files
-	l := New(r, []Config{{
-		IncludedPaths: []string{"**"},
-		RuleConfigs:   map[string]RuleConfig{"": {}},
-	}})
+		fd := new(descriptorpb.FileDescriptorProto)
+		fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
 
-	_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
-	if err == nil || !strings.Contains(err.Error(), "panic") {
-		t.Fatalf("Expected error with panic, got %q", err)
+		l := New(r, []Config{{
+			IncludedPaths: []string{"**"},
+			RuleConfigs:   map[string]RuleConfig{"": {}},
+		}})
+
+		_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
+		if err == nil || !strings.Contains(err.Error(), "panic") {
+			t.Fatalf("Expected error with panic, got %q", err)
+		}
 	}
 }
