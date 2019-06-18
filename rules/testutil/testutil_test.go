@@ -22,8 +22,7 @@ message Foo {
 		t.Fatalf("desc.GetDependency()=%d; want 1", len(desc.GetDependency()))
 	}
 
-	want := "google/api/auth.proto"
-	if desc.GetDependency()[0] != want {
+	if want := "google/api/auth.proto"; desc.GetDependency()[0] != want {
 		t.Fatalf("desc.GetDependency()[0] = %q; want %q", desc.GetDependency()[0], want)
 	}
 }
