@@ -18,6 +18,7 @@ package lint
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -73,7 +74,7 @@ func (l *Linter) run(req Request) (Response, error) {
 	for name, rl := range l.rules {
 		var config RuleConfig
 
-		if c, err := l.configs.getRuleConfig(req.ProtoFile().Path(), name); err == nil {
+		if c, err := l.configs.GetRuleConfig(req.ProtoFile().Path(), name); err == nil {
 			config = config.withOverride(c)
 		} else {
 			errMessages = append(errMessages, err.Error())
@@ -81,7 +82,7 @@ func (l *Linter) run(req Request) (Response, error) {
 		}
 
 		if !config.Disabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
-			if problems, err := rl.Lint(req); err == nil {
+			if problems, err := l.runAndRecoverFromPanics(rl, req); err == nil {
 				for _, p := range problems {
 					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
 						p.RuleID = rl.Info().Name
@@ -101,4 +102,18 @@ func (l *Linter) run(req Request) (Response, error) {
 	}
 
 	return resp, err
+}
+
+func (l *Linter) runAndRecoverFromPanics(rl Rule, req Request) (probs []Problem, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if rerr, ok := r.(error); ok {
+				err = rerr
+			} else {
+				err = fmt.Errorf("panic occurred during rule execution: %v", r)
+			}
+		}
+	}()
+
+	return rl.Lint(req)
 }
