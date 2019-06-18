@@ -109,9 +109,9 @@ func ReadConfigsYAML(f io.Reader) (Configs, error) {
 	return c, nil
 }
 
-// getRuleConfig returns a RuleConfig that matches the given path and rule.
+// GetRuleConfig returns a RuleConfig that matches the given path and rule.
 // Returns an error if a config is not found for the path.
-func (c Configs) getRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
+func (c Configs) GetRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
 	err = fmt.Errorf("failed to find a config for path %q", path)
 	for _, cfg := range c {
 		if cfg.match(path) {
