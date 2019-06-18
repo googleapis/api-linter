@@ -19,15 +19,22 @@ var protocPath = func() string {
 	return "protoc"
 }
 
+type FileDescriptorSpec struct {
+	Filename string
+	Template string
+	Data     interface{}
+	Deps     []*descriptorpb.FileDescriptorProto
+}
+
 // MustCreateFileDescriptorProtoFromTemplate creates a *descriptorpb.FileDescriptorProto from a string template and data.
-func MustCreateFileDescriptorProtoFromTemplate(filename, srcTmpl string, data interface{}, deps []*descriptorpb.FileDescriptorProto) *descriptorpb.FileDescriptorProto {
-	tmpl := template.Must(template.New("test").Parse(srcTmpl))
+func MustCreateFileDescriptorProtoFromTemplate(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
+	tmpl := template.Must(template.New("test").Parse(spec.Template))
 	b := new(bytes.Buffer)
-	if err := tmpl.Execute(b, data); err != nil {
+	if err := tmpl.Execute(b, spec.Data); err != nil {
 		log.Fatalf("Error executing template %v", err)
 	}
 
-	return mustCreateDescriptorProtoFromSource(filename, b, deps)
+	return mustCreateDescriptorProtoFromSource(spec.Filename, b, spec.Deps)
 }
 
 func mustCreateDescriptorProtoFromSource(filename string, source io.Reader, deps []*descriptorpb.FileDescriptorProto) *descriptorpb.FileDescriptorProto {

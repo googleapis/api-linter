@@ -7,19 +7,26 @@ import (
 )
 
 func TestMakeRegistryFromAllFiles(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate("bar.proto", `syntax = "proto3";
+	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "bar.proto",
+		Template: `syntax = "proto3";
 
 message Bar {
   string baz = 1;
-}`, nil, nil)
+}`,
+	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate("foo.proto", `syntax = "proto3";
+	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "foo.proto",
+		Template: `syntax = "proto3";
 
 import "bar.proto";
 
 message Foo {
   Bar bar = 1;
-}`, nil, []*descriptorpb.FileDescriptorProto{barProto})
+}`,
+		Deps: []*descriptorpb.FileDescriptorProto{barProto},
+	})
 
 	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto})
 
@@ -47,21 +54,30 @@ message Foo {
 }
 
 func TestMakeRegistryFromAllFiles_DirectAndIndirectDependencies(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate("bar.proto", `syntax = "proto3";
+	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "bar.proto",
+		Template: `syntax = "proto3";
 
 message Bar {
   string baz = 1;
-}`, nil, nil)
+}`,
+	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate("foo.proto", `syntax = "proto3";
+	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "foo.proto",
+		Template: `syntax = "proto3";
 
 import "bar.proto";
 
 message Foo {
   Bar bar = 1;
-}`, nil, []*descriptorpb.FileDescriptorProto{barProto})
+}`,
+		Deps: []*descriptorpb.FileDescriptorProto{barProto},
+	})
 
-	bazProto := testutil.MustCreateFileDescriptorProtoFromTemplate("baz.proto", `syntax = "proto3";
+	bazProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "baz.proto",
+		Template: `syntax = "proto3";
 
 import "bar.proto";
 import "foo.proto";
@@ -70,7 +86,9 @@ message Baz {
 	Foo foo = 1;
 	Bar bar = 2;
 }
-`, nil, []*descriptorpb.FileDescriptorProto{barProto, fooProto})
+`,
+		Deps: []*descriptorpb.FileDescriptorProto{barProto, fooProto},
+	})
 
 	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto, bazProto})
 
@@ -124,19 +142,26 @@ message Baz {
 }
 
 func TestMakeRegistryFromAllFiles_MissingImports(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate("bar.proto", `syntax = "proto3";
+	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "bar.proto",
+		Template: `syntax = "proto3";
 
 message Bar {
   string baz = 1;
-}`, nil, nil)
+}`,
+	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate("foo.proto", `syntax = "proto3";
+	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+		Filename: "foo.proto",
+		Template: `syntax = "proto3";
 
 import "bar.proto";
 
 message Foo {
   Bar bar = 1;
-}`, nil, []*descriptorpb.FileDescriptorProto{barProto})
+}`,
+		Deps: []*descriptorpb.FileDescriptorProto{barProto},
+	})
 
 	_, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
 
