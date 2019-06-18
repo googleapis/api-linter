@@ -54,20 +54,6 @@ var testCases = []struct {
 	},
 }
 
-func TestEveryRuleHasATestCase(t *testing.T) {
-	tests := make(map[string]bool)
-	for _, test := range testCases {
-		tests[test.rule] = true
-	}
-	rules := rules()
-	for _, rl := range rules {
-		ruleID := string(rl.Info().Name)
-		if _, found := tests[ruleID]; !found {
-			t.Errorf("%s does not have a test case", ruleID)
-		}
-	}
-}
-
 func TestRules_Enabled(t *testing.T) {
 	config := `
 	[
