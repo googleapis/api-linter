@@ -130,15 +130,15 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 
 				// Rule check: Establish that there are no unexpected fields.
 				allowedFields := map[string]struct{}{
-					"parent":       struct{}{}, // AIP-131
-					"page_size":    struct{}{}, // AIP-158
-					"page_token":   struct{}{}, // AIP-158
-					"filter":       struct{}{}, // AIP-132
-					"order_by":     struct{}{}, // AIP-132
-					"group_by":     struct{}{}, // Nowhere yet, but permitted
-					"show_deleted": struct{}{}, // AIP-135
-					"read_mask":    struct{}{}, // AIP-157
-					"view":         struct{}{}, // AIP-157
+					"parent":       {}, // AIP-131
+					"page_size":    {}, // AIP-158
+					"page_token":   {}, // AIP-158
+					"filter":       {}, // AIP-132
+					"order_by":     {}, // AIP-132
+					"group_by":     {}, // Nowhere yet, but permitted
+					"show_deleted": {}, // AIP-135
+					"read_mask":    {}, // AIP-157
+					"view":         {}, // AIP-157
 				}
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
