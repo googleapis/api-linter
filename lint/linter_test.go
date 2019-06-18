@@ -15,7 +15,9 @@
 package lint
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -106,6 +108,42 @@ func TestLinter_run(t *testing.T) {
 		resp, _ := l.run(req)
 		if !reflect.DeepEqual(resp, test.resp) {
 			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp, test.resp)
+		}
+	}
+}
+
+type panickingRule struct{}
+
+func (r *panickingRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
+func (r *panickingRule) Lint(_ Request) ([]Problem, error) { panic("panic") }
+
+type panickingErrorRule struct{}
+
+func (r *panickingErrorRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
+func (r *panickingErrorRule) Lint(_ Request) ([]Problem, error) { panic(fmt.Errorf("panic")) }
+
+func TestLinter_LintProtos_RulePanics(t *testing.T) {
+	tests := []struct {
+		rule Rule
+	}{{&panickingRule{}}, {&panickingErrorRule{}}}
+
+	for _, test := range tests {
+		r, err := NewRules(test.rule)
+		if err != nil {
+			t.Fatalf("Failed to create Rules: %q", err)
+		}
+
+		fd := new(descriptorpb.FileDescriptorProto)
+		fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
+
+		l := New(r, []Config{{
+			IncludedPaths: []string{"**"},
+			RuleConfigs:   map[string]RuleConfig{"": {}},
+		}})
+
+		_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
+		if err == nil || !strings.Contains(err.Error(), "panic") {
+			t.Fatalf("Expected error with panic, got %q", err)
 		}
 	}
 }
