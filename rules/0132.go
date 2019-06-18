@@ -118,7 +118,7 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 			Name:         lint.NewRuleName("core", "0132", "request_message", "unknown_fields"),
 			Description:  "check that there are no unknown fields",
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
-			URI:          "https://aip.dev/131#request-message",
+			URI:          "https://aip.dev/132#request-message",
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
@@ -164,7 +164,7 @@ func checkListResponseMessageName() lint.Rule {
 			Name:         lint.NewRuleName("core", "0132", "response_message", "name"),
 			Description:  "check that List RPCs have appropriate response messages",
 			RequestTypes: []lint.RequestType{lint.ProtoRequest},
-			URI:          "https://aip.dev/131#guidance",
+			URI:          "https://aip.dev/132#guidance",
 		},
 		Callback: descriptor.Callbacks{
 			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
