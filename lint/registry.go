@@ -43,12 +43,15 @@ type entry struct {
 	registering bool
 }
 
+func (e entry) isRegistered() bool {
+	return e.desc != nil
+}
+
 func (f *files) register(path string) error {
 	e, ok := f.filesSet[path]
 
-	// if it's already been registered (from another import) do nothing. if it doesn't exist,
-	// also do nothing, and a placeholder will be filled in for those that import it
-	if !ok || e.desc != nil {
+	// if we don't have the file do nothing, and a placeholder will be filled in for those that import it
+	if !ok || e.isRegistered() {
 		return nil
 	}
 
