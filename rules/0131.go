@@ -131,9 +131,9 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 
 				// Rule check: Establish that there are no unexpected fields.
 				allowedFields := map[string]struct{}{
-					"name":      struct{}{}, // AIP-131
-					"read_mask": struct{}{}, // AIP-157
-					"view":      struct{}{}, // AIP-157
+					"name":      {}, // AIP-131
+					"read_mask": {}, // AIP-157
+					"view":      {}, // AIP-157
 				}
 				fields := m.Input().Fields()
 				for i := 0; i < fields.Len(); i++ {
