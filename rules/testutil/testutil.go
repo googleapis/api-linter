@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"text/template"
 
-	"github.com/googleapis/api-linter/lint"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -22,58 +21,115 @@ var protocPath = func() string {
 	return "protoc"
 }
 
-func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorProto, error) {
+type FileDescriptorSpec struct {
+	Filename string
+	Template string
+	Data     interface{}
+	Deps     []*descriptorpb.FileDescriptorProto
+}
+
+// MustCreateFileDescriptorProtoFromTemplate creates a *descriptorpb.FileDescriptorProto from a string template and data.
+func MustCreateFileDescriptorProtoFromTemplate(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
+	tmpl := template.Must(template.New("test").Parse(spec.Template))
+	b := new(bytes.Buffer)
+	if err := tmpl.Execute(b, spec.Data); err != nil {
+		log.Fatalf("Error executing template %v", err)
+	}
+
+	return mustCreateDescriptorProtoFromSource(spec.Filename, b, spec.Deps)
+}
+
+func mustCreateDescriptorProtoFromSource(filename string, source io.Reader, deps []*descriptorpb.FileDescriptorProto) *descriptorpb.FileDescriptorProto {
 	tmpDir := os.TempDir()
 
 	f, err := ioutil.TempFile(tmpDir, "proto*")
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed creating temp proto source file: %s", err)
 	}
 	defer mustCloseAndRemoveFile(f)
 
 	if _, err = io.Copy(f, source); err != nil {
-		return nil, err
+		log.Fatalf("Failed to copy source to templ file: %s", err)
 	}
 
 	descSetF, err := ioutil.TempFile(tmpDir, "descset*")
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to create temp descriptor set file: %s", err)
 	}
 	defer mustCloseAndRemoveFile(descSetF)
 
 	_, thisFilePath, _, _ := runtime.Caller(0)
 
-	cmd := exec.Command(
-		protocPath(),
+	args := []string{
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--proto_path=%s/%s", filepath.Dir(thisFilePath), "api-common-protos"),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
-		f.Name(),
-	)
+	}
+
+	if len(deps) > 0 {
+		descSetIn := mustCreateDescSetFileFromFileDescriptorProtos(deps)
+		defer mustCloseAndRemoveFile(descSetIn)
+
+		args = append(args, fmt.Sprintf("--descriptor_set_in=%s", descSetIn.Name()))
+	}
+
+	args = append(args, f.Name())
+
+	cmd := exec.Command(protocPath(), args...)
 
 	stderr := new(bytes.Buffer)
 	cmd.Stderr = stderr
 
 	if err = cmd.Run(); err != nil {
-		return nil, fmt.Errorf("protoc failed with %v and Stderr %q", err, stderr.String())
+		log.Fatalf("protoc failed with %v and Stderr %q", err, stderr.String())
 	}
 
 	descSet, err := ioutil.ReadFile(descSetF.Name())
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to read descriptor set file: %s", err)
 	}
 
 	protoset := &descriptorpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(descSet, protoset); err != nil {
-		return nil, err
+		log.Fatalf("Failed to unmarshal descriptor set file: %s", err)
 	}
 
 	if len(protoset.GetFile()) == 0 {
-		return nil, fmt.Errorf("protoset.GetFile() returns empty list")
+		log.Fatalf("protoset.GetFile() returns empty list")
 	}
 
-	return protoset.GetFile()[0], nil
+	protoset.GetFile()[0].Name = &filename
+
+	return protoset.GetFile()[0]
+}
+
+func mustCreateDescSetFileFromFileDescriptorProtos(descs []*descriptorpb.FileDescriptorProto) *os.File {
+	if len(descs) == 0 {
+		return nil
+	}
+
+	descSet := new(descriptorpb.FileDescriptorSet)
+	descSet.File = descs
+
+	rawDescSet, err := proto.Marshal(descSet)
+
+	if err != nil {
+		log.Fatalf("Failed to marshal descriptor set: %s", err)
+	}
+
+	descSetF, err := ioutil.TempFile(os.TempDir(), "descset*")
+
+	if err != nil {
+		log.Fatalf("Failed to make descriptor set file: %s", err)
+	}
+
+	if _, err := io.Copy(descSetF, bytes.NewReader(rawDescSet)); err != nil {
+		mustCloseAndRemoveFile(descSetF)
+		log.Fatalf("Failed to ")
+	}
+
+	return descSetF
 }
 
 func mustCloseAndRemoveFile(f *os.File) {
@@ -84,29 +140,4 @@ func mustCloseAndRemoveFile(f *os.File) {
 	if err := os.Remove(f.Name()); err != nil {
 		log.Fatalf("Error removing proto file: %v", err)
 	}
-}
-
-// MustCreateTemplate creates a template with name "test" from
-// the provided template string.
-func MustCreateTemplate(tmpl string) *template.Template {
-	return template.Must(template.New("test").Parse(tmpl))
-}
-
-// MustCreateRequestFromTemplate creates a lint.Request from the provided template and test data.
-func MustCreateRequestFromTemplate(tmpl *template.Template, testData interface{}) lint.Request {
-	b := new(bytes.Buffer)
-	if err := tmpl.Execute(b, testData); err != nil {
-		log.Fatalf("Error executing template %v", err)
-	}
-
-	pd, err := descriptorProtoFromSource(b)
-	if err != nil {
-		log.Fatalf("Error generating proto descriptor: %v", err)
-	}
-
-	req, err := lint.NewProtoRequest(pd)
-	if err != nil {
-		log.Fatalf("Error creating proto request: %v", err)
-	}
-	return req
 }

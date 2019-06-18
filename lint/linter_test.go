@@ -28,7 +28,7 @@ func TestLinter_run(t *testing.T) {
 	req, _ := NewProtoRequest(
 		&descriptorpb.FileDescriptorProto{
 			Name: &fileName,
-		})
+		}, nil)
 
 	defaultConfigs := Configs{
 		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
