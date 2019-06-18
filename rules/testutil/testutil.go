@@ -52,8 +52,6 @@ func descriptorProtoFromSource(source io.Reader) (*descriptorpb.FileDescriptorPr
 		f.Name(),
 	)
 
-	fmt.Println(fmt.Sprintf("--proto_path=%s/%s", filepath.Dir(thisFilePath), "api-common-protos"))
-
 	stderr := new(bytes.Buffer)
 	cmd.Stderr = stderr
 
