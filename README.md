@@ -13,7 +13,7 @@ API linter checks APIs defined in protobuf files. It follows [Google API Design 
 * Install `api-linter` using `go get`:
 
 ```sh
-go get github.com/googleapis/api-linter/cmd/api-linter
+go get -u github.com/googleapis/api-linter/cmd/api-linter
 ```
 
 This installs `api-linter` into your local Go binary folder `$HOME/go/bin`. Ensure that your operating system's `PATH` contains the folder.
