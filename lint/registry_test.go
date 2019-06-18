@@ -50,7 +50,7 @@ message Foo {
 	if foo.Fields().Get(0).Message().Name() != "Bar" {
 		t.Fatalf("foo.Fields().Get(0).Message().Name() = %q; want %q", foo.Fields().Get(0).Message().Name(), "Bar")
 	}
-	if foo.Fields().Get(0).IsPlaceholder() {
+	if foo.Fields().Get(0).Message().IsPlaceholder() {
 		t.Fatalf("foo.Fields().Get(0).IsPlaceholder()=true; want false")
 	}
 }
@@ -112,7 +112,7 @@ message Baz {
 	if foo.Fields().Get(0).Message().Name() != "Bar" {
 		t.Fatalf("foo.Fields().Get(0).Message().Name() = %q; want %q", foo.Fields().Get(0).Message().Name(), "Bar")
 	}
-	if foo.Fields().Get(0).IsPlaceholder() {
+	if foo.Fields().Get(0).Message().IsPlaceholder() {
 		t.Fatalf("foo.Fields().Get(0).IsPlaceholder()=true; want false")
 	}
 
@@ -131,7 +131,7 @@ message Baz {
 	if baz.Fields().Get(0).Message().Name() != "Foo" {
 		t.Fatalf("baz.Fields().Get(0).Message().Name() = %q; want %q", baz.Fields().Get(1).Message().Name(), "Foo")
 	}
-	if baz.Fields().Get(0).IsPlaceholder() {
+	if baz.Fields().Get(0).Message().IsPlaceholder() {
 		t.Fatalf("baz.Fields().Get(0).IsPlaceholder()=true; want false")
 	}
 
@@ -141,7 +141,7 @@ message Baz {
 	if baz.Fields().Get(1).Message().Name() != "Bar" {
 		t.Fatalf("baz.Fields().Get(1).Message().Name() = %q; want %q", baz.Fields().Get(1).Message().Name(), "Bar")
 	}
-	if baz.Fields().Get(1).IsPlaceholder() {
+	if baz.Fields().Get(1).Message().IsPlaceholder() {
 		t.Fatalf("baz.Fields().Get(1).IsPlaceholder()=true; want false")
 	}
 }
@@ -189,7 +189,7 @@ message Foo {
 	if foo.Fields().Get(0).Message().Name() != "Bar" {
 		t.Fatalf("foo.Fields().Get(0).Message().Name() = %q; want %q", foo.Fields().Get(0).Message().Name(), "Bar")
 	}
-	if foo.Fields().Get(0).IsPlaceholder() {
+	if !foo.Fields().Get(0).Message().IsPlaceholder() {
 		t.Fatalf("foo.Fields().Get(0).IsPlaceholder()=true; want false")
 	}
 }
