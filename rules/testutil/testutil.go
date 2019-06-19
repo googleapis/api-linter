@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"text/template"
 
-	"github.com/googleapis/api-linter/lint"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
