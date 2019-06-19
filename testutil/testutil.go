@@ -9,8 +9,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"text/template"
 
 	"google.golang.org/protobuf/proto"
@@ -21,25 +19,27 @@ var protocPath = func() string {
 	return "protoc"
 }
 
+// FileDescriptorSpec defines a specification for generating a FileDescriptorProto
 type FileDescriptorSpec struct {
+	// Filename is the output of the returned FileDescriptorProto.GetName().
 	Filename string
+	// Template defines a text/template to use for the proto source.
 	Template string
-	Data     interface{}
-	Deps     []*descriptorpb.FileDescriptorProto
+	// Data is plugged into the template to create the full source code.
+	Data interface{}
+	// Deps are any additional FileDescriptorProtos that the protocol compiler will need for the source.
+	Deps []*descriptorpb.FileDescriptorProto
+	// AdditionalProtoPaths are any additional proto_paths that the protocol compiler will need for the source.
+	AdditionalProtoPaths []string
 }
 
-// MustCreateFileDescriptorProtoFromTemplate creates a *descriptorpb.FileDescriptorProto from a string template and data.
-func MustCreateFileDescriptorProtoFromTemplate(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
-	tmpl := template.Must(template.New("test").Parse(spec.Template))
-	b := new(bytes.Buffer)
-	if err := tmpl.Execute(b, spec.Data); err != nil {
+// MustCreateFileDescriptorProtoFromSpec creates a *descriptorpb.FileDescriptorProto from a string template and data.
+func MustCreateFileDescriptorProtoFromSpec(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
+	source := new(bytes.Buffer)
+	if err := template.Must(template.New("").Parse(spec.Template)).Execute(source, spec.Data); err != nil {
 		log.Fatalf("Error executing template %v", err)
 	}
 
-	return mustCreateDescriptorProtoFromSource(spec.Filename, b, spec.Deps)
-}
-
-func mustCreateDescriptorProtoFromSource(filename string, source io.Reader, deps []*descriptorpb.FileDescriptorProto) *descriptorpb.FileDescriptorProto {
 	tmpDir := os.TempDir()
 
 	f, err := ioutil.TempFile(tmpDir, "proto*")
@@ -58,17 +58,18 @@ func mustCreateDescriptorProtoFromSource(filename string, source io.Reader, deps
 	}
 	defer mustCloseAndRemoveFile(descSetF)
 
-	_, thisFilePath, _, _ := runtime.Caller(0)
-
 	args := []string{
 		"--include_source_info",
 		fmt.Sprintf("--proto_path=%s", tmpDir),
-		fmt.Sprintf("--proto_path=%s/%s", filepath.Dir(thisFilePath), "api-common-protos"),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
 	}
 
-	if len(deps) > 0 {
-		descSetIn := mustCreateDescSetFileFromFileDescriptorProtos(deps)
+	for _, p := range spec.AdditionalProtoPaths {
+		args = append(args, fmt.Sprintf("--proto_path=%s", p))
+	}
+
+	if len(spec.Deps) > 0 {
+		descSetIn := mustCreateDescSetFileFromFileDescriptorProtos(spec.Deps)
 		defer mustCloseAndRemoveFile(descSetIn)
 
 		args = append(args, fmt.Sprintf("--descriptor_set_in=%s", descSetIn.Name()))
@@ -99,7 +100,7 @@ func mustCreateDescriptorProtoFromSource(filename string, source io.Reader, deps
 		log.Fatalf("protoset.GetFile() returns empty list")
 	}
 
-	protoset.GetFile()[0].Name = &filename
+	protoset.GetFile()[0].Name = &spec.Filename
 
 	return protoset.GetFile()[0]
 }

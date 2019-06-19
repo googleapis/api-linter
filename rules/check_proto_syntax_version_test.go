@@ -19,7 +19,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testutil"
+	"github.com/googleapis/api-linter/testutil"
 )
 
 func TestProtoVersionRule(t *testing.T) {
@@ -39,7 +39,7 @@ func TestProtoVersionRule(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
 
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromSpec(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {

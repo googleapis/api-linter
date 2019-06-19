@@ -19,7 +19,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testutil"
+	"github.com/googleapis/api-linter/testutil"
 )
 
 func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
@@ -48,7 +48,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := fmt.Sprintf("Check field name `%s`", test.FieldName)
 
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromSpec(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {

@@ -1,13 +1,13 @@
 package lint
 
 import (
-	"github.com/googleapis/api-linter/rules/testutil"
+	"github.com/googleapis/api-linter/testutil"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"testing"
 )
 
 func TestMakeRegistryFromAllFiles(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -16,7 +16,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
@@ -56,7 +56,7 @@ message Foo {
 }
 
 func TestMakeRegistryFromAllFiles_DirectAndIndirectDependencies(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -65,7 +65,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
@@ -77,7 +77,7 @@ message Foo {
 		Deps: []*descriptorpb.FileDescriptorProto{barProto},
 	})
 
-	bazProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	bazProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "baz.proto",
 		Template: `syntax = "proto3";
 
@@ -147,7 +147,7 @@ message Baz {
 }
 
 func TestMakeRegistryFromAllFiles_MissingImports(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -156,7 +156,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProtoFromTemplate(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProtoFromSpec(testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
