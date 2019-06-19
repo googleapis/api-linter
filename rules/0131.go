@@ -16,7 +16,7 @@ package rules
 
 import (
 	"fmt"
-	"strings"
+	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
@@ -199,5 +199,5 @@ func isGetMethod(m p.MethodDescriptor) bool {
 	if methodName == "GetIamPolicy" {
 		return false
 	}
-	return strings.HasPrefix(methodName, "Get")
+	return regexp.MustCompile("^Get(?:[A-Z]|$)").MatchString(string(m.Name()))
 }
