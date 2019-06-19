@@ -39,7 +39,7 @@ func TestProtoVersionRule(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
 
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromSpec(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {

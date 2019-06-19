@@ -33,8 +33,8 @@ type FileDescriptorSpec struct {
 	AdditionalProtoPaths []string
 }
 
-// MustCreateFileDescriptorProtoFromSpec creates a *descriptorpb.FileDescriptorProto from a string template and data.
-func MustCreateFileDescriptorProtoFromSpec(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
+// MustCreateFileDescriptorProto creates a *descriptorpb.FileDescriptorProto from a string template and data.
+func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
 	source := new(bytes.Buffer)
 	if err := template.Must(template.New("").Parse(spec.Template)).Execute(source, spec.Data); err != nil {
 		log.Fatalf("Error executing template %v", err)

@@ -9,7 +9,7 @@ import (
 
 func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
 	_, thisFilePath, _, _ := runtime.Caller(0)
-	desc := MustCreateFileDescriptorProtoFromSpec(FileDescriptorSpec{
+	desc := MustCreateFileDescriptorProto(FileDescriptorSpec{
 		AdditionalProtoPaths: []string{fmt.Sprintf("%s/%s", filepath.Dir(thisFilePath), "testdata")},
 		Template: `syntax = "proto3";
 
