@@ -69,7 +69,7 @@ func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDe
 	}
 
 	if len(spec.Deps) > 0 {
-		descSetIn := mustCreateDescSetFileFromFileDescriptorProtos(spec.Deps)
+		descSetIn := mustCreateDescSetFile(spec.Deps)
 		defer mustCloseAndRemoveFile(descSetIn)
 
 		args = append(args, fmt.Sprintf("--descriptor_set_in=%s", descSetIn.Name()))
@@ -105,7 +105,7 @@ func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDe
 	return protoset.GetFile()[0]
 }
 
-func mustCreateDescSetFileFromFileDescriptorProtos(descs []*descriptorpb.FileDescriptorProto) *os.File {
+func mustCreateDescSetFile(descs []*descriptorpb.FileDescriptorProto) *os.File {
 	if len(descs) == 0 {
 		return nil
 	}
