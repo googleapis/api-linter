@@ -16,7 +16,7 @@ package rules
 
 import (
 	"fmt"
-	"strings"
+	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
@@ -197,5 +197,5 @@ func checkListResponseMessageName() lint.Rule {
 
 // Return true if this is a List method, false otherwise.
 func isListMethod(m p.MethodDescriptor) bool {
-	return strings.HasPrefix(string(m.Name()), "List")
+	return regexp.MustCompile("^List(?:[A-Z]|$)").MatchString(string(m.Name()))
 }
