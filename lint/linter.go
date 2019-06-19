@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -39,15 +40,25 @@ func New(rules Rules, configs Configs) *Linter {
 	return l
 }
 
-// LintProtos checks protobuf files and returns a list of problems or an error.
+// LintProtos checks protobuf files and returns a list of problems or an error. Note that a *FileDescriptorProto
+// for any imported file must be present in files. If any file in files has an import that is not also in the
+// slice, an error will be returned.
 func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
-	return l.lintProtos(files)
+	reg, err := makeRegistryFromAllFiles(files)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return l.LintProtosWithRegistry(files, reg)
 }
 
-func (l *Linter) lintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
+// LintProtosWithRegistry checks protobuf files and returns a list of Responses or returns an error.
+// The input *protoregistry.Files must include all imports from any file in files.
+func (l *Linter) LintProtosWithRegistry(files []*descriptorpb.FileDescriptorProto, reg *protoregistry.Files) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
-		req, err := NewProtoRequest(proto)
+		req, err := NewProtoRequest(proto, reg)
 		if err != nil {
 			return nil, err
 		}
