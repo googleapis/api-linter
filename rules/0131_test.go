@@ -16,7 +16,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/testutil"
+	"github.com/googleapis/api-linter/testutil"
 )
 
 func TestGetRequestMessageName(t *testing.T) {
@@ -47,7 +47,7 @@ func TestGetRequestMessageName(t *testing.T) {
 
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Name"
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -102,7 +102,7 @@ func TestGetRequestMessageNameField(t *testing.T) {
 
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Name Field"
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -169,7 +169,7 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Unknown Fields"
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -225,7 +225,7 @@ func TestGetResponseMessageName(t *testing.T) {
 
 	for _, test := range tests {
 		errPrefix := "AIP-131 Response Message Name"
-		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
