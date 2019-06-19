@@ -16,13 +16,14 @@ package rules
 
 import (
 	"fmt"
+	"github.com/googleapis/api-linter/lint"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/testutil"
 )
 
 func TestProtoVersionRule(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`syntax = "{{.Syntax}}";`)
+	tmpl := `syntax = "{{.Syntax}}";`
 
 	tests := []struct {
 		Syntax     string
@@ -36,9 +37,14 @@ func TestProtoVersionRule(t *testing.T) {
 
 	rule := checkProtoVersion()
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
+
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: NewProtoRequest returned error %v", errPrefix, err)
+		}
 
 		resp, err := rule.Lint(req)
 		if err != nil {
