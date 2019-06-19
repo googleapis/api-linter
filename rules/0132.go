@@ -97,7 +97,7 @@ func checkListRequestMessageParentField() lint.Rule {
 					return problems, nil
 				}
 
-				// Rule check: Establish that the name field is a string.
+				// Rule check: Establish that the parent field is a string.
 				if parentField.Kind() != p.StringKind {
 					problems = append(problems, lint.Problem{
 						Message:    "`parent` field on List RPCs should be a string",
