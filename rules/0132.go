@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-// Get messages should have a properly named Request message.
+// List messages should have a properly named Request message.
 func checkListRequestMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
@@ -49,8 +49,8 @@ func checkListRequestMessageName() lint.Rule {
 					return
 				}
 
-				// Rule check: Establish that for methods such as `GetFoo`, the request
-				// message is named `GetFooRequest`.
+				// Rule check: Establish that for methods such as `ListFoos`, the request
+				// message is named `ListFoosRequest`.
 				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
 				if requestMessageName != methodName+"Request" {
@@ -87,7 +87,7 @@ func checkListRequestMessageParentField() lint.Rule {
 					return
 				}
 
-				// Rule check: Establish that a name field is present.
+				// Rule check: Establish that a `parent` field is present.
 				parentField := m.Input().Fields().ByName("parent")
 				if parentField == nil {
 					problems = append(problems, lint.Problem{
@@ -111,7 +111,7 @@ func checkListRequestMessageParentField() lint.Rule {
 	}
 }
 
-// Get methods should not have unrecognized fields.
+// List methods should not have unrecognized fields.
 func checkListRequestMessageUnknownFields() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
@@ -157,7 +157,7 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 	}
 }
 
-// Get messages should use the resource as the respose message
+// List messages should use a `ListFoosResponse` response message.
 func checkListResponseMessageName() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{

@@ -15,11 +15,12 @@ package rules
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/testutil"
 )
 
 func TestListRequestMessageName(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`
+	tmpl := `
 	syntax = "proto3";
 
 	service Aip132 {
@@ -33,7 +34,7 @@ func TestListRequestMessageName(t *testing.T) {
 	}
 
 	message ListFoosResponse {}
-	`)
+	`
 
 	tests := []struct {
 		RequestName  string
@@ -48,9 +49,14 @@ func TestListRequestMessageName(t *testing.T) {
 	rule := checkListRequestMessageName()
 
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := "AIP-132 Request Name"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
@@ -72,7 +78,7 @@ func TestListRequestMessageName(t *testing.T) {
 }
 
 func TestListRequestMessageParentField(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`
+	tmpl := `
 	syntax = "proto3";
 
 	service Aip132 {
@@ -86,7 +92,7 @@ func TestListRequestMessageParentField(t *testing.T) {
 	}
 
 	message ListFoosResponse {}
-	`)
+	`
 
 	tests := []struct {
 		ParentFieldType string
@@ -102,9 +108,14 @@ func TestListRequestMessageParentField(t *testing.T) {
 	rule := checkListRequestMessageParentField()
 
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := "AIP-132 Request Parent Field"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
@@ -123,10 +134,10 @@ func TestListRequestMessageParentField(t *testing.T) {
 }
 
 func TestListRequestMessageUnknownFields(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`
+	tmpl := `
 	syntax = "proto3";
 
-	service Aip131 {
+	service Aip132 {
 		rpc ListFoos(ListFoosRequest) returns (ListFoosResponse);
 	}
 
@@ -142,7 +153,7 @@ func TestListRequestMessageUnknownFields(t *testing.T) {
 	message ListFoosResponse {}
 
 	message Foo {}
-	`)
+	`
 
 	tests := []struct {
 		ExtraFields  []string
@@ -168,9 +179,14 @@ func TestListRequestMessageUnknownFields(t *testing.T) {
 	rule := checkListRequestMessageUnknownFields()
 
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := "AIP-132 Request Unknown Fields"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
@@ -189,7 +205,7 @@ func TestListRequestMessageUnknownFields(t *testing.T) {
 }
 
 func TestListResponseMessageName(t *testing.T) {
-	tmpl := testutil.MustCreateTemplate(`
+	tmpl := `
 	syntax = "proto3";
 
 	service Aip132 {
@@ -203,7 +219,7 @@ func TestListResponseMessageName(t *testing.T) {
 	}
 
 	message {{ .ResponseName }} {}
-	`)
+	`
 
 	tests := []struct {
 		ResponseName string
@@ -218,9 +234,14 @@ func TestListResponseMessageName(t *testing.T) {
 	rule := checkListResponseMessageName()
 
 	for _, test := range tests {
-		req := testutil.MustCreateRequestFromTemplate(tmpl, test)
-
 		errPrefix := "AIP-132 Response Message Name"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProtoFromTemplate(
+			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
 		resp, err := rule.Lint(req)
 		if err != nil {
 			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
