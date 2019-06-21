@@ -16,9 +16,8 @@
 package rules
 
 import (
-	"log"
-
 	"github.com/googleapis/api-linter/lint"
+	"log"
 )
 
 var coreRules, _ = lint.NewRules()
