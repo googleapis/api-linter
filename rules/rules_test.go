@@ -11,7 +11,7 @@ import (
 
 // This function maps testdata directories to their real directories. The convoluted mechanism for
 // doing so is an unfortunate consequence of maintaining compatibility when syncing internally.
-var testdata = func(lib string) string {
+var testdatadir = func(lib string) string {
 	_, f, _, _ := runtime.Caller(0)
 	testdataDir := filepath.Dir(f) + string(os.PathSeparator) + "testdata" + string(os.PathSeparator)
 	switch lib {
@@ -31,7 +31,7 @@ message Foo {
 	google.api.Authentication foo = 1;
 }
 `,
-		AdditionalProtoPaths: []string{testdata("api-common-protos")},
+		AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
 	})
 
 	if got, want := len(fd.GetDependency()), 1; got != want {
