@@ -1,9 +1,10 @@
 package testutil
 
 import (
-	"google.golang.org/protobuf/types/descriptorpb"
 	"os"
 	"testing"
+
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {

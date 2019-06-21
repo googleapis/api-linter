@@ -16,9 +16,9 @@ package rules
 
 import (
 	"fmt"
-	"github.com/googleapis/api-linter/lint"
 	"testing"
 
+	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/testutil"
 )
 
