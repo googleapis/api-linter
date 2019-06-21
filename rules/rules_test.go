@@ -13,10 +13,10 @@ import (
 // doing so is an unfortunate consequence of maintaining compatibility when syncing internally.
 var testdata = func(lib string) string {
 	_, f, _, _ := runtime.Caller(0)
-	thisDir := filepath.Dir(f) + string(os.PathSeparator)
+	testdataDir := filepath.Dir(f) + string(os.PathSeparator) + "testdata" + string(os.PathSeparator)
 	switch lib {
 	case "api-common-protos":
-		return thisDir + "testdata/api-common-protos"
+		return testdataDir + "api-common-protos"
 	}
 	return ""
 }
