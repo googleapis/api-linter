@@ -1,17 +1,36 @@
 package testutil
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/types/descriptorpb"
-	"path/filepath"
-	"runtime"
+	"os"
 	"testing"
 )
 
 func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
-	_, thisFilePath, _, _ := runtime.Caller(0)
+	dirName := os.TempDir() + string(os.PathSeparator) + "api-linter-fake-dir"
+	err := os.Mkdir(dirName, 0777)
+	if err != nil {
+		t.Fatalf("Failed to create dependency directory: %s", err)
+	}
+	defer os.RemoveAll(dirName)
+
+	fh, err := os.Create(dirName + string(os.PathSeparator) + "sample.proto")
+	if err != nil {
+		t.Fatalf("Failed to create sample.proto: %s", err)
+	}
+
+	_, err = fh.WriteString(`syntax = "proto3";
+package testdata;
+message Sample {
+	string foo = 1;
+}
+`)
+	if err != nil {
+		t.Fatalf("Failed to write proto source to sample.proto: %s", err)
+	}
+
 	desc := MustCreateFileDescriptorProto(FileDescriptorSpec{
-		AdditionalProtoPaths: []string{fmt.Sprintf("%s/%s", filepath.Dir(thisFilePath), "testdata")},
+		AdditionalProtoPaths: []string{dirName},
 		Template: `syntax = "proto3";
 
 import "sample.proto";
