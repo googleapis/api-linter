@@ -1,11 +1,12 @@
 package rules
 
 import (
-	"github.com/googleapis/api-linter/testutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"github.com/googleapis/api-linter/testutil"
 )
 
 // This function maps testdata directories to their real directories. The convoluted mechanism for
