@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/parser/protoc"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
@@ -66,12 +67,13 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				if len(filenames) == 0 {
 					return nil
 				}
+				p := protoc.New(
+					protoc.Command(c.String("protoc")),
+					protoc.IncludeImports(),
+					protoc.AddProtoPath(c.String("proto_path")),
+				)
 
-				p := protocParser{
-					importPath: c.String("proto_path"),
-					protoc:     c.String("protoc"),
-				}
-				files, err := p.ParseProto(filenames...)
+				files, err := p.Parse(filenames...)
 				if err != nil {
 					return err
 				}
@@ -85,7 +87,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				}
 
 				l := lint.New(rules, configs)
-				problems, err := l.LintProtos(files)
+				problems, err := l.LintProtos(files.GetFile())
 				if err != nil {
 					return err
 				}

@@ -2,10 +2,11 @@ package testutil
 
 import (
 	"fmt"
-	"google.golang.org/protobuf/types/descriptorpb"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
@@ -58,5 +59,26 @@ message Bar {
 
 	if got, want := bar.GetDependency()[0], "foo.proto"; got != want {
 		t.Fatalf("bar.GetDependency()[0] = %s; want %s", got, want)
+	}
+}
+
+func TestDescriptorFromProtoSource_CommonProtos(t *testing.T) {
+	desc := MustCreateFileDescriptorProto(FileDescriptorSpec{
+		Template: `
+		syntax = "proto3";
+
+		import "google/type/date.proto";
+
+		message Foo {
+			google.type.Date date = 1;
+		}`,
+	})
+
+	if len(desc.GetDependency()) != 1 {
+		t.Fatalf("desc.GetDependency()=%d; want 1", len(desc.GetDependency()))
+	}
+
+	if want := "google/type/date.proto"; desc.GetDependency()[0] != want {
+		t.Fatalf("desc.GetDependency()[0] = %q; want %q", desc.GetDependency()[0], want)
 	}
 }
