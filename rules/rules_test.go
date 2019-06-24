@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -13,10 +12,10 @@ import (
 // doing so is an unfortunate consequence of maintaining compatibility when syncing internally.
 var testdatadir = func(lib string) string {
 	_, f, _, _ := runtime.Caller(0)
-	testdataDir := filepath.Dir(f) + string(os.PathSeparator) + "testdata" + string(os.PathSeparator)
+	testdataDir := filepath.Join(filepath.Dir(f), "testdata")
 	switch lib {
 	case "api-common-protos":
-		return testdataDir + "api-common-protos"
+		return filepath.Join(testdataDir, "api-common-protos")
 	}
 	return ""
 }
