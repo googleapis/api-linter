@@ -1,8 +1,48 @@
 package protoc
 
 import (
+	"reflect"
 	"testing"
 )
+
+func TestExtractImports(t *testing.T) {
+	tests := []struct {
+		content string
+		results []string
+	}{
+		{
+			`
+import "a.proto";
+ import     "b.proto"   ; // some comments
+// import "c.proto";
+			`,
+			[]string{
+				"a.proto",
+				"b.proto",
+			},
+		},
+		{
+			`
+import "a.proto";
+/**
+ import     "b.proto"   ; // some comments
+*/
+// import "c.proto";
+			`,
+			[]string{
+				"a.proto",
+				"b.proto",
+			},
+		},
+	}
+
+	for i, test := range tests {
+		got := extractImports(test.content)
+		if !reflect.DeepEqual(got, test.results) {
+			t.Errorf("extractImports(CASE %d) returns %v, but want %v", i, got, test.results)
+		}
+	}
+}
 
 func TestParse(t *testing.T) {
 	p := New()

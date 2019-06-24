@@ -59,7 +59,7 @@ func gitClone(uri, outDir string) error {
 	return cmd.Run()
 }
 
-var packagePattern = regexp.MustCompile(`\s*option\s+go_package\s*=\s*"([a-zA-Z0-9/\.]+);[a-zA-Z0-9]+";`)
+var packagePattern = regexp.MustCompile(`(?m)^\s*option\s+go_package\s*=\s*"([a-zA-Z0-9/\.]+);[a-zA-Z0-9]+";`)
 
 func extractGoPkg(filename string) (string, error) {
 	b, err := ioutil.ReadFile(filename)

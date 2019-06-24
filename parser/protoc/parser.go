@@ -163,7 +163,7 @@ func extractImportsFromFiles(files ...string) ([]string, error) {
 	return names, nil
 }
 
-var importPattern = regexp.MustCompile(`\s*import\s+"([a-zA-Z0-9/\.]+)"\s*;`)
+var importPattern = regexp.MustCompile(`(?m)^\s*import\s+"([a-zA-Z0-9/\.]+)"\s*;`)
 
 func extractImports(s string) []string {
 	var imports []string

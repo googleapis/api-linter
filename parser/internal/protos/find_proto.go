@@ -16,7 +16,7 @@ import (
 func FindByName(filename string) (*descriptorpb.FileDescriptorProto, error) {
 	d := protoV1.FileDescriptor(filename)
 	if d == nil {
-		return nil, fmt.Errorf("Proto file %q is not found", filename)
+		return nil, fmt.Errorf("proto file %q is not found", filename)
 	}
 	b := bytes.NewBuffer(d)
 	g, err := gzip.NewReader(b)
