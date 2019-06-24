@@ -175,7 +175,7 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 
 func getPath(d protoreflect.Descriptor) []int {
 	path := []int{}
-	for p := d; !isFileDescriptor(p); p, _ = p.Parent() {
+	for p := d; !isFileDescriptor(p); p = p.Parent() {
 		path = append(path, p.Index(), getDescriptorTag(p))
 	}
 	reverseInts(path)
@@ -232,7 +232,7 @@ func getDescriptorTag(d protoreflect.Descriptor) int {
 
 func isFieldExtension(d protoreflect.Descriptor) bool {
 	f, ok := d.(protoreflect.FieldDescriptor)
-	return ok && f.Extendee() != nil
+	return ok && f.IsExtension()
 }
 
 func isFileDescriptor(d protoreflect.Descriptor) bool {
@@ -241,7 +241,7 @@ func isFileDescriptor(d protoreflect.Descriptor) bool {
 }
 
 func isTopLevelDescriptor(d protoreflect.Descriptor) bool {
-	p, _ := d.Parent()
+	p := d.Parent()
 	_, ok := p.(protoreflect.FileDescriptor)
 	return ok
 }
@@ -263,7 +263,7 @@ func reverseInts(a []int) {
 func (s DescriptorSource) isRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
 	commentsToCheck := s.fileComments().LeadingDetachedComments
 
-	for d, ok := d, true; ok && d != nil; d, ok = d.Parent() {
+	for ; d != nil; d = d.Parent() {
 		comments, err := s.DescriptorComments(d)
 
 		if err != nil {
