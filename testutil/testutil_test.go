@@ -1,30 +1,32 @@
 package testutil
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
-	dirName := os.TempDir() + string(os.PathSeparator) + "api-linter-fake-dir"
-	err := os.Mkdir(dirName, 0777)
+	dirName, err := ioutil.TempDir("", "api_linter")
 	if err != nil {
 		t.Fatalf("Failed to create dependency directory: %s", err)
 	}
 	defer os.RemoveAll(dirName)
 
-	fh, err := os.Create(dirName + string(os.PathSeparator) + "sample.proto")
+	fh, err := os.Create(filepath.Join(dirName, "sample.proto"))
 	if err != nil {
 		t.Fatalf("Failed to create sample.proto: %s", err)
 	}
 
-	_, err = fh.WriteString(`syntax = "proto3";
-package testdata;
-message Sample {
-	string foo = 1;
-}
+	_, err = fh.WriteString(`
+		syntax = "proto3";
+		package testdata;
+		message Sample {
+			string foo = 1;
+		}
 `)
 	if err != nil {
 		t.Fatalf("Failed to write proto source to sample.proto: %s", err)
@@ -32,13 +34,14 @@ message Sample {
 
 	desc := MustCreateFileDescriptorProto(FileDescriptorSpec{
 		AdditionalProtoPaths: []string{dirName},
-		Template: `syntax = "proto3";
+		Template: `
+		syntax = "proto3";
 
-import "sample.proto";
+		import "sample.proto";
 
-message Foo {
-	testdata.Sample foo = 1;
-}`,
+		message Foo {
+			testdata.Sample foo = 1;
+		}`,
 	})
 
 	if len(desc.GetDependency()) != 1 {
@@ -53,22 +56,24 @@ message Foo {
 func TestDescriptorFromProtoSource_CustomDeps(t *testing.T) {
 	foo := MustCreateFileDescriptorProto(FileDescriptorSpec{
 		Filename: "foo.proto",
-		Template: `syntax = "proto3";
+		Template: `
+		syntax = "proto3";
 
-message Foo {
-	string foo = 1;
-}`,
+		message Foo {
+			string foo = 1;
+		}`,
 	})
 
 	bar := MustCreateFileDescriptorProto(FileDescriptorSpec{
 		Filename: "bar.proto",
-		Template: `syntax = "proto3";
+		Template: `
+		syntax = "proto3";
 
-import "foo.proto";
+		import "foo.proto";
 
-message Bar {
-	Foo foo = 1;
-}`,
+		message Bar {
+			Foo foo = 1;
+		}`,
 		Deps: []*descriptorpb.FileDescriptorProto{foo},
 	})
 
