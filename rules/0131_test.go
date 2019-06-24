@@ -171,9 +171,8 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 		errPrefix := "AIP-131 Request Unknown Fields"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			testutil.FileDescriptorSpec{
-				Template:             tmpl,
-				Data:                 test,
-				AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
+				Template: tmpl,
+				Data:     test,
 			},
 		), nil)
 		if err != nil {
