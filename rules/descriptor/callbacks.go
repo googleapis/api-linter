@@ -15,8 +15,8 @@
 package descriptor
 
 import (
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/googleapis/api-linter/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Callbacks contains a collection of functions that will be called
@@ -50,7 +50,7 @@ func (c Callbacks) Apply(d protoreflect.Descriptor, src lint.DescriptorSource) (
 			return c.EnumValueCallback(desc, src)
 		}
 	case protoreflect.FieldDescriptor:
-		if desc.Extendee() != nil && c.ExtensionCallback != nil {
+		if desc.IsExtension() && c.ExtensionCallback != nil {
 			return c.ExtensionCallback(desc, src)
 		}
 		if c.FieldCallback != nil {
