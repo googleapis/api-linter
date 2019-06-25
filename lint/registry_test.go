@@ -1,9 +1,10 @@
 package lint
 
 import (
+	"testing"
+
 	"github.com/googleapis/api-linter/testutil"
 	"google.golang.org/protobuf/types/descriptorpb"
-	"testing"
 )
 
 func TestMakeRegistryFromAllFiles(t *testing.T) {
