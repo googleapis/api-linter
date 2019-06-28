@@ -21,7 +21,7 @@ var testdatadir = func(lib string) string {
 }
 
 func TestTestData_ApiCommonProtos(t *testing.T) {
-	fd := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	fd := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Template: `syntax = "proto3";
 
 import "google/api/auth.proto";

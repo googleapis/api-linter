@@ -51,6 +51,7 @@ func TestListRequestMessageName(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-132 Request Name"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -110,6 +111,7 @@ func TestListRequestMessageParentField(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-132 Request Parent Field"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -181,6 +183,7 @@ func TestListRequestMessageUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-132 Request Unknown Fields"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
@@ -236,6 +239,7 @@ func TestListResponseMessageName(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-132 Response Message Name"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
 			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
