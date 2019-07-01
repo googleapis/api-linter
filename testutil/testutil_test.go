@@ -32,7 +32,7 @@ func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
 		t.Fatalf("Failed to write proto source to sample.proto: %s", err)
 	}
 
-	desc := MustCreateFileDescriptorProto(FileDescriptorSpec{
+	desc := MustCreateFileDescriptorProto(t, FileDescriptorSpec{
 		AdditionalProtoPaths: []string{dirName},
 		Template: `
 		syntax = "proto3";
@@ -54,7 +54,7 @@ func TestDescriptorFromProtoSource_CustomProtoPaths(t *testing.T) {
 }
 
 func TestDescriptorFromProtoSource_CustomDeps(t *testing.T) {
-	foo := MustCreateFileDescriptorProto(FileDescriptorSpec{
+	foo := MustCreateFileDescriptorProto(t, FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `
 		syntax = "proto3";
@@ -64,7 +64,7 @@ func TestDescriptorFromProtoSource_CustomDeps(t *testing.T) {
 		}`,
 	})
 
-	bar := MustCreateFileDescriptorProto(FileDescriptorSpec{
+	bar := MustCreateFileDescriptorProto(t, FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `
 		syntax = "proto3";

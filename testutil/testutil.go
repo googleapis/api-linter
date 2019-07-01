@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
+	"testing"
 	"text/template"
 
 	"google.golang.org/protobuf/proto"
@@ -34,29 +34,29 @@ type FileDescriptorSpec struct {
 }
 
 // MustCreateFileDescriptorProto creates a *descriptorpb.FileDescriptorProto from a string template and data.
-func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
+func MustCreateFileDescriptorProto(t *testing.T, spec FileDescriptorSpec) *descriptorpb.FileDescriptorProto {
 	source := new(bytes.Buffer)
 	if err := template.Must(template.New("").Parse(spec.Template)).Execute(source, spec.Data); err != nil {
-		log.Fatalf("Error executing template %v", err)
+		t.Fatalf("Error executing template %v", err)
 	}
 
 	tmpDir := os.TempDir()
 
 	f, err := ioutil.TempFile(tmpDir, "proto*")
 	if err != nil {
-		log.Fatalf("Failed creating temp proto source file: %s", err)
+		t.Fatalf("Failed creating temp proto source file: %s", err)
 	}
-	defer mustCloseAndRemoveFile(f)
+	defer mustCloseAndRemoveFile(t, f)
 
 	if _, err = io.Copy(f, source); err != nil {
-		log.Fatalf("Failed to copy source to templ file: %s", err)
+		t.Fatalf("Failed to copy source to templ file: %s", err)
 	}
 
 	descSetF, err := ioutil.TempFile(tmpDir, "descset*")
 	if err != nil {
-		log.Fatalf("Failed to create temp descriptor set file: %s", err)
+		t.Fatalf("Failed to create temp descriptor set file: %s", err)
 	}
-	defer mustCloseAndRemoveFile(descSetF)
+	defer mustCloseAndRemoveFile(t, descSetF)
 
 	args := []string{
 		"--include_source_info",
@@ -69,8 +69,8 @@ func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDe
 	}
 
 	if len(spec.Deps) > 0 {
-		descSetIn := mustCreateDescSetFile(spec.Deps)
-		defer mustCloseAndRemoveFile(descSetIn)
+		descSetIn := mustCreateDescSetFile(t, spec.Deps)
+		defer mustCloseAndRemoveFile(t, descSetIn)
 
 		args = append(args, fmt.Sprintf("--descriptor_set_in=%s", descSetIn.Name()))
 	}
@@ -83,21 +83,21 @@ func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDe
 	cmd.Stderr = stderr
 
 	if err = cmd.Run(); err != nil {
-		log.Fatalf("protoc failed with %v and Stderr %q", err, stderr.String())
+		t.Fatalf("protoc failed with %v and Stderr %q", err, stderr.String())
 	}
 
 	descSet, err := ioutil.ReadFile(descSetF.Name())
 	if err != nil {
-		log.Fatalf("Failed to read descriptor set file: %s", err)
+		t.Fatalf("Failed to read descriptor set file: %s", err)
 	}
 
 	protoset := &descriptorpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(descSet, protoset); err != nil {
-		log.Fatalf("Failed to unmarshal descriptor set file: %s", err)
+		t.Fatalf("Failed to unmarshal descriptor set file: %s", err)
 	}
 
 	if len(protoset.GetFile()) == 0 {
-		log.Fatalf("protoset.GetFile() returns empty list")
+		t.Fatalf("protoset.GetFile() returns empty list")
 	}
 
 	protoset.GetFile()[0].Name = &spec.Filename
@@ -105,7 +105,7 @@ func MustCreateFileDescriptorProto(spec FileDescriptorSpec) *descriptorpb.FileDe
 	return protoset.GetFile()[0]
 }
 
-func mustCreateDescSetFile(descs []*descriptorpb.FileDescriptorProto) *os.File {
+func mustCreateDescSetFile(t *testing.T, descs []*descriptorpb.FileDescriptorProto) *os.File {
 	if len(descs) == 0 {
 		return nil
 	}
@@ -116,29 +116,29 @@ func mustCreateDescSetFile(descs []*descriptorpb.FileDescriptorProto) *os.File {
 	rawDescSet, err := proto.Marshal(descSet)
 
 	if err != nil {
-		log.Fatalf("Failed to marshal descriptor set: %s", err)
+		t.Fatalf("Failed to marshal descriptor set: %s", err)
 	}
 
 	descSetF, err := ioutil.TempFile(os.TempDir(), "descset*")
 
 	if err != nil {
-		log.Fatalf("Failed to make descriptor set file: %s", err)
+		t.Fatalf("Failed to make descriptor set file: %s", err)
 	}
 
 	if _, err := io.Copy(descSetF, bytes.NewReader(rawDescSet)); err != nil {
-		mustCloseAndRemoveFile(descSetF)
-		log.Fatalf("Failed to ")
+		mustCloseAndRemoveFile(t, descSetF)
+		t.Fatalf("Failed to ")
 	}
 
 	return descSetF
 }
 
-func mustCloseAndRemoveFile(f *os.File) {
+func mustCloseAndRemoveFile(t *testing.T, f *os.File) {
 	if err := f.Close(); err != nil {
-		log.Fatalf("Error closing proto file: %v", err)
+		t.Fatalf("Error closing proto file: %v", err)
 	}
 
 	if err := os.Remove(f.Name()); err != nil {
-		log.Fatalf("Error removing proto file: %v", err)
+		t.Fatalf("Error removing proto file: %v", err)
 	}
 }

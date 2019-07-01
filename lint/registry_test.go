@@ -8,7 +8,7 @@ import (
 )
 
 func TestMakeRegistryFromAllFiles(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -17,7 +17,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
@@ -57,7 +57,7 @@ message Foo {
 }
 
 func TestMakeRegistryFromAllFiles_DirectAndIndirectDependencies(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -66,7 +66,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
@@ -78,7 +78,7 @@ message Foo {
 		Deps: []*descriptorpb.FileDescriptorProto{barProto},
 	})
 
-	bazProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	bazProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "baz.proto",
 		Template: `syntax = "proto3";
 
@@ -148,7 +148,7 @@ message Baz {
 }
 
 func TestMakeRegistryFromAllFiles_MissingImports(t *testing.T) {
-	barProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	barProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "bar.proto",
 		Template: `syntax = "proto3";
 
@@ -157,7 +157,7 @@ message Bar {
 }`,
 	})
 
-	fooProto := testutil.MustCreateFileDescriptorProto(testutil.FileDescriptorSpec{
+	fooProto := testutil.MustCreateFileDescriptorProto(t, testutil.FileDescriptorSpec{
 		Filename: "foo.proto",
 		Template: `syntax = "proto3";
 
