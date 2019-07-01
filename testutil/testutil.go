@@ -15,8 +15,17 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
+// protocPath() returns the location of the protoc binary. On machines that have installed protoc
+// in $PATH, this will just be protoc. We will map it to the appropriate value internally.
 var protocPath = func() string {
 	return "protoc"
+}
+
+// protocAdditionalFlags() provides additional protoc flags that will be added to the protoc
+// command by default. Internally, we need additional flags to include the standard proto library
+// which are installed by default for external users.
+var protocAdditionalFlags = func() []string {
+	return nil
 }
 
 // FileDescriptorSpec defines a specification for generating a FileDescriptorProto
@@ -63,6 +72,8 @@ func MustCreateFileDescriptorProto(t *testing.T, spec FileDescriptorSpec) *descr
 		fmt.Sprintf("--proto_path=%s", tmpDir),
 		fmt.Sprintf("--descriptor_set_out=%s", descSetF.Name()),
 	}
+
+	args = append(args, protocAdditionalFlags()...)
 
 	for _, p := range spec.AdditionalProtoPaths {
 		args = append(args, fmt.Sprintf("--proto_path=%s", p))
