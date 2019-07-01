@@ -16,13 +16,13 @@ import (
 )
 
 // protocPath() returns the location of the protoc binary. On machines that have installed protoc
-// in $PATH, this will just be protoc. In google3, it will be pulled from runfiles.
+// in $PATH, this will just be protoc. We will map it to the appropriate value internally.
 var protocPath = func() string {
 	return "protoc"
 }
 
 // protocAdditionalFlags() provides additional protoc flags that will be added to the protoc
-// command by default. In google3, we need additional args to include the standard proto library
+// command by default. Internally, we need additional flags to include the standard proto library
 // which are installed by default for external users.
 var protocAdditionalFlags = func() []string {
 	return nil
