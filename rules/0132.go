@@ -91,7 +91,7 @@ func checkListRequestMessageParentField() lint.Rule {
 				parentField := m.Input().Fields().ByName("parent")
 				if parentField == nil {
 					problems = append(problems, lint.Problem{
-						Message:    fmt.Sprintf("method %q has no `parent` field", m.Name()),
+						Message:    fmt.Sprintf("method %q input %q has no `parent` field", m.Name(), m.Input().Name()),
 						Descriptor: m.Input(),
 					})
 					return problems, nil
