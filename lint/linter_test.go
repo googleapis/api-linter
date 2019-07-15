@@ -16,11 +16,11 @@ package lint
 
 import (
 	"fmt"
-	"google.golang.org/protobuf/proto"
 	"reflect"
 	"strings"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
