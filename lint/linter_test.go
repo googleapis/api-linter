@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -135,6 +136,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 
 		fd := new(descriptorpb.FileDescriptorProto)
 		fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
+		fd.Name = proto.String("test.proto")
 
 		l := New(r, []Config{{
 			IncludedPaths: []string{"**"},

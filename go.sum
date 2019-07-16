@@ -66,6 +66,8 @@ google.golang.org/protobuf v0.0.0-20190617175724-bd7b7a9e0c26/go.mod h1:+FOB8T5/
 google.golang.org/protobuf v0.0.0-20190620020611-d888139e7b59/go.mod h1:of3pt14Y+dOxz2tBOHXEoapPpKFC15/0zWhPAddkfsU=
 google.golang.org/protobuf v0.0.0-20190620205513-8c86fc5e7dbb h1:Rt6Lb4RxAELQU0uyIZTqVdj9179KaZdDvCEDkUdupHI=
 google.golang.org/protobuf v0.0.0-20190620205513-8c86fc5e7dbb/go.mod h1:yGm7aNHn9Bp1NIvj6+CVUkcJshu+Usshfd3A+YxEuI8=
+google.golang.org/protobuf v0.0.0-20190715184412-3d8e369c4e5f h1:CWLaSX+UXIJ6DJHhwzgUmwhSSzBFBnEvQ7vnFpcGLWc=
+google.golang.org/protobuf v0.0.0-20190715184412-3d8e369c4e5f/go.mod h1:yGm7aNHn9Bp1NIvj6+CVUkcJshu+Usshfd3A+YxEuI8=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=

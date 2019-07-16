@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/testutil"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -35,10 +36,15 @@ message Foo {
 		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
-	foo, err := reg.FindMessageByName("Foo")
+	fooDesc, err := reg.FindDescriptorByName("Foo")
 
 	if err != nil {
-		t.Fatalf("reg.FindMessageByName(%q) returned error %q; want nil", fooProto.GetName(), err)
+		t.Fatalf("reg.FindDescriptorByName(%q) returned error %q; want nil", fooProto.GetName(), err)
+	}
+
+	foo, ok := fooDesc.(protoreflect.MessageDescriptor)
+	if !ok {
+		t.Fatalf("reg.FindDescriptorByname(%q) returned a non-message descriptor: %+v", fooProto.GetName(), fooDesc)
 	}
 
 	if foo.Fields().Len() != 1 {
@@ -98,9 +104,13 @@ message Baz {
 		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
-	foo, err := reg.FindMessageByName("Foo")
+	fooDesc, err := reg.FindDescriptorByName("Foo")
 	if err != nil {
 		t.Fatalf("reg.FindMessageByName(%q) returned error %q; want nil", "Foo", err)
+	}
+	foo, ok := fooDesc.(protoreflect.MessageDescriptor)
+	if !ok {
+		t.Fatalf("reg.FindDescriptorByname(%q) returned a non-message descriptor: %+v", fooProto.GetName(), fooDesc)
 	}
 
 	if foo.Fields().Len() != 1 {
@@ -117,9 +127,13 @@ message Baz {
 		t.Fatalf("foo.Fields().Get(0).IsPlaceholder()=true; want false")
 	}
 
-	baz, err := reg.FindMessageByName("Baz")
+	bazDesc, err := reg.FindDescriptorByName("Baz")
 	if err != nil {
 		t.Fatalf("reg.FindMessageByName(%q) returned error %q; want nil", "Baz", err)
+	}
+	baz, ok := bazDesc.(protoreflect.MessageDescriptor)
+	if !ok {
+		t.Fatalf("reg.FindDescriptorByname(%q) returned a non-message descriptor: %+v", bazProto.GetName(), bazDesc)
 	}
 
 	if baz.Fields().Len() != 2 {
@@ -175,9 +189,13 @@ message Foo {
 		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
-	foo, err := reg.FindMessageByName("Foo")
+	fooDesc, err := reg.FindDescriptorByName("Foo")
 	if err != nil {
 		t.Fatalf("Failed to find Foo message: %s.", err)
+	}
+	foo, ok := fooDesc.(protoreflect.MessageDescriptor)
+	if !ok {
+		t.Fatalf("reg.FindDescriptorByname(%q) returned a non-message descriptor: %+v", fooProto.GetName(), fooDesc)
 	}
 
 	if foo.Fields().Len() != 1 {
