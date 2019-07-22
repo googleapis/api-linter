@@ -4,6 +4,7 @@ workflows:
   workflow:
     jobs:
       - format
+      - lint
       - build
 jobs:
   format:
@@ -14,6 +15,15 @@ jobs:
       - run:
           name: Check Format
           command: "! go fmt ./... 2>&1 | read"
+  lint:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - checkout
+      - run:
+          name: Lint code
+          command: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
+          command: golangci-lint run
   build:
     docker:
       - image: circleci/golang:1.12
