@@ -173,6 +173,9 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 	return s.findLocationByPath(getPath(d))
 }
 
+// DescriptorLocationOrFileStart returns a `Location` for the given descriptor. If there was an
+// error finding the location, it returns the start location of the file instead (that is,
+// line 1 column 1 as the Start and End Positions).
 func (s DescriptorSource) DescriptorLocationOrFileStart(d protoreflect.Descriptor) Location {
 	loc, err := s.DescriptorLocation(d)
 	if err != nil {
