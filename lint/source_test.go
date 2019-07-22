@@ -29,14 +29,6 @@ import (
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_rule_disable.protoset --proto_path=testdata testdata/test_rule_disable.proto
 
-type testDescriptorVisiting struct {
-	visit func(d protoreflect.Descriptor)
-}
-
-func (v testDescriptorVisiting) VisitDescriptor(d protoreflect.Descriptor) {
-	v.visit(d)
-}
-
 func TestDescriptorLocation(t *testing.T) {
 	req := readProtoFile(t, "test_source.protoset")
 	fileDesc := req.ProtoFile()
