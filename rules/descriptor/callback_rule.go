@@ -68,8 +68,7 @@ func (r *CallbackRule) Consume(d protoreflect.Descriptor) error {
 func (r *CallbackRule) addProblems(problems ...lint.Problem) {
 	for _, p := range problems {
 		if !p.Location.IsValid() {
-			loc, _ := r.source.DescriptorLocation(p.Descriptor)
-			p.Location = loc
+			p.Location = r.source.DescriptorLocationOrFileStart(p.Descriptor)
 		}
 		r.problems = append(r.problems, p)
 	}

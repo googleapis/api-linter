@@ -173,9 +173,20 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 	return s.findLocationByPath(getPath(d))
 }
 
+func (s DescriptorSource) DescriptorLocationOrFileStart(d protoreflect.Descriptor) Location {
+	loc, err := s.DescriptorLocation(d)
+	if err != nil {
+		return Location{
+			Start: Position{Line: 1, Column: 1},
+			End:   Position{Line: 1, Column: 1},
+		}
+	}
+	return loc
+}
+
 func getPath(d protoreflect.Descriptor) []int {
 	path := []int{}
-	for p := d; !isFileDescriptor(p); p = p.Parent() {
+	for p := d; p != nil && !isFileDescriptor(p); p = p.Parent() {
 		path = append(path, p.Index(), getDescriptorTag(p))
 	}
 	reverseInts(path)
