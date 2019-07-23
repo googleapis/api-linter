@@ -70,9 +70,9 @@ func buildLocPathMap(sci protoreflect.SourceLocations) map[locPath]*protoreflect
 
 	for i := 0; i < sci.Len(); i++ {
 		loc := sci.Get(i)
-		path := make([]int, len(loc.Path))
-		for k := range path {
-			path[k] = int(loc.Path[k])
+		path := make([]int, 0, len(loc.Path))
+		for _, v := range loc.Path {
+			path = append(path, int(v))
 		}
 		m[newLocPath(path...)] = &loc
 	}
