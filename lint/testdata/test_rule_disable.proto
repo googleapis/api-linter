@@ -7,7 +7,7 @@ syntax = "proto2";
 package api.linter.lint;
 
 // Outer
-// (-- api-linter: rule_disabled_in_message_leading_comment=disabled --)
+// api-linter: rule_disabled_in_message_leading_comment=disabled
 message Outer {
   optional string name = 1; // (-- api-linter: rule_disabled_in_field_trailing_comment=disabled --)
   optional string value = 2;
