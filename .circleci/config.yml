@@ -22,10 +22,10 @@ jobs:
       - checkout
       - run:
           name: Install golangci-lint
-          command: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+          command: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
       - run:
           name: Run golangci-lint
-          command: "! $HOME/go/bin/golangci-lint run ./... 2>&1 | read"
+          command: "! $(go env GOPATH)/bin/golangci-lint run ./... 2>&1 | read"
   build:
     docker:
       - image: circleci/golang:1.12
