@@ -79,7 +79,7 @@ func buildLocPathMap(sci protoreflect.SourceLocations) map[locPath]*protoreflect
 	return m
 }
 
-// DescriptorSource represents a map of locPath to *descriptorpb.SourceCodeInfo_Location.
+// DescriptorSource contains source locations and comments for descriptors.
 type DescriptorSource struct {
 	m map[locPath]*protoreflect.SourceLocation
 }
