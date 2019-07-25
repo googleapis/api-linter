@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var (
@@ -63,34 +62,35 @@ func newLocPath(p ...int) locPath {
 
 // buildLocPathMap creates a map of locPath to *descriptorpb.SourceCodeInfo_Location
 // from *descriptorpb.SourceCodeInfo.
-func buildLocPathMap(sci *descriptorpb.SourceCodeInfo) map[locPath]*descriptorpb.SourceCodeInfo_Location {
-	m := make(map[locPath]*descriptorpb.SourceCodeInfo_Location)
+func buildLocPathMap(sci protoreflect.SourceLocations) map[locPath]*protoreflect.SourceLocation {
+	m := make(map[locPath]*protoreflect.SourceLocation)
 	if sci == nil {
 		return m
 	}
 
-	for _, loc := range sci.GetLocation() {
-		var path []int
-		for _, v := range loc.GetPath() {
+	for i := 0; i < sci.Len(); i++ {
+		loc := sci.Get(i)
+		path := make([]int, 0, len(loc.Path))
+		for _, v := range loc.Path {
 			path = append(path, int(v))
 		}
-		m[newLocPath(path...)] = loc
+		m[newLocPath(path...)] = &loc
 	}
 	return m
 }
 
-// DescriptorSource represents a map of locPath to *descriptorpb.SourceCodeInfo_Location.
+// DescriptorSource contains source locations and comments for descriptors.
 type DescriptorSource struct {
-	m map[locPath]*descriptorpb.SourceCodeInfo_Location
+	m map[locPath]*protoreflect.SourceLocation
 }
 
-// newDescriptorSource creates a new DescriptorSource from a FileDescriptorProto.
+// newDescriptorSource creates a new DescriptorSource from a FileDescriptor.
 // If source code information is not available, returns (nil, ErrSourceInfoNotAvailable).
-func newDescriptorSource(f *descriptorpb.FileDescriptorProto) (DescriptorSource, error) {
-	if f.GetSourceCodeInfo() == nil {
+func newDescriptorSource(f protoreflect.FileDescriptor) (DescriptorSource, error) {
+	if f.SourceLocations() == nil {
 		return DescriptorSource{}, ErrSourceInfoNotAvailable
 	}
-	return DescriptorSource{m: buildLocPathMap(f.GetSourceCodeInfo())}, nil
+	return DescriptorSource{m: buildLocPathMap(f.SourceLocations())}, nil
 }
 
 // findLocationByPath returns a `Location` if found in the map,
@@ -100,7 +100,7 @@ func (s DescriptorSource) findLocationByPath(path []int) (Location, error) {
 	if l == nil {
 		return Location{}, ErrPathNotFound
 	}
-	return newLocationFromSpan(l.GetSpan())
+	return extractLocation(l), nil
 }
 
 // findCommentsByPath returns a `Comments` for the path. If not found, returns
@@ -111,40 +111,23 @@ func (s DescriptorSource) findCommentsByPath(path []int) (Comments, error) {
 		return Comments{}, ErrPathNotFound
 	}
 	return Comments{
-		LeadingComments:         l.GetLeadingComments(),
-		TrailingComments:        l.GetTrailingComments(),
-		LeadingDetachedComments: l.GetLeadingDetachedComments(),
+		LeadingComments:         l.LeadingComments,
+		TrailingComments:        l.TrailingComments,
+		LeadingDetachedComments: l.LeadingDetachedComments,
 	}, nil
 }
 
-func newLocationFromSpan(span []int32) (Location, error) {
-	if len(span) == 4 {
-		return Location{
-			Start: Position{
-				Line:   int(span[0]) + 1,
-				Column: int(span[1]) + 1,
-			},
-			End: Position{
-				Line:   int(span[2]) + 1,
-				Column: int(span[3]) + 1,
-			},
-		}, nil
+func extractLocation(loc *protoreflect.SourceLocation) Location {
+	return Location{
+		Start: Position{
+			Line:   loc.StartLine + 1,
+			Column: loc.StartColumn + 1,
+		},
+		End: Position{
+			Line:   loc.EndLine + 1,
+			Column: loc.EndColumn + 1,
+		},
 	}
-
-	if len(span) == 3 {
-		return Location{
-			Start: Position{
-				Line:   int(span[0]) + 1,
-				Column: int(span[1]) + 1,
-			},
-			End: Position{
-				Line:   int(span[0]) + 1,
-				Column: int(span[2]) + 1,
-			},
-		}, nil
-	}
-
-	return Location{}, fmt.Errorf("source: %v is not a valid span to create a Location", span)
 }
 
 // SyntaxLocation returns the location of the syntax definition.
