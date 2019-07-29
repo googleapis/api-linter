@@ -173,6 +173,8 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 	return s.findLocationByPath(getPath(d))
 }
 
+// DescriptorNameLocation returns a `Location` for the name of a given descriptor. If not found,
+// returns (nil, ErrPathNotFound).
 func (s DescriptorSource) DescriptorNameLocation(d protoreflect.Descriptor) (Location, error) {
 	return s.findLocationByPath(append(getPath(d), 1))
 }

@@ -330,7 +330,7 @@ enum MyEnum {
 	})
 
 	t.Run("rpcs", func(t *testing.T) {
-			svc := req.ProtoFile().Services().Get(0)
+		svc := req.ProtoFile().Services().Get(0)
 		for i := 0; i < svc.Methods().Len(); i++ {
 			rpc := svc.Methods().Get(i)
 			loc, err := req.DescriptorSource().DescriptorNameLocation(rpc)
@@ -377,21 +377,21 @@ enum MyEnum {
 }
 
 func TestMustGetTextAtLocation(t *testing.T) {
-	tests := []struct{
-		name string
+	tests := []struct {
+		name           string
 		source, result string
-		loc Location
+		loc            Location
 	}{
 		{
 			name: "simple 3 line test",
 			source: `foo
 bar
 baz`,
-result: "bar",
-loc: Location{
-	Start: Position{2, 1},
-	End: Position{2, 4},
-},
+			result: "bar",
+			loc: Location{
+				Start: Position{2, 1},
+				End:   Position{2, 4},
+			},
 		},
 		{
 			name: "multiline result",
@@ -405,7 +405,7 @@ qux`,
 ba`,
 			loc: Location{
 				Start: Position{2, 2},
-				End: Position{4, 3},
+				End:   Position{4, 3},
 			},
 		},
 	}
