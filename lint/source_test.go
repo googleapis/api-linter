@@ -408,6 +408,18 @@ ba`,
 				End:   Position{4, 3},
 			},
 		},
+		{
+			name: "text at end of file",
+			source: `foo
+bar
+baz
+qux`,
+			result: "qux",
+			loc: Location{
+				Start: Position{4, 1},
+				End: Position{4, 4},
+			},
+		},
 	}
 
 	for _, test := range tests {
