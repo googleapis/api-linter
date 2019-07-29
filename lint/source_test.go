@@ -15,6 +15,7 @@
 package lint
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -24,6 +25,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
+
+	"github.com/googleapis/api-linter/testutil"
 )
 
 //go:generate protoc --include_source_info --descriptor_set_out=testdata/test_source.protoset --proto_path=testdata testdata/test_source.proto
@@ -251,6 +254,196 @@ func TestIsRuleDisabled(t *testing.T) {
 			t.Errorf("isRuleDisabled(%s, %s): got %v, but wanted %v", test.rule, test.desc.FullName(), disabled, test.disabled)
 		}
 	}
+}
+
+func TestGetDescriptorName(t *testing.T) {
+	source := `
+syntax = "proto3";
+
+message FooMessage {
+  string foo = 1;
+}
+
+service FooService {
+  rpc GetFoo(FooMessage) returns (FooMessage);
+}
+
+enum MyEnum {
+  FOO = 0;
+}
+`
+	fd := testutil.MustCreateFileDescriptorProto(
+		t,
+		testutil.FileDescriptorSpec{
+			Filename: "test.proto",
+			Template: source,
+		})
+
+	req, err := NewProtoRequest(fd, nil)
+	if err != nil {
+		t.Fatalf("Error creating proto request: %s", err)
+	}
+
+	t.Run("messages", func(t *testing.T) {
+		for i := 0; i < req.ProtoFile().Messages().Len(); i++ {
+			msg := req.ProtoFile().Messages().Get(i)
+
+			loc, err := req.DescriptorSource().DescriptorNameLocation(msg)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(msg.Name()); got != want {
+				t.Fatalf("Got %q as message name; want %q", got, want)
+			}
+		}
+	})
+
+	t.Run("fields", func(t *testing.T) {
+		msg := req.ProtoFile().Messages().Get(0)
+		for i := 0; i < msg.Fields().Len(); i++ {
+			f := msg.Fields().Get(i)
+			loc, err := req.DescriptorSource().DescriptorNameLocation(f)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(f.Name()); got != want {
+				t.Fatalf("Got %q as field name; want %q", got, want)
+			}
+		}
+	})
+
+	t.Run("services", func(t *testing.T) {
+		for i := 0; i < req.ProtoFile().Services().Len(); i++ {
+			svc := req.ProtoFile().Services().Get(i)
+
+			loc, err := req.DescriptorSource().DescriptorNameLocation(svc)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(svc.Name()); got != want {
+				t.Fatalf("Got %q as service name; want %q", got, want)
+			}
+		}
+	})
+
+	t.Run("rpcs", func(t *testing.T) {
+			svc := req.ProtoFile().Services().Get(0)
+		for i := 0; i < svc.Methods().Len(); i++ {
+			rpc := svc.Methods().Get(i)
+			loc, err := req.DescriptorSource().DescriptorNameLocation(rpc)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(rpc.Name()); got != want {
+				t.Fatalf("Got %q as RPC name; want %q", got, want)
+			}
+		}
+	})
+
+	t.Run("enums", func(t *testing.T) {
+		for i := 0; i < req.ProtoFile().Enums().Len(); i++ {
+			enum := req.ProtoFile().Enums().Get(i)
+
+			loc, err := req.DescriptorSource().DescriptorNameLocation(enum)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(enum.Name()); got != want {
+				t.Fatalf("Got %q as enum name; want %q", got, want)
+			}
+		}
+	})
+
+	t.Run("enum values", func(t *testing.T) {
+		enum := req.ProtoFile().Enums().Get(0)
+		for i := 0; i < enum.Values().Len(); i++ {
+			val := enum.Values().Get(i)
+
+			loc, err := req.DescriptorSource().DescriptorNameLocation(val)
+			if err != nil {
+				t.Fatalf("Error finding location of descriptor name: %s", err)
+			}
+
+			if got, want := mustGetTextAtLocation(source, loc), string(val.Name()); got != want {
+				t.Fatalf("Got %q as enum value name; want %q", got, want)
+			}
+		}
+	})
+}
+
+func TestMustGetTextAtLocation(t *testing.T) {
+	tests := []struct{
+		name string
+		source, result string
+		loc Location
+	}{
+		{
+			name: "simple 3 line test",
+			source: `foo
+bar
+baz`,
+result: "bar",
+loc: Location{
+	Start: Position{2, 1},
+	End: Position{2, 4},
+},
+		},
+		{
+			name: "multiline result",
+			source: `foo
+bar
+
+baz
+qux`,
+			result: `ar
+
+ba`,
+			loc: Location{
+				Start: Position{2, 2},
+				End: Position{4, 3},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got, want := mustGetTextAtLocation(test.source, test.loc), test.result; got != want {
+				t.Fatalf("Got %q, but expecting %q for location %+v", got, want, test.loc)
+			}
+		})
+	}
+}
+
+// mustGetTextAtLocation returns the contents of source at location loc. If the location is not valid
+// or no text exists in source for the provided Location, panic.
+func mustGetTextAtLocation(source string, loc Location) string {
+	fmt.Printf("Getting text at %+v\n", loc)
+	if !loc.IsValid() {
+		panic("Invalid location provided")
+	}
+
+	var buf bytes.Buffer
+	line, col := 1, 1
+	for _, char := range source {
+		if line > loc.Start.Line || line == loc.Start.Line && col >= loc.Start.Column {
+			buf.WriteRune(char)
+		}
+		col += 1
+		if char == '\n' {
+			line += 1
+			col = 1
+		}
+		if line > loc.End.Line || (line == loc.End.Line && col >= loc.End.Column) {
+			return buf.String()
+		}
+	}
+
+	panic("Failed to find text at provided location")
 }
 
 func readProtoFile(t *testing.T, fileName string) Request {
