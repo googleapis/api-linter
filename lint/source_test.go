@@ -422,7 +422,6 @@ ba`,
 // mustGetTextAtLocation returns the contents of source at location loc. If the location is not valid
 // or no text exists in source for the provided Location, panic.
 func mustGetTextAtLocation(source string, loc Location) string {
-	fmt.Printf("Getting text at %+v\n", loc)
 	if !loc.IsValid() {
 		panic("Invalid location provided")
 	}
