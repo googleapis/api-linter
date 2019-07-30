@@ -444,9 +444,9 @@ func mustGetTextAtLocation(source string, loc Location) string {
 		if line > loc.Start.Line || line == loc.Start.Line && col >= loc.Start.Column {
 			buf.WriteRune(char)
 		}
-		col += 1
+		col++
 		if char == '\n' {
-			line += 1
+			line++
 			col = 1
 		}
 		if line > loc.End.Line || (line == loc.End.Line && col >= loc.End.Column) {
