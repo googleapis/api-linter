@@ -11,6 +11,6 @@ require (
 	golang.org/x/net v0.0.0-20190806135440-ca1201d0de80 // indirect
 	golang.org/x/sync v0.0.0-20190806142011-112230192c58 // indirect
 	golang.org/x/tools v0.0.0-20190806153100-35ef2682e516 // indirect
-	google.golang.org/protobuf v0.0.0-20190715184412-3d8e369c4e5f
+	google.golang.org/protobuf v0.0.0-20190806153346-52ec1759a437
 	gopkg.in/yaml.v2 v2.2.2
 )
