@@ -3,7 +3,7 @@ module github.com/googleapis/api-linter
 go 1.12
 
 require (
-	github.com/bmatcuk/doublestar v1.1.1
+	github.com/bmatcuk/doublestar v1.1.5
 	github.com/google/go-cmp v0.3.0
 	github.com/stoewer/go-strcase v1.0.2
 	github.com/stretchr/testify v1.3.0
