@@ -20,6 +20,8 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
+	"github.com/golang/protobuf/proto"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	p "google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -51,6 +53,50 @@ func checkGetRequestMessageName() lint.Rule {
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// message is named `GetFooRequest`.
+				methodName := string(m.Name())
+				requestMessageName := string(m.Input().Name())
+				correctRequestMessageName := methodName + "Request"
+				if requestMessageName != correctRequestMessageName {
+					problems = append(problems, lint.Problem{
+						Message: fmt.Sprintf(
+							"Get RPCs should have a request message named after the RPC, such as %q.",
+							correctRequestMessageName,
+						),
+						Suggestion: correctRequestMessageName,
+						Descriptor: m,
+					})
+				}
+
+				return problems, nil
+			},
+		},
+	}
+}
+
+// Get messages should have a properly named Request message.
+func checkGetURI() lint.Rule {
+	return &descriptor.CallbackRule{
+		RuleInfo: lint.RuleInfo{
+			Name:         lint.NewRuleName("core", "0131", "uri"),
+			Description:  "check that Get RPCs have an appropriate URI",
+			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#guidance",
+		},
+		Callback: descriptor.Callbacks{
+			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+				// We only care about Get methods for the purpose of this rule;
+				// ignore everything else.
+				if !isGetMethod(m) {
+					return
+				}
+
+				// Rule check: Establish that for methods such as `GetFoo`, the request
+				// URI uses HTTP GET.
+				httpRule, err := proto.GetExtension(
+					m.Options().(*proto.MethodOptions),
+					annotations.E_Http,
+				)
+				fmt.Printf("%v\n", httpRule)
 				methodName := string(m.Name())
 				requestMessageName := string(m.Input().Name())
 				correctRequestMessageName := methodName + "Request"

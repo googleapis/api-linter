@@ -49,7 +49,79 @@ func TestGetRequestMessageName(t *testing.T) {
 		errPrefix := "AIP-131 Request Name"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			t,
-			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
+			testutil.FileDescriptorSpec{
+				AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
+				Filename:             "test.proto",
+				Template:             tmpl,
+				Data:                 test,
+			}), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
+		resp, err := rule.Lint(req)
+		if err != nil {
+			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+		}
+
+		if got, want := len(resp), test.problemCount; got != want {
+			t.Errorf("%s: got %d problems, but want %d", errPrefix, got, want)
+		}
+
+		if len(resp) > 0 {
+			if got, want := resp[0].Suggestion, test.suggestion; got != want {
+				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
+			}
+			if got, want := resp[0].Location.Start.Line, test.startLine; got != want {
+				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
+			}
+		}
+	}
+}
+
+func TestGetURI(t *testing.T) {
+	tmpl := `
+	syntax = "proto3";
+
+	import "google/api/annotations.proto";
+
+	service Aip131 {
+		rpc GetBook(GetBookRequest) returns (Book) {
+			option (google.api.http) = {
+				{{ .Method }}: "/v1/{{ "{" }}{{ .VarName }}={{ .ResourceName }}}"
+			};
+		}
+	}
+
+	message GetBookRequest {
+		string name = 1;
+	}
+
+	message Book {}`
+
+	tests := []struct {
+		Method       string
+		VarName      string
+		ResourceName string
+		problemCount int
+		suggestion   string
+		startLine    int
+	}{
+		{"get", "name", "publishers/*/books/*", 0, "", -1},
+	}
+
+	rule := checkGetURI()
+
+	for _, test := range tests {
+		errPrefix := "AIP-131 RPC URI"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
+			testutil.FileDescriptorSpec{
+				AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
+				Filename:             "test.proto",
+				Template:             tmpl,
+				Data:                 test,
+			},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
