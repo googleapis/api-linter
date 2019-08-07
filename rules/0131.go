@@ -22,6 +22,7 @@ import (
 	"github.com/googleapis/api-linter/rules/descriptor"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	desc "google.golang.org/protobuf/types/descriptorpb"
 	p "google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -92,12 +93,16 @@ func checkGetURI() lint.Rule {
 
 				// Rule check: Establish that for methods such as `GetFoo`, the request
 				// URI uses HTTP GET.
+				opts := m.Options().(*desc.MethodOptions)
+				fmt.Printf("%v\n", opts)
 				httpRule, err := proto.GetExtension(
-					m.Options().(*proto.MethodOptions),
+					m.Options().(*desc.MethodOptions),
 					annotations.E_Http,
 				)
 				fmt.Printf("%v\n", httpRule)
 				methodName := string(m.Name())
+				fmt.Printf("%v\n", proto.WireStartGroup)
+				fmt.Printf("%v\n", annotations.E_Http)
 				requestMessageName := string(m.Input().Name())
 				correctRequestMessageName := methodName + "Request"
 				if requestMessageName != correctRequestMessageName {
