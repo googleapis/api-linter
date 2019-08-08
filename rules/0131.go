@@ -20,9 +20,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
-	"github.com/golang/protobuf/proto"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"github.com/googleapis/api-linter/rules/ruleutil"
 	p "google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -93,30 +91,26 @@ func checkGetURI() lint.Rule {
 					return
 				}
 
-				// Get the HTTP annotation value.
-				var httpRule *annotations.HttpRule
-				opts := m.Options().(*dpb.MethodOptions)
-				if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
-					httpRule = x.(*annotations.HttpRule)
-				}
+				// Iterate over the HTTP rules.
+				for _, httpRule := range ruleutil.GetHTTPRules(m) {
+					// Rule check: Ensure that the GET HTTP verb is used.
+					getURI := httpRule.GetGet()
+					if getURI == "" {
+						problems = append(problems, lint.Problem{
+							Message:    "Get RPCs should use the GET HTTP verb.",
+							Descriptor: m,
+						})
+						return problems, nil
+					}
 
-				// Rule check: Ensure that the GET HTTP verb is used.
-				getURI := httpRule.GetGet()
-				if getURI == "" {
-					problems = append(problems, lint.Problem{
-						Message: "Get RPCs should use the GET HTTP verb.",
-						Descriptor: m,
-					})
-					return problems, nil
-				}
-
-				// Rule check: Ensure that the name variable is included in the URI,
-				// and encompasses the entire resource name.
-				if !regexp.MustCompile("\\{name=[a-zA-Z/*]+\\}$").MatchString(getURI) {
-					problems = append(problems, lint.Problem{
-						Message: "Get RPCs should include the `name` field in the URI. Example: /v1/{name=publishers/*/books/*}",
-						Descriptor: m,
-					})
+					// Rule check: Ensure that the name variable is included in the URI,
+					// and encompasses the entire resource name.
+					if !regexp.MustCompile("\\{name=[a-zA-Z/*]+\\}$").MatchString(getURI) {
+						problems = append(problems, lint.Problem{
+							Message:    "Get RPCs should include the `name` field in the URI. Example: /v1/{name=publishers/*/books/*}",
+							Descriptor: m,
+						})
+					}
 				}
 
 				return problems, nil
@@ -142,19 +136,14 @@ func checkGetBody() lint.Rule {
 					return
 				}
 
-				// Get the HTTP annotation value.
-				var httpRule *annotations.HttpRule
-				opts := m.Options().(*dpb.MethodOptions)
-				if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
-					httpRule = x.(*annotations.HttpRule)
-				}
-
 				// Rule check: Ensure that there is no HTTP body.
-				if httpRule.GetBody() != "" {
-					problems = append(problems, lint.Problem{
-						Message: "Get RPCs should not have an HTTP body. Ensure the `body` key in the google.api.http annotation is absent.",
-						Descriptor: m,
-					})
+				for _, httpRule := range ruleutil.GetHTTPRules(m) {
+					if httpRule.GetBody() != "" {
+						problems = append(problems, lint.Problem{
+							Message:    "Get RPCs should not have an HTTP body. Ensure the `body` key in the google.api.http annotation is absent.",
+							Descriptor: m,
+						})
+					}
 				}
 
 				return problems, nil

@@ -89,6 +89,7 @@ func TestGetURI(t *testing.T) {
 		rpc GetBook(GetBookRequest) returns (Book) {
 			option (google.api.http) = {
 				{{ .Method }}: "{{ .URI }}"
+				{{ .AdditionalBindings }}
 			};
 		}
 	}
@@ -100,18 +101,21 @@ func TestGetURI(t *testing.T) {
 	message Book {}`
 
 	tests := []struct {
-		Method       string
-		URI string
-		problemCount int
-		suggestion   string
-		startLine    int
+		Method             string
+		URI                string
+		AdditionalBindings string
+		problemCount       int
+		suggestion         string
+		startLine          int
 	}{
-		{"get", "/v1/{name=publishers/*/books/*}", 0, "", -1},
-		{"post", "/v1/{name=publishers/*/books/*}", 1, "", 7},
-		{"get", "/v1/publishers/*/books/*", 1, "", 7},
-		{"get", "/v1/publishers/{publisher_id}/books/{book_id}", 1, "", 7},
-		{"get", "/v1/publishers/{publisher=*}/books/{book=*}", 1, "", 7},
-		{"get", "/v1/{name=publishers/*/books/*}/somethingElse", 1, "", 7},
+		{"get", "/v1/{name=publishers/*/books/*}", "", 0, "", -1},
+		{"get", "/v1/{name=publishers/*/books/*}", "additional_bindings: { get: \"/v1/{name=authors/*/books/*}\" }", 0, "", -1},
+		{"post", "/v1/{name=publishers/*/books/*}", "", 1, "", 7},
+		{"get", "/v1/publishers/*/books/*", "", 1, "", 7},
+		{"get", "/v1/publishers/{publisher_id}/books/{book_id}", "", 1, "", 7},
+		{"get", "/v1/publishers/{publisher=*}/books/{book=*}", "", 1, "", 7},
+		{"get", "/v1/{name=publishers/*/books/*}/somethingElse", "", 1, "", 7},
+		{"get", "/v1/{name=publishers/*/books/*}", "additional_bindings: { get: \"/v1/authors/*/books/*\" }", 1, "", 7},
 	}
 
 	rule := checkGetURI()
@@ -173,7 +177,7 @@ func TestGetBody(t *testing.T) {
 	message Book {}`
 
 	tests := []struct {
-		Body string
+		Body         string
 		problemCount int
 		suggestion   string
 		startLine    int
@@ -218,7 +222,6 @@ func TestGetBody(t *testing.T) {
 		}
 	}
 }
-
 
 func TestGetRequestMessageNameField(t *testing.T) {
 	tmpl := `syntax = "proto3";
