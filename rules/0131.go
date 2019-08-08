@@ -131,19 +131,19 @@ func checkGetRequestMessageNameField() lint.Rule {
 			URI:          "https://aip.dev/131#request-message",
 		},
 		Callback: descriptor.Callbacks{
-			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+			MessageCallback: func(m p.MessageDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				if !isGetMethod(m) {
+				if !isGetRequestMessage(m) {
 					return
 				}
 
 				// Rule check: Establish that a name field is present.
-				nameField := m.Input().Fields().ByName("name")
+				nameField := m.Fields().ByName("name")
 				if nameField == nil {
 					problems = append(problems, lint.Problem{
 						Message:    fmt.Sprintf("method %q has no `name` field", m.Name()),
-						Descriptor: m.Input(),
+						Descriptor: m,
 					})
 					return problems, nil
 				}
@@ -172,10 +172,10 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 			URI:          "https://aip.dev/131#request-message",
 		},
 		Callback: descriptor.Callbacks{
-			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+			MessageCallback: func(m p.MessageDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about Get methods for the purpose of this rule;
 				// ignore everything else.
-				if !isGetMethod(m) {
+				if !isGetRequestMessage(m) {
 					return
 				}
 
@@ -185,7 +185,7 @@ func checkGetRequestMessageUnknownFields() lint.Rule {
 					"read_mask": {}, // AIP-157
 					"view":      {}, // AIP-157
 				}
-				fields := m.Input().Fields()
+				fields := m.Fields()
 				for i := 0; i < fields.Len(); i++ {
 					field := fields.Get(i)
 					if _, ok := allowedFields[string(field.Name())]; !ok {
@@ -249,5 +249,10 @@ func isGetMethod(m p.MethodDescriptor) bool {
 	if methodName == "GetIamPolicy" {
 		return false
 	}
-	return regexp.MustCompile("^Get(?:[A-Z]|$)").MatchString(string(m.Name()))
+	return regexp.MustCompile("^Get(?:[A-Z]|$)").MatchString(methodName)
+}
+
+// Return true if this is an AIP-131 Get request message, false otherwise.
+func isGetRequestMessage(m p.MessageDescriptor) bool {
+	return regexp.MustCompile("^Get[A-Za-z0-9]*Request$").MatchString(string(m.Name()))
 }
