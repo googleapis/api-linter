@@ -88,7 +88,7 @@ func TestGetURI(t *testing.T) {
 	service Aip131 {
 		rpc GetBook(GetBookRequest) returns (Book) {
 			option (google.api.http) = {
-				{{ .Method }}: "/v1/{{ "{" }}{{ .VarName }}={{ .ResourceName }}}"
+				{{ .Method }}: "{{ .URI }}"
 			};
 		}
 	}
@@ -101,13 +101,17 @@ func TestGetURI(t *testing.T) {
 
 	tests := []struct {
 		Method       string
-		VarName      string
-		ResourceName string
+		URI string
 		problemCount int
 		suggestion   string
 		startLine    int
 	}{
-		{"get", "name", "publishers/*/books/*", 0, "", -1},
+		{"get", "/v1/{name=publishers/*/books/*}", 0, "", -1},
+		{"post", "/v1/{name=publishers/*/books/*}", 1, "", 7},
+		{"get", "/v1/publishers/*/books/*", 1, "", 7},
+		{"get", "/v1/publishers/{publisher_id}/books/{book_id}", 1, "", 7},
+		{"get", "/v1/publishers/{publisher=*}/books/{book=*}", 1, "", 7},
+		{"get", "/v1/{name=publishers/*/books/*}/somethingElse", 1, "", 7},
 	}
 
 	rule := checkGetURI()
@@ -146,6 +150,75 @@ func TestGetURI(t *testing.T) {
 		}
 	}
 }
+
+func TestGetBody(t *testing.T) {
+	tmpl := `
+	syntax = "proto3";
+
+	import "google/api/annotations.proto";
+
+	service Aip131 {
+		rpc GetBook(GetBookRequest) returns (Book) {
+			option (google.api.http) = {
+				get: "/v1/{name=publishers/*/books/*}"
+				{{ .Body }}
+			};
+		}
+	}
+
+	message GetBookRequest {
+		string name = 1;
+	}
+
+	message Book {}`
+
+	tests := []struct {
+		Body string
+		problemCount int
+		suggestion   string
+		startLine    int
+	}{
+		{"", 0, "", -1},
+		{"body: \"*\"", 1, "", 7},
+	}
+
+	rule := checkGetBody()
+
+	for _, test := range tests {
+		errPrefix := "AIP-131 RPC Body"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
+			testutil.FileDescriptorSpec{
+				AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
+				Filename:             "test.proto",
+				Template:             tmpl,
+				Data:                 test,
+			},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
+		resp, err := rule.Lint(req)
+		if err != nil {
+			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+		}
+
+		if got, want := len(resp), test.problemCount; got != want {
+			t.Errorf("%s: got %d problems, but want %d", errPrefix, got, want)
+		}
+
+		if len(resp) > 0 {
+			if got, want := resp[0].Suggestion, test.suggestion; got != want {
+				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
+			}
+			if got, want := resp[0].Location.Start.Line, test.startLine; got != want {
+				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
+			}
+		}
+	}
+}
+
 
 func TestGetRequestMessageNameField(t *testing.T) {
 	tmpl := `syntax = "proto3";

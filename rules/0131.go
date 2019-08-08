@@ -32,6 +32,8 @@ func init() {
 		checkGetRequestMessageNameField(),
 		checkGetRequestMessageUnknownFields(),
 		checkGetResponseMessageName(),
+		checkGetURI(),
+		checkGetBody(),
 	)
 }
 
@@ -74,7 +76,7 @@ func checkGetRequestMessageName() lint.Rule {
 	}
 }
 
-// Get messages should have a properly named Request message.
+// Get messages should have an appropriate (google.api.http).get URI.
 func checkGetURI() lint.Rule {
 	return &descriptor.CallbackRule{
 		RuleInfo: lint.RuleInfo{
@@ -91,26 +93,66 @@ func checkGetURI() lint.Rule {
 					return
 				}
 
-				// Rule check: Establish that for methods such as `GetFoo`, the request
-				// URI uses HTTP GET.
+				// Get the HTTP annotation value.
+				var httpRule *annotations.HttpRule
 				opts := m.Options().(*dpb.MethodOptions)
-				httpRule, err := proto.GetExtension(
-					opts,
-					annotations.E_Http,
-				)
-				fmt.Printf("%v\n", httpRule)
-				methodName := string(m.Name())
-				fmt.Printf("%v\n", proto.WireStartGroup)
-				fmt.Printf("%v\n", annotations.E_Http)
-				requestMessageName := string(m.Input().Name())
-				correctRequestMessageName := methodName + "Request"
-				if requestMessageName != correctRequestMessageName {
+				if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
+					httpRule = x.(*annotations.HttpRule)
+				}
+
+				// Rule check: Ensure that the GET HTTP verb is used.
+				getURI := httpRule.GetGet()
+				if getURI == "" {
 					problems = append(problems, lint.Problem{
-						Message: fmt.Sprintf(
-							"Get RPCs should have a request message named after the RPC, such as %q.",
-							correctRequestMessageName,
-						),
-						Suggestion: correctRequestMessageName,
+						Message: "Get RPCs should use the GET HTTP verb.",
+						Descriptor: m,
+					})
+					return problems, nil
+				}
+
+				// Rule check: Ensure that the name variable is included in the URI,
+				// and encompasses the entire resource name.
+				if !regexp.MustCompile("\\{name=[a-zA-Z/*]+\\}$").MatchString(getURI) {
+					problems = append(problems, lint.Problem{
+						Message: "Get RPCs should include the `name` field in the URI. Example: /v1/{name=publishers/*/books/*}",
+						Descriptor: m,
+					})
+				}
+
+				return problems, nil
+			},
+		},
+	}
+}
+
+// Get messages should not have an HTTP body.
+func checkGetBody() lint.Rule {
+	return &descriptor.CallbackRule{
+		RuleInfo: lint.RuleInfo{
+			Name:         lint.NewRuleName("core", "0131", "body"),
+			Description:  "check that Get RPCs have no HTTP body",
+			RequestTypes: []lint.RequestType{lint.ProtoRequest},
+			URI:          "https://aip.dev/131#guidance",
+		},
+		Callback: descriptor.Callbacks{
+			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+				// We only care about Get methods for the purpose of this rule;
+				// ignore everything else.
+				if !isGetMethod(m) {
+					return
+				}
+
+				// Get the HTTP annotation value.
+				var httpRule *annotations.HttpRule
+				opts := m.Options().(*dpb.MethodOptions)
+				if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
+					httpRule = x.(*annotations.HttpRule)
+				}
+
+				// Rule check: Ensure that there is no HTTP body.
+				if httpRule.GetBody() != "" {
+					problems = append(problems, lint.Problem{
+						Message: "Get RPCs should not have an HTTP body. Ensure the `body` key in the google.api.http annotation is absent.",
 						Descriptor: m,
 					})
 				}
