@@ -80,19 +80,19 @@ func checkListRequestMessageParentField() lint.Rule {
 			URI:          "https://aip.dev/132#request-message",
 		},
 		Callback: descriptor.Callbacks{
-			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+			MessageCallback: func(m p.MessageDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				if !isListMethod(m) {
+				if !isListRequestMessage(m) {
 					return
 				}
 
 				// Rule check: Establish that a `parent` field is present.
-				parentField := m.Input().Fields().ByName("parent")
+				parentField := m.Fields().ByName("parent")
 				if parentField == nil {
 					problems = append(problems, lint.Problem{
-						Message:    fmt.Sprintf("method %q has no `parent` field", m.Name()),
-						Descriptor: m.Input(),
+						Message:    fmt.Sprintf("Message %q has no `parent` field", m.Name()),
+						Descriptor: m,
 					})
 					return problems, nil
 				}
@@ -121,10 +121,10 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 			URI:          "https://aip.dev/132#request-message",
 		},
 		Callback: descriptor.Callbacks{
-			MethodCallback: func(m p.MethodDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
+			MessageCallback: func(m p.MessageDescriptor, s lint.DescriptorSource) (problems []lint.Problem, err error) {
 				// We only care about List- methods for the purpose of this rule;
 				// ignore everything else.
-				if !isListMethod(m) {
+				if !isListRequestMessage(m) {
 					return
 				}
 
@@ -140,7 +140,7 @@ func checkListRequestMessageUnknownFields() lint.Rule {
 					"read_mask":    {}, // AIP-157
 					"view":         {}, // AIP-157
 				}
-				fields := m.Input().Fields()
+				fields := m.Fields()
 				for i := 0; i < fields.Len(); i++ {
 					field := fields.Get(i)
 					if _, ok := allowedFields[string(field.Name())]; !ok {
@@ -195,7 +195,12 @@ func checkListResponseMessageName() lint.Rule {
 	}
 }
 
-// Return true if this is a List method, false otherwise.
+// Return true if this is an AIP-132 List method, false otherwise.
 func isListMethod(m p.MethodDescriptor) bool {
 	return regexp.MustCompile("^List(?:[A-Z]|$)").MatchString(string(m.Name()))
+}
+
+// Return true if this is an AIP-132 List request message, false otherwise.
+func isListRequestMessage(m p.MessageDescriptor) bool {
+	return regexp.MustCompile("^List[A-Za-z0-9]*Request$").MatchString(string(m.Name()))
 }
