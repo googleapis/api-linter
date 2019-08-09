@@ -20,7 +20,6 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/descriptor"
-	"github.com/googleapis/api-linter/rules/ruleutil"
 	p "google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -92,7 +91,7 @@ func checkGetURI() lint.Rule {
 				}
 
 				// Iterate over the HTTP rules.
-				for _, httpRule := range ruleutil.GetHTTPRules(m) {
+				for _, httpRule := range getHTTPRules(m) {
 					// Rule check: Ensure that the GET HTTP verb is used.
 					getURI := httpRule.GetGet()
 					if getURI == "" {
@@ -137,7 +136,7 @@ func checkGetBody() lint.Rule {
 				}
 
 				// Rule check: Ensure that there is no HTTP body.
-				for _, httpRule := range ruleutil.GetHTTPRules(m) {
+				for _, httpRule := range getHTTPRules(m) {
 					if httpRule.GetBody() != "" {
 						problems = append(problems, lint.Problem{
 							Message:    "Get RPCs should not have an HTTP body. Ensure the `body` key in the google.api.http annotation is absent.",

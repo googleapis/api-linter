@@ -30,10 +30,10 @@ message Foo {
 		Deps: []*descriptorpb.FileDescriptorProto{barProto},
 	})
 
-	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto})
+	reg, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto})
 
 	if err != nil {
-		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
 	fooDesc, err := reg.FindDescriptorByName("Foo")
@@ -99,9 +99,9 @@ message Baz {
 		Deps: []*descriptorpb.FileDescriptorProto{barProto, fooProto},
 	})
 
-	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto, bazProto})
+	reg, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto, barProto, bazProto})
 	if err != nil {
-		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
 	fooDesc, err := reg.FindDescriptorByName("Foo")
@@ -183,10 +183,10 @@ message Foo {
 		Deps: []*descriptorpb.FileDescriptorProto{barProto},
 	})
 
-	reg, err := makeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
+	reg, err := MakeRegistryFromAllFiles([]*descriptorpb.FileDescriptorProto{fooProto})
 
 	if err != nil {
-		t.Fatalf("makeRegistryFromAllFiles() returned error %q; want nil", err)
+		t.Fatalf("MakeRegistryFromAllFiles() returned error %q; want nil", err)
 	}
 
 	fooDesc, err := reg.FindDescriptorByName("Foo")

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ruleutil
+package rules
 
 import (
 	"github.com/golang/protobuf/proto"
@@ -27,13 +27,18 @@ import (
 // and then flattens the values in `additional_bindings`. This allows
 // rule authors to simply range over all of the HTTP rules, since we almost
 // always want to apply the same checks to all of them.
-func GetHTTPRules(m p.MethodDescriptor) (rules []*annotations.HttpRule) {
+func getHTTPRules(m p.MethodDescriptor) (rules []*annotations.HttpRule) {
 	var httpRule *annotations.HttpRule
 	opts := m.Options().(*descriptorpb.MethodOptions)
+
+	// Get the "primary" rule (the direct google.api.http extension).
 	if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
 		httpRule = x.(*annotations.HttpRule)
 		rules = append(rules, httpRule)
 	}
+
+	// Iterate over any additional bindings and flatten them into the `rules`
+	// array.
 	for _, additionalBinding := range httpRule.GetAdditionalBindings() {
 		rules = append(rules, additionalBinding)
 	}

@@ -44,7 +44,7 @@ func New(rules Rules, configs Configs) *Linter {
 // for any imported file must be present in files. If any file in files has an import that is not also in the
 // slice, an error will be returned.
 func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
-	reg, err := makeRegistryFromAllFiles(files)
+	reg, err := MakeRegistryFromAllFiles(files)
 
 	if err != nil {
 		return nil, err
