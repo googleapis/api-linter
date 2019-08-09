@@ -219,7 +219,7 @@ func TestCreateResponseMessageName(t *testing.T) {
 		startLine    int
 	}{
 		{"Foo", 0, "", -1},
-		{"Operation", 0, "", -1},
+		{"Operation", 1, "Foo", 5},
 		{"CreateFooResponse", 1, "Foo", 5},
 	}
 
@@ -230,6 +230,69 @@ func TestCreateResponseMessageName(t *testing.T) {
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			t,
 			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
+		), nil)
+		if err != nil {
+			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
+		}
+
+		resp, err := rule.Lint(req)
+		if err != nil {
+			t.Errorf("%s: lint.Run return error %v", errPrefix, err)
+		}
+
+		if got, want := len(resp), test.problemCount; got != want {
+			t.Errorf("%s: got %d problems, but want %d", errPrefix, got, want)
+		}
+
+		if len(resp) > 0 {
+			if got, want := resp[0].Suggestion, test.suggestion; got != want {
+				t.Errorf("%s: got suggestion '%s', but want '%s'", errPrefix, got, want)
+			}
+			if got, want := resp[0].Location.Start.Line, test.startLine; got != want {
+				t.Errorf("%s: got location starting with %d, but want %d", errPrefix, got, want)
+			}
+		}
+	}
+}
+
+func TestCreateResponseMessageNameLRO(t *testing.T) {
+	tmpl := `
+	syntax = "proto3";
+
+	import "google/longrunning/operations.proto";
+
+	service Aip133 {
+		rpc CreateFoo(CreateFooRequest) returns (google.longrunning.Operation);
+	}
+
+	message CreateFooRequest {
+		string parent = 1;
+		Foo foo = 2;
+	}
+
+	message Foo {}
+	`
+
+	tests := []struct {
+		problemCount int
+		suggestion   string
+		startLine    int
+	}{
+		{0, "", -1},
+	}
+
+	rule := checkCreateResponseMessageName()
+
+	for _, test := range tests {
+		errPrefix := "AIP-133 Response Message Name LRO"
+		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
+			t,
+			testutil.FileDescriptorSpec{
+				AdditionalProtoPaths: []string{testdatadir("api-common-protos")},
+				Filename:             "test.proto",
+				Template:             tmpl,
+				Data:                 test,
+			},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)

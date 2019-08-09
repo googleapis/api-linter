@@ -191,13 +191,13 @@ func checkCreateResponseMessageName() lint.Rule {
 
 				// Sanity check: If the response type is an LRO, accept this.
 				// TODO: Check the response type annotation.
-				responseMessageName := string(m.Output().Name())
-				if responseMessageName == "Operation" {
+				if string(m.Output().FullName()) == "google.longrunning.Operation" {
 					return problems, nil
 				}
 
 				// Rule check: Establish that for methods such as `CreateFoo`, the response
 				// message is named `Foo`.
+				responseMessageName := string(m.Output().Name())
 				methodName := string(m.Name())
 				if correctResponseMessageName := methodName[6:]; correctResponseMessageName != responseMessageName {
 					problems = append(problems, lint.Problem{
@@ -216,12 +216,15 @@ func checkCreateResponseMessageName() lint.Rule {
 	}
 }
 
+var createMethodRegexp = regexp.MustCompile("^Create(?:[A-Z]|$)")
+var createRequestMessageRegexp = regexp.MustCompile("^Create[A-Za-z0-9]+Request$")
+
 // Return true if this is a AIP-133 Create method, false otherwise.
 func isCreateMethod(m p.MethodDescriptor) bool {
-	return regexp.MustCompile("^Create(?:[A-Z]|$)").MatchString(string(m.Name()))
+	return createMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Return true if this is an AIP-133 Create request message, false otherwise.
 func isCreateRequestMessage(m p.MessageDescriptor) bool {
-	return regexp.MustCompile("^Create[A-Za-z0-9]+Request$").MatchString(string(m.Name()))
+	return createRequestMessageRegexp.MatchString(string(m.Name()))
 }
