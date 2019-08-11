@@ -96,7 +96,7 @@ func checkGetURI() lint.Rule {
 					getURI := httpRule.GetGet()
 					if getURI == "" {
 						problems = append(problems, lint.Problem{
-							Message:    "Get RPCs should use the GET HTTP verb.",
+							Message:    "Get RPCs must use the GET HTTP verb.",
 							Descriptor: m,
 						})
 						return problems, nil
