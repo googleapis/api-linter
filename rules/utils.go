@@ -21,7 +21,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-// GetHTTPRules returns a array of HTTP rules for a given method descriptor.
+// getHTTPRules returns a array of HTTP rules for a given method descriptor.
 //
 // Note: This returns an array -- it takes the google.api.http annotation,
 // and then flattens the values in `additional_bindings`. This allows
