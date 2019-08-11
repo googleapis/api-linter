@@ -142,7 +142,7 @@ func checkCreateRequestMessageUnknownFields() lint.Rule {
 				}
 
 				// Determine the name of the resource being created.
-				resource := regexp.MustCompile("^Create([A-Za-z0-9]+)Request$").FindStringSubmatch(string(m.Name()))[1]
+				resource := createRequestMessageRegexp.FindStringSubmatch(string(m.Name()))[1]
 				resourceSnake := strcase.SnakeCase(resource)
 
 				// Rule check: Establish that there are no unexpected fields.
