@@ -217,7 +217,7 @@ func checkCreateResponseMessageName() lint.Rule {
 }
 
 var createMethodRegexp = regexp.MustCompile("^Create(?:[A-Z]|$)")
-var createRequestMessageRegexp = regexp.MustCompile("^Create[A-Za-z0-9]+Request$")
+var createRequestMessageRegexp = regexp.MustCompile("^Create([A-Za-z0-9]+)Request$")
 
 // Return true if this is a AIP-133 Create method, false otherwise.
 func isCreateMethod(m p.MethodDescriptor) bool {

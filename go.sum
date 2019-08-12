@@ -1,6 +1,7 @@
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bmatcuk/doublestar v1.1.1 h1:YroD6BJCZBYx06yYFEWvUuKVWQn3vLLQAVmDmvTSaiQ=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
+github.com/bmatcuk/doublestar v1.1.5 h1:2bNwBOmhyFEFcoB3tGvTD5xanq+4kyOZlB8wFYbMjkk=
 github.com/bmatcuk/doublestar v1.1.5/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -88,6 +89,7 @@ google.golang.org/protobuf v0.0.0-20190715184412-3d8e369c4e5f/go.mod h1:yGm7aNHn
 google.golang.org/protobuf v0.0.0-20190717230113-f647c82cc3c7/go.mod h1:yGm7aNHn9Bp1NIvj6+CVUkcJshu+Usshfd3A+YxEuI8=
 google.golang.org/protobuf v0.0.0-20190806153346-52ec1759a437/go.mod h1:tz+apeFTZNtTi+/OLFgttE1oRPO3IRqTEDRM2e5DQpU=
 google.golang.org/protobuf v0.0.0-20190808020513-bab3d4084ecc/go.mod h1:tz+apeFTZNtTi+/OLFgttE1oRPO3IRqTEDRM2e5DQpU=
+google.golang.org/protobuf v0.0.0-20190808190341-92f76189a39a h1:11MYv7fbGaIWSNlNXbDAZAvVTfQRaIO57IAoPUHBnuI=
 google.golang.org/protobuf v0.0.0-20190808190341-92f76189a39a/go.mod h1:tRqhEyKwbKqwt5CQZAuOtj09RfhLNklDOhndhYA9blU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
