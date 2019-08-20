@@ -16,9 +16,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/urfave/cli"
@@ -61,10 +59,6 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					Name:  "proto_path",
 					Value: ".",
 					Usage: "the directory in which for protoc to search for imports",
-				},
-				cli.BoolTFlag{
-					Name:	"summary",
-					Usage: "Outputs a summary of how many violations were found",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -111,31 +105,17 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				case "json":
 					marshal = json.Marshal
 				}
-				b, err := marshal(lintResponses)
-				if err != nil {
-					return err
-				}
-				if _, err = w.Write(b); err != nil {
-					return err
-				}
 
-				if c.BoolT("summary") {
-					summary, longestRuleLen := createSummary(lintResponses)
-					colOneFormat, colTwoFormat := "%-"+strconv.Itoa(max(longestRuleLen+5, 25))+"s", "%25s"
-					w.WriteString("\n----------SUMMARY TABLE---------\n")
-					w.WriteString(fmt.Sprintf(colOneFormat,
-						fmt.Sprintf("Linted %d proto files.", len(lintResponses))) + "\n")
-					w.WriteString(fmt.Sprintf(colOneFormat, "Rule") +
-						fmt.Sprintf(colTwoFormat, "Violations (Percent)") + "\n")
-
-					for rule_id, numViolations := range summary {
-						w.WriteString(fmt.Sprintf(colOneFormat, string(rule_id)) +
-							fmt.Sprintf(colTwoFormat,
-								fmt.Sprintf("%d (%.2f%%)",
-									numViolations, float64(numViolations)/float64(len(lintResponses)) * 100,
-								),
-							) + "\n",
-						)
+				if c.String("fmt") == "summary" {
+					summary := createSummary(lintResponses)
+					emitSummary(&summary, w)
+				} else {
+					b, err := marshal(lintResponses)
+					if err != nil {
+						return err
+					}
+					if _, err = w.Write(b); err != nil {
+						return err
 					}
 				}
 				return nil

@@ -12,12 +12,11 @@ func TestSummaryCli(t *testing.T) {
 	tests := []struct {
 		name	string
 		data	[]lint.Response
-		wantSummary	map[string]int
-		wantLongestRuleLen int
+		wantSummary	*LintSummary
 	}{{
 		name: "Empty input",
 		data: []lint.Response{},
-		wantSummary: make(map[string]int),
+		wantSummary: &LintSummary{violationData: make(map[string]map[string]bool)},
 	},
 	{
 		name: "Example with a couple of responses",
@@ -48,20 +47,39 @@ func TestSummaryCli(t *testing.T) {
 					{RuleID: "core::0132::response_message::name"},
 				},
 		}},
-		wantSummary: map[string]int{
-			"core::0131::request_message::name": 1,
-			"core::0132::response_message::name": 2,
-			"core::naming_formats::field_names": 3,
+		wantSummary: &LintSummary{
+			violationData: map[string]map[string]bool{
+				"core::0131::request_message::name": map[string]bool{"example2.proto": true},
+				"core::0132::response_message::name": map[string]bool{
+					"example2.proto": true,
+					"example4.proto": true,
+				},
+				"core::naming_formats::field_names": map[string]bool{
+					"example.proto": true,
+					"example3.proto": true,
+					"example4.proto": true,
+				},
+
+			},
+			longestRuleLen: len("core::0132::response_message::name"),
+			numSourceFiles: 4,
 		},
-		wantLongestRuleLen: 34,
+		//	map[string]int{
+		//	"core::0131::request_message::name": 1,
+		//	"core::0132::response_message::name": 2,
+		//	"core::naming_formats::field_names": 3,
+		//},
 	}}
 	for _, test := range tests {
-		gotSummary, gotLongestRuleLen := createSummary(test.data)
-		if !reflect.DeepEqual(gotSummary, test.wantSummary) {
-			t.Errorf("Incorrect Summary Output: \nGot: %#v\n Want: %#v", gotSummary, test.wantSummary)
+		gotSummary := createSummary(test.data)
+		if !reflect.DeepEqual(gotSummary.violationData, test.wantSummary.violationData) {
+			t.Errorf("Incorrect violation data:\nGot: %#v\n Want: %#v", gotSummary.violationData, test.wantSummary.violationData)
 		}
-		if gotLongestRuleLen != test.wantLongestRuleLen {
-			t.Errorf("Incorrect")
+		if gotSummary.longestRuleLen != test.wantSummary.longestRuleLen {
+			t.Errorf("Incorrect longest rule length:\nGot: %d want: %d", gotSummary.longestRuleLen, test.wantSummary.longestRuleLen)
+		}
+		if gotSummary.numSourceFiles != test.wantSummary.numSourceFiles {
+			t.Errorf("Incorrect numSourceFiles:\nGot: %d want: %d", gotSummary.numSourceFiles, test.wantSummary.numSourceFiles)
 		}
 	}
 }
