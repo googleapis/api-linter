@@ -34,7 +34,9 @@ func createSummary(responses []lint.Response) (summary LintSummary) {
 // Given a pointer to a summary of lint responses, and output location,
 // this functions will emit to the output a table describing the percentage of files failing for each rule
 func emitSummary(summary *LintSummary, w *os.File) {
-	colOneFormat, colTwoFormat := "%-"+strconv.Itoa(max(summary.longestRuleLen+5, 25))+"s", "%25s"
+	DEFAULT_SUMMARY_COL_WIDTH := 25
+	colOneFormat := "%-"+strconv.Itoa(max(summary.longestRuleLen+5, DEFAULT_SUMMARY_COL_WIDTH))+"s"
+	colTwoFormat := "%"+strconv.Itoa(DEFAULT_SUMMARY_COL_WIDTH)+"s"
 	w.WriteString("\n----------SUMMARY TABLE---------\n")
 	w.WriteString(fmt.Sprintf(colOneFormat,
 		fmt.Sprintf("Linted %d proto files.", summary.numSourceFiles)) + "\n")
