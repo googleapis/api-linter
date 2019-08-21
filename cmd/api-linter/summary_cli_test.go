@@ -8,7 +8,7 @@ import (
 )
 
 
-func TestSummaryCli(t *testing.T) {
+func TestCreateSummary(t *testing.T) {
 	tests := []struct {
 		name	string
 		data	[]lint.Response

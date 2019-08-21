@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 )
-
 
 func createSummary(responses []lint.Response) (summary LintSummary) {
 	summary.numSourceFiles = len(responses)
@@ -25,26 +24,26 @@ func createSummary(responses []lint.Response) (summary LintSummary) {
 				summary.longestRuleLen = max(summary.longestRuleLen, len(ruleName))
 				summary.violationData[ruleName] = map[string]bool{pathToAdd: true}
 			}
-
 		}
 	}
 	return summary
 }
 
 // Given a pointer to a summary of lint responses, and output location,
-// this functions will emit to the output a table describing the percentage of files failing for each rule
-func emitSummary(summary *LintSummary, w *os.File) {
+// this functions will return a []byte which shows the percentage of files failing for each rule
+func emitSummary(summary *LintSummary) ([]byte, error) {
+	var sb strings.Builder
 	DEFAULT_SUMMARY_COL_WIDTH := 25
 	colOneFormat := "%-"+strconv.Itoa(max(summary.longestRuleLen+5, DEFAULT_SUMMARY_COL_WIDTH))+"s"
 	colTwoFormat := "%"+strconv.Itoa(DEFAULT_SUMMARY_COL_WIDTH)+"s"
-	w.WriteString("\n----------SUMMARY TABLE---------\n")
-	w.WriteString(fmt.Sprintf(colOneFormat,
+	sb.WriteString("\n----------SUMMARY TABLE---------\n")
+	sb.WriteString(fmt.Sprintf(colOneFormat,
 		fmt.Sprintf("Linted %d proto files.", summary.numSourceFiles)) + "\n")
-	w.WriteString(fmt.Sprintf(colOneFormat, "Rule") +
+	sb.WriteString(fmt.Sprintf(colOneFormat, "Rule") +
 			fmt.Sprintf(colTwoFormat, "Violations (Percent)") + "\n")
 
 	for rule_id, filePaths := range summary.violationData {
-		w.WriteString(fmt.Sprintf(colOneFormat, string(rule_id)) +
+		sb.WriteString(fmt.Sprintf(colOneFormat, string(rule_id)) +
 				fmt.Sprintf(colTwoFormat,
 					fmt.Sprintf("%d (%.2f%%)",
 						len(filePaths), float64(len(filePaths))/float64(summary.numSourceFiles) * 100,
@@ -52,18 +51,9 @@ func emitSummary(summary *LintSummary, w *os.File) {
 				) + "\n",
 		)
 	}
+	return []byte(sb.String()), nil
 }
 
-func max(x, y int) int {
-	if x < y {
-		return y
-	}
-	return x
-}
-
-//1. A summary map where
-// 		key = rule_id, value = a set of file paths that violates the rule
-// 2. length of the rule_id of the longest rule added
 type LintSummary struct {
 	// key = rule_id, value = number of unique files that violated rule
 	violationData map[string]map[string]bool
@@ -71,4 +61,11 @@ type LintSummary struct {
 	longestRuleLen int
 	// count of files from the original source.
 	numSourceFiles int
+}
+
+func max(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
 }
