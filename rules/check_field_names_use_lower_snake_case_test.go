@@ -50,7 +50,7 @@ func TestFieldNamesUseLowerSnakeCaseRule(t *testing.T) {
 
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
 			t,
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)

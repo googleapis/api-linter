@@ -26,6 +26,7 @@ type RuleInfo struct {
 	URI          string        // a link to a document for more details.
 	RequestTypes []RequestType // types of requests that this rule should receive.
 
+	// nolint:structcheck,unused
 	noPositional struct{} // Prevent positional composite literal instantiation
 }
 
