@@ -6,7 +6,7 @@ require (
 	github.com/bmatcuk/doublestar v1.1.5
 	github.com/google/go-cmp v0.3.1
 	github.com/stoewer/go-strcase v1.0.2
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli v1.21.0
 	golang.org/x/net v0.0.0-20190813202137-74dc4d7220e7 // indirect
 	golang.org/x/sync v0.0.0-20190806142011-112230192c58 // indirect
