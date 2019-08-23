@@ -106,8 +106,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					marshal = json.Marshal
 				case "summary":
 					marshal = func(i interface{}) ([]byte, error) {
-						summary := createSummary(i.([]lint.Response))
-						return emitSummary(&summary)
+						return emitSummary(i.([]lint.Response))
 					}
 				}
 

@@ -16,9 +16,8 @@ func TestCreateSummary(t *testing.T) {
 	}{{
 		name: "Empty input",
 		data: []lint.Response{},
-		wantSummary: &LintSummary{violationData: make(map[string]map[string]bool)},
-	},
-	{
+		wantSummary: &LintSummary{Violations: make(map[string]map[string]bool)},
+	}, {
 		name: "Example with a couple of responses",
 		data: []lint.Response{{
 				FilePath: "example.proto",
@@ -48,7 +47,7 @@ func TestCreateSummary(t *testing.T) {
 				},
 		}},
 		wantSummary: &LintSummary{
-			violationData: map[string]map[string]bool{
+			Violations: map[string]map[string]bool{
 				"core::0131::request_message::name": map[string]bool{"example2.proto": true},
 				"core::0132::response_message::name": map[string]bool{
 					"example2.proto": true,
@@ -59,27 +58,21 @@ func TestCreateSummary(t *testing.T) {
 					"example3.proto": true,
 					"example4.proto": true,
 				},
-
 			},
-			longestRuleLen: len("core::0132::response_message::name"),
-			numSourceFiles: 4,
+			LongestRuleLen: len("core::0132::response_message::name"),
+			NumSourceFiles: 4,
 		},
-		//	map[string]int{
-		//	"core::0131::request_message::name": 1,
-		//	"core::0132::response_message::name": 2,
-		//	"core::naming_formats::field_names": 3,
-		//},
 	}}
 	for _, test := range tests {
 		gotSummary := createSummary(test.data)
-		if !reflect.DeepEqual(gotSummary.violationData, test.wantSummary.violationData) {
-			t.Errorf("Incorrect violation data:\nGot: %#v\n Want: %#v", gotSummary.violationData, test.wantSummary.violationData)
+		if !reflect.DeepEqual(gotSummary.Violations, test.wantSummary.Violations) {
+			t.Errorf("Incorrect violation data:\nGot: %#v\n Want: %#v", gotSummary.Violations, test.wantSummary.Violations)
 		}
-		if gotSummary.longestRuleLen != test.wantSummary.longestRuleLen {
-			t.Errorf("Incorrect longest rule length:\nGot: %d want: %d", gotSummary.longestRuleLen, test.wantSummary.longestRuleLen)
+		if gotSummary.LongestRuleLen != test.wantSummary.LongestRuleLen {
+			t.Errorf("Incorrect longest rule length:\nGot: %d want: %d", gotSummary.LongestRuleLen, test.wantSummary.LongestRuleLen)
 		}
-		if gotSummary.numSourceFiles != test.wantSummary.numSourceFiles {
-			t.Errorf("Incorrect numSourceFiles:\nGot: %d want: %d", gotSummary.numSourceFiles, test.wantSummary.numSourceFiles)
+		if gotSummary.NumSourceFiles != test.wantSummary.NumSourceFiles {
+			t.Errorf("Incorrect numSourceFiles:\nGot: %d want: %d", gotSummary.NumSourceFiles, test.wantSummary.NumSourceFiles)
 		}
 	}
 }

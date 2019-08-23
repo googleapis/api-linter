@@ -1,66 +1,80 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
 	"strconv"
-	"strings"
+	"text/template"
 
 	"github.com/googleapis/api-linter/lint"
 )
 
+// emitSummary will return a []byte that shows the percentage of files failing for each rule
+func emitSummary(responses []lint.Response) ([]byte, error) {
+	var buffer bytes.Buffer
+	summary := createSummary(responses)
+	defaultSummaryColWidth := 25
+	colOneFormat := "%-"+strconv.Itoa(max(summary.LongestRuleLen+5, defaultSummaryColWidth))+"s"
+	colTwoFormat := "%"+strconv.Itoa(defaultSummaryColWidth)+"s"
+
+	lintSummaryTemplate, err := template.New("lintSummary").Funcs(
+		template.FuncMap{"calcPercentage": func(filePaths map[string]bool, numSourceFiles int) float64 {
+		return float64(len(filePaths))/float64(numSourceFiles) * 100
+	}}).Parse(`
+----------SUMMARY TABLE---------
+{{ printf "Linted %d proto files." .Summary.LongestRuleLen | printf .ColOneFormat }}
+{{ printf .ColOneFormat "Rule"}} {{ printf .ColTwoFormat "Violations (Percent)" -}}
+{{$colOneFormat := .ColOneFormat -}}
+{{$colTwoFormat := .ColTwoFormat -}}
+{{$numSourceFiles := .Summary.NumSourceFiles}}
+{{range $ruleID, $filePaths := .Summary.Violations -}}
+{{printf 	$colOneFormat $ruleID}}{{printf "%d (%.2f%%)" (len $filePaths) (calcPercentage $filePaths $numSourceFiles) | printf $colTwoFormat}}
+{{end}}
+`)
+	if err != nil {
+		panic(err)
+	}
+	templateData := LintSummaryTemplateData{colOneFormat, colTwoFormat, summary }
+	err = lintSummaryTemplate.Execute(&buffer, templateData)
+	if err != nil {
+		panic(err)
+	}
+	return buffer.Bytes(), nil
+}
+
 func createSummary(responses []lint.Response) (summary LintSummary) {
-	summary.numSourceFiles = len(responses)
-	summary.violationData = make(map[string]map[string]bool)
+	summary.NumSourceFiles = len(responses)
+	summary.Violations = make(map[string]map[string]bool)
 	for _, response := range responses {
 		pathToAdd := string(response.FilePath)
 		problems := response.Problems
 		for _, currentProb := range problems {
 			ruleName := string(currentProb.RuleID)
-			if existingPaths, ok := summary.violationData[ruleName]; ok {
+			if existingPaths, ok := summary.Violations[ruleName]; ok {
 				if _, isExist := existingPaths[pathToAdd]; !isExist {
 					existingPaths[pathToAdd] = true
 				}
 			} else {
-				summary.longestRuleLen = max(summary.longestRuleLen, len(ruleName))
-				summary.violationData[ruleName] = map[string]bool{pathToAdd: true}
+				summary.LongestRuleLen = max(summary.LongestRuleLen, len(ruleName))
+				summary.Violations[ruleName] = map[string]bool{pathToAdd: true}
 			}
 		}
 	}
-	return summary
-}
-
-// Given a pointer to a summary of lint responses, and output location,
-// this functions will return a []byte which shows the percentage of files failing for each rule
-func emitSummary(summary *LintSummary) ([]byte, error) {
-	var sb strings.Builder
-	DEFAULT_SUMMARY_COL_WIDTH := 25
-	colOneFormat := "%-"+strconv.Itoa(max(summary.longestRuleLen+5, DEFAULT_SUMMARY_COL_WIDTH))+"s"
-	colTwoFormat := "%"+strconv.Itoa(DEFAULT_SUMMARY_COL_WIDTH)+"s"
-	sb.WriteString("\n----------SUMMARY TABLE---------\n")
-	sb.WriteString(fmt.Sprintf(colOneFormat,
-		fmt.Sprintf("Linted %d proto files.", summary.numSourceFiles)) + "\n")
-	sb.WriteString(fmt.Sprintf(colOneFormat, "Rule") +
-			fmt.Sprintf(colTwoFormat, "Violations (Percent)") + "\n")
-
-	for rule_id, filePaths := range summary.violationData {
-		sb.WriteString(fmt.Sprintf(colOneFormat, string(rule_id)) +
-				fmt.Sprintf(colTwoFormat,
-					fmt.Sprintf("%d (%.2f%%)",
-						len(filePaths), float64(len(filePaths))/float64(summary.numSourceFiles) * 100,
-					),
-				) + "\n",
-		)
-	}
-	return []byte(sb.String()), nil
+	return
 }
 
 type LintSummary struct {
-	// key = rule_id, value = number of unique files that violated rule
-	violationData map[string]map[string]bool
+	// key = rule_id, value = set of unique files that violated rule
+	Violations map[string]map[string]bool
 	// length of the rule_id of the longest rule added
-	longestRuleLen int
+	LongestRuleLen int
 	// count of files from the original source.
-	numSourceFiles int
+	NumSourceFiles int
+}
+
+type LintSummaryTemplateData struct {
+	ColOneFormat string
+	ColTwoFormat string
+	Summary LintSummary
 }
 
 func max(x, y int) int {
