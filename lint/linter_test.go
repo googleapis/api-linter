@@ -135,6 +135,8 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 
 		fd := new(descriptorpb.FileDescriptorProto)
 		fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
+		filename := "test.proto"
+		fd.Name = &filename
 
 		l := New(r, []Config{{
 			IncludedPaths: []string{"**"},

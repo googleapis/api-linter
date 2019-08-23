@@ -2,6 +2,7 @@ package lint
 
 import (
 	"fmt"
+
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"

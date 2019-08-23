@@ -173,9 +173,29 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 	return s.findLocationByPath(getPath(d))
 }
 
+// DescriptorNameLocation returns a `Location` for the name of a given descriptor. If not found,
+// returns (nil, ErrPathNotFound).
+func (s DescriptorSource) DescriptorNameLocation(d protoreflect.Descriptor) (Location, error) {
+	return s.findLocationByPath(append(getPath(d), 1))
+}
+
+// DescriptorLocationOrFileStart returns a `Location` for the given descriptor. If there was an
+// error finding the location, it returns the start location of the file instead (that is,
+// line 1 column 1 as the Start and End Positions).
+func (s DescriptorSource) DescriptorLocationOrFileStart(d protoreflect.Descriptor) Location {
+	loc, err := s.DescriptorLocation(d)
+	if err != nil {
+		return Location{
+			Start: Position{Line: 1, Column: 1},
+			End:   Position{Line: 1, Column: 1},
+		}
+	}
+	return loc
+}
+
 func getPath(d protoreflect.Descriptor) []int {
 	path := []int{}
-	for p := d; !isFileDescriptor(p); p, _ = p.Parent() {
+	for p := d; p != nil && !isFileDescriptor(p); p = p.Parent() {
 		path = append(path, p.Index(), getDescriptorTag(p))
 	}
 	reverseInts(path)
@@ -232,7 +252,7 @@ func getDescriptorTag(d protoreflect.Descriptor) int {
 
 func isFieldExtension(d protoreflect.Descriptor) bool {
 	f, ok := d.(protoreflect.FieldDescriptor)
-	return ok && f.Extendee() != nil
+	return ok && f.IsExtension()
 }
 
 func isFileDescriptor(d protoreflect.Descriptor) bool {
@@ -241,7 +261,7 @@ func isFileDescriptor(d protoreflect.Descriptor) bool {
 }
 
 func isTopLevelDescriptor(d protoreflect.Descriptor) bool {
-	p, _ := d.Parent()
+	p := d.Parent()
 	_, ok := p.(protoreflect.FileDescriptor)
 	return ok
 }
@@ -263,7 +283,7 @@ func reverseInts(a []int) {
 func (s DescriptorSource) isRuleDisabled(name RuleName, d protoreflect.Descriptor) bool {
 	commentsToCheck := s.fileComments().LeadingDetachedComments
 
-	for d, ok := d, true; ok && d != nil; d, ok = d.Parent() {
+	for ; d != nil; d = d.Parent() {
 		comments, err := s.DescriptorComments(d)
 
 		if err != nil {
@@ -291,7 +311,7 @@ func stringsContains(comments []string, s string) bool {
 }
 
 func ruleDisablingComment(name RuleName) string {
-	return fmt.Sprintf("(-- api-linter: %s=disabled --)", name)
+	return fmt.Sprintf("api-linter: %s=disabled", name)
 }
 
 func (s DescriptorSource) fileComments() Comments {

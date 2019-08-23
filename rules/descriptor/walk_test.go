@@ -73,7 +73,10 @@ func TestWalk(t *testing.T) {
 	for _, test := range tests {
 		consumer := new(mockConsumer)
 
-		Walk(test.descriptor, consumer)
+		err := Walk(test.descriptor, consumer)
+		if err != nil {
+			t.Fatalf("Walk(%s) returned error: %v", test.descriptor.FullName(), err)
+		}
 		if consumer.count != test.num {
 			t.Errorf("Walk(%s): Got %d descriptors, but wanted %d", test.descriptor.FullName(), consumer.count, test.num)
 		}
@@ -86,7 +89,10 @@ func TestWalkWithErr(t *testing.T) {
 	}
 	f := readProtoFile("test.protoset")
 
-	Walk(f, consumer)
+	err := Walk(f, consumer)
+	if err == nil {
+		t.Fatalf("Walk(%s) returned no error", f.FullName())
+	}
 	if consumer.count != 1 {
 		t.Errorf("Walk(%s) with error: got %d descriptors, but wanted 1", f.FullName(), consumer.count)
 	}

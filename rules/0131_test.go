@@ -48,7 +48,8 @@ func TestGetRequestMessageName(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Name"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			t,
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
@@ -103,7 +104,8 @@ func TestGetRequestMessageNameField(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Name Field"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			t,
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
@@ -170,7 +172,8 @@ func TestGetRequestMessageUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-131 Request Unknown Fields"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			t,
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)
@@ -226,7 +229,8 @@ func TestGetResponseMessageName(t *testing.T) {
 	for _, test := range tests {
 		errPrefix := "AIP-131 Response Message Name"
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			t,
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: lint.NewProtoRequest returned error %v", errPrefix, err)

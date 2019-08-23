@@ -16,9 +16,9 @@ package rules
 
 import (
 	"fmt"
-	"github.com/googleapis/api-linter/lint"
 	"testing"
 
+	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/testutil"
 )
 
@@ -40,7 +40,8 @@ func TestProtoVersionRule(t *testing.T) {
 		errPrefix := fmt.Sprintf("Check syntax `%s`", test.Syntax)
 
 		req, err := lint.NewProtoRequest(testutil.MustCreateFileDescriptorProto(
-			testutil.FileDescriptorSpec{Template: tmpl, Data: test},
+			t,
+			testutil.FileDescriptorSpec{Filename: "test.proto", Template: tmpl, Data: test},
 		), nil)
 		if err != nil {
 			t.Errorf("%s: NewProtoRequest returned error %v", errPrefix, err)
