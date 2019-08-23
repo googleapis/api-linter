@@ -85,7 +85,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				}
 
 				l := lint.New(rules, configs)
-				problems, err := l.LintProtos(files)
+				lintResponses, err := l.LintProtos(files)
 				if err != nil {
 					return err
 				}
@@ -104,12 +104,16 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				switch c.String("fmt") {
 				case "json":
 					marshal = json.Marshal
+				case "summary":
+					marshal = func(i interface{}) ([]byte, error) {
+						return emitSummary(i.([]lint.Response))
+					}
 				}
-				b, err := marshal(problems)
+
+				b, err := marshal(lintResponses)
 				if err != nil {
 					return err
 				}
-
 				if _, err = w.Write(b); err != nil {
 					return err
 				}
