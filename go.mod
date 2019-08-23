@@ -10,7 +10,7 @@ require (
 	github.com/urfave/cli v1.21.0
 	golang.org/x/net v0.0.0-20190813202137-74dc4d7220e7 // indirect
 	golang.org/x/sync v0.0.0-20190806142011-112230192c58 // indirect
-	golang.org/x/tools v0.0.0-20190823163120-aa644d2adf2a // indirect
+	golang.org/x/tools v0.0.0-20190823182225-c4a336ef6a2f // indirect
 	google.golang.org/protobuf v0.0.0-20190823162813-08ff73004835
 	gopkg.in/yaml.v2 v2.2.2
 )
