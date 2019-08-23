@@ -173,6 +173,12 @@ func (s DescriptorSource) DescriptorLocation(d protoreflect.Descriptor) (Locatio
 	return s.findLocationByPath(getPath(d))
 }
 
+// DescriptorNameLocation returns a `Location` for the name of a given descriptor. If not found,
+// returns (nil, ErrPathNotFound).
+func (s DescriptorSource) DescriptorNameLocation(d protoreflect.Descriptor) (Location, error) {
+	return s.findLocationByPath(append(getPath(d), 1))
+}
+
 // DescriptorLocationOrFileStart returns a `Location` for the given descriptor. If there was an
 // error finding the location, it returns the start location of the file instead (that is,
 // line 1 column 1 as the Start and End Positions).
