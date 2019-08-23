@@ -95,6 +95,66 @@ message Example {
 }
 ```
 
+## Writing Rules
+
+If you would like to extend the linter with your own logic for linting proto files, you need to
+implement the [`Rule` interface][rule_interface]. First, expose the metadata for your rule by
+implementing an `Info()` method, which returns a [`RuleInfo` struct][rule_info]. You must give your
+rule a unique name, description, and URL, and define the types of requests that the rule should
+receive (currently, the only type of request is a [`lint.ProtoRequest`][proto_request_type]).
+
+Then, implement the `Lint` method, which takes a [`lint.Request`][lint_request], and returns a slice
+of [`Problem`s][problems] (or an error). The `lint.Request` provides to you a compiled
+[`protoreflect.FileDescriptor`][file_descriptor], which allows you to programmatically navigate the
+definitions in a proto file, as well as a `lint.DescriptorSource`, which provides some helper
+[methods][desc_source] for finding the locations of a given descriptor in the proto source. Please
+ensure that every `Problem` you output contains a valid [`lint.Location`][location] (usually
+determined through `lint.DescriptorSource`). The `Location` will enable other tools to display
+warnings in the relevant location in source code. Furthermore, you can provide a `Suggestion` to
+replace the violating code covered by the `Location`.
+
+For Example:
+
+```go
+type myRule struct{}
+
+func Info() lint.RuleInfo {
+	return lint.RuleInfo{
+    Name:         "my_test_rule",
+    Description:  "dummy rule that doesn't do anything",
+    RequestTypes: []lint.RequestType{lint.ProtoRequest},
+    URI:          "http://example.com",
+  }
+}
+
+func Lint(req lint.Request) ([]lint.Problem, error) {
+	if req.ProtoFile().Syntax() != protoreflect.Proto3 {
+		loc, err := req.DescriptorSource().SyntaxLocation()
+		if err != nil {
+			// use start location of file
+			loc = lint.Location{
+				Start: lint.Position{Line: 1, Column: 1},
+				End:   lint.Position{Line: 1, Column: 1},
+			}
+		}
+		return []lint.Problem{{
+			Message:    "Please use proto3 syntax.",
+			Location:   loc,
+			Suggestion: "proto3",
+		}}
+	}
+}
+```
+
+[file_descriptor]: https://google.golang.org/protobuf/reflect/protoreflect
+[rule_interface]: https://github.com/googleapis/api-linter/blob/master/lint/rule.go
+[rule_info]: https://github.com/googleapis/api-linter/blob/master/lint/rule_info.go
+[lint_request]: https://github.com/googleapis/api-linter/blob/master/lint/request.go#L25-L28
+[problems]: https://github.com/googleapis/api-linter/blob/master/lint/response.go
+[proto_request_type]: https://github.com/googleapis/api-linter/blob/master/lint/rule_info.go#L37
+[desc_source]: https://github.com/googleapis/api-linter/blob/master/lint/source.go#L151-L174
+[location]: https://github.com/googleapis/api-linter/blob/master/lint/location.go
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

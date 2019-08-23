@@ -26,15 +26,15 @@ import (
 )
 
 type protocParser struct {
-	protoc     string
-	importPath string
+	protoc      string
+	importPaths []string
 }
 
 func (p *protocParser) ParseProto(filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
-	return compileProto(p.protoc, p.importPath, filenames...)
+	return compileProto(p.protoc, p.importPaths, filenames...)
 }
 
-func compileProto(protoc, importPath string, filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
+func compileProto(protoc string, importPaths []string, filenames ...string) ([]*descriptorpb.FileDescriptorProto, error) {
 	outfile, err := ioutil.TempFile("", "desc.pb")
 	if err != nil {
 		return nil, err
@@ -44,7 +44,9 @@ func compileProto(protoc, importPath string, filenames ...string) ([]*descriptor
 	cmd := exec.Command(protoc, "--descriptor_set_out="+outfile.Name())
 	cmd.Args = append(cmd.Args, "--include_source_info")
 	cmd.Args = append(cmd.Args, "--include_imports")
-	cmd.Args = append(cmd.Args, "--proto_path="+importPath)
+	for _, arg := range importPaths {
+		cmd.Args = append(cmd.Args, "--proto_path="+arg)
+	}
 	cmd.Args = append(cmd.Args, filenames...)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return nil, fmt.Errorf("Running %s: %s, %v", strings.Join(cmd.Args, " "), string(out), err)

@@ -55,10 +55,10 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					Value: "protoc",
 					Usage: "protocol compiler path",
 				},
-				cli.StringFlag{
+				cli.StringSliceFlag{
 					Name:  "proto_path",
-					Value: ".",
-					Usage: "the directory in which for protoc to search for imports",
+					Value: &cli.StringSlice{"."},
+					Usage: "the directories in which for protoc to search for imports",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -68,8 +68,8 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				}
 
 				p := protocParser{
-					importPath: c.String("proto_path"),
-					protoc:     c.String("protoc"),
+					importPaths: c.StringSlice("proto_path"),
+					protoc:      c.String("protoc"),
 				}
 				files, err := p.ParseProto(filenames...)
 				if err != nil {
