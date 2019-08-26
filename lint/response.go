@@ -26,12 +26,15 @@ type Response struct {
 type Problem struct {
 	// Message provides a short description of the problem.
 	Message string `json:"message" yaml:"message"`
+
 	// Suggestion provides a suggested fix, if applicable.
 	Suggestion string `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
+
 	// Location provides the location of the problem. If both
 	// `Location` and `Descriptor` are specified, the location
 	// is then used from `Location` instead of `Descriptor`.
 	Location Location `json:"location" yaml:"location"`
+
 	// Descriptor provides the descriptor related
 	// to the problem. If present and `Location` is not
 	// specified, then the starting location of the descriptor

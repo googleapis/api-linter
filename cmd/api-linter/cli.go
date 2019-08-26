@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/protoparse"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
@@ -50,11 +51,6 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					Value: "yaml",
 					Usage: "output format",
 				},
-				cli.StringFlag{
-					Name:  "protoc",
-					Value: "protoc",
-					Usage: "protocol compiler path",
-				},
 				cli.StringSliceFlag{
 					Name:  "proto_path",
 					Value: &cli.StringSlice{"."},
@@ -63,19 +59,25 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 			},
 			Action: func(c *cli.Context) error {
 				filenames := c.Args()
+
+				// Sanity check: Were we given any files to parse at all?
+				// If not, abort.
 				if len(filenames) == 0 {
 					return nil
 				}
 
-				p := protocParser{
-					importPaths: c.StringSlice("proto_path"),
-					protoc:      c.String("protoc"),
+				// Parse the provided protobuf files into a protoreflect file
+				// descriptor.
+				p := protoparse.Parser{
+					ImportPaths: c.StringSlice("proto_path"),
+					IncludeSourceCodeInfo: true,
 				}
-				files, err := p.ParseProto(filenames...)
+				fd, err := p.ParseFiles(filenames...)
 				if err != nil {
 					return err
 				}
 
+				// If a configuration file was provided, parse it.
 				if c.String("cfg") != "" {
 					userConfigs, err := lint.ReadConfigsFromFile(c.String("cfg"))
 					if err != nil {
@@ -84,12 +86,15 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					configs = append(configs, userConfigs...)
 				}
 
+				// Instantitate the linter object, and lint the protos.
 				l := lint.New(rules, configs)
-				lintResponses, err := l.LintProtos(files)
+				lintResponses, err := l.LintProtos(fd...)
 				if err != nil {
 					return err
 				}
 
+				// If writing output to a file, set that up.
+				// If no file was specified, use stdout.
 				w := os.Stdout
 				if c.String("out") != "" {
 					var err error
@@ -100,6 +105,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					defer w.Close()
 				}
 
+				// Determine what format we are using to print the results.
 				marshal := yaml.Marshal
 				switch c.String("fmt") {
 				case "json":
@@ -110,6 +116,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					}
 				}
 
+				// Print the actual results.
 				b, err := marshal(lintResponses)
 				if err != nil {
 					return err

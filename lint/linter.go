@@ -21,8 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"github.com/jhump/protoreflect/desc"
 )
 
 // Linter checks API files and returns a list of detected problems.
@@ -40,29 +39,11 @@ func New(rules Rules, configs Configs) *Linter {
 	return l
 }
 
-// LintProtos checks protobuf files and returns a list of problems or an error. Note that a *FileDescriptorProto
-// for any imported file must be present in files. If any file in files has an import that is not also in the
-// slice, an error will be returned.
-func (l *Linter) LintProtos(files []*descriptorpb.FileDescriptorProto) ([]Response, error) {
-	reg, err := makeRegistryFromAllFiles(files)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return l.LintProtosWithRegistry(files, reg)
-}
-
-// LintProtosWithRegistry checks protobuf files and returns a list of Responses or returns an error.
-// The input *protoregistry.Files must include all imports from any file in files.
-func (l *Linter) LintProtosWithRegistry(files []*descriptorpb.FileDescriptorProto, reg *protoregistry.Files) ([]Response, error) {
+// LintProtos checks protobuf files and returns a list of problems or an error.
+func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
-		req, err := NewProtoRequest(proto, reg)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := l.run(req)
+		resp, err := l.run(proto)
 		if err != nil {
 			return nil, err
 		}
@@ -76,26 +57,29 @@ func (l *Linter) LintProtosWithRegistry(files []*descriptorpb.FileDescriptorProt
 // It uses the proto file path to determine which rules will
 // be applied to the request, according to the list of Linter
 // configs.
-func (l *Linter) run(req Request) (Response, error) {
+func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 	resp := Response{
-		FilePath: req.ProtoFile().Path(),
+		FilePath: fd.GetName(),
 	}
 	var errMessages []string
 
 	for name, rl := range l.rules {
 		var config RuleConfig
 
-		if c, err := l.configs.GetRuleConfig(req.ProtoFile().Path(), name); err == nil {
+		if c, err := l.configs.GetRuleConfig(fd.GetName(), name); err == nil {
 			config = config.withOverride(c)
 		} else {
 			errMessages = append(errMessages, err.Error())
 			continue
 		}
 
-		if !config.Disabled && !req.DescriptorSource().isRuleDisabledInFile(rl.Info().Name) {
+		// Run the linter rule against this file, and throw away any problems
+		// which should have been disabled.
+		// FIXME: Move `isRuleDisabledInFile` to here.
+		if !config.Disabled && !fd.GetSourceInfo().isRuleDisabledInFile(rl.Info().Name) {
 			if problems, err := l.runAndRecoverFromPanics(rl, req); err == nil {
 				for _, p := range problems {
-					if !req.DescriptorSource().isRuleDisabled(rl.Info().Name, p.Descriptor) {
+					if !req.DescriptorSource().isRuleDisabled(rl.Info.Name, p.Descriptor) {
 						p.RuleID = rl.Info().Name
 						p.Category = config.Category
 						resp.Problems = append(resp.Problems, p)
