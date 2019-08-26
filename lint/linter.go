@@ -63,7 +63,7 @@ func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 	}
 	var errMessages []string
 
-	for name, rl := range l.rules {
+	for name, rule := range l.rules {
 		var config RuleConfig
 
 		if c, err := l.configs.GetRuleConfig(fd.GetName(), name); err == nil {
@@ -75,12 +75,11 @@ func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 
 		// Run the linter rule against this file, and throw away any problems
 		// which should have been disabled.
-		// FIXME: Move `isRuleDisabledInFile` to here.
-		if !config.Disabled && !fd.GetSourceInfo().isRuleDisabledInFile(rl.Info().Name) {
-			if problems, err := l.runAndRecoverFromPanics(rl, req); err == nil {
+		if !config.Disabled {
+			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
-					if !req.DescriptorSource().isRuleDisabled(rl.Info.Name, p.Descriptor) {
-						p.RuleID = rl.Info().Name
+					if rule.IsDisabled(p.Descriptor) {
+						p.RuleID = rule.Info.Name
 						p.Category = config.Category
 						resp.Problems = append(resp.Problems, p)
 					}
@@ -99,7 +98,7 @@ func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 	return resp, err
 }
 
-func (l *Linter) runAndRecoverFromPanics(rl Rule, req Request) (probs []Problem, err error) {
+func (l *Linter) runAndRecoverFromPanics(rule Rule, fd *desc.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if rerr, ok := r.(error); ok {
@@ -110,5 +109,5 @@ func (l *Linter) runAndRecoverFromPanics(rl Rule, req Request) (probs []Problem,
 		}
 	}()
 
-	return rl.Lint(req)
+	return rule.Lint(fd), nil
 }

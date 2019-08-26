@@ -14,7 +14,12 @@
 
 package lint
 
-import "github.com/jhump/protoreflect/desc"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/jhump/protoreflect/desc"
+)
 
 // Rule defines a lint rule that checks Google Protobuf APIs.
 type Rule struct {
@@ -88,6 +93,28 @@ func (rule *Rule) Lint(f *desc.FileDescriptor) (problems []Problem) {
 
 	// Done aggregating problems for this file; return the list.
 	return problems
+}
+
+// IsDisabled returns true if the rule is disabled by the comments for
+// the given descriptor or its file, false otherwise.
+func (rule *Rule) IsDisabled(d desc.Descriptor) bool {
+	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Info.Name)
+
+	// If the comments above the descriptor disable the rule,
+	// return true.
+	if strings.Contains(d.GetSourceInfo().GetLeadingComments(), directive) {
+		return true
+	}
+
+	// The rule may also be disabled at the file level; if it is, return true.
+	for _, line := range d.GetFile().GetSourceInfo().GetLeadingDetachedComments() {
+		if strings.Contains(line, directive) {
+			return true
+		}
+	}
+
+	// The rule is not disabled.
+	return false
 }
 
 // getAllMessages returns a slice with every message (not just top-level

@@ -14,7 +14,7 @@
 
 package lint
 
-import "google.golang.org/protobuf/reflect/protoreflect"
+import "github.com/jhump/protoreflect/desc"
 
 // Response describes the result returned by a rule.
 type Response struct {
@@ -39,7 +39,7 @@ type Problem struct {
 	// to the problem. If present and `Location` is not
 	// specified, then the starting location of the descriptor
 	// is used as the location of the problem.
-	Descriptor protoreflect.Descriptor `json:"-" yaml:"-"`
+	Descriptor desc.Descriptor `json:"-" yaml:"-"`
 
 	// RuleID provides the ID of the rule that this problem belongs to.
 	// DO NOT SET: this field will be set by the linter based on rule info
