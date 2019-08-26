@@ -20,6 +20,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jhump/protoreflect/desc"
+
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -97,7 +99,7 @@ func TestLinter_run(t *testing.T) {
 
 	for ind, test := range tests {
 		rules, err := NewRules(&mockRule{
-			info:     RuleInfo{Name: "test::rule1"},
+			Name:     "test::rule1",
 			lintResp: ruleProblems,
 		})
 		if err != nil {
@@ -112,20 +114,31 @@ func TestLinter_run(t *testing.T) {
 	}
 }
 
-type panickingRule struct{}
+type panickingRule struct {
+	Name string
+}
 
-func (r *panickingRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
-func (r *panickingRule) Lint(_ Request) ([]Problem, error) { panic("panic") }
+func (r *panickingRule) Lint(_ *desc.FileDescriptor) []Problem {
+	panic("panic")
+}
 
-type panickingErrorRule struct{}
+type panickingErrorRule struct {
+	Name string
+}
 
-func (r *panickingErrorRule) Info() RuleInfo                    { return RuleInfo{Name: "panic"} }
-func (r *panickingErrorRule) Lint(_ Request) ([]Problem, error) { panic(fmt.Errorf("panic")) }
+func (r *panickingErrorRule) Lint(_ *desc.FileDescriptor) []Problem {
+	panic(fmt.Errorf("panic"))
+}
 
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	tests := []struct {
 		rule Rule
-	}{{&panickingRule{}}, {&panickingErrorRule{}}}
+	}{{Rule{
+		Name: "panic",
+		LintFile: func (fd *desc.FileDescriptor) []Problem {
+			panic("panic")
+		}
+	}}, {&panickingErrorRule{Name: "panicerror"}}}
 
 	for _, test := range tests {
 		r, err := NewRules(test.rule)

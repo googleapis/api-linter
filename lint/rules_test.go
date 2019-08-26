@@ -18,25 +18,9 @@ import (
 	"testing"
 )
 
-type mockRule struct {
-	info       RuleInfo
-	lintCalled int
-	lintResp   []Problem
-	err        error
-}
-
-func (r *mockRule) Info() RuleInfo {
-	return r.info
-}
-
-func (r *mockRule) Lint(Request) ([]Problem, error) {
-	r.lintCalled++
-	return r.lintResp, r.err
-}
-
 func TestRulesRegister(t *testing.T) {
-	r1 := &mockRule{info: RuleInfo{Name: "a"}}
-	r2 := &mockRule{info: RuleInfo{Name: "b"}}
+	r1 := Rule{Name: "a"}
+	r2 := Rule{Name: "b"}
 
 	rules, _ := NewRules()
 	if err := rules.Register(r1, r2); err != nil {
@@ -50,8 +34,8 @@ func TestRulesRegister(t *testing.T) {
 }
 
 func TestRulesRegister_Duplicate(t *testing.T) {
-	r1 := &mockRule{info: RuleInfo{Name: "a"}}
-	r2 := &mockRule{info: RuleInfo{Name: "a"}}
+	r1 := Rule{Name: "a"}
+	r2 := Rule{Name: "a"}
 
 	rules, _ := NewRules()
 	if err := rules.Register(r1, r2); err == nil {
