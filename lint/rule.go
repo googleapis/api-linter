@@ -23,8 +23,17 @@ import (
 
 // Rule defines a lint rule that checks Google Protobuf APIs.
 type Rule struct {
-	// Info contains metadata about a rule.
-	Info RuleInfo
+	// Name contains the rule's name.
+	Name RuleName
+
+	// Description is a short description of the rule,
+	// used in documentation and elsewhere.
+	Description string
+
+	// URI is the address where the guideline is documented.
+	// This should be displayed to give API designers more information about
+	// "how to do this right".
+	URI string
 
 	// LintFile is called for files as a whole.
 	LintFile func(*desc.FileDescriptor) []Problem
@@ -98,7 +107,7 @@ func (rule *Rule) Lint(f *desc.FileDescriptor) (problems []Problem) {
 // IsDisabled returns true if the rule is disabled by the comments for
 // the given descriptor or its file, false otherwise.
 func (rule *Rule) IsDisabled(d desc.Descriptor) bool {
-	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Info.Name)
+	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Name)
 
 	// If the comments above the descriptor disable the rule,
 	// return true.

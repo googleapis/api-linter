@@ -79,7 +79,7 @@ func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
 					if rule.IsDisabled(p.Descriptor) {
-						p.RuleID = rule.Info.Name
+						p.RuleID = rule.Name
 						p.Category = config.Category
 						resp.Problems = append(resp.Problems, p)
 					}

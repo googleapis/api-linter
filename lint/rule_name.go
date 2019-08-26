@@ -19,25 +19,6 @@ import (
 	"strings"
 )
 
-// RuleInfo stores information of a rule.
-type RuleInfo struct {
-	Name         RuleName      // rule name in the set.
-	Description  string        // a short description of this rule.
-	URI          string        // a link to a document for more details.
-	RequestTypes []RequestType // types of requests that this rule should receive.
-
-	// nolint:structcheck,unused
-	noPositional struct{} // Prevent positional composite literal instantiation
-}
-
-// RequestType defines a request type that can be passed into rules.
-type RequestType string
-
-const (
-	// ProtoRequest indicates that the targeted request contains a protobuf-definition file.
-	ProtoRequest RequestType = "proto-request"
-)
-
 // Status defines whether a rule is enabled, disabled or deprecated.
 type Status string
 
@@ -58,7 +39,8 @@ const nameSeparator string = "::"
 
 var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::[a-zA-Z0-9-_]+)?)+$")
 
-// NewRuleName creates a RuleName from segments. It will join the segments with the "::" separator.
+// NewRuleName creates a RuleName from segments.
+// It will join the segments with the "::" separator.
 func NewRuleName(segments ...string) RuleName {
 	return RuleName(strings.Join(segments, nameSeparator))
 }
