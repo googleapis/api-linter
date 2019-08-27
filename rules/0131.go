@@ -77,7 +77,7 @@ var checkGetRequestMessageNameField = lint.Rule{
 		name := m.FindFieldByName("name")
 		if name == nil {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf("method %q has no `name` field", m.GetName()),
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
 				Descriptor: m,
 			})
 			return problems
