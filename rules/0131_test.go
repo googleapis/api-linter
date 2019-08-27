@@ -53,7 +53,8 @@ func TestCheckGetMessageNameInvalid(t *testing.T) {
 }
 
 func TestCheckGetMessageNameIrrelevant(t *testing.T) {
-	// Create an appropriate method, with a correct message name.
+	// Create an appropriate method, with a message name that should make
+	// the rule pass right on by.
 	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("AcquireBook",
 		builder.RpcTypeMessage(builder.NewMessage("AcquireBookReq"), false),
 		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
