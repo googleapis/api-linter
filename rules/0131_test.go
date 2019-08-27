@@ -21,17 +21,53 @@ import (
 )
 
 func TestCheckGetMessageNameValid(t *testing.T) {
-	// Create an appropriate method.
+	// Create an appropriate method, with a correct message name.
 	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("GetBook",
 		builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
 		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
 	)).Build()
 	if err != nil {
-		t.Fatalf("Could not build method.")
+		t.Fatalf("Could not build GetBook method.")
 	}
 
 	// Run the lint rule; it should return no problems.
 	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) > 0 {
 		t.Errorf("False positive on rule %s: %#v", checkGetRequestMessageName.Name, problems)
+	}
+}
+
+func TestCheckGetMessageNameInvalid(t *testing.T) {
+	// Create an appropriate method, with an incorrect request message name.
+	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("GetBook",
+		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+	)).Build()
+	if err != nil {
+		t.Fatalf("Could not build GetBook method.")
+	}
+
+	// Run the lint rule; it should return no problems.
+	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) < 1 {
+		t.Errorf("False negative on rule %s: %#v", checkGetRequestMessageName.Name, problems)
+	}
+}
+
+func TestCheckGetMessageNameIrrelevant(t *testing.T) {
+	// Create an appropriate method, with a correct message name.
+	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("AcquireBook",
+		builder.RpcTypeMessage(builder.NewMessage("AcquireBookReq"), false),
+		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+	)).Build()
+	if err != nil {
+		t.Fatalf("Could not build AcquireBook method.")
+	}
+
+	// Run the lint rule; it should return no problems.
+	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) > 0 {
+		t.Errorf(
+			"False positive on rule %s (should have been irrelevant): %#v",
+			checkGetRequestMessageName.Name,
+			problems,
+		)
 	}
 }
