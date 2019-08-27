@@ -93,37 +93,46 @@ func (rule *Rule) Lint(f *desc.FileDescriptor) (problems []Problem) {
 		}
 	}
 
-	// Finally, process rules for top-level enums.
+	// Process rules for top-level enums.
 	for _, enum := range f.GetEnumTypes() {
 		if rule.LintEnum != nil {
 			problems = append(problems, rule.LintEnum(enum)...)
 		}
 	}
 
+	// Finally, process rules for the file itself.
+	if rule.LintFile != nil {
+		problems = append(problems, rule.LintFile(f)...)
+	}
+
 	// Done aggregating problems for this file; return the list.
 	return problems
 }
 
-// IsDisabled returns true if the rule is disabled by the comments for
-// the given descriptor or its file, false otherwise.
-func (rule *Rule) IsDisabled(d desc.Descriptor) bool {
+// IsEnabled returns true if the rule is enabled (not disabled by the comments
+// for the given descriptor or its file), false otherwise.
+func (rule *Rule) IsEnabled(d desc.Descriptor) bool {
 	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Name)
 
 	// If the comments above the descriptor disable the rule,
 	// return true.
-	if strings.Contains(d.GetSourceInfo().GetLeadingComments(), directive) {
-		return true
-	}
-
-	// The rule may also be disabled at the file level; if it is, return true.
-	for _, line := range d.GetFile().GetSourceInfo().GetLeadingDetachedComments() {
-		if strings.Contains(line, directive) {
-			return true
+	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+		if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
+			return false
 		}
 	}
 
-	// The rule is not disabled.
-	return false
+	// The rule may also be disabled at the file level; if it is, return true.
+	if sourceInfo := d.GetFile().GetSourceInfo(); sourceInfo != nil {
+		for _, line := range sourceInfo.GetLeadingDetachedComments() {
+			if strings.Contains(line, directive) {
+				return false
+			}
+		}
+	}
+
+	// The rule is enabled.
+	return true
 }
 
 // getAllMessages returns a slice with every message (not just top-level

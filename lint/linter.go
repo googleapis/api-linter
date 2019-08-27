@@ -60,6 +60,7 @@ func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 	resp := Response{
 		FilePath: fd.GetName(),
+		Problems: []Problem{},
 	}
 	var errMessages []string
 
@@ -78,7 +79,7 @@ func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
 		if !config.Disabled {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
-					if rule.IsDisabled(p.Descriptor) {
+					if rule.IsEnabled(p.Descriptor) {
 						p.RuleID = rule.Name
 						p.Category = config.Category
 						resp.Problems = append(resp.Problems, p)

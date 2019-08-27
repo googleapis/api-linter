@@ -21,29 +21,31 @@ import (
 	"testing"
 
 	"github.com/jhump/protoreflect/desc"
-
-	"google.golang.org/protobuf/types/descriptorpb"
+	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestLinter_run(t *testing.T) {
-	fileName := "protofile"
-	req, _ := NewProtoRequest(
-		&descriptorpb.FileDescriptorProto{
-			Name: &fileName,
-		}, nil)
-
+	fd, err := builder.NewFile("protofile.proto").Build()
+	if err != nil {
+		t.Fatalf("Failed to build a file descriptor.")
+	}
 	defaultConfigs := Configs{
 		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
 	}
 
-	ruleProblems := []Problem{{Message: "rule1_problem", Category: "", RuleID: "test::rule1"}}
+	ruleProblems := []Problem{{
+		Message:    "rule1_problem",
+		Category:   "",
+		RuleID:     "test::rule1",
+		Descriptor: fd,
+	}}
 
 	tests := []struct {
-		desc    string
-		configs Configs
-		resp    Response
+		desc     string
+		configs  Configs
+		problems []Problem
 	}{
-		{"empty config empty response", Configs{}, Response{FilePath: req.ProtoFile().Path()}},
+		{"empty config empty response", Configs{}, []Problem{}},
 		{
 			"config with non-matching file has no effect",
 			append(
@@ -53,7 +55,7 @@ func TestLinter_run(t *testing.T) {
 					RuleConfigs:   map[string]RuleConfig{"": {Disabled: true}},
 				},
 			),
-			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
+			ruleProblems,
 		},
 		{
 			"config with non-matching rule has no effect",
@@ -64,7 +66,7 @@ func TestLinter_run(t *testing.T) {
 					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Disabled: true}},
 				},
 			),
-			Response{Problems: ruleProblems, FilePath: req.ProtoFile().Path()},
+			ruleProblems,
 		},
 		{
 			"matching config can disable rule",
@@ -77,7 +79,7 @@ func TestLinter_run(t *testing.T) {
 					},
 				},
 			),
-			Response{FilePath: req.ProtoFile().Path()},
+			[]Problem{},
 		},
 		{
 			"matching config can override Category",
@@ -90,55 +92,59 @@ func TestLinter_run(t *testing.T) {
 					},
 				},
 			),
-			Response{
-				Problems: []Problem{{Message: "rule1_problem", Category: "error", RuleID: "test::rule1"}},
-				FilePath: req.ProtoFile().Path(),
-			},
+			[]Problem{{
+				Category:   "error",
+				Descriptor: fd,
+				Message:    "rule1_problem",
+				RuleID:     "test::rule1",
+			}},
 		},
 	}
 
 	for ind, test := range tests {
-		rules, err := NewRules(&mockRule{
-			Name:     "test::rule1",
-			lintResp: ruleProblems,
+		rules, err := NewRules(Rule{
+			Name: "test::rule1",
+			LintFile: func(f *desc.FileDescriptor) []Problem {
+				return test.problems
+			},
 		})
 		if err != nil {
 			t.Fatal(err)
 		}
 		l := New(rules, test.configs)
 
-		resp, _ := l.run(req)
-		if !reflect.DeepEqual(resp, test.resp) {
-			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp, test.resp)
+		// Actually run the linter.
+		resp, _ := l.run(fd)
+
+		// Assert that we got the problems we expected.
+		if !reflect.DeepEqual(resp.Problems, test.problems) {
+			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp.Problems, test.problems)
 		}
 	}
 }
 
-type panickingRule struct {
-	Name string
-}
-
-func (r *panickingRule) Lint(_ *desc.FileDescriptor) []Problem {
-	panic("panic")
-}
-
-type panickingErrorRule struct {
-	Name string
-}
-
-func (r *panickingErrorRule) Lint(_ *desc.FileDescriptor) []Problem {
-	panic(fmt.Errorf("panic"))
-}
-
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
+	fd, err := builder.NewFile("test.proto").Build()
+	if err != nil {
+		t.Fatalf("Failed to build the file descriptor.")
+	}
+
 	tests := []struct {
 		rule Rule
-	}{{Rule{
-		Name: "panic",
-		LintFile: func (fd *desc.FileDescriptor) []Problem {
-			panic("panic")
-		}
-	}}, {&panickingErrorRule{Name: "panicerror"}}}
+	}{
+		{Rule{
+			Name: "panic",
+			LintFile: func(_ *desc.FileDescriptor) []Problem {
+				panic("panic")
+			},
+		}},
+		{Rule{
+			Name: "panic-error",
+			LintFile: func(_ *desc.FileDescriptor) []Problem {
+				panic(fmt.Errorf("panic"))
+			},
+		}},
+	}
 
 	for _, test := range tests {
 		r, err := NewRules(test.rule)
@@ -146,17 +152,13 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			t.Fatalf("Failed to create Rules: %q", err)
 		}
 
-		fd := new(descriptorpb.FileDescriptorProto)
-		fd.SourceCodeInfo = new(descriptorpb.SourceCodeInfo)
-		filename := "test.proto"
-		fd.Name = &filename
-
+		// Instantiate a linter with the given rule.
 		l := New(r, []Config{{
 			IncludedPaths: []string{"**"},
 			RuleConfigs:   map[string]RuleConfig{"": {}},
 		}})
 
-		_, err = l.LintProtos([]*descriptorpb.FileDescriptorProto{fd})
+		_, err = l.LintProtos(fd)
 		if err == nil || !strings.Contains(err.Error(), "panic") {
 			t.Fatalf("Expected error with panic, got %q", err)
 		}
