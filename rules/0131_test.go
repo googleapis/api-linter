@@ -20,55 +20,74 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestCheckGetMessageNameValid(t *testing.T) {
-	// Create an appropriate method, with a correct message name.
-	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("GetBook",
-		builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-	)).Build()
-	if err != nil {
-		t.Fatalf("Could not build GetBook method.")
+func TestCheckGetRequestMessageName(t *testing.T) {
+	// Set up the testing permutations.
+	tests := []struct {
+		testName       string
+		methodName     string
+		reqMessageName string
+		problemCount   int
+		errPrefix      string
+	}{
+		{"Valid", "GetBook", "GetBookRequest", 0, "False positive"},
+		{"Invalid", "GetBook", "Book", 1, "False negative"},
+		{"Irrelevant", "AcquireBook", "Book", 0, "False positive"},
 	}
 
-	// Run the lint rule; it should return no problems.
-	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) > 0 {
-		t.Errorf("False positive on rule %s: %#v", checkGetRequestMessageName.Name, problems)
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create a minimal service with a AIP-131 Get method
+			// (or with a different method, in the "Irrelevant" case).
+			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
+				builder.RpcTypeMessage(builder.NewMessage(test.reqMessageName), false),
+				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+			)).Build()
+			if err != nil {
+				t.Fatalf("Could not build %s method.", test.methodName)
+			}
+
+			// Run the lint rule, and establish that it returns the correct
+			// number of problems.
+			if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) != test.problemCount {
+				t.Errorf("%s on rule %s: %#v", test.errPrefix, checkGetRequestMessageName.Name, problems)
+			}
+		})
 	}
 }
 
-func TestCheckGetMessageNameInvalid(t *testing.T) {
-	// Create an appropriate method, with an incorrect request message name.
-	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("GetBook",
-		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-	)).Build()
-	if err != nil {
-		t.Fatalf("Could not build GetBook method.")
+func TestCheckGetRequestMessageNameField(t *testing.T) {
+	// Set up the testing permutations.
+	tests := []struct {
+		testName      string
+		messageName   string
+		nameFieldName string
+		nameFieldType *builder.FieldType
+		problemCount  int
+		errPrefix     string
+	}{
+		{"Valid", "GetBookRequest", "name", builder.FieldTypeString(), 0, "False positive"},
+		{"InvalidName", "GetBookRequest", "id", builder.FieldTypeString(), 1, "False negative"},
+		{"InvalidType", "GetBookRequest", "name", builder.FieldTypeBytes(), 1, "False negative"},
+		{"Irrelevant", "AcquireBookRequest", "id", builder.FieldTypeString(), 0, "False positive"},
 	}
 
-	// Run the lint rule; it should return no problems.
-	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) < 1 {
-		t.Errorf("False negative on rule %s: %#v", checkGetRequestMessageName.Name, problems)
-	}
-}
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create an appropriate message descriptor.
+			message, err := builder.NewMessage(test.messageName).AddField(
+				builder.NewField(test.nameFieldName, test.nameFieldType),
+			).Build()
+			if err != nil {
+				t.Fatalf("Could not build %s message.", test.messageName)
+			}
 
-func TestCheckGetMessageNameIrrelevant(t *testing.T) {
-	// Create an appropriate method, with a message name that should make
-	// the rule pass right on by.
-	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("AcquireBook",
-		builder.RpcTypeMessage(builder.NewMessage("AcquireBookReq"), false),
-		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-	)).Build()
-	if err != nil {
-		t.Fatalf("Could not build AcquireBook method.")
-	}
-
-	// Run the lint rule; it should return no problems.
-	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) > 0 {
-		t.Errorf(
-			"False positive on rule %s (should have been irrelevant): %#v",
-			checkGetRequestMessageName.Name,
-			problems,
-		)
+			// Run the lint rule, and establish that it returns the correct
+			// number of problems.
+			if problems := checkGetRequestMessageNameField.LintMessage(message); len(problems) != test.problemCount {
+				t.Errorf("%s on rule %s: %#v", test.errPrefix, checkGetRequestMessageNameField.Name, problems)
+			}
+		})
 	}
 }
