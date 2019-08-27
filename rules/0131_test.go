@@ -21,17 +21,17 @@ import (
 )
 
 func TestCheckGetMessageNameValid(t *testing.T) {
-	// Create an appropriate request and response message.
-	method, err := builder.NewMethod("GetBook",
+	// Create an appropriate method.
+	service, err := builder.NewService("Library").AddMethod(builder.NewMethod("GetBook",
 		builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
 		builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-	).Build()
+	)).Build()
 	if err != nil {
 		t.Fatalf("Could not build method.")
 	}
 
 	// Run the lint rule; it should return no problems.
-	if problems := checkGetRequestMessageName.LintMethod(method); len(problems) > 0 {
-		t.Errorf("False positive on rule %s: %#v", checkGetMessageRequestName.Name, problems)
+	if problems := checkGetRequestMessageName.LintMethod(service.GetMethods()[0]); len(problems) > 0 {
+		t.Errorf("False positive on rule %s: %#v", checkGetRequestMessageName.Name, problems)
 	}
 }
