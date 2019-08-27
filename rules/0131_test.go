@@ -29,6 +29,8 @@ func TestCheckGetMessageNameValid(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not build method.")
 	}
+
+	// Run the lint rule; it should return no problems.
 	if problems := checkGetRequestMessageName.LintMethod(method); len(problems) > 0 {
 		t.Errorf("False positive on rule %s: %#v", checkGetMessageRequestName.Name, problems)
 	}
