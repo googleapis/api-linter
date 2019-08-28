@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0140
+package aip0191
 
 import (
 	"strings"
+	"testing"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/stoewer/go-strcase"
 )
 
-// AddRules adds all of the AIP-140 rules to the provided registry.
-func AddRules(r lint.Rules) {
-	r.Register(
-		lowerSnake,
-	)
-}
-
-// toLowerSnakeCase converts s to lower_snake_case.
-func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.SnakeCase(s))
+func TestAddRules(t *testing.T) {
+	rules := make(lint.Rules)
+	AddRules(rules)
+	for ruleName := range rules {
+		if !strings.HasPrefix(string(ruleName), "core::0191") {
+			t.Errorf("Rule %s is not namespaced to core::0191.", ruleName)
+		}
+	}
 }

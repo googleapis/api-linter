@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0140
+package aip0191
 
 import (
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/stoewer/go-strcase"
 )
 
-// AddRules adds all of the AIP-140 rules to the provided registry.
+// AddRules adds all of the AIP-191 rules to the provided registry.
 func AddRules(r lint.Rules) {
 	r.Register(
-		lowerSnake,
+		syntax,
 	)
-}
-
-// toLowerSnakeCase converts s to lower_snake_case.
-func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.SnakeCase(s))
 }

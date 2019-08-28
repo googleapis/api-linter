@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+// 		https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0140
+package aip0191
 
 import (
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/stoewer/go-strcase"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-140 rules to the provided registry.
-func AddRules(r lint.Rules) {
-	r.Register(
-		lowerSnake,
-	)
-}
-
-// toLowerSnakeCase converts s to lower_snake_case.
-func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.SnakeCase(s))
+var syntax = lint.Rule{
+	Name:        lint.NewRuleName("core", "0191", "proto-version"),
+	Description: "APIs must use proto3.",
+	URI:         "https://aip.dev/191#guidance",
+	LintFile: func(f *desc.FileDescriptor) (problems []lint.Problem) {
+		if !f.IsProto3() {
+			problems = append(problems, lint.Problem{
+				Message:    "All API proto files must use proto3 syntax.",
+				Suggestion: "syntax = \"proto3\"",
+				Descriptor: f,
+			})
+		}
+		return problems
+	},
 }
