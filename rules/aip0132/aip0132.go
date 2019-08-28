@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0132
 
 import (
 	"regexp"
@@ -21,30 +21,25 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
+// AddRules adds all of the AIP-132 rules to the provided registry.
 func AddRules(r lint.Rules) {
 	r.Register(
 		requestMessageName,
+		responseMessageName,
 		standardFields,
 		unknownFields,
-		responseMessageName,
 	)
 }
 
-var getMethodRegexp = regexp.MustCompile("^Get(?:[A-Z]|$)")
-var getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
+var listMethodRegexp = regexp.MustCompile("^List(?:[A-Z]|$)")
+var listReqMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
 
-// Returns true if this is a AIP-131 Get method, false otherwise.
-func isGetMethod(m *desc.MethodDescriptor) bool {
-	methodName := m.GetName()
-	if methodName == "GetIamPolicy" {
-		return false
-	}
-	return getMethodRegexp.MatchString(methodName)
+// Return true if this is an AIP-132 List method, false otherwise.
+func isListMethod(m *desc.MethodDescriptor) bool {
+	return listMethodRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-131 Get request message, false otherwise.
-func isGetRequestMessage(m *desc.MessageDescriptor) bool {
-	return getReqMessageRegexp.MatchString(m.GetName())
+// Return true if this is an AIP-132 List request message, false otherwise.
+func isListRequestMessage(m *desc.MessageDescriptor) bool {
+	return listReqMessageRegexp.MatchString(m.GetName())
 }

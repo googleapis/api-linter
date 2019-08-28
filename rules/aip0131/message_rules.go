@@ -19,30 +19,36 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// Get messages should have a properly named Request message.
-var requestMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "request-message", "name"),
-	Description: "Get RPCs must have a consistent request message name.",
-	URI:         "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+// The Get standard method should only have expected fields.
+var standardFields = lint.Rule{
+	Name:        lint.NewRuleName("core", "0131", "request-message", "name-field"),
+	Description: "The Get standard method must include expected fields.",
+	URI:         "https://aip.dev/131#request-message",
+	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
-		if !isGetMethod(m) {
+		if !isGetRequestMessage(m) {
 			return problems
 		}
 
-		// Rule check: Establish that for methods such as `GetFoo`, the request
-		// message is named `GetFooRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
+		// Rule check: Establish that a name field is present.
+		name := m.FindFieldByName("name")
+		if name == nil {
 			problems = append(problems, lint.Problem{
-				Message: fmt.Sprintf(
-					"Get RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
 				Descriptor: m,
+			})
+			return problems
+		}
+
+		// Rule check: Ensure that the name field is the correct type.
+		if name.GetType() != builder.FieldTypeString().GetType() {
+			problems = append(problems, lint.Problem{
+				Message:    "`name` field on Get RPCs should be a string",
+				Descriptor: name,
 			})
 		}
 
@@ -50,29 +56,34 @@ var requestMessageName = lint.Rule{
 	},
 }
 
-// Get messages should use the resource as the response message
-var responseMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "response-message", "name"),
-	Description: "check that Get RPCs have appropriate response messages",
-	URI:         "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+// Get methods should not have unrecognized fields.
+var unknownFields = lint.Rule{
+	Name:        lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
+	Description: "Get RPCs must not contain unexpected fields.",
+	URI:         "https://aip.dev/131#request-message",
+	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
-		if !isGetMethod(m) {
+		if !isGetRequestMessage(m) {
 			return
 		}
 
-		// Rule check: Establish that for methods such as `GetFoo`, the response
-		// message is named `Foo`.
-		if got, want := m.GetOutputType().GetName(), m.GetName()[3:]; got != want {
-			problems = append(problems, lint.Problem{
-				Message: fmt.Sprintf(
-					"Get RPCs should have the corresponding resource as the response message, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-			})
+		// Rule check: Establish that there are no unexpected fields.
+		allowedFields := map[string]struct{}{
+			"name":      {}, // AIP-131
+			"read_mask": {}, // AIP-157
+			"view":      {}, // AIP-157
+		}
+		for _, field := range m.GetFields() {
+			if _, ok := allowedFields[string(field.GetName())]; !ok {
+				problems = append(problems, lint.Problem{
+					Message: fmt.Sprintf(
+						"Get RPCs must only contain fields explicitly described in AIPs, not %q.",
+						string(field.GetName()),
+					),
+					Descriptor: field,
+				})
+			}
 		}
 
 		return problems

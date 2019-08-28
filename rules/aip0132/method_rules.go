@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0132
 
 import (
 	"fmt"
@@ -21,24 +21,24 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Get messages should have a properly named Request message.
+// List messages should have a properly named Request message.
 var requestMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "request-message", "name"),
-	Description: "Get RPCs must have a consistent request message name.",
-	URI:         "https://aip.dev/131#guidance",
+	Name:        lint.NewRuleName("core", "0132", "request-message", "name"),
+	Description: "List RPCs must have an appropriate request message name.",
+	URI:         "https://aip.dev/132#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
+		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
-		if !isGetMethod(m) {
-			return problems
+		if !isListMethod(m) {
+			return
 		}
 
-		// Rule check: Establish that for methods such as `GetFoo`, the request
-		// message is named `GetFooRequest`.
+		// Rule check: Establish that for methods such as `ListFoos`, the request
+		// message is named `ListFoosRequest`.
 		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
-					"Get RPCs should have a request message named after the RPC, such as %q.",
+					"List RPCs should have a request message named after the RPC, such as %q.",
 					want,
 				),
 				Suggestion: want,
@@ -50,24 +50,24 @@ var requestMessageName = lint.Rule{
 	},
 }
 
-// Get messages should use the resource as the response message
+// List messages should use a `ListFoosResponse` response message.
 var responseMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "response-message", "name"),
-	Description: "check that Get RPCs have appropriate response messages",
-	URI:         "https://aip.dev/131#guidance",
+	Name:        lint.NewRuleName("core", "0132", "response_message", "name"),
+	Description: "check that List RPCs have appropriate response messages",
+	URI:         "https://aip.dev/132#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
+		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
-		if !isGetMethod(m) {
+		if !isListMethod(m) {
 			return
 		}
 
-		// Rule check: Establish that for methods such as `GetFoo`, the response
-		// message is named `Foo`.
-		if got, want := m.GetOutputType().GetName(), m.GetName()[3:]; got != want {
+		// Rule check: Establish that for methods such as `ListFoos`, the response
+		// message is named `ListFoosResponse`.
+		if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
-					"Get RPCs should have the corresponding resource as the response message, such as %q.",
+					"List RPCs should have a response message named after the RPC, such as %q.",
 					want,
 				),
 				Suggestion: want,
