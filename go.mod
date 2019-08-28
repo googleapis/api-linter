@@ -7,6 +7,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/jhump/protoreflect v1.5.0
+	github.com/stoewer/go-strcase v1.0.2
 	github.com/urfave/cli v1.21.0
 	golang.org/x/net v0.0.0-20190813202137-74dc4d7220e7 // indirect
 	google.golang.org/genproto v0.0.0-20170818010345-ee236bd376b0

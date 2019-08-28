@@ -52,7 +52,7 @@ var requestMessageName = lint.Rule{
 
 // List messages should use a `ListFoosResponse` response message.
 var responseMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0132", "response_message", "name"),
+	Name:        lint.NewRuleName("core", "0132", "response-message", "name"),
 	Description: "check that List RPCs have appropriate response messages",
 	URI:         "https://aip.dev/132#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {

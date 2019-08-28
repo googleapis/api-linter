@@ -58,7 +58,7 @@ var standardFields = lint.Rule{
 
 // List methods should not have unrecognized fields.
 var unknownFields = lint.Rule{
-	Name:        lint.NewRuleName("core", "0132", "request_message", "unknown_fields"),
+	Name:        lint.NewRuleName("core", "0132", "request-message", "unknown-fields"),
 	Description: "List methods should only contain fields described in AIPs.",
 	URI:         "https://aip.dev/132#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
