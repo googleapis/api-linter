@@ -68,21 +68,23 @@ func TestUnknownFields(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName     string
+		messageName  string
 		fieldName    string
 		fieldType    *builder.FieldType
 		problemCount int
 		errPrefix    string
 	}{
-		{"ReadMask", "read_mask", builder.FieldTypeImportedMessage(fieldMask), 0, "False positive"},
-		{"View", "view", builder.FieldTypeEnum(builder.NewEnum("View")), 0, "False positive"},
-		{"Invalid", "application_id", builder.FieldTypeString(), 1, "False negative"},
+		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), 0, "False positive"},
+		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), 0, "False positive"},
+		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), 1, "False negative"},
+		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), 0, "False positive"},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage("GetBookRequest").AddField(
+			message, err := builder.NewMessage(test.messageName).AddField(
 				builder.NewField("name", builder.FieldTypeString()),
 			).AddField(
 				builder.NewField(test.fieldName, test.fieldType),
