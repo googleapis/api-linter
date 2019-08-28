@@ -19,7 +19,12 @@ import (
 	"log"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/aip0131"
 )
+
+func init() {
+	aip0131.AddRules(coreRules)
+}
 
 var coreRules, _ = lint.NewRules()
 
@@ -28,6 +33,7 @@ func Rules() lint.Rules {
 	return coreRules.Copy()
 }
 
+// registerRules registers the given rule into "core rules".
 func registerRules(r ...lint.Rule) {
 	for _, rl := range r {
 		if err := coreRules.Register(rl); err != nil {
