@@ -31,6 +31,7 @@ func TestRequestMessageName(t *testing.T) {
 	}{
 		{"Valid", "GetBook", "GetBookRequest", 0, "False positive"},
 		{"Invalid", "GetBook", "Book", 1, "False negative"},
+		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", 0, "False positive"},
 		{"Irrelevant", "AcquireBook", "Book", 0, "False positive"},
 	}
 
