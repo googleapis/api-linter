@@ -23,10 +23,6 @@ import (
 	"testing"
 )
 
-var protocPath = func() string {
-	return "protoc"
-}
-
 // Each rule must have a testing case stored here.
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
@@ -175,11 +171,14 @@ func runLinter(t *testing.T, proto, config string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := os.Chdir(workdir); err != nil {
+		t.Fatal(err)
+	}
 	defer os.RemoveAll(workdir)
 
-	protoPath := filepath.Join(workdir, "test.proto")
-	configPath := filepath.Join(workdir, "test_config.json")
-	outPath := filepath.Join(workdir, "test.out")
+	protoPath := "test.proto"
+	configPath := "test_config.json"
+	outPath := "test.out"
 
 	if err := writeFile(protoPath, proto); err != nil {
 		t.Fatal(err)

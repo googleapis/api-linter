@@ -16,6 +16,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
@@ -69,11 +70,13 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				// Parse the provided protobuf files into a protoreflect file
 				// descriptor.
 				p := protoparse.Parser{
-					ImportPaths: c.StringSlice("proto_path"),
+					ImportPaths:           c.StringSlice("proto_path"),
 					IncludeSourceCodeInfo: true,
 				}
 				fd, err := p.ParseFiles(filenames...)
 				if err != nil {
+					es := err.Error()
+					fmt.Printf("%v", es)
 					return err
 				}
 
