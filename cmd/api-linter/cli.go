@@ -19,7 +19,7 @@ import (
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/protoparse"
+	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
