@@ -16,7 +16,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
@@ -75,8 +74,6 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 				}
 				fd, err := p.ParseFiles(filenames...)
 				if err != nil {
-					es := err.Error()
-					fmt.Printf("%v", es)
 					return err
 				}
 

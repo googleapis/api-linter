@@ -32,15 +32,21 @@ var testCases = []struct {
 	testName, rule, proto string
 }{
 	{
-		testName: "ProtoVersion",
-		rule:     "core::0191::proto-version",
+		testName: "GetRequestMessage",
+		rule:     "core::0131::request-message::name",
 		proto: `
-		// disable-me-here
-		syntax = "proto2";
+		syntax = "proto3";
+
+		service Library {
+			// disable-me-here
+			rpc GetBook(Book) returns (Book);
+		}
+
+		message Book {}
 		`,
 	},
 	{
-		testName: "Field Names",
+		testName: "FieldNames",
 		rule:     "core::0140::lower-snake",
 		proto: `
 				syntax = "proto3";
@@ -95,7 +101,7 @@ func TestRules_DisabledByFileComments(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
-			disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
+			disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)", test.rule)
 			proto := disableInFile + "\n" + test.proto
 			result := runLinter(t, proto, config)
 			if strings.Contains(result, test.rule) {
@@ -122,7 +128,7 @@ func TestRules_DisabledByInlineComments(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
-			disableInline := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
+			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
 			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
 			result := runLinter(t, proto, config)
 			if strings.Contains(result, test.rule) {
