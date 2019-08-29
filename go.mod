@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/bmatcuk/doublestar v1.1.5
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	github.com/golang/protobuf v1.3.1
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/jhump/protoreflect v1.5.0
 	github.com/stoewer/go-strcase v1.0.2

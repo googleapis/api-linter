@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -115,20 +116,17 @@ func (rule *Rule) IsEnabled(d desc.Descriptor) bool {
 	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Name)
 
 	// If the comments above the descriptor disable the rule,
-	// return true.
+	// return false.
 	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
 		if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
 			return false
 		}
 	}
 
-	// The rule may also be disabled at the file level; if it is, return true.
-	if sourceInfo := d.GetFile().GetSourceInfo(); sourceInfo != nil {
-		for _, line := range sourceInfo.GetLeadingDetachedComments() {
-			if strings.Contains(line, directive) {
-				return false
-			}
-		}
+	// The rule may also be disabled at the file level.
+	// If it is, return false.
+	if strings.Contains(fileHeader(d.GetFile()), directive) {
+		return false
 	}
 
 	// The rule is enabled.
@@ -153,4 +151,35 @@ func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDe
 		messages = append(messages, getAllNestedMessages(nested)...)
 	}
 	return messages
+}
+
+// fileHeader attempts to get the comment at the top of the file, but it
+// is on a best effort basis because protobuf is inconsistent.
+//
+// Taken from https://github.com/jhump/protoreflect/issues/215
+func fileHeader(fd *desc.FileDescriptor) string {
+	var firstLoc *descriptor.SourceCodeInfo_Location
+	var firstSpan int64
+	for _, curr := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
+		if curr.LeadingComments == nil && len(curr.LeadingDetachedComments) == 0 {
+			// Skip locations that have no comments.
+			continue
+		}
+		currSpan := asPos(curr.Span)
+		if firstLoc == nil || currSpan < firstSpan {
+			firstLoc = curr
+			firstSpan = currSpan
+		}
+	}
+	if firstLoc == nil {
+		return ""
+	}
+	if len(firstLoc.LeadingDetachedComments) > 0 {
+		return strings.Join(firstLoc.LeadingDetachedComments, "\n")
+	}
+	return firstLoc.GetLeadingComments()
+}
+
+func asPos(span []int32) int64 {
+	return (int64(span[0]) << 32) + int64(span[1])
 }
