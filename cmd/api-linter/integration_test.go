@@ -33,7 +33,7 @@ var testCases = []struct {
 }{
 	{
 		testName: "ProtoVersion",
-		rule:     "core::0190::syntax",
+		rule:     "core::0191::proto-version",
 		proto: `
 		// disable-me-here
 		syntax = "proto2";
@@ -41,7 +41,7 @@ var testCases = []struct {
 	},
 	{
 		testName: "Field Names",
-		rule:     "core::0141::lower-snake",
+		rule:     "core::0140::lower-snake",
 		proto: `
 				syntax = "proto3";
 				message Test {
