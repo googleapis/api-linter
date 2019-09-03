@@ -41,13 +41,13 @@ func TestLinter_run(t *testing.T) {
 	}}
 
 	tests := []struct {
-		desc     string
+		testName string
 		configs  Configs
 		problems []Problem
 	}{
-		{"empty config empty response", Configs{}, []Problem{}},
+		{"Empty", Configs{}, []Problem{}},
 		{
-			"config with non-matching file has no effect",
+			"NonMatchingFile",
 			append(
 				defaultConfigs,
 				Config{
@@ -58,7 +58,7 @@ func TestLinter_run(t *testing.T) {
 			ruleProblems,
 		},
 		{
-			"config with non-matching rule has no effect",
+			"NonMatchingRule",
 			append(
 				defaultConfigs,
 				Config{
@@ -69,7 +69,7 @@ func TestLinter_run(t *testing.T) {
 			ruleProblems,
 		},
 		{
-			"matching config can disable rule",
+			"DisabledRule",
 			append(
 				defaultConfigs,
 				Config{
@@ -82,7 +82,7 @@ func TestLinter_run(t *testing.T) {
 			[]Problem{},
 		},
 		{
-			"matching config can override Category",
+			"CategoryOverride",
 			append(
 				defaultConfigs,
 				Config{
@@ -101,25 +101,27 @@ func TestLinter_run(t *testing.T) {
 		},
 	}
 
-	for ind, test := range tests {
-		rules, err := NewRules(Rule{
-			Name: "test::rule1",
-			LintFile: func(f *desc.FileDescriptor) []Problem {
-				return test.problems
-			},
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			rules, err := NewRules(Rule{
+				Name: "test::rule1",
+				LintFile: func(f *desc.FileDescriptor) []Problem {
+					return test.problems
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			l := New(rules, test.configs)
+
+			// Actually run the linter.
+			resp, _ := l.lintFileDescriptor(fd)
+
+			// Assert that we got the problems we expected.
+			if !reflect.DeepEqual(resp.Problems, test.problems) {
+				t.Errorf("Expected %v, got %v.", resp.Problems, test.problems)
+			}
 		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		l := New(rules, test.configs)
-
-		// Actually run the linter.
-		resp, _ := l.run(fd)
-
-		// Assert that we got the problems we expected.
-		if !reflect.DeepEqual(resp.Problems, test.problems) {
-			t.Errorf("Test #%d (%s): Linter.run()=%v; want %v", ind+1, test.desc, resp.Problems, test.problems)
-		}
 	}
 }
 
