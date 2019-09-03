@@ -26,27 +26,27 @@ var requestMessageName = lint.Rule{
 	Name:        lint.NewRuleName("core", "0131", "request-message", "name"),
 	Description: "Get RPCs must have a consistent request message name.",
 	URI:         "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
-			return problems
+			return nil
 		}
 
 		// Rule check: Establish that for methods such as `GetFoo`, the request
 		// message is named `GetFooRequest`.
 		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have a request message named after the RPC, such as %q.",
 					want,
 				),
 				Suggestion: want,
 				Descriptor: m,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }
 
@@ -55,26 +55,26 @@ var responseMessageName = lint.Rule{
 	Name:        lint.NewRuleName("core", "0131", "response-message", "name"),
 	Description: "check that Get RPCs have appropriate response messages",
 	URI:         "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
-			return
+			return nil
 		}
 
 		// Rule check: Establish that for methods such as `GetFoo`, the response
 		// message is named `Foo`.
 		if got, want := m.GetOutputType().GetName(), m.GetName()[3:]; got != want {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have the corresponding resource as the response message, such as %q.",
 					want,
 				),
 				Suggestion: want,
 				Descriptor: m,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }

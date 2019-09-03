@@ -27,32 +27,31 @@ var standardFields = lint.Rule{
 	Name:        lint.NewRuleName("core", "0132", "request-message", "parent-field"),
 	Description: "List methods should include a `parent` field.",
 	URI:         "https://aip.dev/132#request-message",
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
 		if !isListRequestMessage(m) {
-			return
+			return nil
 		}
 
 		// Rule check: Establish that a `parent` field is present.
 		parentField := m.FindFieldByName("parent")
 		if parentField == nil {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message:    fmt.Sprintf("Message `%s` has no `parent` field", m.GetName()),
 				Descriptor: m,
-			})
-			return problems
+			}}
 		}
 
 		// Rule check: Establish that the parent field is a string.
 		if parentField.GetType() != builder.FieldTypeString().GetType() {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message:    "`parent` field on List RPCs must be a string",
 				Descriptor: parentField,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }
 
@@ -102,6 +101,6 @@ var unknownFields = lint.Rule{
 			}
 		}
 
-		return problems
+		return
 	},
 }

@@ -27,32 +27,31 @@ var standardFields = lint.Rule{
 	Name:        lint.NewRuleName("core", "0131", "request-message", "name-field"),
 	Description: "The Get standard method must include expected fields.",
 	URI:         "https://aip.dev/131#request-message",
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetRequestMessage(m) {
-			return problems
+			return nil
 		}
 
 		// Rule check: Establish that a name field is present.
 		name := m.FindFieldByName("name")
 		if name == nil {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
 				Descriptor: m,
-			})
-			return problems
+			}}
 		}
 
 		// Rule check: Ensure that the name field is the correct type.
 		if name.GetType() != builder.FieldTypeString().GetType() {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message:    "`name` field on Get RPCs should be a string",
 				Descriptor: name,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }
 
@@ -86,6 +85,6 @@ var unknownFields = lint.Rule{
 			}
 		}
 
-		return problems
+		return
 	},
 }

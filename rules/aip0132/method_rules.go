@@ -26,27 +26,27 @@ var requestMessageName = lint.Rule{
 	Name:        lint.NewRuleName("core", "0132", "request-message", "name"),
 	Description: "List RPCs must have an appropriate request message name.",
 	URI:         "https://aip.dev/132#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
 		if !isListMethod(m) {
-			return
+			return nil
 		}
 
 		// Rule check: Establish that for methods such as `ListFoos`, the request
 		// message is named `ListFoosRequest`.
 		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"List RPCs should have a request message named after the RPC, such as %q.",
 					want,
 				),
 				Suggestion: want,
 				Descriptor: m,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }
 
@@ -55,26 +55,26 @@ var responseMessageName = lint.Rule{
 	Name:        lint.NewRuleName("core", "0132", "response-message", "name"),
 	Description: "check that List RPCs have appropriate response messages",
 	URI:         "https://aip.dev/132#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
 		if !isListMethod(m) {
-			return
+			return nil
 		}
 
 		// Rule check: Establish that for methods such as `ListFoos`, the response
 		// message is named `ListFoosResponse`.
 		if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
-			problems = append(problems, lint.Problem{
+			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"List RPCs should have a response message named after the RPC, such as %q.",
 					want,
 				),
 				Suggestion: want,
 				Descriptor: m,
-			})
+			}}
 		}
 
-		return problems
+		return nil
 	},
 }
