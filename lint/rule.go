@@ -136,8 +136,8 @@ func (rule *Rule) IsEnabled(d desc.Descriptor) bool {
 // getAllMessages returns a slice with every message (not just top-level
 // messages) in the file.
 func getAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor) {
+	messages = append(messages, f.GetMessageTypes()...)
 	for _, message := range f.GetMessageTypes() {
-		messages = append(messages, message)
 		messages = append(messages, getAllNestedMessages(message)...)
 	}
 	return messages
