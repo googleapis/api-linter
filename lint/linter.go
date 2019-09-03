@@ -43,7 +43,7 @@ func New(rules Rules, configs Configs) *Linter {
 func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
-		resp, err := l.run(proto)
+		resp, err := l.lintFileDescriptor(proto)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +57,7 @@ func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 // It uses the proto file path to determine which rules will
 // be applied to the request, according to the list of Linter
 // configs.
-func (l *Linter) run(fd *desc.FileDescriptor) (Response, error) {
+func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	resp := Response{
 		FilePath: fd.GetName(),
 		Problems: []Problem{},
