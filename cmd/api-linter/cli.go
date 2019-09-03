@@ -86,7 +86,7 @@ func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
 					configs = append(configs, userConfigs...)
 				}
 
-				// Instantitate the linter object, and lint the protos.
+				// Instantiate the linter object, and lint the protos.
 				l := lint.New(rules, configs)
 				lintResponses, err := l.LintProtos(fd...)
 				if err != nil {
