@@ -79,7 +79,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 		if !config.Disabled {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
-					if rule.IsEnabled(p.Descriptor) {
+					if rule.isEnabled(p.Descriptor) {
 						p.RuleID = rule.Name
 						p.Category = config.Category
 						resp.Problems = append(resp.Problems, p)
