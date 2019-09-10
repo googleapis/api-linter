@@ -55,6 +55,9 @@ type Rule struct {
 
 	// LintEnum is called for each enum in the file.
 	LintEnum func(*desc.EnumDescriptor) []Problem
+
+	// Force keyword argument instantiation.
+	noPositional struct{}
 }
 
 // Lint iterates over every message in a FileDescriptor and runs the
@@ -110,9 +113,9 @@ func (rule *Rule) Lint(f *desc.FileDescriptor) (problems []Problem) {
 	return problems
 }
 
-// IsEnabled returns true if the rule is enabled (not disabled by the comments
+// isEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func (rule *Rule) IsEnabled(d desc.Descriptor) bool {
+func (rule *Rule) isEnabled(d desc.Descriptor) bool {
 	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Name)
 
 	// If the comments above the descriptor disable the rule,
