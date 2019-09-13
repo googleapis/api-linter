@@ -94,7 +94,7 @@ func (r *MessageRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	for _, message := range getAllMessages(fd) {
 		problems = append(problems, r.LintMessage(message)...)
 	}
-	return problems
+	return
 }
 
 // FieldRule defines a lint rule that is run on each field within a file.

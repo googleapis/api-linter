@@ -15,11 +15,129 @@
 package lint
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
+
+func TestFileRule(t *testing.T) {
+	// Create a file descriptor with nothing in it.
+	fd, err := builder.NewFile("test.proto").Build()
+	if err != nil {
+		t.Fatalf("Could not build file descriptor.")
+	}
+
+	// Declare tests.
+	tests := []struct {
+		testName string
+		problems []Problem
+	}{
+		{"NoProblems", []Problem{}},
+		{"OneProblem", []Problem{{
+			Message:    "There was a problem.",
+			Descriptor: fd,
+		}}},
+		{"TwoProblems", []Problem{
+			{Message: "This was the first problem.", Descriptor: fd},
+			{Message: "This was the second problem.", Descriptor: fd},
+		}},
+	}
+
+	// Iterate over the tests and run them.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			uri := "https://foo.dev/file-test"
+			rule := &FileRule{
+				Name: NewRuleName("test", test.testName),
+				URI:  uri,
+				LintFile: func(fd *desc.FileDescriptor) []Problem {
+					return test.problems
+				},
+			}
+			if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
+				t.Errorf("Got %q for GetName(), expected %q", got, want)
+			}
+			if got, want := rule.GetURI(), uri; got != want {
+				t.Errorf("Got %q for GetURI(), expected %q.", got, want)
+			}
+			if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
+				t.Errorf("Got %v problems; expected %v.", got, want)
+			}
+		})
+	}
+}
+
+func TestMessageRule(t *testing.T) {
+	// Create a file descriptor with two messages in it.
+	fd, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("Foo"),
+	).AddMessage(
+		builder.NewMessage("Bar"),
+	).Build()
+	if err != nil {
+		t.Fatalf("Failed to build file descriptor.")
+	}
+
+	// Declare tests.
+	tests := []struct {
+		testName string
+		problems []Problem
+	}{
+		{"NoProblems", []Problem{}},
+		{"OneProblem", []Problem{{
+			Message:    "There was a problem.",
+			Descriptor: fd.GetMessageTypes()[1],
+		}}},
+		{"TwoProblems", []Problem{
+			{
+				Message:    "This was the first problem.",
+				Descriptor: fd.GetMessageTypes()[1],
+			},
+			{
+				Message:    "This was the second problem.",
+				Descriptor: fd.GetMessageTypes()[1],
+			},
+		}},
+	}
+
+	// Iterate over the tests and run them.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the message rule.
+			uri := "https://foo.dev/message-test"
+			rule := &MessageRule{
+				Name: NewRuleName("test", test.testName),
+				URI:  uri,
+				LintMessage: func(m *desc.MessageDescriptor) []Problem {
+					if m.GetName() == "Bar" {
+						return test.problems
+					}
+					return nil
+				},
+			}
+
+			// Establish that the metadata methods work.
+			if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
+				t.Errorf("Got %q for GetName(), expected %q", got, want)
+			}
+			if got, want := rule.GetURI(), uri; got != want {
+				t.Errorf("Got %q for GetURI(), expected %q.", got, want)
+			}
+
+			// Run the message's lint function on the file descriptor
+			// and assert that we got what we expect.
+			if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
+				// For some reason, reflect.DeepEqual finds two empty []Problem{}
+				// to be unequal.
+				if len(got) > 0 || len(want) > 0 {
+					t.Errorf("Got %v problems; expected %v.", got, want)
+				}
+			}
+		})
+	}
+}
 
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
