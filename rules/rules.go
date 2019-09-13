@@ -43,7 +43,7 @@ func Rules() lint.Rules {
 func registerRules(r ...lint.Rule) {
 	for _, rl := range r {
 		if err := coreRules.Register(rl); err != nil {
-			log.Fatalf("Error when registering rule '%s': %v", rl.Name, err)
+			log.Fatalf("Error when registering rule '%s': %v", rl.GetName(), err)
 		}
 	}
 }
