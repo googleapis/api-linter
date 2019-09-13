@@ -87,7 +87,7 @@ func (r *MessageRule) GetURI() string {
 	return r.URI
 }
 
-// LintFile accepts a FileDescriptor and iterates over every message in the
+// Lint accepts a FileDescriptor and iterates over every message in the
 // file, and lints each message in the file.
 func (r *MessageRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	// Iterate over each message and process rules for each message.
@@ -119,7 +119,7 @@ func (r *FieldRule) GetURI() string {
 	return r.URI
 }
 
-// LintFile accepts a FileDescriptor and lints every field in the file.
+// Lint accepts a FileDescriptor and lints every field in the file.
 func (r *FieldRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	// Iterate over each message and process rules for each field in that
 	// message.
@@ -152,7 +152,7 @@ func (r *ServiceRule) GetURI() string {
 	return r.URI
 }
 
-// LintFile accepts a FileDescriptor and lints every service in the file.
+// Lint accepts a FileDescriptor and lints every service in the file.
 func (r *ServiceRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	for _, service := range fd.GetServices() {
 		problems = append(problems, r.LintService(service)...)
@@ -181,7 +181,7 @@ func (r *MethodRule) GetURI() string {
 	return r.URI
 }
 
-// LintFile accepts a FileDescriptor and lints every method in the file.
+// Lint accepts a FileDescriptor and lints every method in the file.
 func (r *MethodRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	for _, service := range fd.GetServices() {
 		for _, method := range service.GetMethods() {
@@ -212,7 +212,7 @@ func (r *EnumRule) GetURI() string {
 	return r.URI
 }
 
-// LintFile accepts a FileDescriptor and lints every enum in the file
+// Lint accepts a FileDescriptor and lints every enum in the file
 // (including enums nested within messages).
 func (r *EnumRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
 	// Lint enums that are at the top level of the file.
