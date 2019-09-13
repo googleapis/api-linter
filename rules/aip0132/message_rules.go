@@ -37,7 +37,7 @@ var standardFields = &lint.MessageRule{
 		parentField := m.FindFieldByName("parent")
 		if parentField == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message `%s` has no `parent` field", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
 				Descriptor: m,
 			}}
 		}
@@ -92,7 +92,7 @@ var unknownFields = &lint.MessageRule{
 			if fieldType != nil && field.GetType() != fieldType.GetType() {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Field `%s` is the wrong type; expected `%s`.",
+						"Field %q is the wrong type; expected %q.",
 						field.GetName(), fieldType.GetTypeName()),
 					Descriptor: field,
 				})
