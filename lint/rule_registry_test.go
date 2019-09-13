@@ -18,11 +18,11 @@ import (
 	"testing"
 )
 
-func TestRulesRegister(t *testing.T) {
+func TestRuleRegistryRegister(t *testing.T) {
 	r1 := &FileRule{Name: "a"}
 	r2 := &FileRule{Name: "b"}
 
-	rules, _ := NewRules()
+	rules, _ := NewRuleRegistry()
 	if err := rules.Register(r1, r2); err != nil {
 		t.Errorf("Register: return error %v, but want nil", err)
 	}
@@ -37,7 +37,7 @@ func TestRulesRegister_Duplicate(t *testing.T) {
 	r1 := &FileRule{Name: "a"}
 	r2 := &FileRule{Name: "a"}
 
-	rules, _ := NewRules()
+	rules, _ := NewRuleRegistry()
 	if err := rules.Register(r1, r2); err == nil {
 		t.Errorf("Register with duplicate name")
 	}

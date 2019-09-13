@@ -18,12 +18,12 @@ import (
 	"fmt"
 )
 
-// Rules is a registry for registering and looking up rules.
-type Rules map[RuleName]Rule
+// RuleRegistry is a registry for registering and looking up rules.
+type RuleRegistry map[RuleName]Rule
 
 // Copy returns a new copy of the rules.
-func (r Rules) Copy() Rules {
-	n := make(Rules, len(r))
+func (r RuleRegistry) Copy() RuleRegistry {
+	n := make(RuleRegistry, len(r))
 	for k, v := range r {
 		n[k] = v
 	}
@@ -32,7 +32,7 @@ func (r Rules) Copy() Rules {
 
 // Register registers the list of rules.
 // Return an error if any of the rules is found duplicate in the registry.
-func (r Rules) Register(rules ...Rule) error {
+func (r RuleRegistry) Register(rules ...Rule) error {
 	for _, rl := range rules {
 		if !rl.GetName().IsValid() {
 			return fmt.Errorf("%q is not a valid RuleName", rl.GetName())
@@ -48,7 +48,7 @@ func (r Rules) Register(rules ...Rule) error {
 }
 
 // All returns all rules.
-func (r Rules) All() []Rule {
+func (r RuleRegistry) All() []Rule {
 	rules := make([]Rule, 0, len(r))
 	for _, r1 := range r {
 		rules = append(rules, r1)
@@ -56,9 +56,9 @@ func (r Rules) All() []Rule {
 	return rules
 }
 
-// NewRules returns a rule registry initialized with the given set of rules.
-func NewRules(rules ...Rule) (Rules, error) {
-	r := make(Rules, len(rules))
+// NewRuleRegistry returns a rule registry initialized with the given set of rules.
+func NewRuleRegistry(rules ...Rule) (RuleRegistry, error) {
+	r := make(RuleRegistry, len(rules))
 	err := r.Register(rules...)
 	return r, err
 }

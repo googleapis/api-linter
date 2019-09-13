@@ -24,7 +24,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func runCLI(rules lint.Rules, configs lint.Configs, args []string) error {
+func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error {
 	app := cli.NewApp()
 	app.Name = "api-linter"
 	app.Usage = "A linter for APIs"

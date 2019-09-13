@@ -22,7 +22,7 @@ import (
 )
 
 func TestAddRules(t *testing.T) {
-	rules := make(lint.Rules)
+	rules := make(lint.RuleRegistry)
 	AddRules(rules)
 	for ruleName := range rules {
 		if !strings.HasPrefix(string(ruleName), "core::0132") {

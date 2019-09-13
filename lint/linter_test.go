@@ -103,7 +103,7 @@ func TestLinter_run(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			rules, err := NewRules(&FileRule{
+			rules, err := NewRuleRegistry(&FileRule{
 				Name: "test::rule1",
 				LintFile: func(f *desc.FileDescriptor) []Problem {
 					return test.problems
@@ -149,7 +149,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r, err := NewRules(test.rule)
+		r, err := NewRuleRegistry(test.rule)
 		if err != nil {
 			t.Fatalf("Failed to create Rules: %q", err)
 		}

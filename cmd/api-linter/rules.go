@@ -20,7 +20,7 @@ import (
 )
 
 // Register rules.
-func rules() lint.Rules {
+func rules() lint.RuleRegistry {
 	rules := core.Rules().Copy()
 	return rules
 }

@@ -26,12 +26,12 @@ import (
 
 // Linter checks API files and returns a list of detected problems.
 type Linter struct {
-	rules   Rules
+	rules   RuleRegistry
 	configs Configs
 }
 
 // New creates and returns a linter with the given rules and configs.
-func New(rules Rules, configs Configs) *Linter {
+func New(rules RuleRegistry, configs Configs) *Linter {
 	l := &Linter{
 		rules:   rules,
 		configs: configs,

@@ -32,10 +32,10 @@ func init() {
 	aip0191.AddRules(coreRules)
 }
 
-var coreRules, _ = lint.NewRules()
+var coreRules, _ = lint.NewRuleRegistry()
 
 // Rules returns all rules registered in this package.
-func Rules() lint.Rules {
+func Rules() lint.RuleRegistry {
 	return coreRules.Copy()
 }
 
