@@ -34,15 +34,15 @@ func (r Rules) Copy() Rules {
 // Return an error if any of the rules is found duplicate in the registry.
 func (r Rules) Register(rules ...Rule) error {
 	for _, rl := range rules {
-		if !rl.Name.IsValid() {
-			return fmt.Errorf("%q is not a valid RuleName", rl.Name)
+		if !rl.GetName().IsValid() {
+			return fmt.Errorf("%q is not a valid RuleName", rl.GetName())
 		}
 
-		if _, found := r[rl.Name]; found {
-			return fmt.Errorf("duplicate rule name %q", rl.Name)
+		if _, found := r[rl.GetName()]; found {
+			return fmt.Errorf("duplicate rule name %q", rl.GetName())
 		}
 
-		r[rl.Name] = rl
+		r[rl.GetName()] = rl
 	}
 	return nil
 }

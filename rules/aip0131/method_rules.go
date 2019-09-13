@@ -22,10 +22,9 @@ import (
 )
 
 // Get messages should have a properly named Request message.
-var requestMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "request-message", "name"),
-	Description: "Get RPCs must have a consistent request message name.",
-	URI:         "https://aip.dev/131#guidance",
+var requestMessageName = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0131", "request-message", "name"),
+	URI:  "https://aip.dev/131#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
@@ -51,10 +50,9 @@ var requestMessageName = lint.Rule{
 }
 
 // Get messages should use the resource as the response message
-var responseMessageName = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "response-message", "name"),
-	Description: "check that Get RPCs have appropriate response messages",
-	URI:         "https://aip.dev/131#guidance",
+var responseMessageName = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0131", "response-message", "name"),
+	URI:  "https://aip.dev/131#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.

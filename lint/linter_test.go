@@ -103,7 +103,7 @@ func TestLinter_run(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			rules, err := NewRules(Rule{
+			rules, err := NewRules(&FileRule{
 				Name: "test::rule1",
 				LintFile: func(f *desc.FileDescriptor) []Problem {
 					return test.problems
@@ -134,13 +134,13 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	tests := []struct {
 		rule Rule
 	}{
-		{Rule{
+		{&FileRule{
 			Name: "panic",
 			LintFile: func(_ *desc.FileDescriptor) []Problem {
 				panic("panic")
 			},
 		}},
-		{Rule{
+		{&FileRule{
 			Name: "panic-error",
 			LintFile: func(_ *desc.FileDescriptor) []Problem {
 				panic(fmt.Errorf("panic"))

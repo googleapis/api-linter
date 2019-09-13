@@ -23,100 +23,216 @@ import (
 )
 
 // Rule defines a lint rule that checks Google Protobuf APIs.
-type Rule struct {
-	// Name contains the rule's name.
+type Rule interface {
+	// GetName returns the name of the rule.
+	GetName() RuleName
+
+	// GetURI returns the URI where the applicable guideline
+	// is documented. (This should generally be an AIP on https://aip.dev/.)
+	GetURI() string
+
+	// Lint accepts a FileDescriptor and lints it,
+	// returning a slice of Problem objects it finds.
+	Lint(*desc.FileDescriptor) []Problem
+}
+
+// FileRule defines a lint rule that checks a file as a whole.
+type FileRule struct {
 	Name RuleName
+	URI  string
 
-	// Description is a short description of the rule,
-	// used in documentation and elsewhere.
-	Description string
-
-	// URI is the address where the guideline is documented.
-	// This should be displayed to give API designers more information about
-	// "how to do this right".
-	URI string
-
-	// LintFile is called for files as a whole.
+	// LintFile accepts a FileDescriptor and lints it, returning a slice of
+	// Problems it finds.
 	LintFile func(*desc.FileDescriptor) []Problem
 
-	// LintMessage is called for any messages in the file.
-	// This includes nested messages, regardless of depth.
-	LintMessage func(*desc.MessageDescriptor) []Problem
-
-	// LintField is called for any fields in the file.
-	// This includes fields within nested messages, regardless of depth.
-	LintField func(*desc.FieldDescriptor) []Problem
-
-	// LintService is called for each service in the file.
-	LintService func(*desc.ServiceDescriptor) []Problem
-
-	// LintMethod is called for each method in the file.
-	LintMethod func(*desc.MethodDescriptor) []Problem
-
-	// LintEnum is called for each enum in the file.
-	LintEnum func(*desc.EnumDescriptor) []Problem
-
-	// Force keyword argument instantiation.
 	noPositional struct{}
 }
 
-// Lint iterates over every message in a FileDescriptor and runs the
-// callback, aggregating any problems that are found.
-func (rule *Rule) Lint(f *desc.FileDescriptor) (problems []Problem) {
-	// Iterate over each message and process for any kind of rules within
-	// the message.
-	//
-	// Note: Messages can contain enums in addition to messages and fields, so
-	// enums are processed both here *and* at the top level.
-	for _, message := range getAllMessages(f) {
-		if rule.LintMessage != nil {
-			problems = append(problems, rule.LintMessage(message)...)
-		}
-		for _, field := range message.GetFields() {
-			if rule.LintField != nil {
-				problems = append(problems, rule.LintField(field)...)
-			}
-		}
-		for _, enum := range message.GetNestedEnumTypes() {
-			if rule.LintEnum != nil {
-				problems = append(problems, rule.LintEnum(enum)...)
-			}
-		}
-	}
+// GetName returns the name of the rule.
+func (r *FileRule) GetName() RuleName {
+	return r.Name
+}
 
-	// Iterate over each service and process any rules within that service,
-	// as well as rules for each method.
-	for _, service := range f.GetServices() {
-		if rule.LintService != nil {
-			problems = append(problems, rule.LintService(service)...)
-		}
-		for _, method := range service.GetMethods() {
-			if rule.LintMethod != nil {
-				problems = append(problems, rule.LintMethod(method)...)
-			}
-		}
-	}
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *FileRule) GetURI() string {
+	return r.URI
+}
 
-	// Process rules for top-level enums.
-	for _, enum := range f.GetEnumTypes() {
-		if rule.LintEnum != nil {
-			problems = append(problems, rule.LintEnum(enum)...)
-		}
-	}
+// Lint forwards the FileDescriptor to the LintFile method defined on the
+// FileRule.
+func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
+	return r.LintFile(fd)
+}
 
-	// Finally, process rules for the file itself.
-	if rule.LintFile != nil {
-		problems = append(problems, rule.LintFile(f)...)
-	}
+// MessageRule defines a lint rule that is run on each message (top-level or
+// nested) within a file.
+type MessageRule struct {
+	Name RuleName
+	URI  string
 
-	// Done aggregating problems for this file; return the list.
+	// LintMessage accepts a MessageDescriptor and lints it, returning a slice
+	// of Problems it finds.
+	LintMessage func(*desc.MessageDescriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *MessageRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *MessageRule) GetURI() string {
+	return r.URI
+}
+
+// LintFile accepts a FileDescriptor and iterates over every message in the
+// file, and lints each message in the file.
+func (r *MessageRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+	// Iterate over each message and process rules for each message.
+	for _, message := range getAllMessages(fd) {
+		problems = append(problems, r.LintMessage(message)...)
+	}
 	return problems
 }
 
-// isEnabled returns true if the rule is enabled (not disabled by the comments
+// FieldRule defines a lint rule that is run on each field within a file.
+type FieldRule struct {
+	Name RuleName
+	URI  string
+
+	// LintField accepts a FieldDescriptor and lints it, returning a slice of
+	// Problems it finds.
+	LintField func(*desc.FieldDescriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *FieldRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *FieldRule) GetURI() string {
+	return r.URI
+}
+
+// LintFile accepts a FileDescriptor and lints every field in the file.
+func (r *FieldRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+	// Iterate over each message and process rules for each field in that
+	// message.
+	for _, message := range getAllMessages(fd) {
+		for _, field := range message.GetFields() {
+			problems = append(problems, r.LintField(field)...)
+		}
+	}
+	return problems
+}
+
+// ServiceRule defines a lint rule that is run on each service.
+type ServiceRule struct {
+	Name RuleName
+	URI  string
+
+	// LintService accepts a ServiceDescriptor and lints it.
+	LintService func(*desc.ServiceDescriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *ServiceRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *ServiceRule) GetURI() string {
+	return r.URI
+}
+
+// LintFile accepts a FileDescriptor and lints every service in the file.
+func (r *ServiceRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+	for _, service := range fd.GetServices() {
+		problems = append(problems, r.LintService(service)...)
+	}
+	return problems
+}
+
+// MethodRule defines a lint rule that is run on each method.
+type MethodRule struct {
+	Name RuleName
+	URI  string
+
+	// LintMethod accepts a MethodDescriptor and lints it.
+	LintMethod func(*desc.MethodDescriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *MethodRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *MethodRule) GetURI() string {
+	return r.URI
+}
+
+// LintFile accepts a FileDescriptor and lints every method in the file.
+func (r *MethodRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+	for _, service := range fd.GetServices() {
+		for _, method := range service.GetMethods() {
+			problems = append(problems, r.LintMethod(method)...)
+		}
+	}
+	return problems
+}
+
+// EnumRule defines a lint rule that is run on each enum.
+type EnumRule struct {
+	Name RuleName
+	URI  string
+
+	// LintEnum accepts a EnumDescriptor and lints it.
+	LintEnum func(*desc.EnumDescriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *EnumRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *EnumRule) GetURI() string {
+	return r.URI
+}
+
+// LintFile accepts a FileDescriptor and lints every enum in the file
+// (including enums nested within messages).
+func (r *EnumRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+	// Lint enums that are at the top level of the file.
+	for _, enum := range fd.GetEnumTypes() {
+		problems = append(problems, r.LintEnum(enum)...)
+	}
+
+	// Lint enums that are nested within messages.
+	for _, message := range getAllMessages(fd) {
+		for _, enum := range message.GetNestedEnumTypes() {
+			problems = append(problems, r.LintEnum(enum)...)
+		}
+	}
+	return problems
+}
+
+// ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func (rule *Rule) isEnabled(d desc.Descriptor) bool {
-	directive := fmt.Sprintf("api-linter: %s=disabled", rule.Name)
+func ruleIsEnabled(rule Rule, d desc.Descriptor) bool {
+	directive := fmt.Sprintf("api-linter: %s=disabled", rule.GetName())
 
 	// If the comments above the descriptor disable the rule,
 	// return false.

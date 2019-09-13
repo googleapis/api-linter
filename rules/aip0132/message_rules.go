@@ -23,10 +23,9 @@ import (
 )
 
 // The List standard method should contain a parent field.
-var standardFields = lint.Rule{
-	Name:        lint.NewRuleName("core", "0132", "request-message", "parent-field"),
-	Description: "List methods should include a `parent` field.",
-	URI:         "https://aip.dev/132#request-message",
+var standardFields = &lint.MessageRule{
+	Name: lint.NewRuleName("core", "0132", "request-message", "parent-field"),
+	URI:  "https://aip.dev/132#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.
@@ -56,10 +55,9 @@ var standardFields = lint.Rule{
 }
 
 // List methods should not have unrecognized fields.
-var unknownFields = lint.Rule{
-	Name:        lint.NewRuleName("core", "0132", "request-message", "unknown-fields"),
-	Description: "List methods should only contain fields described in AIPs.",
-	URI:         "https://aip.dev/132#request-message",
+var unknownFields = &lint.MessageRule{
+	Name: lint.NewRuleName("core", "0132", "request-message", "unknown-fields"),
+	URI:  "https://aip.dev/132#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// We only care about List- methods for the purpose of this rule;
 		// ignore everything else.

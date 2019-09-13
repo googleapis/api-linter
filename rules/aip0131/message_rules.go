@@ -23,10 +23,9 @@ import (
 )
 
 // The Get standard method should only have expected fields.
-var standardFields = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "request-message", "name-field"),
-	Description: "The Get standard method must include expected fields.",
-	URI:         "https://aip.dev/131#request-message",
+var standardFields = &lint.MessageRule{
+	Name: lint.NewRuleName("core", "0131", "request-message", "name-field"),
+	URI:  "https://aip.dev/131#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
@@ -56,10 +55,9 @@ var standardFields = lint.Rule{
 }
 
 // Get methods should not have unrecognized fields.
-var unknownFields = lint.Rule{
-	Name:        lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
-	Description: "Get RPCs must not contain unexpected fields.",
-	URI:         "https://aip.dev/131#request-message",
+var unknownFields = &lint.MessageRule{
+	Name: lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
+	URI:  "https://aip.dev/131#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.

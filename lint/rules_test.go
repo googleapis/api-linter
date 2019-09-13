@@ -19,8 +19,8 @@ import (
 )
 
 func TestRulesRegister(t *testing.T) {
-	r1 := Rule{Name: "a"}
-	r2 := Rule{Name: "b"}
+	r1 := &FileRule{Name: "a"}
+	r2 := &FileRule{Name: "b"}
 
 	rules, _ := NewRules()
 	if err := rules.Register(r1, r2); err != nil {
@@ -34,8 +34,8 @@ func TestRulesRegister(t *testing.T) {
 }
 
 func TestRulesRegister_Duplicate(t *testing.T) {
-	r1 := Rule{Name: "a"}
-	r2 := Rule{Name: "a"}
+	r1 := &FileRule{Name: "a"}
+	r2 := &FileRule{Name: "a"}
 
 	rules, _ := NewRules()
 	if err := rules.Register(r1, r2); err == nil {

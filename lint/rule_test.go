@@ -17,12 +17,18 @@ package lint
 import (
 	"testing"
 
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestIsEnabled(t *testing.T) {
+func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
-	rule := Rule{Name: NewRuleName("test")}
+	rule := &FileRule{
+		Name: NewRuleName("test"),
+		LintFile: func(fd *desc.FileDescriptor) []Problem {
+			return []Problem{}
+		},
+	}
 
 	// Create appropriate test permutations.
 	tests := []struct {
@@ -49,7 +55,7 @@ func TestIsEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test message")
 			}
-			if got, want := rule.isEnabled(f.GetMessageTypes()[0]), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0]), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from isEnabled, got %v", want, got)
 			}
 		})
