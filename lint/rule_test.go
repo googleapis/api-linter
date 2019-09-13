@@ -56,12 +56,17 @@ func TestFileRule(t *testing.T) {
 					return test.problems
 				},
 			}
+
+			// Ensure that the metadata methods seem correct.
 			if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
 				t.Errorf("Got %q for GetName(), expected %q", got, want)
 			}
 			if got, want := rule.GetURI(), uri; got != want {
 				t.Errorf("Got %q for GetURI(), expected %q.", got, want)
 			}
+
+			// Run the rule's lint function on the file descriptor
+			// and assert that we got what we expect.
 			if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
 				t.Errorf("Got %v problems; expected %v.", got, want)
 			}
@@ -126,14 +131,10 @@ func TestMessageRule(t *testing.T) {
 				t.Errorf("Got %q for GetURI(), expected %q.", got, want)
 			}
 
-			// Run the message's lint function on the file descriptor
+			// Run the message rule's lint function on the file descriptor
 			// and assert that we got what we expect.
 			if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
-				// For some reason, reflect.DeepEqual finds two empty []Problem{}
-				// to be unequal.
-				if len(got) > 0 || len(want) > 0 {
-					t.Errorf("Got %v problems; expected %v.", got, want)
-				}
+				t.Errorf("Got %v problems; expected %v.", got, want)
 			}
 		})
 	}

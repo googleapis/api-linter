@@ -18,7 +18,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-
 // Problem contains information about a result produced by an API Linter.
 type Problem struct {
 	// Message provides a short description of the problem.
@@ -27,16 +26,15 @@ type Problem struct {
 	// Suggestion provides a suggested fix, if applicable.
 	Suggestion string `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
 
-	// Location provides the location of the problem. If both
-	// `Location` and `Descriptor` are specified, the location
-	// is then used from `Location` instead of `Descriptor`.
-	Location Location `json:"location" yaml:"location"`
-
 	// Descriptor provides the descriptor related
 	// to the problem. If present and `Location` is not
 	// specified, then the starting location of the descriptor
 	// is used as the location of the problem.
 	Descriptor desc.Descriptor `json:"-" yaml:"-"`
+
+	// Location provides the location of the problem.
+	// DO NOT SET: Set the descriptor instead.
+	Location Location `json:"location" yaml:"location"`
 
 	// RuleID provides the ID of the rule that this problem belongs to.
 	// DO NOT SET: this field will be set by the linter based on rule info
@@ -45,4 +43,6 @@ type Problem struct {
 
 	// DO NOT SET:  this field will be set by the linter based on user configs.
 	Category string `json:"category,omitempty" yaml:"category,omitempty"`
+
+	noPositional struct{}
 }
