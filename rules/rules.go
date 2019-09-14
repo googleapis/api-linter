@@ -40,7 +40,7 @@ func Rules() lint.RuleRegistry {
 }
 
 // registerRules registers the given rule into "core rules".
-func registerRules(r ...lint.Rule) {
+func registerRules(r ...lint.ProtoRule) {
 	for _, rl := range r {
 		if err := coreRules.Register(rl); err != nil {
 			log.Fatalf("Error when registering rule '%s': %v", rl.GetName(), err)

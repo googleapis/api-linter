@@ -22,8 +22,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Rule defines a lint rule that checks Google Protobuf APIs.
-type Rule interface {
+// ProtoRule defines a lint rule that checks Google Protobuf APIs.
+type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
 
@@ -239,7 +239,7 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule Rule, d desc.Descriptor) bool {
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor) bool {
 	directive := fmt.Sprintf("api-linter: %s=disabled", rule.GetName())
 
 	// If the comments above the descriptor disable the rule,

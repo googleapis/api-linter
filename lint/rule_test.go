@@ -329,7 +329,7 @@ type lintRuleTest struct {
 }
 
 // runRule runs a rule within a test environment.
-func (test *lintRuleTest) runRule(rule Rule, fd *desc.FileDescriptor, t *testing.T) {
+func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *testing.T) {
 	// Establish that the metadata methods work.
 	if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
 		t.Errorf("Got %q for GetName(), expected %q", got, want)
