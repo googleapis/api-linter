@@ -317,9 +317,37 @@ func TestRuleIsEnabled(t *testing.T) {
 				t.Fatalf("Error building test message")
 			}
 			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0]), test.enabled; got != want {
-				t.Errorf("Expected the test rule to return %v from isEnabled, got %v", want, got)
+				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 		})
+	}
+}
+
+func TestRuleIsEnabledFirstMessage(t *testing.T) {
+	// Create a no-op rule, which we can check enabled status on.
+	rule := &FileRule{
+		Name: NewRuleName("test"),
+		LintFile: func(fd *desc.FileDescriptor) []Problem {
+			return []Problem{}
+		},
+	}
+
+	// Run the specific tests individually.
+	f, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("FirstMessage").SetComments(builder.Comments{
+			LeadingComment: "api-linter: test=disabled",
+		}),
+	).AddMessage(
+		builder.NewMessage("SecondMessage"),
+	).Build()
+	if err != nil {
+		t.Fatalf("Error building test file")
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0]), false; got != want {
+		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1]), true; got != want {
+		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
 	}
 }
 
