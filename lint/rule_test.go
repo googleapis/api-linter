@@ -23,11 +23,6 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-type lintRuleTest struct {
-	testName string
-	problems []Problem
-}
-
 func TestFileRule(t *testing.T) {
 	// Create a file descriptor with nothing in it.
 	fd, err := builder.NewFile("test.proto").Build()
@@ -48,7 +43,7 @@ func TestFileRule(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -56,9 +51,9 @@ func TestFileRule(t *testing.T) {
 func TestMessageRule(t *testing.T) {
 	// Create a file descriptor with two messages in it.
 	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Foo"),
+		builder.NewMessage("Book"),
 	).AddMessage(
-		builder.NewMessage("Bar"),
+		builder.NewMessage("Author"),
 	).Build()
 	if err != nil {
 		t.Fatalf("Failed to build file descriptor.")
@@ -73,7 +68,7 @@ func TestMessageRule(t *testing.T) {
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
 				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					if m.GetName() == "Bar" {
+					if m.GetName() == "Author" {
 						return test.problems
 					}
 					return nil
@@ -81,7 +76,7 @@ func TestMessageRule(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -90,7 +85,7 @@ func TestMessageRule(t *testing.T) {
 func TestMessageRuleNested(t *testing.T) {
 	// Create a file descriptor with a message and nested message in it.
 	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Foo").AddNestedMessage(builder.NewMessage("Bar")),
+		builder.NewMessage("Book").AddNestedMessage(builder.NewMessage("Author")),
 	).Build()
 	if err != nil {
 		t.Fatalf("Failed to build file descriptor.")
@@ -105,7 +100,7 @@ func TestMessageRuleNested(t *testing.T) {
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
 				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					if m.GetName() == "Bar" {
+					if m.GetName() == "Author" {
 						return test.problems
 					}
 					return nil
@@ -113,7 +108,7 @@ func TestMessageRuleNested(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -121,10 +116,10 @@ func TestMessageRuleNested(t *testing.T) {
 func TestFieldRule(t *testing.T) {
 	// Create a file descriptor with one message and two fields in that message.
 	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Foo").AddField(
-			builder.NewField("bar", builder.FieldTypeString()),
+		builder.NewMessage("Book").AddField(
+			builder.NewField("title", builder.FieldTypeString()),
 		).AddField(
-			builder.NewField("baz", builder.FieldTypeInt32()),
+			builder.NewField("edition_count", builder.FieldTypeInt32()),
 		),
 	).Build()
 	if err != nil {
@@ -140,7 +135,7 @@ func TestFieldRule(t *testing.T) {
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
 				LintField: func(f *desc.FieldDescriptor) []Problem {
-					if f.GetName() == "baz" {
+					if f.GetName() == "edition_count" {
 						return test.problems
 					}
 					return nil
@@ -148,7 +143,7 @@ func TestFieldRule(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -156,7 +151,7 @@ func TestFieldRule(t *testing.T) {
 func TestServiceRule(t *testing.T) {
 	// Create a file descriptor with a service.
 	fd, err := builder.NewFile("test.proto").AddService(
-		builder.NewService("Foo"),
+		builder.NewService("Library"),
 	).Build()
 	if err != nil {
 		t.Fatalf("Failed to build a file descriptor.")
@@ -175,7 +170,7 @@ func TestServiceRule(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -205,7 +200,7 @@ func TestMethodRule(t *testing.T) {
 	// Iterate over the tests and run them.
 	for _, test := range makeLintRuleTests(fd.GetServices()[0].GetMethods()[1]) {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create the service rule.
+			// Create the method rule.
 			rule := &MethodRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
@@ -218,7 +213,71 @@ func TestMethodRule(t *testing.T) {
 			}
 
 			// Run the rule and assert that we got what we expect.
-			runRule(rule, fd, t, test)
+			test.runRule(rule, fd, t)
+		})
+	}
+}
+
+func TestEnumRule(t *testing.T) {
+	// Create a file descriptor with top-level enums.
+	fd, err := builder.NewFile("test.proto").AddEnum(
+		builder.NewEnum("Format"),
+	).AddEnum(
+		builder.NewEnum("Edition"),
+	).Build()
+	if err != nil {
+		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+	}
+
+	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[1]) {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the enum rule.
+			rule := &EnumRule{
+				Name: NewRuleName("test", test.testName),
+				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
+				LintEnum: func(e *desc.EnumDescriptor) []Problem {
+					if e.GetName() == "Edition" {
+						return test.problems
+					}
+					return nil
+				},
+			}
+
+			// Run the rule and assert that we got what we expect.
+			test.runRule(rule, fd, t)
+		})
+	}
+}
+
+func TestEnumRuleNested(t *testing.T) {
+	// Create a file descriptor with top-level enums.
+	fd, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("Book").AddNestedEnum(
+			builder.NewEnum("Format"),
+		).AddNestedEnum(
+			builder.NewEnum("Edition"),
+		),
+	).Build()
+	if err != nil {
+		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+	}
+
+	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedEnumTypes()[1]) {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the enum rule.
+			rule := &EnumRule{
+				Name: NewRuleName("test", test.testName),
+				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
+				LintEnum: func(e *desc.EnumDescriptor) []Problem {
+					if e.GetName() == "Edition" {
+						return test.problems
+					}
+					return nil
+				},
+			}
+
+			// Run the rule and assert that we got what we expect.
+			test.runRule(rule, fd, t)
 		})
 	}
 }
@@ -264,6 +323,28 @@ func TestRuleIsEnabled(t *testing.T) {
 	}
 }
 
+type lintRuleTest struct {
+	testName string
+	problems []Problem
+}
+
+// runRule runs a rule within a test environment.
+func (test *lintRuleTest) runRule(rule Rule, fd *desc.FileDescriptor, t *testing.T) {
+	// Establish that the metadata methods work.
+	if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
+		t.Errorf("Got %q for GetName(), expected %q", got, want)
+	}
+	if got, want := rule.GetURI(), fmt.Sprintf("https://aip.dev/%s", t.Name()); got != want {
+		t.Errorf("Got %q for GetURI(), expected %q.", got, want)
+	}
+
+	// Run the rule's lint function on the file descriptor
+	// and assert that we got what we expect.
+	if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
+		t.Errorf("Got %v problems; expected %v.", got, want)
+	}
+}
+
 // makeLintRuleTests generates boilerplate tests that are consistent for
 // each type of rule.
 func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
@@ -283,22 +364,5 @@ func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
 				Descriptor: d,
 			},
 		}},
-	}
-}
-
-// runRule runs a rule within a test environment.
-func runRule(rule Rule, fd *desc.FileDescriptor, t *testing.T, test lintRuleTest) {
-	// Establish that the metadata methods work.
-	if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
-		t.Errorf("Got %q for GetName(), expected %q", got, want)
-	}
-	if got, want := rule.GetURI(), fmt.Sprintf("https://aip.dev/%s", t.Name()); got != want {
-		t.Errorf("Got %q for GetURI(), expected %q.", got, want)
-	}
-
-	// Run the rule's lint function on the file descriptor
-	// and assert that we got what we expect.
-	if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
-		t.Errorf("Got %v problems; expected %v.", got, want)
 	}
 }

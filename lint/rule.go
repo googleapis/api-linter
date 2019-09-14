@@ -220,7 +220,9 @@ func (r *EnumRule) GetURI() string {
 
 // Lint accepts a FileDescriptor and lints every enum in the file
 // (including enums nested within messages).
-func (r *EnumRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
+
 	// Lint enums that are at the top level of the file.
 	for _, enum := range fd.GetEnumTypes() {
 		problems = append(problems, r.LintEnum(enum)...)
