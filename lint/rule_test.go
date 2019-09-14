@@ -140,6 +140,75 @@ func TestMessageRule(t *testing.T) {
 	}
 }
 
+func TestFieldRule(t *testing.T) {
+	// Create a file descriptor with two messages in it.
+	fd, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("Foo").AddField(
+			builder.NewField("bar", builder.FieldTypeString()),
+		).AddField(
+			builder.NewField("baz", builder.FieldTypeInt32()),
+		),
+	).Build()
+	if err != nil {
+		t.Fatalf("Failed to build file descriptor.")
+	}
+
+	// Declare tests.
+	problemField := fd.GetMessageTypes()[0].GetFields()[1]
+	tests := []struct {
+		testName string
+		problems []Problem
+	}{
+		{"NoProblems", []Problem{}},
+		{"OneProblem", []Problem{{
+			Message:    "There was a problem.",
+			Descriptor: problemField,
+		}}},
+		{"TwoProblems", []Problem{
+			{
+				Message:    "This was the first problem.",
+				Descriptor: problemField,
+			},
+			{
+				Message:    "This was the second problem.",
+				Descriptor: problemField,
+			},
+		}},
+	}
+
+	// Iterate over the tests and run them.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the message rule.
+			uri := "https://foo.dev/field-test"
+			rule := &FieldRule{
+				Name: NewRuleName("test", test.testName),
+				URI:  uri,
+				LintField: func(f *desc.FieldDescriptor) []Problem {
+					if f.GetName() == "baz" {
+						return test.problems
+					}
+					return nil
+				},
+			}
+
+			// Establish that the metadata methods work.
+			if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
+				t.Errorf("Got %q for GetName(), expected %q", got, want)
+			}
+			if got, want := rule.GetURI(), uri; got != want {
+				t.Errorf("Got %q for GetURI(), expected %q.", got, want)
+			}
+
+			// Run the message rule's lint function on the file descriptor
+			// and assert that we got what we expect.
+			if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
+				t.Errorf("Got %v problems; expected %v.", got, want)
+			}
+		})
+	}
+}
+
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{

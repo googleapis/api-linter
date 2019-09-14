@@ -122,7 +122,9 @@ func (r *FieldRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every field in the file.
-func (r *FieldRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
+
 	// Iterate over each message and process rules for each field in that
 	// message.
 	for _, message := range getAllMessages(fd) {
