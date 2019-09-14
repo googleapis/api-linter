@@ -132,37 +132,46 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	}
 
 	tests := []struct {
-		rule Rule
+		testName string
+		rule     Rule
 	}{
-		{&FileRule{
-			Name: "panic",
-			LintFile: func(_ *desc.FileDescriptor) []Problem {
-				panic("panic")
+		{
+			testName: "Panic",
+			rule: &FileRule{
+				Name: "panic",
+				LintFile: func(_ *desc.FileDescriptor) []Problem {
+					panic("panic")
+				},
 			},
-		}},
-		{&FileRule{
-			Name: "panic-error",
-			LintFile: func(_ *desc.FileDescriptor) []Problem {
-				panic(fmt.Errorf("panic"))
+		},
+		{
+			testName: "PanicError",
+			rule: &FileRule{
+				Name: "panic-error",
+				LintFile: func(_ *desc.FileDescriptor) []Problem {
+					panic(fmt.Errorf("panic"))
+				},
 			},
-		}},
+		},
 	}
 
 	for _, test := range tests {
-		r, err := NewRuleRegistry(test.rule)
-		if err != nil {
-			t.Fatalf("Failed to create Rules: %q", err)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			r, err := NewRuleRegistry(test.rule)
+			if err != nil {
+				t.Fatalf("Failed to create Rules: %q", err)
+			}
 
-		// Instantiate a linter with the given rule.
-		l := New(r, []Config{{
-			IncludedPaths: []string{"**"},
-			RuleConfigs:   map[string]RuleConfig{"": {}},
-		}})
+			// Instantiate a linter with the given rule.
+			l := New(r, []Config{{
+				IncludedPaths: []string{"**"},
+				RuleConfigs:   map[string]RuleConfig{"": {}},
+			}})
 
-		_, err = l.LintProtos(fd)
-		if err == nil || !strings.Contains(err.Error(), "panic") {
-			t.Fatalf("Expected error with panic, got %q", err)
-		}
+			_, err = l.LintProtos(fd)
+			if err == nil || !strings.Contains(err.Error(), "panic") {
+				t.Fatalf("Expected error with panic, got %q", err)
+			}
+		})
 	}
 }
