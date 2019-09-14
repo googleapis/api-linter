@@ -157,7 +157,8 @@ func (r *ServiceRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every service in the file.
-func (r *ServiceRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
 	for _, service := range fd.GetServices() {
 		problems = append(problems, r.LintService(service)...)
 	}
@@ -186,7 +187,8 @@ func (r *MethodRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every method in the file.
-func (r *MethodRule) Lint(fd *desc.FileDescriptor) (problems []Problem) {
+func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
 	for _, service := range fd.GetServices() {
 		for _, method := range service.GetMethods() {
 			problems = append(problems, r.LintMethod(method)...)
