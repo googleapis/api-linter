@@ -288,8 +288,13 @@ func fileHeader(fd *desc.FileDescriptor) string {
 	var firstLoc *descriptor.SourceCodeInfo_Location
 	var firstSpan int64
 	for _, curr := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
+		// Skip locations that have no comments.
 		if curr.LeadingComments == nil && len(curr.LeadingDetachedComments) == 0 {
-			// Skip locations that have no comments.
+			continue
+		}
+		// Skip locations that are not syntax, package, option, or import.
+		allowedPaths := map[int32]struct{}{2: {}, 3: {}, 8: {}, 12: {}}
+		if _, ok := allowedPaths[curr.GetPath()[0]]; !ok {
 			continue
 		}
 		currSpan := asPos(curr.Span)
