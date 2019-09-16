@@ -23,7 +23,6 @@ import (
 	"testing"
 )
 
-// Each rule must have a testing case stored here.
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
 // comment at the place where you want the rule to be
