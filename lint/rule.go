@@ -287,13 +287,20 @@ func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDe
 func fileHeader(fd *desc.FileDescriptor) string {
 	var firstLoc *descriptor.SourceCodeInfo_Location
 	var firstSpan int64
+
+	// File level comments should only be comments identified on either
+	// syntax (12), package (2), option (8), or import (3) statements.
+	allowedPaths := map[int32]struct{}{2: {}, 3: {}, 8: {}, 12: {}}
+
+	// Iterate over locations in the file descriptor looking for
+	// what we think is a file-level comment.
 	for _, curr := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
 		// Skip locations that have no comments.
 		if curr.LeadingComments == nil && len(curr.LeadingDetachedComments) == 0 {
 			continue
 		}
-		// Skip locations that are not syntax, package, option, or import.
-		allowedPaths := map[int32]struct{}{2: {}, 3: {}, 8: {}, 12: {}}
+		// Skip locations that are not allowed because they should never be
+		// mistaken for file-level comments.
 		if _, ok := allowedPaths[curr.GetPath()[0]]; !ok {
 			continue
 		}
