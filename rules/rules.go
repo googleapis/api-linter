@@ -19,19 +19,31 @@ import (
 	"log"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/aip0131"
+	"github.com/googleapis/api-linter/rules/aip0132"
+	"github.com/googleapis/api-linter/rules/aip0140"
+	"github.com/googleapis/api-linter/rules/aip0191"
 )
 
-var coreRules, _ = lint.NewRules()
+func init() {
+	aip0131.AddRules(coreRules)
+	aip0132.AddRules(coreRules)
+	aip0140.AddRules(coreRules)
+	aip0191.AddRules(coreRules)
+}
+
+var coreRules, _ = lint.NewRuleRegistry()
 
 // Rules returns all rules registered in this package.
-func Rules() lint.Rules {
+func Rules() lint.RuleRegistry {
 	return coreRules.Copy()
 }
 
-func registerRules(r ...lint.Rule) {
+// registerRules registers the given rule into "core rules".
+func registerRules(r ...lint.ProtoRule) {
 	for _, rl := range r {
 		if err := coreRules.Register(rl); err != nil {
-			log.Fatalf("Error when registering rule '%s': %v", rl.Info().Name, err)
+			log.Fatalf("Error when registering rule '%s': %v", rl.GetName(), err)
 		}
 	}
 }

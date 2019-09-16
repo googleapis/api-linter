@@ -23,27 +23,30 @@ import (
 	"testing"
 )
 
-var protocPath = func() string {
-	return "protoc"
-}
-
-// Each rule must have a testing case stored here.
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
 // comment at the place where you want the rule to be
 // disabled.
 var testCases = []struct {
-	rule, proto string
+	testName, rule, proto string
 }{
 	{
-		rule: "core::proto_version",
+		testName: "GetRequestMessage",
+		rule:     "core::0131::request-message::name",
 		proto: `
-		// disable-me-here
-		syntax = "proto2";
+		syntax = "proto3";
+
+		service Library {
+			// disable-me-here
+			rpc GetBook(Book) returns (Book);
+		}
+
+		message Book {}
 		`,
 	},
 	{
-		rule: "core::naming_formats::field_names",
+		testName: "FieldNames",
+		rule:     "core::0140::lower-snake",
 		proto: `
 				syntax = "proto3";
 				message Test {
@@ -70,11 +73,13 @@ func TestRules_Enabled(t *testing.T) {
 	`
 
 	for _, test := range testCases {
-		proto := test.proto
-		result := runLinter(t, proto, config)
-		if !strings.Contains(result, test.rule) {
-			t.Errorf("Rule %q should be enabled by the user config: %q", test.rule, config)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			proto := test.proto
+			result := runLinter(t, proto, config)
+			if !strings.Contains(result, test.rule) {
+				t.Errorf("Rule %q should be enabled by the user config: %q", test.rule, config)
+			}
+		})
 	}
 }
 
@@ -94,12 +99,14 @@ func TestRules_DisabledByFileComments(t *testing.T) {
 	`
 
 	for _, test := range testCases {
-		disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
-		proto := disableInFile + "\n" + test.proto
-		result := runLinter(t, proto, config)
-		if strings.Contains(result, test.rule) {
-			t.Errorf("Rule %q should be disabled by file comments", test.rule)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)", test.rule)
+			proto := disableInFile + "\n" + test.proto
+			result := runLinter(t, proto, config)
+			if strings.Contains(result, test.rule) {
+				t.Errorf("Rule %q should be disabled by file comments", test.rule)
+			}
+		})
 	}
 }
 
@@ -119,12 +126,14 @@ func TestRules_DisabledByInlineComments(t *testing.T) {
 	`
 
 	for _, test := range testCases {
-		disableInline := fmt.Sprintf("// (-- api-linter: %s=disabled --)\n", test.rule)
-		proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
-		result := runLinter(t, proto, config)
-		if strings.Contains(result, test.rule) {
-			t.Errorf("Rule %q should be disabled by in-line comments", test.rule)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
+			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+			result := runLinter(t, proto, config)
+			if strings.Contains(result, test.rule) {
+				t.Errorf("Rule %q should be disabled by in-line comments", test.rule)
+			}
+		})
 	}
 }
 
@@ -152,11 +161,13 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	`
 
 	for _, test := range testCases {
-		c := strings.Replace(config, "replace-me-here", test.rule, -1)
-		result := runLinter(t, test.proto, c)
-		if strings.Contains(result, test.rule) {
-			t.Errorf("Rule %q should be disabled by the user config: %q", test.rule, c)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			c := strings.Replace(config, "replace-me-here", test.rule, -1)
+			result := runLinter(t, test.proto, c)
+			if strings.Contains(result, test.rule) {
+				t.Errorf("Rule %q should be disabled by the user config: %q", test.rule, c)
+			}
+		})
 	}
 }
 
@@ -165,11 +176,14 @@ func runLinter(t *testing.T, proto, config string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := os.Chdir(workdir); err != nil {
+		t.Fatal(err)
+	}
 	defer os.RemoveAll(workdir)
 
-	protoPath := filepath.Join(workdir, "test.proto")
-	configPath := filepath.Join(workdir, "test_config.json")
-	outPath := filepath.Join(workdir, "test.out")
+	protoPath := "test.proto"
+	configPath := "test_config.json"
+	outPath := "test.out"
 
 	if err := writeFile(protoPath, proto); err != nil {
 		t.Fatal(err)
@@ -184,7 +198,6 @@ func runLinter(t *testing.T, proto, config string) string {
 		"--cfg=" + configPath,
 		"--out=" + outPath,
 		"--proto_path=" + workdir,
-		"--protoc=" + protocPath(),
 		protoPath}
 	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)

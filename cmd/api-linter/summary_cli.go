@@ -62,6 +62,7 @@ func createSummary(responses []lint.Response) (summary LintSummary) {
 	return
 }
 
+// LintSummary summarizes a lint run, including which files have violations.
 type LintSummary struct {
 	// key = rule_id, value = set of unique files that violated rule
 	Violations map[string]map[string]bool
@@ -71,6 +72,7 @@ type LintSummary struct {
 	NumSourceFiles int
 }
 
+// LintSummaryTemplateData provides formatting data for the file-level report.
 type LintSummaryTemplateData struct {
 	ColOneFormat string
 	ColTwoFormat string

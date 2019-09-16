@@ -12,15 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package aip0191
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	core "github.com/googleapis/api-linter/rules"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// Register rules.
-func rules() lint.RuleRegistry {
-	rules := core.Rules().Copy()
-	return rules
+// APIs must use proto3.
+var syntax = &lint.FileRule{
+	Name: lint.NewRuleName("core", "0191", "proto-version"),
+	URI:  "https://aip.dev/191#guidance",
+	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+		if !f.IsProto3() {
+			return []lint.Problem{{
+				Message:    "All API proto files must use proto3 syntax.",
+				Suggestion: "syntax = \"proto3\"",
+				Descriptor: f,
+			}}
+		}
+		return nil
+	},
 }

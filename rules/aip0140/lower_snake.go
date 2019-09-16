@@ -12,15 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package aip0140
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
-	core "github.com/googleapis/api-linter/rules"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// Register rules.
-func rules() lint.RuleRegistry {
-	rules := core.Rules().Copy()
-	return rules
+// Field names must be snake case.
+var lowerSnake = &lint.FieldRule{
+	Name: lint.NewRuleName("core", "0140", "lower-snake"),
+	URI:  "https://aip.dev/140#guidance",
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if got, want := f.GetName(), toLowerSnakeCase(f.GetName()); got != want {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("Field `%s` must use lower_snake_case.", got),
+				Suggestion: want,
+				Descriptor: f,
+			}}
+		}
+		return nil
+	},
 }

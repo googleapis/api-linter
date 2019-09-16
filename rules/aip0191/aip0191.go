@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		https://www.apache.org/licenses/LICENSE-2.0
+//     https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package aip0191
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	core "github.com/googleapis/api-linter/rules"
 )
 
-// Register rules.
-func rules() lint.RuleRegistry {
-	rules := core.Rules().Copy()
-	return rules
+// AddRules adds all of the AIP-191 rules to the provided registry.
+func AddRules(r lint.RuleRegistry) {
+	r.Register(
+		syntax,
+	)
 }
