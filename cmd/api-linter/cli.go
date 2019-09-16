@@ -63,6 +63,7 @@ func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error 
 				// Sanity check: Were we given any files to parse at all?
 				// If not, abort.
 				if len(filenames) == 0 {
+					os.Stderr.WriteString("No files specified to lint.\n")
 					return nil
 				}
 
