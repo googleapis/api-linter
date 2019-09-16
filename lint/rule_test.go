@@ -27,7 +27,7 @@ func TestFileRule(t *testing.T) {
 	// Create a file descriptor with nothing in it.
 	fd, err := builder.NewFile("test.proto").Build()
 	if err != nil {
-		t.Fatalf("Could not build file descriptor.")
+		t.Fatalf("Could not build file descriptor: %q", err)
 	}
 
 	// Iterate over the tests and run them.
@@ -154,7 +154,7 @@ func TestServiceRule(t *testing.T) {
 		builder.NewService("Library"),
 	).Build()
 	if err != nil {
-		t.Fatalf("Failed to build a file descriptor.")
+		t.Fatalf("Failed to build a file descriptor: %q", err)
 	}
 
 	// Iterate over the tests and run them.
@@ -194,7 +194,7 @@ func TestMethodRule(t *testing.T) {
 		),
 	).Build()
 	if err != nil {
-		t.Fatalf("Failed to build a file descriptor.")
+		t.Fatalf("Failed to build a file descriptor: %q", err)
 	}
 
 	// Iterate over the tests and run them.
@@ -341,7 +341,7 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 		builder.NewMessage("SecondMessage"),
 	).Build()
 	if err != nil {
-		t.Fatalf("Error building test file")
+		t.Fatalf("Error building test file: %q", err)
 	}
 	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0]), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
