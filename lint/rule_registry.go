@@ -19,7 +19,7 @@ import (
 )
 
 // RuleRegistry is a registry for registering and looking up rules.
-type RuleRegistry map[RuleName]ProtoRule
+type RuleRegistry map[RuleName]protoRule
 
 // Copy returns a new copy of the rules.
 func (r RuleRegistry) Copy() RuleRegistry {
@@ -32,7 +32,7 @@ func (r RuleRegistry) Copy() RuleRegistry {
 
 // Register registers the list of rules.
 // Return an error if any of the rules is found duplicate in the registry.
-func (r RuleRegistry) Register(rules ...ProtoRule) error {
+func (r RuleRegistry) Register(rules ...protoRule) error {
 	for _, rl := range rules {
 		if !rl.GetName().IsValid() {
 			return fmt.Errorf("%q is not a valid RuleName", rl.GetName())
@@ -48,8 +48,8 @@ func (r RuleRegistry) Register(rules ...ProtoRule) error {
 }
 
 // All returns all rules.
-func (r RuleRegistry) All() []ProtoRule {
-	rules := make([]ProtoRule, 0, len(r))
+func (r RuleRegistry) All() []protoRule {
+	rules := make([]protoRule, 0, len(r))
 	for _, r1 := range r {
 		rules = append(rules, r1)
 	}
@@ -57,7 +57,7 @@ func (r RuleRegistry) All() []ProtoRule {
 }
 
 // NewRuleRegistry returns a rule registry initialized with the given set of rules.
-func NewRuleRegistry(rules ...ProtoRule) (RuleRegistry, error) {
+func NewRuleRegistry(rules ...protoRule) (RuleRegistry, error) {
 	r := make(RuleRegistry, len(rules))
 	err := r.Register(rules...)
 	return r, err
