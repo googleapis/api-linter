@@ -9,7 +9,7 @@ workflows:
 jobs:
   format:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
     steps:
       - checkout
       - run:
@@ -17,7 +17,7 @@ jobs:
           command: "! go fmt ./... 2>&1 | read"
   lint:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
     steps:
       - checkout
       - run:
@@ -28,7 +28,7 @@ jobs:
           command: "! $(go env GOPATH)/bin/golangci-lint run ./... 2>&1 | read"
   build:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
     steps:
       - checkout
       - run:
