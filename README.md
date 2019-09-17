@@ -6,7 +6,6 @@ API linter checks APIs defined in protobuf files. It follows [Google API Design 
 
 * Install `git` from [https://git-scm.com](https://git-scm.com/);
 * Install `go` from [https://golang.org/doc/install](https://golang.org/doc/install);
-* Install `protoc` by following this [guide](http://google.github.io/proto-lens/installing-protoc.html);
 
 ## Installation
 
