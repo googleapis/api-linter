@@ -239,47 +239,35 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule ProtoRule, d desc.Descriptor) bool {
-	name := string(rule.GetName())
-	if ruleDisabledInComments(name, d) {
-		return false
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+	// Some rules have a legacy name. We add it to the check list.
+	ruleName := string(rule.GetName())
+	names := []string{ruleName}
+	if alias := aliasMap[ruleName]; alias != "" {
+		names = append(names, alias)
 	}
 
-	// Some rules have a legacy alias.
-	if alias := ruleAlias(name); alias != "" && ruleDisabledInComments(alias, d) {
-		return false
+	var directives []string
+	for _, name := range names {
+		directives = append(directives, fmt.Sprintf("api-linter: %s=disabled", name))
 	}
 
-	return true
-}
+	for _, directive := range directives {
+		// The rule may be disabled in the comments above the descriptor.
+		if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+			if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
+				return false
+			}
+		}
 
-// ruleAlias returns the rule alias. If not exists, return empty string.
-func ruleAlias(name string) string {
-	aliasMap := map[string]string{
-		"core::0140::lower-snake": "naming-format",
-	}
-	return aliasMap[name]
-}
-
-// ruleDisabledInComments returns true if the rule is disabled by the comments
-// for the given descriptor or its file.
-func ruleDisabledInComments(ruleName string, d desc.Descriptor) bool {
-	directive := fmt.Sprintf("api-linter: %s=disabled", ruleName)
-
-	// The rule may be disabled in the comments above the descriptor.
-	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
-		if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
-			return true
+		// The rule may also be disabled at the file level.
+		if strings.Contains(fileHeader(d.GetFile()), directive) {
+			return false
 		}
 	}
 
-	// The rule may also be disabled at the file level.
-	if strings.Contains(fileHeader(d.GetFile()), directive) {
-		return true
-	}
-
 	// The rule is enabled.
-	return false
+	return true
 }
 
 // getAllMessages returns a slice with every message (not just top-level
