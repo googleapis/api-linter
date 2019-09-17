@@ -285,7 +285,6 @@ func TestEnumRuleNested(t *testing.T) {
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
-		Name: NewRuleName("test"),
 		LintFile: func(fd *desc.FileDescriptor) []Problem {
 			return []Problem{}
 		},
@@ -294,13 +293,16 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Create appropriate test permutations.
 	tests := []struct {
 		testName       string
+		ruleName       RuleName
 		fileComment    string
 		messageComment string
 		enabled        bool
 	}{
-		{"Enabled", "", "", true},
-		{"FileDisabled", "api-linter: test=disabled", "", false},
-		{"MessageDisabled", "", "api-linter: test=disabled", false},
+		{"Enabled", NewRuleName("test"), "", "", true},
+		{"FileDisabled", NewRuleName("test"), "api-linter: test=disabled", "", false},
+		{"MessageDisabled", NewRuleName("test"), "", "api-linter: test=disabled", false},
+		{"NameNotMatch", NewRuleName("test"), "", "api-linter: other=disabled", true},
+		{"AliasDisabled", NewRuleName("core", "0140", "lower-snake"), "", "api-linter: naming-format=disabled", false},
 	}
 
 	// Run the specific tests individually.
@@ -316,6 +318,7 @@ func TestRuleIsEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test message")
 			}
+			rule.Name = test.ruleName
 			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0]), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}

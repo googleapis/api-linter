@@ -240,24 +240,46 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
 func ruleIsEnabled(rule ProtoRule, d desc.Descriptor) bool {
-	directive := fmt.Sprintf("api-linter: %s=disabled", rule.GetName())
+	name := string(rule.GetName())
+	if ruleDisabledInComments(name, d) {
+		return false
+	}
 
-	// If the comments above the descriptor disable the rule,
-	// return false.
+	// Some rules have legacy alias.
+	if alias := ruleAlias(name); alias != "" && ruleDisabledInComments(alias, d) {
+		return false
+	}
+
+	return true
+}
+
+// ruleAlias returns the rule alias. If not exists, return empty string.
+func ruleAlias(name string) string {
+	aliasMap := map[string]string{
+		"core::0140::lower-snake": "naming-format",
+	}
+	return aliasMap[name]
+}
+
+// ruleDisabledInComments returns true if the rule is disabled by the comments
+// for the given descriptor or its file.
+func ruleDisabledInComments(ruleName string, d desc.Descriptor) bool {
+	directive := fmt.Sprintf("api-linter: %s=disabled", ruleName)
+
+	// The rule may be disabled in the comments above the descriptor.
 	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
 		if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
-			return false
+			return true
 		}
 	}
 
 	// The rule may also be disabled at the file level.
-	// If it is, return false.
 	if strings.Contains(fileHeader(d.GetFile()), directive) {
-		return false
+		return true
 	}
 
 	// The rule is enabled.
-	return true
+	return false
 }
 
 // getAllMessages returns a slice with every message (not just top-level
