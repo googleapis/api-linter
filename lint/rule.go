@@ -245,7 +245,7 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor) bool {
 		return false
 	}
 
-	// Some rules have legacy alias.
+	// Some rules have a legacy alias.
 	if alias := ruleAlias(name); alias != "" && ruleDisabledInComments(alias, d) {
 		return false
 	}
