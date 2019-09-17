@@ -54,7 +54,7 @@ func (ps *ProblemStub) VerifyMessage(p lint.Problem, t *testing.T) {
 type ProblemStubs []ProblemStub
 
 // Verify establishes that the provided problems match the stubs.
-func (pss *ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
+func (pss ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
 	// Ensure that we got the same number of problems.
 	// If we did not, then it is probably difficult to compare beyond that.
 	if got, want := len(problems), len(pss); got != want {
@@ -62,9 +62,11 @@ func (pss *ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
 		return
 	}
 
+	// Compare each of the problem stubs to establish that they
+	// match the actual problems.
 	for i, stub := range pss {
 		stub.VerifyDescriptor(problems[i], t)
-		if stub.Message {
+		if stub.Message != "" {
 			stub.VerifyMessage(problems[i], t)
 		}
 	}
