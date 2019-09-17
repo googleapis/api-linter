@@ -19,18 +19,6 @@ import (
 	"strings"
 )
 
-// Status defines whether a rule is enabled, disabled or deprecated.
-type Status string
-
-const (
-	// Enabled indicates that a rule should be enabled.
-	Enabled Status = "enabled"
-	// Disabled indicates that a rule should be disabled.
-	Disabled Status = "disabled"
-	// Deprecated indicates that a rule should be deprecated.
-	Deprecated Status = "Deprecated"
-)
-
 // RuleName is an identifier for a rule. Allowed characters include a-z, A-Z, 0-9, -, _. The
 // namespace separator :: is allowed between RuleName segments (for example, my_namespace::my_rule).
 type RuleName string
