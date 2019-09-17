@@ -71,6 +71,20 @@ func TestVerifyMessageError(t *testing.T) {
 	}
 }
 
+func TestSetDescriptor(t *testing.T) {
+	m, err := builder.NewMessage("Foo").Build()
+	if err != nil {
+		t.Fatalf("Unable to build descriptor.")
+	}
+	stubs := ProblemStubs{ProblemStub{}, ProblemStub{}}
+	resp := stubs.SetDescriptor(m)
+	for _, stub := range resp {
+		if stub.Descriptor != m {
+			t.Errorf("ProblemStubs.SetDescriptor did not set the descriptor properly.")
+		}
+	}
+}
+
 func TestVerifyProblemStubs(t *testing.T) {
 	m, err := builder.NewMessage("Foo").Build()
 	if err != nil {

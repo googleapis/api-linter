@@ -53,6 +53,18 @@ func (ps *ProblemStub) VerifyMessage(p lint.Problem, t *testing.T) {
 // ProblemStubs is a slice of ProblemStub objects.
 type ProblemStubs []ProblemStub
 
+// SetDescriptor sets the descriptor to each ProblemStub and returns a new
+// ProblemStubs object.
+// It returns a new ProblemStubs (for chaining).
+func (pss ProblemStubs) SetDescriptor(d desc.Descriptor) ProblemStubs {
+	answer := ProblemStubs{}
+	for _, stub := range pss {
+		stub.Descriptor = d
+		answer = append(answer, stub)
+	}
+	return answer
+}
+
 // Verify establishes that the provided problems match the stubs.
 func (pss ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
 	// Ensure that we got the same number of problems.

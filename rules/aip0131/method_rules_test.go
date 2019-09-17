@@ -17,6 +17,7 @@ package aip0131
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/testutil"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -26,13 +27,14 @@ func TestRequestMessageName(t *testing.T) {
 		testName       string
 		methodName     string
 		reqMessageName string
-		problemCount   int
-		errPrefix      string
+		problems       testutil.ProblemStubs
 	}{
-		{"Valid", "GetBook", "GetBookRequest", 0, "False positive"},
-		{"Invalid", "GetBook", "Book", 1, "False negative"},
-		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", 0, "False positive"},
-		{"Irrelevant", "AcquireBook", "Book", 0, "False positive"},
+		{"Valid", "GetBook", "GetBookRequest", testutil.ProblemStubs{}},
+		{"Invalid", "GetBook", "Book", testutil.ProblemStubs{testutil.ProblemStub{
+			Message: "GetBookRequest",
+		}}},
+		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutil.ProblemStubs{}},
+		{"Irrelevant", "AcquireBook", "Book", testutil.ProblemStubs{}},
 	}
 
 	// Run each test individually.
@@ -50,9 +52,8 @@ func TestRequestMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := requestMessageName.LintMethod(service.GetMethods()[0]); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestMessageName.Name, problems)
-			}
+			method := service.GetMethods()[0]
+			test.problems.SetDescriptor(method).Verify(requestMessageName.LintMethod(method), t)
 		})
 	}
 }
@@ -63,12 +64,11 @@ func TestResponseMessageName(t *testing.T) {
 		testName        string
 		methodName      string
 		respMessageName string
-		problemCount    int
-		errPrefix       string
+		problems        testutil.ProblemStubs
 	}{
-		{"Valid", "GetBook", "Book", 0, "False positive"},
-		{"Invalid", "GetBook", "GetBookResponse", 1, "False negative"},
-		{"Irrelevant", "AcquireBook", "AcquireBookResponse", 0, "False positive"},
+		{"Valid", "GetBook", "Book", testutil.ProblemStubs{}},
+		{"Invalid", "GetBook", "GetBookResponse", testutil.ProblemStubs{testutil.ProblemStub{Message: "Book"}}},
+		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutil.ProblemStubs{}},
 	}
 
 	// Run each test individually.
@@ -86,9 +86,8 @@ func TestResponseMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := responseMessageName.LintMethod(service.GetMethods()[0]); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, responseMessageName.Name, problems)
-			}
+			method := service.GetMethods()[0]
+			test.problems.SetDescriptor(method).Verify(responseMessageName.LintMethod(method), t)
 		})
 	}
 }
