@@ -239,21 +239,31 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule protoRule, d desc.Descriptor) bool {
-	directive := fmt.Sprintf("api-linter: %s=disabled", rule.GetName())
-
-	// If the comments above the descriptor disable the rule,
-	// return false.
-	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
-		if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
-			return false
-		}
+func ruleIsEnabled(rule protoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+	// Some rules have a legacy name. We add it to the check list.
+	ruleName := string(rule.GetName())
+	names := []string{ruleName}
+	if alias := aliasMap[ruleName]; alias != "" {
+		names = append(names, alias)
 	}
 
-	// The rule may also be disabled at the file level.
-	// If it is, return false.
-	if strings.Contains(fileHeader(d.GetFile()), directive) {
-		return false
+	directives := []string{}
+	for _, name := range names {
+		directives = append(directives, fmt.Sprintf("api-linter: %s=disabled", name))
+	}
+
+	for _, directive := range directives {
+		// The rule may be disabled in the comments above the descriptor.
+		if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+			if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
+				return false
+			}
+		}
+
+		// The rule may also be disabled at the file level.
+		if strings.Contains(fileHeader(d.GetFile()), directive) {
+			return false
+		}
 	}
 
 	// The rule is enabled.
