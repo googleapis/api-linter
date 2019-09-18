@@ -17,7 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/testutils"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
