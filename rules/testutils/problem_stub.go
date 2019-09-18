@@ -67,6 +67,8 @@ func (pss ProblemStubs) SetDescriptor(d desc.Descriptor) ProblemStubs {
 
 // Verify establishes that the provided problems match the stubs.
 func (pss ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
+	t.Helper()
+
 	// Ensure that we got the same number of problems.
 	// If we did not, then it is probably difficult to compare beyond that.
 	if got, want := len(problems), len(pss); got != want {
