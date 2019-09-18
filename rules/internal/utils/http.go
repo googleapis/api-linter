@@ -33,14 +33,13 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*annotations.HttpRule {
 	opts := m.GetMethodOptions()
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	var httpRule *annotations.HttpRule
 	if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
-		httpRule = x.(*annotations.HttpRule)
+		httpRule := x.(*annotations.HttpRule)
 		rules = append(rules, httpRule)
-	}
 
-	// Add any additional bindings and flatten them into `rules`.
-	rules = append(rules, httpRule.GetAdditionalBindings()...)
+		// Add any additional bindings and flatten them into `rules`.
+		rules = append(rules, httpRule.GetAdditionalBindings()...)
+	}
 
 	// Done; return the rules.
 	return rules

@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -76,3 +77,30 @@ var responseMessageName = &lint.MethodRule{
 		return nil
 	},
 }
+
+// Get messages should use the HTTP GET verb.
+var httpVerb = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0131", "http-verb"),
+	URI:  "https://aip.dev/131#guidance",
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		// We only care about Get methods for the purpose of this rule;
+		// ignore everything else.
+		if !isGetMethod(m) {
+			return nil
+		}
+
+		// Rule check: Establish that the RPC uses HTTP GET.
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if httpRule.GetGet() == "" {
+				return []lint.Problem{{
+					Message:    "Get methods must use the HTTP GET verb.",
+					Descriptor: m,
+				}}
+			}
+		}
+
+		return nil
+	},
+}
+
+// Get methods should have a proper HTTP pattern.
