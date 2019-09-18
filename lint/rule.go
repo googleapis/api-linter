@@ -247,7 +247,7 @@ func ruleIsEnabled(rule protoRule, d desc.Descriptor, aliasMap map[string]string
 		names = append(names, alias)
 	}
 
-	var directives []string
+	directives := []string{}
 	for _, name := range names {
 		directives = append(directives, fmt.Sprintf("api-linter: %s=disabled", name))
 	}
