@@ -11,7 +11,7 @@ import (
 
 // All enum values must use UPPER_SNAKE_CASE.
 var enumValueUpperSnakeCase = &lint.EnumRule{
-	Name: lint.NewRuleName("core", "0126", "lower-snake"),
+	Name: lint.NewRuleName("core", "0126", "upper-snake"),
 	URI:  "https://aip.dev/126#guidance",
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		var problems []lint.Problem
