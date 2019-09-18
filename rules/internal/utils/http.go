@@ -39,11 +39,8 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*annotations.HttpRule {
 		rules = append(rules, httpRule)
 	}
 
-	// Iterate over any additional bindings and flatten them into the
-	// `rules` array.
-	for _, binding := range httpRule.GetAdditionalBindings() {
-		rules = append(rules, binding)
-	}
+	// Add any additional bindings and flatten them into `rules`.
+	rules = append(rules, httpRule.GetAdditionalBindings()...)
 
 	// Done; return the rules.
 	return rules
