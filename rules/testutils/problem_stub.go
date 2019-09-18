@@ -34,7 +34,7 @@ type ProblemStub struct {
 // problem's descriptor match.
 func (ps *ProblemStub) VerifyDescriptor(p lint.Problem, t *testing.T) {
 	if !reflect.DeepEqual(p.Descriptor, ps.Descriptor) {
-		t.Errorf("Expected descriptor %v; got %v", ps.Descriptor, p.Descriptor)
+		t.Errorf("Got descriptor %v; expected %v", p.Descriptor, ps.Descriptor)
 	}
 }
 
@@ -43,9 +43,9 @@ func (ps *ProblemStub) VerifyDescriptor(p lint.Problem, t *testing.T) {
 func (ps *ProblemStub) VerifyMessage(p lint.Problem, t *testing.T) {
 	if !strings.Contains(p.Message, ps.Message) {
 		t.Errorf(
-			"Expected the problem's message to contain %q.\nActual: %q",
-			ps.Message,
+			"Got %q for problem's message; expected it to contain %q.",
 			p.Message,
+			ps.Message,
 		)
 	}
 }
@@ -72,7 +72,7 @@ func (pss ProblemStubs) Verify(problems []lint.Problem, t *testing.T) {
 	// Ensure that we got the same number of problems.
 	// If we did not, then it is probably difficult to compare beyond that.
 	if got, want := len(problems), len(pss); got != want {
-		t.Errorf("Expected %d problems; got %d.", want, got)
+		t.Errorf("Got %d problems; expected %d.", got, want)
 		return
 	}
 

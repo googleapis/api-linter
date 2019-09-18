@@ -51,7 +51,7 @@ func TestVerifyDescriptorError(t *testing.T) {
 	canary := &testing.T{}
 	stub.VerifyDescriptor(problem, canary)
 	if !canary.Failed() {
-		t.Errorf("Expected ProblemStub.VerifyDescriptor to error, but it succeeded.")
+		t.Errorf("ProblemStub.VerifyDescriptor succeeded; expected error.")
 	}
 }
 
@@ -67,7 +67,7 @@ func TestVerifyMessageError(t *testing.T) {
 	problem := lint.Problem{Message: "bar baz"}
 	stub.VerifyMessage(problem, canary)
 	if !canary.Failed() {
-		t.Errorf("Expected ProblemStub.VerifyMessage to error, but it succeeded.")
+		t.Errorf("ProblemStub.VerifyMessage succeeded; expected error.")
 	}
 }
 
@@ -113,6 +113,6 @@ func TestVerifyProblemStubsMismatchedLength(t *testing.T) {
 	problems := []lint.Problem{}
 	stubs.Verify(problems, canary)
 	if !canary.Failed() {
-		t.Errorf("Expected stubs.Verify to error, but it succeeded.")
+		t.Errorf("stubs.Verify succeeded; expected error.")
 	}
 }
