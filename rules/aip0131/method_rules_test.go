@@ -17,7 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/testutil"
+	"github.com/googleapis/api-linter/rules/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -27,14 +27,14 @@ func TestRequestMessageName(t *testing.T) {
 		testName       string
 		methodName     string
 		reqMessageName string
-		problems       testutil.ProblemStubs
+		problems       testutils.ProblemStubs
 	}{
-		{"Valid", "GetBook", "GetBookRequest", testutil.ProblemStubs{}},
-		{"Invalid", "GetBook", "Book", testutil.ProblemStubs{testutil.ProblemStub{
+		{"Valid", "GetBook", "GetBookRequest", testutils.ProblemStubs{}},
+		{"Invalid", "GetBook", "Book", testutils.ProblemStubs{testutils.ProblemStub{
 			Message: "GetBookRequest",
 		}}},
-		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutil.ProblemStubs{}},
-		{"Irrelevant", "AcquireBook", "Book", testutil.ProblemStubs{}},
+		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutils.ProblemStubs{}},
+		{"Irrelevant", "AcquireBook", "Book", testutils.ProblemStubs{}},
 	}
 
 	// Run each test individually.
@@ -64,11 +64,11 @@ func TestResponseMessageName(t *testing.T) {
 		testName        string
 		methodName      string
 		respMessageName string
-		problems        testutil.ProblemStubs
+		problems        testutils.ProblemStubs
 	}{
-		{"Valid", "GetBook", "Book", testutil.ProblemStubs{}},
-		{"Invalid", "GetBook", "GetBookResponse", testutil.ProblemStubs{testutil.ProblemStub{Message: "Book"}}},
-		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutil.ProblemStubs{}},
+		{"Valid", "GetBook", "Book", testutils.ProblemStubs{}},
+		{"Invalid", "GetBook", "GetBookResponse", testutils.ProblemStubs{testutils.ProblemStub{Message: "Book"}}},
+		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutils.ProblemStubs{}},
 	}
 
 	// Run each test individually.
