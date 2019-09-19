@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package aip0131 contains rules defined in https://aip.dev/131.
 package aip0131
 
 import (

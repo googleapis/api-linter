@@ -21,24 +21,24 @@ import (
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetHTTPRules(t *testing.T) {
 	// Create a MethodOptions with the annotation set.
 	opts := &dpb.MethodOptions{}
-	httpRule := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Get{
+	httpRule := &apb.HttpRule{
+		Pattern: &apb.HttpRule_Get{
 			Get: "/v1/{name=publishers/*/books/*}",
 		},
-		AdditionalBindings: []*annotations.HttpRule{{
-			Pattern: &annotations.HttpRule_Get{
+		AdditionalBindings: []*apb.HttpRule{{
+			Pattern: &apb.HttpRule_Get{
 				Get: "/v1/{name=books/*}",
 			},
 		}},
 	}
 
-	if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
+	if err := proto.SetExtension(opts, apb.E_Http, httpRule); err != nil {
 		t.Fatalf("Failed to set google.api.http annotation.")
 	}
 
@@ -78,7 +78,7 @@ func TestGetHTTPRulesEmpty(t *testing.T) {
 	}
 
 	// Establish that we get back an empty list of rules.
-	if got, want := GetHTTPRules(service.GetMethods()[0]), []*annotations.HttpRule{}; !reflect.DeepEqual(got, want) {
+	if got, want := GetHTTPRules(service.GetMethods()[0]), []*apb.HttpRule{}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Expected empty slice of rules; got %v.", got)
 	}
 }

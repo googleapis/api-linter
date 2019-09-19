@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package aip0140 contains rules defined in https://aip.dev/140.
 package aip0140
 
 import (
