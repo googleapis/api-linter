@@ -17,7 +17,7 @@ package utils
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
@@ -26,15 +26,15 @@ import (
 // and then flattens the values in `additional_bindings`.
 // This allows rule authors to simply range over all of the HTTP rules,
 // since the common case is to want to apply the checks to all of them.
-func GetHTTPRules(m *desc.MethodDescriptor) []*annotations.HttpRule {
-	rules := []*annotations.HttpRule{}
+func GetHTTPRules(m *desc.MethodDescriptor) []*apb.HttpRule {
+	rules := []*apb.HttpRule{}
 
 	// Get the method options.
 	opts := m.GetMethodOptions()
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if x, err := proto.GetExtension(opts, annotations.E_Http); err == nil {
-		httpRule := x.(*annotations.HttpRule)
+	if x, err := proto.GetExtension(opts, apb.E_Http); err == nil {
+		httpRule := x.(*apb.HttpRule)
 		rules = append(rules, httpRule)
 
 		// Add any additional bindings and flatten them into `rules`.

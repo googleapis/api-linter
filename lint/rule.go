@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -295,7 +295,7 @@ func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDe
 //
 // Taken from https://github.com/jhump/protoreflect/issues/215
 func fileHeader(fd *desc.FileDescriptor) string {
-	var firstLoc *descriptor.SourceCodeInfo_Location
+	var firstLoc *dpb.SourceCodeInfo_Location
 	var firstSpan int64
 
 	// File level comments should only be comments identified on either
