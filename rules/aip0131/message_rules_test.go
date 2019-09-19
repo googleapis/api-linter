@@ -19,7 +19,7 @@ import (
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/protobuf/field_mask"
+	fpb "google.golang.org/genproto/protobuf/field_mask"
 )
 
 func TestStandardFields(t *testing.T) {
@@ -60,7 +60,7 @@ func TestStandardFields(t *testing.T) {
 
 func TestUnknownFields(t *testing.T) {
 	// Get the correct message type for google.protobuf.FieldMask.
-	fieldMask, err := desc.LoadMessageDescriptorForMessage(&field_mask.FieldMask{})
+	fieldMask, err := desc.LoadMessageDescriptorForMessage(&fpb.FieldMask{})
 	if err != nil {
 		t.Fatalf("Unable to load the field mask message.")
 	}
