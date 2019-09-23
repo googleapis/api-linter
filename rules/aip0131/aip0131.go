@@ -26,15 +26,19 @@ import (
 // this AIP's rules to it.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		httpBody,
+		httpNameField,
+		httpVerb,
+		responseMessageName,
 		requestMessageName,
 		standardFields,
 		unknownFields,
-		responseMessageName,
 	)
 }
 
 var getMethodRegexp = regexp.MustCompile("^Get(?:[A-Z]|$)")
 var getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
+var getURINameRegexp = regexp.MustCompile("\\{name=[a-zA-Z/*]+\\}$")
 
 // Returns true if this is a AIP-131 Get method, false otherwise.
 func isGetMethod(m *desc.MethodDescriptor) bool {
