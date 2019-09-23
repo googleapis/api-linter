@@ -98,40 +98,36 @@ func TestResponseMessageName(t *testing.T) {
 }
 
 func TestHttpVerb(t *testing.T) {
+	// Set up GET and POST HTTP annotations.
+	httpGet := &annotations.HttpRule{
+		Pattern: &annotations.HttpRule_Get{
+			Get: "/v1/{name=publishers/*/books/*}",
+		},
+	}
+	httpPost := &annotations.HttpRule{
+		Pattern: &annotations.HttpRule_Post{
+			Post: "/v1/{name=publishers/*/books/*}",
+		},
+	}
+
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		verb       string
+		httpRule   *annotations.HttpRule
 		methodName string
 		msg        string
 	}{
-		{"Valid", "get", "GetBook", ""},
-		{"Invalid", "post", "GetBook", "HTTP GET"},
-		{"Irrelevant", "post", "AcquireBook", ""},
+		{"Valid", httpGet, "GetBook", ""},
+		{"Invalid", httpPost, "GetBook", "HTTP GET"},
+		{"Irrelevant", httpPost, "AcquireBook", ""},
 	}
 
 	// Run each test.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create the appropriate pattern based on the desired verb.
-			var httpRule *annotations.HttpRule
-			if test.verb == "post" {
-				httpRule = &annotations.HttpRule{
-					Pattern: &annotations.HttpRule_Post{
-						Post: "/v1/{name=publishers/*/books/*}",
-					},
-				}
-			} else {
-				httpRule = &annotations.HttpRule{
-					Pattern: &annotations.HttpRule_Get{
-						Get: "/v1/{name=publishers/*/books/*}",
-					},
-				}
-			}
-
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
-			if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
+			if err := proto.SetExtension(opts, annotations.E_Http, test.httpRule); err != nil {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
