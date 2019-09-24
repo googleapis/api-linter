@@ -85,3 +85,16 @@ func TestEqualFalse(t *testing.T) {
 		})
 	}
 }
+
+func TestSetDescriptor(t *testing.T) {
+	m, err := builder.NewMessage("Foo").Build()
+	if err != nil {
+		t.Fatalf("Could not build descriptor.")
+	}
+	problems := Problems{{}, {}, {}}.SetDescriptor(m)
+	for _, p := range problems {
+		if p.Descriptor != m {
+			t.Errorf("Got %v, expected %v", p.Descriptor, m)
+		}
+	}
+}

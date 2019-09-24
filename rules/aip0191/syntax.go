@@ -23,9 +23,9 @@ import (
 var syntax = &lint.FileRule{
 	Name: lint.NewRuleName("core", "0191", "proto-version"),
 	URI:  "https://aip.dev/191#guidance",
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f *desc.FileDescriptor) lint.Problems {
 		if !f.IsProto3() {
-			return []lint.Problem{{
+			return lint.Problems{{
 				Message:    "All API proto files must use proto3 syntax.",
 				Suggestion: "syntax = \"proto3\"",
 				Descriptor: f,

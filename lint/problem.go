@@ -99,3 +99,14 @@ func (problems Problems) Equal(other Problems) bool {
 	// These sets of problems are sufficiently equal.
 	return true
 }
+
+// SetDescriptor sets the given descriptor to every Problem in the slice and
+// returns the slice back.
+//
+// This is intended primarily for use in unit tests.
+func (problems Problems) SetDescriptor(d desc.Descriptor) Problems {
+	for i := range problems {
+		problems[i].Descriptor = d
+	}
+	return problems
+}

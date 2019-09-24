@@ -33,7 +33,7 @@ type protoRule interface {
 
 	// Lint accepts a FileDescriptor and lints it,
 	// returning a slice of Problem objects it finds.
-	Lint(*desc.FileDescriptor) []Problem
+	Lint(*desc.FileDescriptor) Problems
 }
 
 // FileRule defines a lint rule that checks a file as a whole.
@@ -43,7 +43,7 @@ type FileRule struct {
 
 	// LintFile accepts a FileDescriptor and lints it, returning a slice of
 	// Problems it finds.
-	LintFile func(*desc.FileDescriptor) []Problem
+	LintFile func(*desc.FileDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -60,7 +60,7 @@ func (r *FileRule) GetURI() string {
 
 // Lint forwards the FileDescriptor to the LintFile method defined on the
 // FileRule.
-func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *FileRule) Lint(fd *desc.FileDescriptor) Problems {
 	return r.LintFile(fd)
 }
 
@@ -72,7 +72,7 @@ type MessageRule struct {
 
 	// LintMessage accepts a MessageDescriptor and lints it, returning a slice
 	// of Problems it finds.
-	LintMessage func(*desc.MessageDescriptor) []Problem
+	LintMessage func(*desc.MessageDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -89,8 +89,8 @@ func (r *MessageRule) GetURI() string {
 
 // Lint accepts a FileDescriptor and iterates over every message in the
 // file, and lints each message in the file.
-func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
+func (r *MessageRule) Lint(fd *desc.FileDescriptor) Problems {
+	problems := Problems{}
 
 	// Iterate over each message and process rules for each message.
 	for _, message := range getAllMessages(fd) {
@@ -106,7 +106,7 @@ type FieldRule struct {
 
 	// LintField accepts a FieldDescriptor and lints it, returning a slice of
 	// Problems it finds.
-	LintField func(*desc.FieldDescriptor) []Problem
+	LintField func(*desc.FieldDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -122,8 +122,8 @@ func (r *FieldRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every field in the file.
-func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
+func (r *FieldRule) Lint(fd *desc.FileDescriptor) Problems {
+	problems := Problems{}
 
 	// Iterate over each message and process rules for each field in that
 	// message.
@@ -141,7 +141,7 @@ type ServiceRule struct {
 	URI  string
 
 	// LintService accepts a ServiceDescriptor and lints it.
-	LintService func(*desc.ServiceDescriptor) []Problem
+	LintService func(*desc.ServiceDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -157,8 +157,8 @@ func (r *ServiceRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every service in the file.
-func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
+func (r *ServiceRule) Lint(fd *desc.FileDescriptor) Problems {
+	problems := Problems{}
 	for _, service := range fd.GetServices() {
 		problems = append(problems, r.LintService(service)...)
 	}
@@ -171,7 +171,7 @@ type MethodRule struct {
 	URI  string
 
 	// LintMethod accepts a MethodDescriptor and lints it.
-	LintMethod func(*desc.MethodDescriptor) []Problem
+	LintMethod func(*desc.MethodDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -187,8 +187,8 @@ func (r *MethodRule) GetURI() string {
 }
 
 // Lint accepts a FileDescriptor and lints every method in the file.
-func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
+func (r *MethodRule) Lint(fd *desc.FileDescriptor) Problems {
+	problems := Problems{}
 	for _, service := range fd.GetServices() {
 		for _, method := range service.GetMethods() {
 			problems = append(problems, r.LintMethod(method)...)
@@ -203,7 +203,7 @@ type EnumRule struct {
 	URI  string
 
 	// LintEnum accepts a EnumDescriptor and lints it.
-	LintEnum func(*desc.EnumDescriptor) []Problem
+	LintEnum func(*desc.EnumDescriptor) Problems
 
 	noPositional struct{}
 }
@@ -220,8 +220,8 @@ func (r *EnumRule) GetURI() string {
 
 // Lint accepts a FileDescriptor and lints every enum in the file
 // (including enums nested within messages).
-func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
+func (r *EnumRule) Lint(fd *desc.FileDescriptor) Problems {
+	problems := Problems{}
 
 	// Lint enums that are at the top level of the file.
 	for _, enum := range fd.GetEnumTypes() {

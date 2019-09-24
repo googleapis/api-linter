@@ -25,7 +25,7 @@ import (
 var requestMessageName = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "request-message", "name"),
 	URI:  "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
@@ -35,7 +35,7 @@ var requestMessageName = &lint.MethodRule{
 		// Rule check: Establish that for methods such as `GetFoo`, the request
 		// message is named `GetFooRequest`.
 		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
+			return lint.Problems{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have a request message named after the RPC, such as %q.",
 					want,
@@ -53,7 +53,7 @@ var requestMessageName = &lint.MethodRule{
 var responseMessageName = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "response-message", "name"),
 	URI:  "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
@@ -63,7 +63,7 @@ var responseMessageName = &lint.MethodRule{
 		// Rule check: Establish that for methods such as `GetFoo`, the response
 		// message is named `Foo`.
 		if got, want := m.GetOutputType().GetName(), m.GetName()[3:]; got != want {
-			return []lint.Problem{{
+			return lint.Problems{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have the corresponding resource as the response message, such as %q.",
 					want,

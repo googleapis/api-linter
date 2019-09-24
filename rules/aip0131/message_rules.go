@@ -26,7 +26,7 @@ import (
 var standardFields = &lint.MessageRule{
 	Name: lint.NewRuleName("core", "0131", "request-message", "name-field"),
 	URI:  "https://aip.dev/131#request-message",
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m *desc.MessageDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetRequestMessage(m) {
@@ -36,7 +36,7 @@ var standardFields = &lint.MessageRule{
 		// Rule check: Establish that a name field is present.
 		name := m.FindFieldByName("name")
 		if name == nil {
-			return []lint.Problem{{
+			return lint.Problems{{
 				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
 				Descriptor: m,
 			}}
@@ -44,7 +44,7 @@ var standardFields = &lint.MessageRule{
 
 		// Rule check: Ensure that the name field is the correct type.
 		if name.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
+			return lint.Problems{{
 				Message:    "`name` field on Get RPCs should be a string",
 				Descriptor: name,
 			}}
@@ -58,7 +58,7 @@ var standardFields = &lint.MessageRule{
 var unknownFields = &lint.MessageRule{
 	Name: lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
 	URI:  "https://aip.dev/131#request-message",
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m *desc.MessageDescriptor) (problems lint.Problems) {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetRequestMessage(m) {
@@ -75,7 +75,7 @@ var unknownFields = &lint.MessageRule{
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Get RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Unexpected field: Get RPCs must only contain fields explicitly described in AIPs, not %q.",
 						string(field.GetName()),
 					),
 					Descriptor: field,
