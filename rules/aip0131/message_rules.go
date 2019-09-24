@@ -24,15 +24,10 @@ import (
 
 // The Get standard method should only have expected fields.
 var standardFields = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0131", "request-message", "name-field"),
-	URI:  "https://aip.dev/131#request-message",
+	Name:   lint.NewRuleName("core", "0131", "request-message", "name-field"),
+	URI:    "https://aip.dev/131#request-message",
+	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
-		if !isGetRequestMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a name field is present.
 		name := m.FindFieldByName("name")
 		if name == nil {
@@ -56,15 +51,10 @@ var standardFields = &lint.MessageRule{
 
 // Get methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
-	URI:  "https://aip.dev/131#request-message",
+	Name:   lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
+	URI:    "https://aip.dev/131#request-message",
+	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
-		if !isGetRequestMessage(m) {
-			return
-		}
-
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
 			"name":      {}, // AIP-131
