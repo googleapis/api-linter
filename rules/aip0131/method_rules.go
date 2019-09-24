@@ -82,7 +82,7 @@ var responseMessageName = &lint.MethodRule{
 var httpVerb = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "http-verb"),
 	URI:  "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
@@ -92,7 +92,7 @@ var httpVerb = &lint.MethodRule{
 		// Rule check: Establish that the RPC uses HTTP GET.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.GetGet() == "" {
-				return []lint.Problem{{
+				return lint.Problems{{
 					Message:    "Get methods must use the HTTP GET verb.",
 					Descriptor: m,
 				}}
@@ -107,7 +107,7 @@ var httpVerb = &lint.MethodRule{
 var httpNameField = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "http-body"),
 	URI:  "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
@@ -118,7 +118,7 @@ var httpNameField = &lint.MethodRule{
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if uri := httpRule.GetGet(); uri != "" {
 				if !getURINameRegexp.MatchString(uri) {
-					return []lint.Problem{{
+					return lint.Problems{{
 						Message:    "Get methods should include the `name` field in the URI.",
 						Descriptor: m,
 					}}
@@ -134,7 +134,7 @@ var httpNameField = &lint.MethodRule{
 var httpBody = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "http-name"),
 	URI:  "https://aip.dev/131#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) lint.Problems {
 		// We only care about Get methods for the purpose of this rule;
 		// ignore everything else.
 		if !isGetMethod(m) {
@@ -144,7 +144,7 @@ var httpBody = &lint.MethodRule{
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.GetBody() != "" {
-				return []lint.Problem{{
+				return lint.Problems{{
 					Message:    "Get methods should not have an HTTP body.",
 					Descriptor: m,
 				}}
