@@ -34,12 +34,12 @@ func AddRules(r lint.RuleRegistry) {
 var listReqMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
 var listResMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Response$")
 
-// Return true if this is an AIP-132 List request message, false otherwise.
+// Return true if this is an AIP-158 List request message, false otherwise.
 func isListRequestMessage(m *desc.MessageDescriptor) bool {
 	return listReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Return true if this is an AIP-132 List request message, false otherwise.
+// Return true if this is an AIP-158 List request message, false otherwise.
 func isListResponseMessage(m *desc.MessageDescriptor) bool {
 	return listResMessageRegexp.MatchString(m.GetName())
 }
