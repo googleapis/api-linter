@@ -25,6 +25,7 @@ func TestRuleNameValid(t *testing.T) {
 		{"LowerNumber", "aip0121"},
 		{"LowerNumberKebab", "aip-0121"},
 		{"Namespaced", "aip::0121"},
+		{"NamespacedHyphen", "core::aip-0121"},
 	}
 
 	for _, test := range tests {
