@@ -24,7 +24,7 @@ import (
 )
 
 func TestLocations(t *testing.T) {
-	f := testutils.ParseString(`
+	f := testutils.ParseProtoString(`
 		// proto3 rules!
 		syntax = "proto3";
 
@@ -42,8 +42,8 @@ func TestLocations(t *testing.T) {
 			fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
 			wantSpan []int32
 		}{
-			{"Syntax", SyntaxLocation, []int32{2, 0, int32(len("syntax = \"proto3\";"))}},
-			{"Package", PackageLocation, []int32{4, 0, int32(len("package google.api.linter;"))}},
+			{"Syntax", SyntaxLocation, []int32{1, 0, int32(len("syntax = \"proto3\";"))}},
+			{"Package", PackageLocation, []int32{3, 0, int32(len("package google.api.linter;"))}},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
@@ -61,8 +61,8 @@ func TestLocations(t *testing.T) {
 			d        desc.Descriptor
 			wantSpan []int32
 		}{
-			{"Message", f.GetMessageTypes()[0], []int32{6, 8, 11}},
-			{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{7, 9, 12}},
+			{"Message", f.GetMessageTypes()[0], []int32{5, 8, 11}},
+			{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{6, 9, 12}},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestLocations(t *testing.T) {
 }
 
 func TestMissingLocations(t *testing.T) {
-	f := testutils.ParseString("message Foo {}")
+	f := testutils.ParseProtoString("message Foo {}")
 	tests := []struct {
 		testName string
 		fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
