@@ -66,8 +66,12 @@ func (p Problem) marshal() interface{} {
 	// Either descriptor or location may be set.
 	// If they are both set, prefer the location.
 	loc := p.Location
-	if loc == nil {
+	if loc == nil && p.Descriptor != nil {
 		loc = p.Descriptor.GetSourceInfo()
+	} else {
+		// We have no location information whatsoever.
+		// Be resilient and fall back to the top of the file.
+		loc = &dpb.SourceCodeInfo_Location{Span: []int32{0, 0, 0}}
 	}
 
 	// Return a marshal-able structure.
