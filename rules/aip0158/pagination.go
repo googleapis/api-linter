@@ -40,6 +40,7 @@ var requestPaginationPageSize = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name page_size is the correct type.
 		if pageSize.GetType() != builder.FieldTypeInt32().GetType() {
 			return []lint.Problem{{
