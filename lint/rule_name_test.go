@@ -57,9 +57,11 @@ func TestRuleNameInvalid(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if test.ruleName.IsValid() {
-			t.Errorf("Rule name %q is valid; want invalid.", test.ruleName)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			if test.ruleName.IsValid() {
+				t.Errorf("Rule name %q is valid; want invalid.", test.ruleName)
+			}
+		})
 	}
 }
 
