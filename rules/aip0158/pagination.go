@@ -102,6 +102,7 @@ var responsePaginationNextPageToken = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name next_page_token is the correct type.
 		if nextPageToken.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
