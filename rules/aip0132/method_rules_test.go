@@ -49,7 +49,7 @@ func TestRequestMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := requestMessageName.LintMethod(service.GetMethods()[0]); len(problems) != test.problemCount {
+			if problems := requestMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
 				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestMessageName.Name, problems)
 			}
 		})
@@ -85,7 +85,7 @@ func TestResponseMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := responseMessageName.LintMethod(service.GetMethods()[0]); len(problems) != test.problemCount {
+			if problems := responseMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
 				t.Errorf("%s on rule %s: %#v", test.errPrefix, responseMessageName.Name, problems)
 			}
 		})
