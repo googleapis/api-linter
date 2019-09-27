@@ -16,25 +16,49 @@ package lint
 
 import "testing"
 
-func TestRuleName_IsValid(t *testing.T) {
+func TestRuleNameValid(t *testing.T) {
 	tests := []struct {
-		name  RuleName
-		valid bool
+		testName string
+		ruleName RuleName
 	}{
-		{"", false},
-		{"a:::b", false},
-		{"a::::b", false},
-		{"a", true},
-		{"::my_rule", false},
-		{"my_namespace::", false},
-		{"my_namespace:my_rule", false},
-		{"my_namespace::my_rule", true},
-		{"my_rule", true},
+		{"Lower", "aip"},
+		{"LowerNumber", "aip0121"},
+		{"LowerNumberKebab", "aip-0121"},
+		{"Namespaced", "aip::0121"},
 	}
 
 	for _, test := range tests {
-		if test.name.IsValid() != test.valid {
-			t.Errorf("%q.IsValid()=%t; want %t", test.name, test.name.IsValid(), test.valid)
+		t.Run(test.testName, func(t *testing.T) {
+			if !test.ruleName.IsValid() {
+				t.Errorf("Rule name %q is invalid; want valid.", test.ruleName)
+			}
+		})
+	}
+}
+
+func TestRuleNameInvalid(t *testing.T) {
+	tests := []struct {
+		testName string
+		ruleName RuleName
+	}{
+		{"EmptyString", ""},
+		{"TripleColon", "a:::b"},
+		{"QuadrupleColon", "a::::b"},
+		{"CapitalLetter", "A"},
+		{"LeadingDoubleColon", "::my-rule"},
+		{"TrailingDoubleColon", "my-namespace::"},
+		{"LeadingHyphen", "-core::aip-0131"},
+		{"LeadingSegmentHyphen", "core::-aip-0131"},
+		{"OnlyHyphen", "-"},
+		{"SingleColon", "core:aip-0131"},
+		{"Underscore", "core::aip_0131"},
+		{"CamelCase", "myRule"},
+		{"PascalCase", "MyRule"},
+	}
+
+	for _, test := range tests {
+		if test.ruleName.IsValid() {
+			t.Errorf("Rule name %q is valid; want invalid.", test.ruleName)
 		}
 	}
 }
@@ -46,7 +70,7 @@ func TestNewRuleName(t *testing.T) {
 	}{
 		{[]string{}, ""},
 		{[]string{""}, ""},
-		{[]string{"my_namespace", "my_rule"}, "my_namespace::my_rule"},
+		{[]string{"my-namespace", "my-rule"}, "my-namespace::my-rule"},
 		{[]string{"my", "name", "space", "foo"}, "my::name::space::foo"},
 	}
 
