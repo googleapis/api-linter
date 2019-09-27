@@ -33,7 +33,7 @@ func TestLinter_run(t *testing.T) {
 		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
 	}
 
-	ruleProblems := Problems{{
+	ruleProblems := []Problem{{
 		Message:    "rule1_problem",
 		Category:   "",
 		RuleID:     "test::rule1",
@@ -43,9 +43,9 @@ func TestLinter_run(t *testing.T) {
 	tests := []struct {
 		testName string
 		configs  Configs
-		problems Problems
+		problems []Problem
 	}{
-		{"Empty", Configs{}, Problems{}},
+		{"Empty", Configs{}, []Problem{}},
 		{
 			"NonMatchingFile",
 			append(
@@ -79,7 +79,7 @@ func TestLinter_run(t *testing.T) {
 					},
 				},
 			),
-			Problems{},
+			[]Problem{},
 		},
 		{
 			"CategoryOverride",
@@ -92,7 +92,7 @@ func TestLinter_run(t *testing.T) {
 					},
 				},
 			),
-			Problems{{
+			[]Problem{{
 				Category:   "error",
 				Descriptor: fd,
 				Message:    "rule1_problem",
@@ -105,7 +105,7 @@ func TestLinter_run(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			rules, err := NewRuleRegistry(&FileRule{
 				Name: "test::rule1",
-				LintFile: func(f *desc.FileDescriptor) Problems {
+				LintFile: func(f *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
 			})
@@ -139,7 +139,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			testName: "Panic",
 			rule: &FileRule{
 				Name: "panic",
-				LintFile: func(_ *desc.FileDescriptor) Problems {
+				LintFile: func(_ *desc.FileDescriptor) []Problem {
 					panic("panic")
 				},
 			},
@@ -148,7 +148,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			testName: "PanicError",
 			rule: &FileRule{
 				Name: "panic-error",
-				LintFile: func(_ *desc.FileDescriptor) Problems {
+				LintFile: func(_ *desc.FileDescriptor) []Problem {
 					panic(fmt.Errorf("panic"))
 				},
 			},
