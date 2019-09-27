@@ -51,7 +51,7 @@ func TestStandardFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := standardFields.LintMessage(message); len(problems) != test.problemCount {
+			if problems := standardFields.Lint(message.GetFile()); len(problems) != test.problemCount {
 				t.Errorf("%s on rule %s: %#v", test.errPrefix, standardFields.Name, problems)
 			}
 		})
@@ -95,7 +95,7 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := unknownFields.LintMessage(message); len(problems) != test.problemCount {
+			if problems := unknownFields.Lint(message.GetFile()); len(problems) != test.problemCount {
 				t.Errorf("%s on rule %s: %#v", test.errPrefix, unknownFields.Name, problems)
 			}
 		})
