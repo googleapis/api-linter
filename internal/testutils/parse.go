@@ -15,6 +15,8 @@
 package testutils
 
 import (
+	"strings"
+
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/lithammer/dedent"
@@ -28,7 +30,7 @@ import (
 func ParseProtoString(src string) *desc.FileDescriptor {
 	parser := protoparse.Parser{
 		Accessor: protoparse.FileContentsFromMap(map[string]string{
-			"test.proto": dedent.Dedent(src),
+			"test.proto": strings.TrimSpace(dedent.Dedent(src)),
 		}),
 		IncludeSourceCodeInfo: true,
 	}
