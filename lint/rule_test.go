@@ -383,12 +383,12 @@ func (test *lintRuleTest) runRule(rule protoRule, fd *desc.FileDescriptor, t *te
 // each type of rule.
 func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
 	return []lintRuleTest{
-		{"No[]Problem", []Problem{}},
+		{"NoProblems", []Problem{}},
 		{"OneProblem", []Problem{{
 			Message:    "There was a problem.",
 			Descriptor: d,
 		}}},
-		{"Two[]Problem", []Problem{
+		{"TwoProblems", []Problem{
 			{
 				Message:    "This was the first problem.",
 				Descriptor: d,
