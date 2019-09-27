@@ -70,6 +70,7 @@ var requestPaginationPageToken = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name page_size is the correct type.
 		if pageToken.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
