@@ -16,44 +16,79 @@ package lint
 
 import (
 	"testing"
+
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/google/go-cmp/cmp"
+	"github.com/googleapis/api-linter/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-func TestLocation_IsValid(t *testing.T) {
-	tests := []struct {
-		l     Location
-		valid bool
-	}{
-		{Location{Position{1, 2}, Position{1, 2}}, true},
-		{Location{Position{0, 0}, Position{1, 1}}, false}, // invalid: start position is invalid
-		{Location{Position{1, 1}, Position{0, 0}}, false}, // invalid: end position is invalid
-		{Location{Position{2, 1}, Position{1, 1}}, false}, // invalid: end line is before start line
-		{Location{Position{1, 2}, Position{1, 1}}, false}, // invalid: end column is before start column in the same line
-		{Location{}, false}, // invalid: empty location
-	}
+func TestLocations(t *testing.T) {
+	f := testutils.ParseString(`
+		// proto3 rules!
+		syntax = "proto3";
 
-	for _, test := range tests {
-		v := test.l.IsValid()
+		package google.api.linter;
 
-		if v != test.valid {
-			t.Errorf("%+v.IsValid()=%t; want %t", test.l, v, test.valid)
+		message Foo {
+		  string bar = 1;
 		}
-	}
+	`)
+
+	// Test the file location functions.
+	t.Run("File", func(t *testing.T) {
+		tests := []struct {
+			testName string
+			fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
+			wantSpan []int32
+		}{
+			{"Syntax", SyntaxLocation, []int32{2, 0, int32(len("syntax = \"proto3\";"))}},
+			{"Package", PackageLocation, []int32{4, 0, int32(len("package google.api.linter;"))}},
+		}
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				if diff := cmp.Diff(test.fx(f).Span, test.wantSpan); diff != "" {
+					t.Errorf(diff)
+				}
+			})
+		}
+	})
+
+	// Test descriptor names.
+	t.Run("DescriptorNames", func(t *testing.T) {
+		tests := []struct {
+			testName string
+			d        desc.Descriptor
+			wantSpan []int32
+		}{
+			{"Message", f.GetMessageTypes()[0], []int32{6, 8, 11}},
+			{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{7, 9, 12}},
+		}
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				if diff := cmp.Diff(DescriptorNameLocation(test.d).Span, test.wantSpan); diff != "" {
+					t.Errorf(diff)
+				}
+			})
+		}
+	})
 }
 
-func TestPosition_IsValid(t *testing.T) {
+func TestMissingLocations(t *testing.T) {
+	f := testutils.ParseString("message Foo {}")
 	tests := []struct {
-		p     Position
-		valid bool
+		testName string
+		fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
 	}{
-		{Position{1, 1}, true},
-		{Position{0, 1}, false},
-		{Position{1, 0}, false},
-		{Position{}, false},
+		{"Syntax", SyntaxLocation},
+		{"Package", PackageLocation},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if diff := cmp.Diff(test.fx(f).Span, []int32{0, 0, 0}); diff != "" {
+				t.Errorf(diff)
+			}
+		})
 	}
 
-	for _, test := range tests {
-		if got, want := test.p.IsValid(), test.valid; got != want {
-			t.Errorf("Position.IsValid() returns %v, but want %v", got, want)
-		}
-	}
 }

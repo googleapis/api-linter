@@ -14,43 +14,97 @@
 
 package lint
 
-import "fmt"
+import (
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/jhump/protoreflect/desc"
+)
 
-// Location describes a location in a source code file.
+// SyntaxLocation returns the location of the syntax definition in a file
+// descriptor.
 //
-// Note: positions are one-based.
-type Location struct {
-	Start Position `json:"start_position" yaml:"start_position"`
-	End   Position `json:"end_position" yaml:"end_position"`
+// If the location can not be found (for example, because there is no syntax
+// statement), it returns beginning of file.
+func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
+	return sourceInfoRegistry.sourceInfo(f).findLocation([]int32{12}) // syntax == 12
 }
 
-// IsValid checks if the location is constructed properly and
-// returns true if so.
-func (l Location) IsValid() bool {
-	return l.Start.IsValid() &&
-		l.End.IsValid() &&
-		(l.End.Line > l.Start.Line ||
-			l.End.Line == l.Start.Line && l.End.Column >= l.Start.Column)
+// PackageLocation returns the location of the package definition in a file
+// descriptor.
+//
+// If the location can not be found (for example, because there is no package
+// statement), it returns beginning of file.
+func PackageLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
+	return sourceInfoRegistry.sourceInfo(f).findLocation([]int32{2}) // package == 2
 }
 
-// String returns the string representation.
-func (l Location) String() string {
-	return fmt.Sprintf("{start: %s, end: %s}", l.Start, l.End)
+// DescriptorNameLocation returns the precise location for a descriptor's name.
+func DescriptorNameLocation(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
+	// All descriptors seem to have `string name = 1`, so this conveniently works.
+	path := append(d.GetSourceInfo().Path, 1)
+	return sourceInfoRegistry.sourceInfo(d.GetFile()).findLocation(path)
 }
 
-// Position describes a one-based position in a source code file.
-type Position struct {
-	Line   int `json:"line_number" yaml:"line_number"`
-	Column int `json:"column_number" yaml:"column_number"`
+type sourceInfo map[string]*dpb.SourceCodeInfo_Location
+
+// findLocation returns the best location it can find for the given path.
+//
+// If the requested path can not be found, it climbs the ancestry tree until
+// it finds one, and ultimately returns a location corresponding to the
+// beginning of the file if it can not find anything.
+func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
+	// Base case: If we have no path left, send back a fake location that
+	// corresponds to "beginning of file".
+	if len(path) == 0 {
+		return &dpb.SourceCodeInfo_Location{
+			Span: []int32{0, 0, 0},
+		}
+	}
+
+	// If the path exists in the source info registry, return that object.
+	if loc, ok := si[strPath(path)]; ok {
+		return loc
+	}
+
+	// No dice; try the immediate parent path.
+	return si.findLocation(path[:len(path)-1])
 }
 
-// IsValid checks if the position is constructed properly and
-// returns true if so.
-func (p Position) IsValid() bool {
-	return p.Line >= 1 && p.Column >= 1
+// The source map registry is a singleton that computes a source map for
+// any file descriptor that it is given, but then caches it to avoid computing
+// the source map for the same file descriptors over and over.
+type sourceInfoRegistryType map[*desc.FileDescriptor]sourceInfo
+
+// Each location has a path defined as an []int32, but we can not
+// use slices as keys, so compile them into a string.
+func strPath(segments []int32) (p string) {
+	for i, segment := range segments {
+		if i > 0 {
+			p += ","
+		}
+		p += string(segment)
+	}
+	return
 }
 
-// String returns the string representation.
-func (p Position) String() string {
-	return fmt.Sprintf("{line: %d, column: %d}", p.Line, p.Column)
+// sourceInfo compiles the source info object for a given file descriptor.
+// It also caches this into a registry, so subsequent calls using the same
+// descriptor will return the same object.
+func (sir sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) sourceInfo {
+	answer, ok := sir[fd]
+	if !ok {
+		answer = sourceInfo{}
+
+		// This file descriptor does not yet have a source info map.
+		// Compile one.
+		for _, loc := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
+			answer[strPath(loc.Path)] = loc
+		}
+
+		// Now that we calculated all of this, cache it on the registry so it
+		// does not need to be calculated again.
+		sir[fd] = answer
+	}
+	return answer
 }
+
+var sourceInfoRegistry = sourceInfoRegistryType{}
