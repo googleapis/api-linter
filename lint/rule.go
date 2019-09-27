@@ -42,7 +42,7 @@ type FileRule struct {
 	URI  string
 
 	// LintFile accepts a FileDescriptor and lints it, returning a slice of
-	// []Problem it finds.
+	// Problems it finds.
 	LintFile func(*desc.FileDescriptor) []Problem
 
 	noPositional struct{}
@@ -71,7 +71,7 @@ type MessageRule struct {
 	URI  string
 
 	// LintMessage accepts a MessageDescriptor and lints it, returning a slice
-	// of []Problem it finds.
+	// of Problems it finds.
 	LintMessage func(*desc.MessageDescriptor) []Problem
 
 	// OnlyIf accepts a MessageDescriptor and determines whether this rule
@@ -111,7 +111,7 @@ type FieldRule struct {
 	URI  string
 
 	// LintField accepts a FieldDescriptor and lints it, returning a slice of
-	// []Problem it finds.
+	// Problems it finds.
 	LintField func(*desc.FieldDescriptor) []Problem
 
 	// OnlyIf accepts a FieldDescriptor and determines whether this rule
