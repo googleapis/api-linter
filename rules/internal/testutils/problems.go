@@ -31,15 +31,6 @@ type Problems []lint.Problem
 // This is intended for unit tests and is intentially generous on what
 // constitutes equality.
 func (problems Problems) Diff(other []lint.Problem) string {
-	// `other` may be nil.
-	// Consider an length-0 slice to be equal to nil.
-	if other == nil {
-		if len(problems) == 0 {
-			return ""
-		}
-		return cmp.Diff(problems, other)
-	}
-
 	// If the problems differ in length, they are by definition unequal.
 	if len(problems) != len(other) {
 		return cmp.Diff(problems, other)
