@@ -25,9 +25,9 @@ import (
 var lowerSnake = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0140", "lower-snake"),
 	URI:  "https://aip.dev/140#guidance",
-	LintField: func(f *desc.FieldDescriptor) lint.Problems {
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if got, want := f.GetName(), toLowerSnakeCase(f.GetName()); got != want {
-			return lint.Problems{{
+			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field `%s` must use lower_snake_case.", got),
 				Suggestion: want,
 				Descriptor: f,

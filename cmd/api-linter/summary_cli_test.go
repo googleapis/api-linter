@@ -21,27 +21,27 @@ func TestCreateSummary(t *testing.T) {
 		name: "Example with a couple of responses",
 		data: []lint.Response{{
 				FilePath: "example.proto",
-				Problems: lint.Problems{
+				Problems: []lint.Problem{
 					{RuleID: "core::naming_formats::field_names"},
 					{RuleID: "core::naming_formats::field_names"},
 				},
 			},
 			{
 				FilePath: "example2.proto",
-				Problems: lint.Problems{
+				Problems: []lint.Problem{
 					{RuleID: "core::0131::request_message::name"},
 					{RuleID: "core::0132::response_message::name"},
 				},
 			},
 			{
 				FilePath: "example3.proto",
-				Problems: lint.Problems{
+				Problems: []lint.Problem{
 					{RuleID: "core::naming_formats::field_names"},
 				},
 			},
 			{
 				FilePath: "example4.proto",
-				Problems: lint.Problems{
+				Problems: []lint.Problem{
 					{RuleID: "core::naming_formats::field_names"},
 					{RuleID: "core::0132::response_message::name"},
 				},

@@ -13,8 +13,8 @@ import (
 var enumValueUpperSnakeCase = &lint.EnumRule{
 	Name: lint.NewRuleName("core", "0126", "upper-snake"),
 	URI:  "https://aip.dev/126#guidance",
-	LintEnum: func(e *desc.EnumDescriptor) lint.Problems {
-		var problems lint.Problems
+	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
+		var problems []lint.Problem
 		for _, v := range e.GetValues() {
 			if got, want := v.GetName(), toUpperSnakeCase(v.GetName()); got != want {
 				problems = append(problems, lint.Problem{
