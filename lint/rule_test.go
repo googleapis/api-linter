@@ -37,7 +37,7 @@ func TestFileRule(t *testing.T) {
 			rule := &FileRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
-				LintFile: func(fd *desc.FileDescriptor) Problems {
+				LintFile: func(fd *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -67,7 +67,7 @@ func TestMessageRule(t *testing.T) {
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
-				LintMessage: func(m *desc.MessageDescriptor) Problems {
+				LintMessage: func(m *desc.MessageDescriptor) []Problem {
 					if m.GetName() == "Author" {
 						return test.problems
 					}
@@ -99,7 +99,7 @@ func TestMessageRuleNested(t *testing.T) {
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
-				LintMessage: func(m *desc.MessageDescriptor) Problems {
+				LintMessage: func(m *desc.MessageDescriptor) []Problem {
 					if m.GetName() == "Author" {
 						return test.problems
 					}
@@ -134,7 +134,7 @@ func TestFieldRule(t *testing.T) {
 			rule := &FieldRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
-				LintField: func(f *desc.FieldDescriptor) Problems {
+				LintField: func(f *desc.FieldDescriptor) []Problem {
 					if f.GetName() == "edition_count" {
 						return test.problems
 					}
@@ -164,7 +164,7 @@ func TestServiceRule(t *testing.T) {
 			rule := &ServiceRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
-				LintService: func(s *desc.ServiceDescriptor) Problems {
+				LintService: func(s *desc.ServiceDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -204,7 +204,7 @@ func TestMethodRule(t *testing.T) {
 			rule := &MethodRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
-				LintMethod: func(m *desc.MethodDescriptor) Problems {
+				LintMethod: func(m *desc.MethodDescriptor) []Problem {
 					if m.GetName() == "CreateBook" {
 						return test.problems
 					}
@@ -235,7 +235,7 @@ func TestEnumRule(t *testing.T) {
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
-				LintEnum: func(e *desc.EnumDescriptor) Problems {
+				LintEnum: func(e *desc.EnumDescriptor) []Problem {
 					if e.GetName() == "Edition" {
 						return test.problems
 					}
@@ -268,7 +268,7 @@ func TestEnumRuleNested(t *testing.T) {
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
-				LintEnum: func(e *desc.EnumDescriptor) Problems {
+				LintEnum: func(e *desc.EnumDescriptor) []Problem {
 					if e.GetName() == "Edition" {
 						return test.problems
 					}
@@ -286,8 +286,8 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: NewRuleName("test"),
-		LintFile: func(fd *desc.FileDescriptor) Problems {
-			return Problems{}
+		LintFile: func(fd *desc.FileDescriptor) []Problem {
+			return []Problem{}
 		},
 	}
 
@@ -333,8 +333,8 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: NewRuleName("test"),
-		LintFile: func(fd *desc.FileDescriptor) Problems {
-			return Problems{}
+		LintFile: func(fd *desc.FileDescriptor) []Problem {
+			return []Problem{}
 		},
 	}
 
@@ -359,7 +359,7 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 
 type lintRuleTest struct {
 	testName string
-	problems Problems
+	problems []Problem
 }
 
 // runRule runs a rule within a test environment.
@@ -383,12 +383,12 @@ func (test *lintRuleTest) runRule(rule protoRule, fd *desc.FileDescriptor, t *te
 // each type of rule.
 func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
 	return []lintRuleTest{
-		{"NoProblems", Problems{}},
-		{"OneProblem", Problems{{
+		{"No[]Problem", []Problem{}},
+		{"OneProblem", []Problem{{
 			Message:    "There was a problem.",
 			Descriptor: d,
 		}}},
-		{"TwoProblems", Problems{
+		{"Two[]Problem", []Problem{
 			{
 				Message:    "This was the first problem.",
 				Descriptor: d,

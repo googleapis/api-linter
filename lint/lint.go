@@ -60,7 +60,7 @@ func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	resp := Response{
 		FilePath: fd.GetName(),
-		Problems: Problems{},
+		Problems: []Problem{},
 	}
 	var errMessages []string
 
@@ -99,7 +99,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	return resp, err
 }
 
-func (l *Linter) runAndRecoverFromPanics(rule protoRule, fd *desc.FileDescriptor) (probs Problems, err error) {
+func (l *Linter) runAndRecoverFromPanics(rule protoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if rerr, ok := r.(error); ok {

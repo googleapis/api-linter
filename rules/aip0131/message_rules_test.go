@@ -17,8 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	fpb "google.golang.org/genproto/protobuf/field_mask"
@@ -30,11 +29,11 @@ func TestStandardFields(t *testing.T) {
 		testName      string
 		messageName   string
 		nameFieldName string
-		problems      lint.Problems
+		problems      testutils.Problems
 	}{
-		{"Valid", "GetBookRequest", "name", lint.Problems{}},
-		{"InvalidName", "GetBookRequest", "id", lint.Problems{{Message: "name"}}},
-		{"Irrelevant", "AcquireBookRequest", "id", lint.Problems{}},
+		{"Valid", "GetBookRequest", "name", testutils.Problems{}},
+		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -50,7 +49,7 @@ func TestStandardFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := standardFields.Lint(message.GetFile())
-			if diff := cmp.Diff(problems, test.problems.SetDescriptor(message)); diff != "" {
+			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
 		})
@@ -68,12 +67,12 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 
 	// Run the lint rule, and establish that it returns the correct
 	// number of problems.
-	wantProblems := lint.Problems{{
+	wantProblems := testutils.Problems{{
 		Descriptor: message.GetFields()[0],
 		Message:    "string",
 	}}
 	gotProblems := standardFields.Lint(message.GetFile())
-	if diff := cmp.Diff(gotProblems, wantProblems); diff != "" {
+	if diff := wantProblems.Diff(gotProblems); diff != "" {
 		t.Errorf(diff)
 	}
 }
@@ -91,14 +90,14 @@ func TestUnknownFields(t *testing.T) {
 		messageName string
 		fieldName   string
 		fieldType   *builder.FieldType
-		problems    lint.Problems
+		problems    testutils.Problems
 	}{
-		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), lint.Problems{}},
-		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), lint.Problems{}},
-		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), lint.Problems{{
+		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
+		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
+		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
 			Message: "Unexpected field",
 		}}},
-		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), lint.Problems{}},
+		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -117,7 +116,7 @@ func TestUnknownFields(t *testing.T) {
 			// Run the lint rule, and establish that it returns the correct problems.
 			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
 			gotProblems := unknownFields.Lint(message.GetFile())
-			if diff := cmp.Diff(gotProblems, wantProblems); diff != "" {
+			if diff := wantProblems.Diff(gotProblems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

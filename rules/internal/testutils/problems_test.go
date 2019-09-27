@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lint
+package testutils
 
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestEqualTrue(t *testing.T) {
+func TestDiffEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
 	m, err := builder.NewMessage("Foo").Build()
 	if err != nil {
@@ -32,29 +32,26 @@ func TestEqualTrue(t *testing.T) {
 	tests := []struct {
 		name string
 		x    Problems
-		y    Problems
+		y    []lint.Problem
 	}{
 		{"NilNil", nil, nil},
 		{"ProblemNil", Problems{}, nil},
-		{"Descriptor", Problems{{Descriptor: m}}, Problems{{Descriptor: m}}},
-		{"Suggestion", Problems{{Suggestion: "foo"}}, Problems{{Suggestion: "foo"}}},
-		{"MessageExact", Problems{{Message: "foo"}}, Problems{{Message: "foo"}}},
-		{"MessageSubstr", Problems{{Message: "foo"}}, Problems{{Message: "foo bar"}}},
+		{"Descriptor", Problems{{Descriptor: m}}, []lint.Problem{{Descriptor: m}}},
+		{"Suggestion", Problems{{Suggestion: "foo"}}, []lint.Problem{{Suggestion: "foo"}}},
+		{"MessageExact", Problems{{Message: "foo"}}, []lint.Problem{{Message: "foo"}}},
+		{"MessageSubstr", Problems{{Message: "foo"}}, []lint.Problem{{Message: "foo bar"}}},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if diff := cmp.Diff(test.x, test.y); diff != "" {
+			if diff := test.x.Diff(test.y); diff != "" {
 				t.Errorf("Problems were unequal (x, y):\n%v", diff)
-			}
-			if diff := cmp.Diff(test.y, test.x); diff != "" {
-				t.Errorf("Problems were unequal (y, x):\n%v", diff)
 			}
 		})
 	}
 }
 
-func TestEqualFalse(t *testing.T) {
+func TestDiffNotEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
 	m1, err1 := builder.NewMessage("Foo").Build()
 	m2, err2 := builder.NewMessage("Bar").Build()
@@ -66,21 +63,21 @@ func TestEqualFalse(t *testing.T) {
 	tests := []struct {
 		name string
 		x    Problems
-		y    Problems
+		y    []lint.Problem
 	}{
-		{"ProblemNil", Problems{{}}, nil},
-		{"Descriptor", Problems{{Descriptor: m1}}, Problems{{Descriptor: m2}}},
-		{"Suggestion", Problems{{Suggestion: "foo"}}, Problems{{Suggestion: "bar"}}},
-		{"Message", Problems{{Message: "foo"}}, Problems{{Message: "bar"}}},
+		{"ProblemNil", Problems{{Descriptor: m1}}, nil},
+		{"EmptyProblemNil", Problems{{}}, nil},
+		{"LengthMismatch", Problems{{}}, []lint.Problem{{}, {}}},
+		{"Descriptor", Problems{{Descriptor: m1}}, []lint.Problem{{Descriptor: m2}}},
+		{"Suggestion", Problems{{Suggestion: "foo"}}, []lint.Problem{{Suggestion: "bar"}}},
+		{"Message", Problems{{Message: "foo"}}, []lint.Problem{{Message: "bar"}}},
+		{"MessageSuperstr", Problems{{Message: "foo bar"}}, []lint.Problem{{Message: "foo"}}},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if diff := cmp.Diff(test.x, test.y); diff == "" {
+			if diff := test.x.Diff(test.y); diff == "" {
 				t.Errorf("Got no diff (x, y); expected one.")
-			}
-			if diff := cmp.Diff(test.y, test.x); diff == "" {
-				t.Errorf("Got no diff (y, x); expected one.")
 			}
 		})
 	}

@@ -17,5 +17,5 @@ package lint
 // Response describes the result returned by a rule.
 type Response struct {
 	FilePath string    `json:"file_path" yaml:"file_path"`
-	Problems Problems `json:"problems" yaml:"problems"`
+	Problems []Problem `json:"problems" yaml:"problems"`
 }
