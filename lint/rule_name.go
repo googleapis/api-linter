@@ -19,13 +19,15 @@ import (
 	"strings"
 )
 
-// RuleName is an identifier for a rule. Allowed characters include a-z, A-Z, 0-9, -, _. The
-// namespace separator :: is allowed between RuleName segments (for example, my_namespace::my_rule).
+// RuleName is an identifier for a rule. Allowed characters include a-z, 0-9, -.
+//
+// The namespace separator :: is allowed between RuleName segments
+// (for example, my-namespace::my-rule).
 type RuleName string
 
 const nameSeparator string = "::"
 
-var ruleNameValidator = regexp.MustCompile("^([a-zA-Z0-9-_]+(::[a-zA-Z0-9-_]+)?)+$")
+var ruleNameValidator = regexp.MustCompile("^([a-z0-9][a-z0-9-]*(::[a-z0-9][a-z0-9-]*)?)+$")
 
 // NewRuleName creates a RuleName from segments.
 // It will join the segments with the "::" separator.

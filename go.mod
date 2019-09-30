@@ -9,6 +9,6 @@ require (
 	github.com/jhump/protoreflect v1.5.0
 	github.com/stoewer/go-strcase v1.0.2
 	github.com/urfave/cli v1.22.1
-	google.golang.org/genproto v0.0.0-20190926190326-7ee9db18f195
+	google.golang.org/genproto v0.0.0-20190927181202-20e1ac93f88c
 	gopkg.in/yaml.v2 v2.2.2
 )
