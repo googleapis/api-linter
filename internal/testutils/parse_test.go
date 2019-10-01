@@ -15,13 +15,14 @@
 package testutils
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/jhump/protoreflect/desc"
 )
 
 func TestParseProtoString(t *testing.T) {
-	fd := ParseProtoString(`
+	fd := ParseProtoString(t, `
 		syntax = "proto3";
 
 		message Foo {
@@ -56,14 +57,24 @@ func TestParseProtoString(t *testing.T) {
 }
 
 func TestParseProtoStringError(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Expected a panic!")
-		}
+	canary := &testing.T{}
+
+	// t.Fatalf will exit the goroutine, so to test this,
+	// we run the test in a different goroutine.
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ParseProtoString(canary, `
+			syntax = "proto3";
+			message Foo {}
+			The quick brown fox jumped over the lazy dogs.
+		`)
 	}()
-	ParseProtoString(`
-		syntax = "proto3";
-		message Foo {}
-		The quick brown fox jumped over the lazy dogs.
-	`)
+	wg.Wait()
+
+	// Verify that the testing.T object was given a failure.
+	if !canary.Failed() {
+		t.Errorf("Expected syntax error to cause a fatal error.")
+	}
 }
