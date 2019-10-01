@@ -41,12 +41,10 @@ type Problem struct {
 	Location *dpb.SourceCodeInfo_Location
 
 	// RuleID provides the ID of the rule that this problem belongs to.
-	// DO NOT SET: this field will be set by the linter based on rule info
-	// and user configs.
-	RuleID RuleName
+	ruleID RuleName
 
-	// DO NOT SET:  this field will be set by the linter based on user configs.
-	Category string
+	// The category for this problem, based on user configuration.
+	category string
 
 	noPositional struct{}
 }
@@ -85,8 +83,8 @@ func (p Problem) marshal() interface{} {
 		p.Message,
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
-		p.RuleID,
-		p.Category,
+		p.ruleID,
+		p.category,
 	}
 }
 
