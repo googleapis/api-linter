@@ -37,7 +37,7 @@ func TestLinter_run(t *testing.T) {
 		Message:    "rule1_problem",
 		Descriptor: fd,
 		category:   "",
-		ruleID:     "test::rule1",
+		RuleID:     "test::rule1",
 	}}
 
 	tests := []struct {
@@ -95,7 +95,7 @@ func TestLinter_run(t *testing.T) {
 			[]Problem{{
 				Descriptor: fd,
 				Message:    "rule1_problem",
-				ruleID:     "test::rule1",
+				RuleID:     "test::rule1",
 				category:   "error",
 			}},
 		},

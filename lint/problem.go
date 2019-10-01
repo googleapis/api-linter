@@ -41,7 +41,8 @@ type Problem struct {
 	Location *dpb.SourceCodeInfo_Location
 
 	// RuleID provides the ID of the rule that this problem belongs to.
-	ruleID RuleName
+	// DO NOT SET: The linter sets this automatically.
+	RuleID RuleName // FIXME: Make this private (cmd/summary_cli.go is the challenge).
 
 	// The category for this problem, based on user configuration.
 	category string
@@ -83,7 +84,7 @@ func (p Problem) marshal() interface{} {
 		p.Message,
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
-		p.ruleID,
+		p.RuleID,
 		p.category,
 	}
 }
