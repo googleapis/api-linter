@@ -18,12 +18,17 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/jhump/protoreflect/desc/builder"
+	"gopkg.in/yaml.v2"
 )
 
 func TestProblemJSON(t *testing.T) {
 	problem := &Problem{
-		Message: "foo bar",
-		RuleID:  "core::0131",
+		Message:  "foo bar",
+		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 41}},
+		RuleID:   "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
 	if err != nil {
@@ -34,15 +39,81 @@ func TestProblemJSON(t *testing.T) {
 		token    string
 	}{
 		{"Message", `"message":"foo bar"`},
-		{"LineNumber", `"line_number":1`},
-		{"ColumnNumber", `"column_number":1`},
+		{"LineNumber", `"line_number":3`},
+		{"ColumnNumberStart", `"column_number":1`},
+		{"ColumnNumberEnd", `"column_number":42`},
 		{"RuleID", `"rule_id":"core::0131"`},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			if !strings.Contains(string(serialized), test.token) {
-				t.Errorf("Got %v, expected `%s` to be present.", string(serialized), test.token)
+				t.Errorf("Got\n%v\nExpected `%s` to be present.", string(serialized), test.token)
 			}
 		})
 	}
+}
+
+func TestProblemYAML(t *testing.T) {
+	problem := &Problem{
+		Message:  "foo bar",
+		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
+		RuleID:   "core::0131",
+	}
+	serialized, err := yaml.Marshal(problem)
+	if err != nil {
+		t.Fatalf("Could not marshal Problem to YAML.")
+	}
+	tests := []struct {
+		testName string
+		token    string
+	}{
+		{"Message", `message: foo bar`},
+		{"LineNumberStart", `line_number: 3`},
+		{"LintNumberEnd", `line_number: 6`},
+		{"ColumnNumberStart", `column_number: 1`},
+		{"ColumnNumberEnd", `column_number: 71`},
+		{"RuleID", `rule_id: core::0131`},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if !strings.Contains(string(serialized), test.token) {
+				t.Errorf("Got\n%v\nExpected `%s` to be present.", string(serialized), test.token)
+			}
+		})
+	}
+}
+
+func TestProblemDescriptor(t *testing.T) {
+	m, err := builder.NewMessage("Foo").Build()
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	m.GetSourceInfo().Span = []int32{42, 0, 79}
+	problem := &Problem{
+		Message:    "foo bar",
+		Descriptor: m,
+		RuleID:     "core::0131",
+	}
+	serialized, err := yaml.Marshal(problem)
+	if err != nil {
+		t.Fatalf("Could not marshal Problem to YAML.")
+	}
+	tests := []struct {
+		testName string
+		token    string
+	}{
+		{"Message", `message: foo bar`},
+		{"LineNumber", `line_number: 43`},
+		{"ColumnNumberStart", `column_number: 1`},
+		{"ColumnNumberEnd", `column_number: 80`},
+		{"RuleID", `rule_id: core::0131`},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if !strings.Contains(string(serialized), test.token) {
+				t.Errorf("Got\n%v\nExpected `%s` to be present.", string(serialized), test.token)
+			}
+		})
+	}
+
 }

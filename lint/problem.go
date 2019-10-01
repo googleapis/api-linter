@@ -19,7 +19,6 @@ import (
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
-	"gopkg.in/yaml.v2"
 )
 
 // Problem contains information about a result produced by an API Linter.
@@ -56,8 +55,8 @@ func (p Problem) MarshalJSON() ([]byte, error) {
 }
 
 // MarshalYAML defines how to represent a Problem in YAML.
-func (p Problem) MarshalYAML() ([]byte, error) {
-	return yaml.Marshal(p.marshal())
+func (p Problem) MarshalYAML() (interface{}, error) {
+	return p.marshal(), nil
 }
 
 // Marshal defines how to represent a serialized Problem.
@@ -67,10 +66,6 @@ func (p Problem) marshal() interface{} {
 	loc := p.Location
 	if loc == nil && p.Descriptor != nil {
 		loc = p.Descriptor.GetSourceInfo()
-	} else {
-		// We have no location information whatsoever.
-		// Be resilient and fall back to the top of the file.
-		loc = &dpb.SourceCodeInfo_Location{Span: []int32{0, 0, 0}}
 	}
 
 	// Return a marshal-able structure.
@@ -89,14 +84,14 @@ func (p Problem) marshal() interface{} {
 	}
 }
 
-// Position describes a one-based position in a source code file.
+// position describes a one-based position in a source code file.
 // They are one-indexed, as a human counts lines or columns.
 type position struct {
 	Line   int `json:"line_number" yaml:"line_number"`
 	Column int `json:"column_number" yaml:"column_number"`
 }
 
-// Location describes a location in a source code file.
+// fileLocation describes a location in a source code file.
 //
 // Note: Positions are one-indexed, as a human counts lines or columns
 // in a file.

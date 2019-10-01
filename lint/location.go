@@ -52,12 +52,9 @@ type sourceInfo map[string]*dpb.SourceCodeInfo_Location
 // it finds one, and ultimately returns a location corresponding to the
 // beginning of the file if it can not find anything.
 func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
-	// Base case: If we have no path left, send back a fake location that
-	// corresponds to "beginning of file".
+	// Base case: If we have no path, return nil.
 	if len(path) == 0 {
-		return &dpb.SourceCodeInfo_Location{
-			Span: []int32{0, 0, 0},
-		}
+		return nil
 	}
 
 	// If the path exists in the source info registry, return that object.
@@ -65,8 +62,8 @@ func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
 		return loc
 	}
 
-	// No dice; try the immediate parent path.
-	return si.findLocation(path[:len(path)-1])
+	// We could not find the path; return nil.
+	return nil
 }
 
 // The source map registry is a singleton that computes a source map for
