@@ -19,13 +19,18 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+// PathLocation returns the precise location within a file for a given path.
+func PathLocation(f *desc.FileDescriptor, path []int32) *dpb.SourceCodeInfo_Location {
+	return sourceInfoRegistry.sourceInfo(f).findLocation(path)
+}
+
 // SyntaxLocation returns the location of the syntax definition in a file
 // descriptor.
 //
 // If the location can not be found (for example, because there is no syntax
 // statement), it returns beginning of file.
 func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return sourceInfoRegistry.sourceInfo(f).findLocation([]int32{12}) // syntax == 12
+	return PathLocation(f, []int32{12}) // syntax == 12
 }
 
 // PackageLocation returns the location of the package definition in a file
@@ -34,29 +39,20 @@ func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // If the location can not be found (for example, because there is no package
 // statement), it returns beginning of file.
 func PackageLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return sourceInfoRegistry.sourceInfo(f).findLocation([]int32{2}) // package == 2
+	return PathLocation(f, []int32{2}) // package == 2
 }
 
 // DescriptorNameLocation returns the precise location for a descriptor's name.
 func DescriptorNameLocation(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
 	// All descriptors seem to have `string name = 1`, so this conveniently works.
 	path := append(d.GetSourceInfo().Path, 1)
-	return sourceInfoRegistry.sourceInfo(d.GetFile()).findLocation(path)
+	return PathLocation(d.GetFile(), path)
 }
 
 type sourceInfo map[string]*dpb.SourceCodeInfo_Location
 
-// findLocation returns the best location it can find for the given path.
-//
-// If the requested path can not be found, it climbs the ancestry tree until
-// it finds one, and ultimately returns a location corresponding to the
-// beginning of the file if it can not find anything.
+// findLocation returns the Location for a given path.
 func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
-	// Base case: If we have no path, return nil.
-	if len(path) == 0 {
-		return nil
-	}
-
 	// If the path exists in the source info registry, return that object.
 	if loc, ok := si[strPath(path)]; ok {
 		return loc

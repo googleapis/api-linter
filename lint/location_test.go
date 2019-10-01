@@ -85,6 +85,23 @@ func TestLocations(t *testing.T) {
 			})
 		}
 	})
+
+	// Test bogus locations.
+	t.Run("Bogus", func(t *testing.T) {
+		tests := []struct {
+			testName string
+			path     []int32
+		}{
+			{"NotFound", []int32{6, 0}},
+		}
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				if loc := PathLocation(f, test.path); loc != nil {
+					t.Errorf("%v", loc)
+				}
+			})
+		}
+	})
 }
 
 func TestMissingLocations(t *testing.T) {
