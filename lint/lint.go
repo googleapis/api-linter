@@ -80,8 +80,8 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
 					if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
-						p.RuleID = rule.GetName()
-						p.Category = config.Category
+						p.ruleID = rule.GetName()
+						p.category = config.Category
 						resp.Problems = append(resp.Problems, p)
 					}
 				}

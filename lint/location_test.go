@@ -15,25 +15,38 @@
 package lint
 
 import (
+	"strings"
 	"testing"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/lithammer/dedent"
 )
 
 func TestLocations(t *testing.T) {
-	f := testutils.ParseProtoString(`
-		// proto3 rules!
-		syntax = "proto3";
+	parser := protoparse.Parser{
+		Accessor: protoparse.FileContentsFromMap(map[string]string{
+			"test.proto": strings.TrimSpace(dedent.Dedent(`
+				// proto3 rules!
+				syntax = "proto3";
 
-		package google.api.linter;
+				package google.api.linter;
 
-		message Foo {
-		  string bar = 1;
-		}
-	`)
+				message Foo {
+				  string bar = 1;
+				}
+			`)),
+		}),
+		IncludeSourceCodeInfo: true,
+	}
+	fds, err := parser.ParseFiles("test.proto")
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	f := fds[0]
 
 	// Test the file location functions.
 	t.Run("File", func(t *testing.T) {
@@ -75,7 +88,11 @@ func TestLocations(t *testing.T) {
 }
 
 func TestMissingLocations(t *testing.T) {
-	f := testutils.ParseProtoString("message Foo {}")
+	m, err := builder.NewMessage("Foo").Build()
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	f := m.GetFile()
 	tests := []struct {
 		testName string
 		fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
@@ -90,5 +107,4 @@ func TestMissingLocations(t *testing.T) {
 			}
 		})
 	}
-
 }

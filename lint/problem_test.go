@@ -23,7 +23,7 @@ import (
 func TestProblemJSON(t *testing.T) {
 	problem := &Problem{
 		Message: "foo bar",
-		RuleID:  "core::0131",
+		ruleID:  "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
 	if err != nil {
