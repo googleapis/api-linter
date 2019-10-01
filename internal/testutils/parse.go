@@ -16,6 +16,7 @@ package testutils
 
 import (
 	"strings"
+	"testing"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -27,7 +28,7 @@ import (
 //
 // It dedents the string before parsing.
 // It is unable to handle imports, and panics if there is any error.
-func ParseProtoString(src string) *desc.FileDescriptor {
+func ParseProtoString(t *testing.T, src string) *desc.FileDescriptor {
 	parser := protoparse.Parser{
 		Accessor: protoparse.FileContentsFromMap(map[string]string{
 			"test.proto": strings.TrimSpace(dedent.Dedent(src)),
@@ -36,7 +37,7 @@ func ParseProtoString(src string) *desc.FileDescriptor {
 	}
 	fds, err := parser.ParseFiles("test.proto")
 	if err != nil {
-		panic(err)
+		t.Fatalf("%v", err)
 	}
 	return fds[0]
 }
