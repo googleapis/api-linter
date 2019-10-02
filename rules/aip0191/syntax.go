@@ -27,8 +27,9 @@ var syntax = &lint.FileRule{
 		if !f.IsProto3() {
 			return []lint.Problem{{
 				Message:    "All API proto files must use proto3 syntax.",
-				Suggestion: "syntax = \"proto3\"",
+				Suggestion: "syntax = \"proto3\";",
 				Descriptor: f,
+				Location:   lint.SyntaxLocation(f),
 			}}
 		}
 		return nil

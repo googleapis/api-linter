@@ -17,7 +17,7 @@ package aip0131
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/internal/utils"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
