@@ -84,7 +84,8 @@ var unknownFields = &lint.MessageRule{
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Field %q is the wrong type; expected %q.",
-						field.GetName(), strings.ToLower(fieldType.GetType().String()[5:])),
+						// fieldType.GetType().String() returns TYPE_STRING, TYPE_INT32, etc.
+						field.GetName(), strings.ToLower(fieldType.GetType().String()[len("TYPE_"):])),
 					Descriptor: field,
 				})
 			}
