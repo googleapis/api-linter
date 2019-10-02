@@ -20,6 +20,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
@@ -30,13 +31,12 @@ func TestRequestMessageName(t *testing.T) {
 		testName       string
 		methodName     string
 		reqMessageName string
-		problemCount   int
-		errPrefix      string
+		problems       testutils.Problems
 	}{
-		{"Valid", "GetBook", "GetBookRequest", 0, "False positive"},
-		{"Invalid", "GetBook", "Book", 1, "False negative"},
-		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", 0, "False positive"},
-		{"Irrelevant", "AcquireBook", "Book", 0, "False positive"},
+		{"Valid", "GetBook", "GetBookRequest", testutils.Problems{}},
+		{"Invalid", "GetBook", "Book", testutils.Problems{{Suggestion: "GetBookRequest"}}},
+		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutils.Problems{}},
+		{"Irrelevant", "AcquireBook", "Book", testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -52,10 +52,10 @@ func TestRequestMessageName(t *testing.T) {
 				t.Fatalf("Could not build %s method.", test.methodName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := requestMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestMessageName.Name, problems)
+			// Run the lint rule, and establish that it returns the expected problems.
+			problems := requestMessageName.Lint(service.GetFile())
+			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
@@ -67,12 +67,11 @@ func TestResponseMessageName(t *testing.T) {
 		testName        string
 		methodName      string
 		respMessageName string
-		problemCount    int
-		errPrefix       string
+		problems        testutils.Problems
 	}{
-		{"Valid", "GetBook", "Book", 0, "False positive"},
-		{"Invalid", "GetBook", "GetBookResponse", 1, "False negative"},
-		{"Irrelevant", "AcquireBook", "AcquireBookResponse", 0, "False positive"},
+		{"Valid", "GetBook", "Book", testutils.Problems{}},
+		{"Invalid", "GetBook", "GetBookResponse", testutils.Problems{{Suggestion: "Book"}}},
+		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -90,8 +89,9 @@ func TestResponseMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := responseMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, responseMessageName.Name, problems)
+			problems := responseMessageName.Lint(service.GetFile())
+			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
