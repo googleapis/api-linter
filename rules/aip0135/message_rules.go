@@ -59,7 +59,7 @@ var unknownFields = &lint.MessageRule{
 		allowedFields := map[string]struct{}{
 			"name":      {}, // AIP-135
 			"force":     {}, // AIP-135
-			"etag":      {}, // AIP-135
+			"etag":      {}, // AIP-154
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
