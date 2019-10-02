@@ -65,7 +65,7 @@ var unknownFields = &lint.MessageRule{
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Unexpected field: Get RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Unexpected field: Delete RPCs must only contain fields explicitly described in AIPs, not %q.",
 						string(field.GetName()),
 					),
 					Descriptor: field,
