@@ -16,6 +16,7 @@ package aip0132
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
@@ -83,7 +84,8 @@ var unknownFields = &lint.MessageRule{
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Field %q is the wrong type; expected %q.",
-						field.GetName(), fieldType.GetTypeName()),
+						// fieldType.GetType().String() returns TYPE_STRING, TYPE_INT32, etc.
+						field.GetName(), strings.ToLower(fieldType.GetType().String()[len("TYPE_"):])),
 					Descriptor: field,
 				})
 			}
