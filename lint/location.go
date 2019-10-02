@@ -28,7 +28,7 @@ func PathLocation(f *desc.FileDescriptor, path []int32) *dpb.SourceCodeInfo_Loca
 // descriptor.
 //
 // If the location can not be found (for example, because there is no syntax
-// statement), it returns beginning of file.
+// statement), it returns nil.
 func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return PathLocation(f, []int32{12}) // syntax == 12
 }
@@ -37,7 +37,7 @@ func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // descriptor.
 //
 // If the location can not be found (for example, because there is no package
-// statement), it returns beginning of file.
+// statement), it returns nil.
 func PackageLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return PathLocation(f, []int32{2}) // package == 2
 }
