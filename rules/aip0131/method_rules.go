@@ -90,7 +90,7 @@ var httpVerb = &lint.MethodRule{
 
 // Get methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "http-body"),
+	Name:   lint.NewRuleName("core", "0131", "http-name"),
 	URI:    "https://aip.dev/131#guidance",
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
@@ -112,7 +112,7 @@ var httpNameField = &lint.MethodRule{
 
 // Get methods should not have an HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "http-name"),
+	Name:   lint.NewRuleName("core", "0131", "http-body"),
 	URI:    "https://aip.dev/131#guidance",
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
