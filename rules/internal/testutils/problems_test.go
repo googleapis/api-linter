@@ -17,7 +17,7 @@ package testutils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
+	. "github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -32,14 +32,14 @@ func TestDiffEquivalent(t *testing.T) {
 	tests := []struct {
 		name string
 		x    Problems
-		y    []lint.Problem
+		y    []Problem
 	}{
 		{"NilNil", nil, nil},
 		{"ProblemNil", Problems{}, nil},
-		{"Descriptor", Problems{{Descriptor: m}}, []lint.Problem{{Descriptor: m}}},
-		{"Suggestion", Problems{{Suggestion: "foo"}}, []lint.Problem{{Suggestion: "foo"}}},
-		{"MessageExact", Problems{{Message: "foo"}}, []lint.Problem{{Message: "foo"}}},
-		{"MessageSubstr", Problems{{Message: "foo"}}, []lint.Problem{{Message: "foo bar"}}},
+		{"Descriptor", Problems{{Descriptor: m}}, []Problem{{Descriptor: m}}},
+		{"Suggestion", Problems{{Suggestion: "foo"}}, []Problem{{Suggestion: "foo"}}},
+		{"MessageExact", Problems{{Message: "foo"}}, []Problem{{Message: "foo"}}},
+		{"MessageSubstr", Problems{{Message: "foo"}}, []Problem{{Message: "foo bar"}}},
 	}
 
 	for _, test := range tests {
@@ -63,15 +63,15 @@ func TestDiffNotEquivalent(t *testing.T) {
 	tests := []struct {
 		name string
 		x    Problems
-		y    []lint.Problem
+		y    []Problem
 	}{
 		{"ProblemNil", Problems{{Descriptor: m1}}, nil},
 		{"EmptyProblemNil", Problems{{}}, nil},
-		{"LengthMismatch", Problems{{}}, []lint.Problem{{}, {}}},
-		{"Descriptor", Problems{{Descriptor: m1}}, []lint.Problem{{Descriptor: m2}}},
-		{"Suggestion", Problems{{Suggestion: "foo"}}, []lint.Problem{{Suggestion: "bar"}}},
-		{"Message", Problems{{Message: "foo"}}, []lint.Problem{{Message: "bar"}}},
-		{"MessageSuperstr", Problems{{Message: "foo bar"}}, []lint.Problem{{Message: "foo"}}},
+		{"LengthMismatch", Problems{{}}, []Problem{{}, {}}},
+		{"Descriptor", Problems{{Descriptor: m1}}, []Problem{{Descriptor: m2}}},
+		{"Suggestion", Problems{{Suggestion: "foo"}}, []Problem{{Suggestion: "bar"}}},
+		{"Message", Problems{{Message: "foo"}}, []Problem{{Message: "bar"}}},
+		{"MessageSuperstr", Problems{{Message: "foo bar"}}, []Problem{{Message: "foo"}}},
 	}
 
 	for _, test := range tests {

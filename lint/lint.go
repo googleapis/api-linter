@@ -81,7 +81,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 				for _, p := range problems {
 					if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
 						p.RuleID = rule.GetName()
-						p.Category = config.Category
+						p.category = config.Category
 						resp.Problems = append(resp.Problems, p)
 					}
 				}
