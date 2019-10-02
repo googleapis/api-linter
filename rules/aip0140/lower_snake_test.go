@@ -17,22 +17,22 @@ package aip0140
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestLowerSnake(t *testing.T) {
 	// Define permutations.
 	tests := []struct {
-		testName     string
-		fieldName    string
-		problemCount int
-		errPrefix    string
+		testName  string
+		fieldName string
+		problems  testutils.Problems
 	}{
-		{"ValidOneWord", "rated", 0, "False positive"},
-		{"ValidTwoWords", "has_rating", 0, "False positive"},
-		{"InvalidCamel", "hasRating", 1, "False negative"},
-		{"InvalidConstantOneWord", "RATED", 1, "False negative"},
-		{"InvalidConstantTwoWords", "HAS_RATING", 1, "False negative"},
+		{"ValidOneWord", "rated", testutils.Problems{}},
+		{"ValidTwoWords", "has_rating", testutils.Problems{}},
+		{"InvalidCamel", "hasRating", testutils.Problems{{Suggestion: "has_rating"}}},
+		{"InvalidConstantOneWord", "RATED", testutils.Problems{{Suggestion: "rated"}}},
+		{"InvalidConstantTwoWords", "HAS_RATING", testutils.Problems{{Suggestion: "has_rating"}}},
 	}
 
 	// Test each permutation.
@@ -45,12 +45,12 @@ func TestLowerSnake(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Could not build `%s` field.", test.fieldName)
 			}
-			field := message.FindFieldByName(test.fieldName)
 
 			// Run the lint rule and verify that we got the expected set
 			// of problems.
-			if problems := lowerSnake.LintField(field); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, lowerSnake.Name, problems)
+			problems := lowerSnake.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(message.GetFields()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
