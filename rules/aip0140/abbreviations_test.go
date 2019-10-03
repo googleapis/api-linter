@@ -1,0 +1,137 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package aip0140
+
+import (
+	"strings"
+	"testing"
+
+	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
+)
+
+func TestAbbreviations(t *testing.T) {
+	ruleGroups := []struct {
+		name     string
+		rule     lint.ProtoRule
+		tmpl     string
+		caseFunc func(string) string
+		descFunc func(*desc.FileDescriptor) desc.Descriptor
+	}{
+		{
+			name:     "Field",
+			rule:     abbreviationsField,
+			tmpl:     `message Book { string {{.Name}} = 1; }`,
+			caseFunc: strcase.SnakeCase,
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetMessageTypes()[0].GetFields()[0]
+			},
+		},
+		{
+			name:     "Message",
+			rule:     abbreviationsMessage,
+			tmpl:     `message {{.Name}} {}`,
+			caseFunc: strcase.UpperCamelCase,
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetMessageTypes()[0]
+			},
+		},
+		{
+			name:     "Service",
+			rule:     abbreviationsService,
+			tmpl:     `service {{.Name}} {}`,
+			caseFunc: strcase.UpperCamelCase,
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetServices()[0]
+			},
+		},
+		{
+			name: "Method",
+			rule: abbreviationsMethod,
+			tmpl: `
+				service Library {
+					rpc {{.Name}}({{.Name}}Request) returns ({{.Name}}Response);
+				}
+
+				message {{.Name}}Request {}
+				message {{.Name}}Response {}
+			`,
+			caseFunc: strcase.UpperCamelCase,
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetServices()[0].GetMethods()[0]
+			},
+		},
+		{
+			name:     "Enum",
+			rule:     abbreviationsEnum,
+			tmpl:     `enum {{.Name}} { UNSPECIFIED = 0; }`,
+			caseFunc: strcase.UpperCamelCase,
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetEnumTypes()[0]
+			},
+		},
+		{
+			name: "EnumValue",
+			rule: abbreviationsEnum,
+			tmpl: `enum Thing { {{.Name}} = 0; }`,
+			caseFunc: func(s string) string {
+				return strings.ToUpper(strcase.SnakeCase(s))
+			},
+			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
+				return f.GetEnumTypes()[0].GetValues()[0]
+			},
+		},
+	}
+	for _, group := range ruleGroups {
+		t.Run(group.name, func(t *testing.T) {
+			for _, test := range buildTests(group.caseFunc) {
+				t.Run(test.Name, func(t *testing.T) {
+					// Build the file descriptor, and retrieve the descriptor we
+					// expect any problems to be attached to.
+					file := testutils.ParseProto3Tmpl(t, group.tmpl, test)
+					d := group.descFunc(file)
+
+					// Establish that we get the problems we expect.
+					problems := group.rule.Lint(file)
+					if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
+						t.Errorf(diff)
+					}
+				})
+			}
+		})
+	}
+}
+
+type abbvTest struct {
+	Name     string
+	problems testutils.Problems
+}
+
+func buildTests(caseFunc func(string) string) []abbvTest {
+	return []abbvTest{
+		{caseFunc("book_configuration"), testutils.Problems{{Suggestion: caseFunc("book_config")}}},
+		{caseFunc("book_config"), testutils.Problems{}},
+		{caseFunc("book_identifier"), testutils.Problems{{Suggestion: caseFunc("book_id")}}},
+		{caseFunc("book_id"), testutils.Problems{}},
+		{caseFunc("book_information"), testutils.Problems{{Suggestion: caseFunc("book_info")}}},
+		{caseFunc("book_info"), testutils.Problems{}},
+		{caseFunc("book_specification"), testutils.Problems{{Suggestion: caseFunc("book_spec")}}},
+		{caseFunc("book_spec"), testutils.Problems{}},
+		{caseFunc("book_statistics"), testutils.Problems{{Suggestion: caseFunc("book_stats")}}},
+		{caseFunc("book_stats"), testutils.Problems{}},
+	}
+}
