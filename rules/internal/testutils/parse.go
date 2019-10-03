@@ -15,6 +15,9 @@
 package testutils
 
 import (
+	"bytes"
+	"fmt"
+	"html/template"
 	"strings"
 	"testing"
 
@@ -27,7 +30,7 @@ import (
 // a FileDescriptor.
 //
 // It dedents the string before parsing.
-// It is unable to handle imports, and panics if there is any error.
+// It is unable to handle imports, and calls t.Fatalf if there is any error.
 func ParseProtoString(t *testing.T, src string) *desc.FileDescriptor {
 	parser := protoparse.Parser{
 		Accessor: protoparse.FileContentsFromMap(map[string]string{
@@ -40,4 +43,40 @@ func ParseProtoString(t *testing.T, src string) *desc.FileDescriptor {
 		t.Fatalf("%v", err)
 	}
 	return fds[0]
+}
+
+// ParseProto3String parses a string representing a proto file, and returns
+// a FileDescriptor.
+//
+// It adds the `syntax = "proto3";` line to the beginning of the file
+// before calling ParseProtoString.
+func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
+	return ParseProtoString(t, fmt.Sprintf(
+		"syntax = \"proto3\";\n\n%s",
+		strings.TrimSpace(dedent.Dedent(src)),
+	))
+}
+
+// ParseProto3Tmpl parses a template string representing a proto file, and
+// returns a FileDescriptor.
+//
+// It parses the template using Go's template Parse function, and then
+// calls ParseProto3String.
+func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescriptor {
+	// Create a new template object.
+	tmpl, err := template.New("test").Parse(src)
+	if err != nil {
+		t.Fatalf("Unable to parse Go template: %v", err)
+	}
+
+	// Execute the template and write the results to a bytes representing
+	// the desired proto.
+	var protoBytes bytes.Buffer
+	err = tmpl.Execute(&protoBytes, data)
+	if err != nil {
+		t.Fatalf("Unable to execute Go template: %v", err)
+	}
+
+	// Parse the proto as a string.
+	return ParseProto3String(t, protoBytes.String())
 }
