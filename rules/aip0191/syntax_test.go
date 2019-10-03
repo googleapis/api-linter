@@ -17,19 +17,19 @@ package aip0191
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestSyntax(t *testing.T) {
 	// Set up the two permutations.
 	tests := []struct {
-		testName     string
-		isProto3     bool
-		problemCount int
-		errPrefix    string
+		testName string
+		isProto3 bool
+		problems testutils.Problems
 	}{
-		{"Valid", true, 0, "False positive"},
-		{"Invalid", false, 1, "False negative"},
+		{"Valid", true, testutils.Problems{}},
+		{"Invalid", false, testutils.Problems{{Suggestion: `syntax = "proto3";`}}},
 	}
 
 	// Run each permutation as an individual test.
@@ -42,8 +42,8 @@ func TestSyntax(t *testing.T) {
 			}
 
 			// Lint the file, and ensure we got the expected problems.
-			if problems := syntax.LintFile(f); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, syntax.Name, problems)
+			if diff := test.problems.SetDescriptor(f).Diff(syntax.Lint(f)); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

@@ -10,6 +10,6 @@ require (
 	github.com/lithammer/dedent v1.1.0
 	github.com/stoewer/go-strcase v1.0.2
 	github.com/urfave/cli v1.22.1
-	google.golang.org/genproto v0.0.0-20190927181202-20e1ac93f88c
-	gopkg.in/yaml.v2 v2.2.3
+	google.golang.org/genproto v0.0.0-20191002211648-c459b9ce5143
+	gopkg.in/yaml.v2 v2.2.4
 )
