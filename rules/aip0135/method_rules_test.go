@@ -20,6 +20,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	epb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
@@ -33,12 +34,11 @@ func TestRequestMessageName(t *testing.T) {
 		testName       string
 		methodName     string
 		reqMessageName string
-		problemCount   int
-		errPrefix      string
+		problems       testutils.Problems
 	}{
-		{"Valid", "DeleteBook", "DeleteBookRequest", 0, "False positive"},
-		{"Invalid", "DeleteBook", "Book", 1, "False negative"},
-		{"Irrelevant", "AcquireBook", "Book", 0, "False positive"},
+		{"Valid", "DeleteBook", "DeleteBookRequest", testutils.Problems{}},
+		{"Invalid", "DeleteBook", "Book", testutils.Problems{{Suggestion: "DeleteBookRequest"}}},
+		{"Irrelevant", "AcquireBook", "Book", testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -54,10 +54,10 @@ func TestRequestMessageName(t *testing.T) {
 				t.Fatalf("Could not build %s method.", test.methodName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := requestMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestMessageName.Name, problems)
+			// Run the lint rule, and establish that it returns the expected problems.
+			problems := requestMessageName.Lint(service.GetFile())
+			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
@@ -87,14 +87,13 @@ func TestResponseMessageName(t *testing.T) {
 		testName     string
 		methodName   string
 		respMessage  *builder.MessageBuilder
-		problemCount int
-		errPrefix    string
+		problems     testutils.Problems
 	}{
-		{"ValidEmpty", "DeleteBook", emptybldr, 0, "False positive"},
-		{"ValidLRO", "DeleteBook", opbldr, 0, "False positive"},
-		{"ValidResource", "DeleteBook", builder.NewMessage("Book"), 0, "False positive"},
-		{"Invalid", "DeleteBook", builder.NewMessage("DeleteBookResponse"), 1, "False negative"},
-		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), 0, "False positive"},
+		{"ValidEmpty", "DeleteBook", emptybldr, testutils.Problems{}},
+		{"ValidLRO", "DeleteBook", opbldr, testutils.Problems{}},
+		{"ValidResource", "DeleteBook", builder.NewMessage("Book"), testutils.Problems{}},
+		{"Invalid", "DeleteBook", builder.NewMessage("DeleteBookResponse"), testutils.Problems{{Suggestion: "google.protobuf.Empty"}}},
+		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -110,10 +109,10 @@ func TestResponseMessageName(t *testing.T) {
 				t.Fatalf("Could not build %s method.", test.methodName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := responseMessageName.Lint(service.GetFile()); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, responseMessageName.Name, problems)
+			// Run the lint rule, and establish that it returns the expected problems.
+			problems := responseMessageName.Lint(service.GetFile())
+			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

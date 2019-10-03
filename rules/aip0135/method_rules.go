@@ -54,7 +54,11 @@ var responseMessageName = &lint.MethodRule{
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
 		// message is `google.protobuf.Empty`, `google.longrunning.Operation`, or `Foo`.
 		got := m.GetOutputType().GetFullyQualifiedName()
-		want := []string{"google.protobuf.Empty", "google.longrunning.Operation", m.GetName()[6:]}
+		want := []string{
+			"google.protobuf.Empty",
+			"google.longrunning.Operation",
+			m.GetName()[6:],
+		}
 		for _, v := range want {
 			if got == v {
 				return nil

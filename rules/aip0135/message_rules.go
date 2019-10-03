@@ -49,7 +49,7 @@ var standardFields = &lint.MessageRule{
 	},
 }
 
-// Get methods should not have unrecognized fields.
+// Delete methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0135", "request-message", "unknown-fields"),
 	URI:    "https://aip.dev/135#request-message",
