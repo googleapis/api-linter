@@ -39,7 +39,7 @@ func isListRequestMessage(m *desc.MessageDescriptor) bool {
 	return listReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Return true if this is an AIP-158 List request message, false otherwise.
+// Return true if this is an AIP-158 List response message, false otherwise.
 func isListResponseMessage(m *desc.MessageDescriptor) bool {
 	return listResMessageRegexp.MatchString(m.GetName())
 }
