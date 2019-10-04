@@ -133,7 +133,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 
 	tests := []struct {
 		testName string
-		rule     protoRule
+		rule     ProtoRule
 	}{
 		{
 			testName: "Panic",

@@ -99,7 +99,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	return resp, err
 }
 
-func (l *Linter) runAndRecoverFromPanics(rule protoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
+func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if rerr, ok := r.(error); ok {
