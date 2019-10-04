@@ -21,5 +21,6 @@ import "github.com/googleapis/api-linter/lint"
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		enumValueUpperSnakeCase,
+		unspecified,
 	)
 }
