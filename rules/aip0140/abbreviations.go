@@ -24,7 +24,7 @@ import (
 
 // checkAbbreviations checks for each long name in the descriptor's name,
 // and returns problems if one is found that suggests the abbreviation instead.
-func checkAbbreviations(d desc.Descriptor, x func(string) string) (problems []lint.Problem) {
+func checkAbbreviations(d desc.Descriptor, caseFunc func(string) string) (problems []lint.Problem) {
 	abbv := map[string]string{
 		"configuration": "config",
 		"identifier":    "id",
@@ -36,14 +36,14 @@ func checkAbbreviations(d desc.Descriptor, x func(string) string) (problems []li
 	// Iterate over each abbreviation and determine whether the descriptor's
 	// name includes the long name.
 	for long, short := range abbv {
-		if strings.Contains(d.GetName(), x(long)) {
+		if strings.Contains(d.GetName(), caseFunc(long)) {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
 					"Use the common abbreviation %q instead of %q.",
-					x(short),
-					x(long),
+					caseFunc(short),
+					caseFunc(long),
 				),
-				Suggestion: strings.ReplaceAll(d.GetName(), x(long), x(short)),
+				Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
 				Descriptor: d,
 				Location:   lint.DescriptorNameLocation(d),
 			})
@@ -71,12 +71,12 @@ var abbreviationsMessage = &lint.MessageRule{
 var abbreviationsEnum = &lint.EnumRule{
 	Name: lint.NewRuleName("core", "0140", "enum-names", "abbreviations"),
 	URI:  "https://aip.dev/140#abbreviations",
-	LintEnum: func(e *desc.EnumDescriptor) (problems []lint.Problem) {
-		problems = append(problems, checkAbbreviations(e, strings.Title)...)
+	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
+		problems := checkAbbreviations(e, strings.Title)
 		for _, ev := range e.GetValues() {
 			problems = append(problems, checkAbbreviations(ev, strings.ToUpper)...)
 		}
-		return
+		return problems
 	},
 }
 
