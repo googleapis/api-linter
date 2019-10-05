@@ -16,14 +16,25 @@ package testutils
 
 import (
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/jhump/protoreflect/desc/protoprint"
 	"github.com/lithammer/dedent"
+
+	// These imports cause the common protos to be registered with
+	// the protocol buffer registry, and therefore make the call to
+	// `proto.FileDescriptor` work for the imported files.
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	_ "google.golang.org/genproto/googleapis/longrunning"
 )
 
 // ParseProtoString parses a string representing a proto file, and returns
@@ -32,10 +43,21 @@ import (
 // It dedents the string before parsing.
 // It is unable to handle imports, and calls t.Fatalf if there is any error.
 func ParseProtoString(t *testing.T, src string) *desc.FileDescriptor {
+	// Make a map of filenames and file contents.
+	// We hard-code "test.proto"; we do not care what the filename is.
+	//
+	// Include the common protos here too, so our proto may safely import them
+	// if needed.
+	fileContents := map[string]string{
+		"test.proto": strings.TrimSpace(dedent.Dedent(src)),
+	}
+	for fn, c := range commonProtos {
+		fileContents[fn] = c
+	}
+
+	// Parse the file.
 	parser := protoparse.Parser{
-		Accessor: protoparse.FileContentsFromMap(map[string]string{
-			"test.proto": strings.TrimSpace(dedent.Dedent(src)),
-		}),
+		Accessor:              protoparse.FileContentsFromMap(fileContents),
 		IncludeSourceCodeInfo: true,
 	}
 	fds, err := parser.ParseFiles("test.proto")
@@ -80,3 +102,69 @@ func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescr
 	// Parse the proto as a string.
 	return ParseProto3String(t, protoBytes.String())
 }
+
+// decompile reads compiled Go protos and returns a map of strings
+// corresponding to the original protos.
+//
+// This is used to handle google.api common protos, which some tests need
+// to use.
+func decompile(filenames ...string) map[string]string {
+	var fdps []*dpb.FileDescriptorProto
+	for _, filename := range filenames {
+		// Compiled golang protos include a compressed descriptor, which must be
+		// uncompressed before it can be populated into a FileDescriptorProto.
+		compressedDesc := proto.FileDescriptor(filename)
+		r, err := gzip.NewReader(bytes.NewReader(compressedDesc))
+		if err != nil {
+			panic(fmt.Errorf("Corrupted compressed file %q: %v", filename, err))
+		}
+		descBytes, _ := ioutil.ReadAll(r) // Error case is unreachable; inputs are trusted.
+
+		// Unmarshal the byte string into a FileDescriptorProto.
+		fdp := &dpb.FileDescriptorProto{}
+		proto.Unmarshal(descBytes, fdp)
+		fdps = append(fdps, fdp)
+	}
+	fds, err := desc.CreateFileDescriptors(fdps)
+	if err != nil {
+		panic(fmt.Errorf(dedent.Dedent(`
+			Unable to create protoreflect descriptors
+			(missing import in args to decompile?): %v
+		`), err))
+	}
+
+	// Iterate over the values in the map and populate the original contents
+	// of the protos.
+	printer := &protoprint.Printer{}
+	answer := make(map[string]string)
+	for filename, fd := range fds {
+		// Error case is unreachable; inputs are trusted.
+		protoStr, _ := printer.PrintProtoToString(fd)
+		answer[filename] = protoStr
+	}
+
+	// Done; return the answer.
+	return answer
+}
+
+// Common protos likely to need to be imported in tests.
+// It is okay to add more here; however, this list **must not** include any
+// protos outside of what is defined in AIP-213 (https://aip.dev/213).
+//
+// Note that any file that needs to be included here must also have each
+// of its imports here, and the corresponding compiled Go protos must be
+// imported up top.
+var commonProtos = decompile(
+	"google/api/annotations.proto",
+	"google/api/client.proto",
+	"google/api/field_behavior.proto",
+	"google/api/http.proto",
+	"google/api/resource.proto",
+	"google/longrunning/operations.proto",
+	"google/protobuf/any.proto",
+	"google/protobuf/descriptor.proto",
+	"google/protobuf/duration.proto",
+	"google/protobuf/empty.proto",
+	"google/protobuf/timestamp.proto",
+	"google/rpc/status.proto",
+)

@@ -25,6 +25,8 @@ func TestParseProtoString(t *testing.T) {
 	fd := ParseProtoString(t, `
 		syntax = "proto3";
 
+		import "google/protobuf/timestamp.proto";
+
 		message Foo {
 			int32 bar = 1;
 			int64 baz = 2;
@@ -32,6 +34,7 @@ func TestParseProtoString(t *testing.T) {
 
 		message Spam {
 			string eggs = 2;
+			google.protobuf.Timestamp create_time = 3;
 		}
 	`)
 	if !fd.IsProto3() {
@@ -46,6 +49,7 @@ func TestParseProtoString(t *testing.T) {
 		{"baz", fd.GetMessageTypes()[0].GetFields()[1]},
 		{"Spam", fd.GetMessageTypes()[1]},
 		{"eggs", fd.GetMessageTypes()[1].GetFields()[0]},
+		{"create_time", fd.GetMessageTypes()[1].GetFields()[1]},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -168,4 +172,28 @@ func TestParseProto3TmplDataError(t *testing.T) {
 	if !canary.Failed() {
 		t.Errorf("Expected missing data to cause a fatal error.")
 	}
+}
+
+func TestDecompileMissingImport(t *testing.T) {
+	// Note: I prefer to test only public interfaces, but because the common
+	// protos are added at module initialization, there is no way to test
+	// the failure cases without hitting the decompile method directly.
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Decompiling with an import not provided should fail.")
+		}
+	}()
+	decompile("google/longrunning/operations.proto")
+}
+
+func TestDecompileBogusFile(t *testing.T) {
+	// Note: I prefer to test only public interfaces, but because the common
+	// protos are added at module initialization, there is no way to test
+	// the failure cases without hitting the decompile method directly.
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Decompiling with an import not provided should fail.")
+		}
+	}()
+	decompile("bogus.proto")
 }
