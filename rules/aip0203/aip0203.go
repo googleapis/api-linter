@@ -23,7 +23,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-126 rules to the provided registry.
+// AddRules adds all of the AIP-203 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		inputOnly,
