@@ -55,10 +55,10 @@ func isCreateRequestMessage(m *desc.MessageDescriptor) bool {
 // get resource message type name from method
 func getResourceMsgName(m *desc.MethodDescriptor) string {
 	if !isCreateMethod(m) {
-		return ""
+		return nil
 	}
 
-	// Usually te response message will be the resource message, and its name will
+	// Usually the response message will be the resource message, and its name will
 	// be part of method name (make a double check here to avoid the issue when
 	// method or output naming doesn't follow the right principles)
 	if strings.Contains(m.GetName()[6:], m.GetOutputType().GetName()) {
