@@ -53,19 +53,26 @@ var responseMessageName = &lint.MethodRule{
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
-		// message is named `Foo`.
-		if got, want := m.GetOutputType().GetName(), m.GetName()[6:]; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Update RPCs should have the corresponding resource as the response message, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-			}}
+		// message is `Foo` or `google.longrunning.Operation`.
+		got := m.GetOutputType().GetFullyQualifiedName()
+		want := []string{
+			m.GetName()[6:],
+			"google.longrunning.Operation",
 		}
-
-		return nil
+		for _, v := range want {
+			if got == v {
+				return nil
+			}
+		}
+		return []lint.Problem{{
+			Message: fmt.Sprintf(
+				"Update RPCs should have response message type in %q, not %q.",
+				want,
+				got,
+			),
+			Suggestion: want[0],
+			Descriptor: m,
+		}}
 	},
 }
 
@@ -96,7 +103,7 @@ var httpNameField = &lint.MethodRule{
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
-		// Establish that the RPC has HTTP body set to the resource.
+		// Establish that the RPC has expected HTTP pattern.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if uri := httpRule.GetPatch(); uri != "" {
 				matches := updateURINameRegexp.FindStringSubmatch(uri);
@@ -120,7 +127,7 @@ var httpBody = &lint.MethodRule{
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
-		// Establish that the RPC has no HTTP body.
+		// Establish that the RPC has HTTP body equal to fieldName.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.GetBody() != fieldName {
 				return []lint.Problem{{

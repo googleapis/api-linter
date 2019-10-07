@@ -21,8 +21,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	lro "google.golang.org/genproto/googleapis/longrunning"
 )
 
 func TestRequestMessageName(t *testing.T) {
@@ -61,16 +63,26 @@ func TestRequestMessageName(t *testing.T) {
 }
 
 func TestResponseMessageName(t *testing.T) {
+	op, err := desc.LoadMessageDescriptorForMessage(&lro.Operation{})
+	if err != nil {
+		t.Fatalf("Unable to load the Operation message.")
+	}
+	opbldr, err := builder.FromMessage(op)
+	if err != nil {
+		t.Fatalf("Unable to construct builder from op desc.")
+	}
+
 	// Set up the testing permutations.
 	tests := []struct {
-		testName        string
-		methodName      string
-		respMessageName string
-		problems        testutils.Problems
+		testName    string
+		methodName  string
+		respMessage *builder.MessageBuilder
+		problems    testutils.Problems
 	}{
-		{"Valid", "UpdateBook", "Book", testutils.Problems{}},
-		{"Invalid", "UpdateBook", "UpdateBookResponse", testutils.Problems{{Suggestion: "Book"}}},
-		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutils.Problems{}},
+		{"ValidResource", "UpdateBook", builder.NewMessage("Book"), testutils.Problems{}},
+		{"ValidLRO", "UpdateBook", opbldr, testutils.Problems{}},
+		{"Invalid", "UpdateBook", builder.NewMessage("UpdateBookResponse"), testutils.Problems{{Suggestion: "Book"}}},
+		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -80,7 +92,7 @@ func TestResponseMessageName(t *testing.T) {
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
 				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage(test.respMessageName), false),
+				builder.RpcTypeMessage(test.respMessage, false),
 			)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)

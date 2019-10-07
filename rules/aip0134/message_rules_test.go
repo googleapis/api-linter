@@ -15,7 +15,6 @@
 package aip0134
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
@@ -45,7 +44,6 @@ func TestStandardFields(t *testing.T) {
 
 	// Run each test individually.
 	for _, test := range tests {
-		fmt.Println(fmt.Sprintf("standardFieldsTest `%q`", test.testName))
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
 			bookMsg := builder.NewMessage("Book")
@@ -59,7 +57,6 @@ func TestStandardFields(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			fmt.Println("standardFieldsTest linting")
 			problems := standardFields.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
@@ -82,7 +79,7 @@ func TestStandardFieldsMissueUpdateMask(t *testing.T) {
 	// number of problems.
 	wantProblems := testutils.Problems{{
 		Descriptor: message,
-		Message:    "Method \"UpdateBookRequest\" has no `\"update_mask\"` field",
+		Message:    "Method UpdateBookRequest has no `update_mask` field",
 	}}
 	gotProblems := standardFields.Lint(message.GetFile())
 	if diff := wantProblems.Diff(gotProblems); diff != "" {
@@ -92,8 +89,9 @@ func TestStandardFieldsMissueUpdateMask(t *testing.T) {
 
 func TestStandardFieldsInvalidType(t *testing.T) {
 	// Create an appropriate message descriptor.
+	parchmentMsg := builder.NewMessage("Parchment")
 	message, err := builder.NewMessage("UpdateBookRequest").AddField(
-		builder.NewField("book", builder.FieldTypeBytes()),
+		builder.NewField("book", builder.FieldTypeMessage(parchmentMsg)),
 	).Build()
 	if err != nil {
 		t.Fatalf("Could not build descriptor.")
@@ -103,7 +101,7 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 	// number of problems.
 	wantProblems := testutils.Problems{{
 		Descriptor: message.GetFields()[0],
-		Message:    "`\"book\"` field on Update RPCs should be of type `\"TYPE_MESSAGE\"`",
+		Message:    "`book` field on Update RPCs should be of type `Book`",
 	}}
 	gotProblems := standardFields.Lint(message.GetFile())
 	if diff := wantProblems.Diff(gotProblems); diff != "" {

@@ -20,11 +20,10 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
-	fpb "google.golang.org/genproto/protobuf/field_mask"
 )
 
 func extractResource(reqName string) string {
+	// Strips "Update" from the beginning and "Request" from the end.
 	return reqName[6:len(reqName)-7]
 }
 
@@ -34,20 +33,13 @@ var standardFields = &lint.MessageRule{
 	URI:    "https://aip.dev/134#request-message",
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Get the correct message type for google.protobuf.FieldMask.
-		fieldMask, err := desc.LoadMessageDescriptorForMessage(&fpb.FieldMask{})
-		if err != nil {
-			panic(fmt.Sprintf("Unable to load the field mask message: `%v`", err))
-		}
-
-		r := extractResource(m.GetName());
-		rField := builder.FieldTypeMessage(builder.NewMessage(r))
+		r := extractResource(m.GetName())
 		fields := []struct {
 			name string
-			typ *builder.FieldType
+			typ  string
 		}{
-			{strings.ToLower(r), rField},
-			{"update_mask", builder.FieldTypeImportedMessage(fieldMask)},
+			{strings.ToLower(r), r},
+			{"update_mask", "google.protobuf.FieldMask"},
 		}
 		// Rule check: Establish that expected fields are present.
 		for _, f := range fields {
@@ -55,15 +47,16 @@ var standardFields = &lint.MessageRule{
 			field := m.FindFieldByName(f.name)
 			if field == nil {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("Method %q has no `%q` field", m.GetName(), f.name),
+					Message:    fmt.Sprintf("Method %s has no `%s` field", m.GetName(), f.name),
 					Descriptor: m,
 				}}
 			}
 
 			// Rule check: Ensure that the field is the correct type.
-			if field.GetType() != f.typ.GetType() {
+			msgDesc := field.GetMessageType()
+			if msgDesc == nil || msgDesc.GetFullyQualifiedName() != f.typ {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("`%q` field on Update RPCs should be of type `%q`", f.name, f.typ.GetType()),
+					Message:    fmt.Sprintf("`%s` field on Update RPCs should be of type `%s`", f.name, f.typ),
 					Descriptor: field,
 				}}
 			}
