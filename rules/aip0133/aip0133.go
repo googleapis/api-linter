@@ -54,10 +54,6 @@ func isCreateRequestMessage(m *desc.MessageDescriptor) bool {
 
 // get resource message type name from method
 func getResourceMsgName(m *desc.MethodDescriptor) string {
-	if !isCreateMethod(m) {
-		return ""
-	}
-
 	// Usually the response message will be the resource message, and its name will
 	// be part of method name (make a double check here to avoid the issue when
 	// method or output naming doesn't follow the right principles)
@@ -70,10 +66,6 @@ func getResourceMsgName(m *desc.MethodDescriptor) string {
 
 // get resource message type name from request message
 func getResourceMsgNameFromReq(m *desc.MessageDescriptor) string {
-	if !isCreateRequestMessage(m) {
-		return ""
-	}
-
 	// retrieve the string between the prefix "Create" and suffix "Request" from
 	// the name "Create<XXX>Request", and this part will usually be the resource
 	// message name(if its naming follows the right principle)
