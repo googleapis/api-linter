@@ -55,7 +55,7 @@ func isCreateRequestMessage(m *desc.MessageDescriptor) bool {
 // get resource message type name from method
 func getResourceMsgName(m *desc.MethodDescriptor) string {
 	if !isCreateMethod(m) {
-		return nil
+		return ""
 	}
 
 	// Usually the response message will be the resource message, and its name will
