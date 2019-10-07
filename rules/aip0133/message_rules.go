@@ -60,8 +60,7 @@ var resourceField = &lint.MessageRule{
 	Name: lint.NewRuleName("core", "0133", "request-message", "resource-field"),
 	URI:  "https://aip.dev/133#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
+		// OnlyIf: isCreateRequestMessage
 		if !isCreateRequestMessage(m) {
 			return nil
 		}
@@ -88,8 +87,7 @@ var unknownFields = &lint.MessageRule{
 	Name: lint.NewRuleName("core", "0133", "request-message", "unknown-fields"),
 	URI:  "https://aip.dev/133#request-message",
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
+		// OnlyIf: isCreateRequestMessage
 		if !isCreateRequestMessage(m) {
 			return
 		}
