@@ -73,7 +73,7 @@ var standardFields = &lint.MessageRule{
 	},
 }
 
-// Get methods should not have unrecognized fields.
+// Update methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0134", "request-message", "unknown-fields"),
 	URI:    "https://aip.dev/134#request-message",
