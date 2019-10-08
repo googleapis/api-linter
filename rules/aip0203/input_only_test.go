@@ -7,7 +7,6 @@ import (
 )
 
 func TestInputOnly(t *testing.T) {
-
 	testCases := []struct {
 		name       string
 		annotation string

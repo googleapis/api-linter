@@ -37,7 +37,7 @@ var inputOnly = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0203", "input-only"),
 	URI:  "http://api.dev/203#guidance",
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkAnnotation(f, inputOnlyRegexp)
+		return checkLeadingComments(f, inputOnlyRegexp, "INPUT_ONLY")
 	},
 }
 

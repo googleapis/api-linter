@@ -30,13 +30,13 @@ func AddRules(r lint.RuleRegistry) {
 	)
 }
 
-// check leading comment of a field and produce a problem
-// if the comment matches the give pattern.
-func checkAnnotation(f *desc.FieldDescriptor, pattern *regexp.Regexp) []lint.Problem {
+// check leading comments of a field and produce a problem
+// if the comments match the give pattern.
+func checkLeadingComments(f *desc.FieldDescriptor, pattern *regexp.Regexp, annotation string) []lint.Problem {
 	leadingComments := f.GetSourceInfo().GetLeadingComments()
 	if pattern.MatchString(leadingComments) {
 		return []lint.Problem{lint.Problem{
-			Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q.", pattern.FindString(leadingComments)),
+			Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q in the leading comments. For example, `string name = 1 [(google.api.field_behavior) = %s];`.", pattern.FindString(leadingComments), annotation),
 			Descriptor: f,
 		}}
 	}
