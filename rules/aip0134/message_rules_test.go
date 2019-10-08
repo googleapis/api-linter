@@ -37,16 +37,17 @@ func TestStandardFields(t *testing.T) {
 		fieldName   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "UpdateBookRequest", "book", testutils.Problems{}},
-		{"NoResource", "UpdateBookRequest", "id", testutils.Problems{{Message: "book"}}},
-		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
+		// We use BigBook instead of Book in order to test correct casing logic
+		{"Valid", "UpdateBigBookRequest", "big_book", testutils.Problems{}},
+		{"NoResource", "UpdateBigBookRequest", "id", testutils.Problems{{Message: "book"}}},
+		{"Irrelevant", "AcquireBigBookRequest", "id", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
-			bookMsg := builder.NewMessage("Book")
+			bookMsg := builder.NewMessage("BigBook")
 			message, err := builder.NewMessage(test.messageName).AddField(
 				builder.NewField(test.fieldName, builder.FieldTypeMessage(bookMsg)),
 			).AddField(
@@ -65,7 +66,7 @@ func TestStandardFields(t *testing.T) {
 	}
 }
 
-func TestStandardFieldsMissueUpdateMask(t *testing.T) {
+func TestStandardFieldsMissingUpdateMask(t *testing.T) {
 	// Create an appropriate message descriptor.
 	bookMsg := builder.NewMessage("Book")
 	message, err := builder.NewMessage("UpdateBookRequest").AddField(
@@ -124,11 +125,15 @@ func TestUnknownFields(t *testing.T) {
 		fieldType   *builder.FieldType
 		problems    testutils.Problems
 	}{
-		{"UpdateMask", "UpdateBookRequest", "update_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
-		{"Invalid", "UpdateBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
-			Message: "Unexpected field",
-		}}},
-		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
+		// Use BigBook instead of Book to test correct casing logic
+		{"UpdateMask", "UpdateBigBookRequest", "update_mask",
+			builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
+		{"Invalid", "UpdateBigBookRequest", "application_id",
+			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
+		{"InvalidCasing", "UpdateBigBookRequest", "bigbook",
+			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
+		{"Irrelevant", "AcquireBigBookRequest", "application_id",
+			builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -136,7 +141,7 @@ func TestUnknownFields(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
 			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField("book", builder.FieldTypeMessage(builder.NewMessage("Book"))),
+				builder.NewField("big_book", builder.FieldTypeMessage(builder.NewMessage("BigBook"))),
 			).AddField(
 				builder.NewField(test.fieldName, test.fieldType),
 			).Build()

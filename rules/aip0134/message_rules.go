@@ -20,11 +20,16 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 func extractResource(reqName string) string {
 	// Strips "Update" from the beginning and "Request" from the end.
 	return reqName[6:len(reqName)-7]
+}
+
+func fieldNameFromResource(resource string) string {
+	return strings.ToLower(strcase.SnakeCase(resource))
 }
 
 // The Update standard method should only have expected fields.
@@ -38,7 +43,7 @@ var standardFields = &lint.MessageRule{
 			name string
 			typ  string
 		}{
-			{strings.ToLower(r), r},
+			{fieldNameFromResource(r), r},
 			{"update_mask", "google.protobuf.FieldMask"},
 		}
 		// Rule check: Establish that expected fields are present.
@@ -75,8 +80,8 @@ var unknownFields = &lint.MessageRule{
 		resource := extractResource(m.GetName());
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			strings.ToLower(resource): {}, // AIP-134
-			"update_mask":             {}, // AIP-134
+			fieldNameFromResource(resource): {}, // AIP-134
+			"update_mask":                   {}, // AIP-134
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {

@@ -219,12 +219,20 @@ func TestHttpNameField(t *testing.T) {
 		methodName string
 		msg        string
 	}{
-		{"Valid", "/v1/{book.name=publishers/*/books/*}", "UpdateBook", ""},
-		{"InvalidVarNameBook", "/v1/{book=publishers/*/books/*}", "UpdateBook", "`book.name` field"},
-		{"InvalidVarNameName", "/v1/{name=publishers/*/books/*}", "UpdateBook", "`book.name` field"},
-		{"InvalidVarNameReversed", "/v1/{name.book=publishers/*/books/*}", "UpdateBook", "`book.name` field"},
-		{"NoVarName", "/v1/publishers/*/books/*", "UpdateBook", "`book.name` field"},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", ""},
+		{"Valid", "/v1/{big_book.name=publishers/*/books/*}",
+			"UpdateBigBook", ""},
+		{"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameName", "/v1/{name=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameReversed", "/v1/{name.big_book=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"NoVarName", "/v1/publishers/*/books/*",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}",
+			"AcquireBigBook", ""},
 	}
 
 	for _, test := range tests {
@@ -243,8 +251,8 @@ func TestHttpNameField(t *testing.T) {
 			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+				builder.RpcTypeMessage(builder.NewMessage("UpdateBigBookRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BigBook"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)
