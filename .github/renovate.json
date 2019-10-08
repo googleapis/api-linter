@@ -1,4 +1,5 @@
 {
   "extends": ["config:base"],
+  "commitMessagePrefix": "[chore] ",
   "groupName": "all"
 }
