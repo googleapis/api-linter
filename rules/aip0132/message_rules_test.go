@@ -17,6 +17,7 @@ package aip0132
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	fpb "google.golang.org/genproto/protobuf/field_mask"
@@ -29,13 +30,22 @@ func TestStandardFields(t *testing.T) {
 		messageName   string
 		nameFieldName string
 		nameFieldType *builder.FieldType
-		problemCount  int
-		errPrefix     string
+		problems      testutils.Problems
+		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
-		{"Valid", "ListBooksRequest", "parent", builder.FieldTypeString(), 0, "False positive"},
-		{"InvalidName", "ListBooksRequest", "publisher", builder.FieldTypeString(), 1, "False negative"},
-		{"InvalidType", "ListBooksRequest", "parent", builder.FieldTypeBytes(), 1, "False negative"},
-		{"Irrelevant", "EnumerateBooksRequest", "id", builder.FieldTypeString(), 0, "False positive"},
+		{"Valid", "ListBooksRequest", "parent", builder.FieldTypeString(), testutils.Problems{}, nil},
+		{"InvalidName", "ListBooksRequest", "publisher", builder.FieldTypeString(), testutils.Problems{{Message: "no `parent` field"}}, nil},
+		{
+			"InvalidType",
+			"ListBooksRequest",
+			"parent",
+			builder.FieldTypeBytes(),
+			testutils.Problems{{Message: "string"}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.GetFields()[0]
+			},
+		},
+		{"Irrelevant", "EnumerateBooksRequest", "id", builder.FieldTypeString(), testutils.Problems{}, nil},
 	}
 
 	// Run each test individually.
@@ -49,10 +59,17 @@ func TestStandardFields(t *testing.T) {
 				t.Fatalf("Could not build %s message.", test.messageName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
+			// What descriptor is the problem expected to be attached to?
+			var problemDesc desc.Descriptor = message
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(message)
+			}
+
+			// Run the lint rule, and establish that it returns the correct problems.
 			// number of problems.
-			if problems := standardFields.LintMessage(message); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, standardFields.Name, problems)
+			problems := standardFields.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
@@ -67,26 +84,25 @@ func TestUnknownFields(t *testing.T) {
 
 	// Set up the testing permutations.
 	tests := []struct {
-		testName     string
-		messageName  string
-		fieldName    string
-		fieldType    *builder.FieldType
-		problemCount int
-		errPrefix    string
+		testName    string
+		messageName string
+		fieldName   string
+		fieldType   *builder.FieldType
+		problems    testutils.Problems
 	}{
-		{"PageSize", "ListBooksRequest", "page_size", builder.FieldTypeInt32(), 0, "False positive"},
-		{"PageToken", "ListBooksRequest", "page_token", builder.FieldTypeString(), 0, "False positive"},
-		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), 0, "False positive"},
-		{"FilterInvalid", "ListBooksRequest", "filter", builder.FieldTypeBytes(), 1, "False negative"},
-		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), 0, "False positive"},
-		{"OrderByInvalid", "ListBooksRequest", "order_by", builder.FieldTypeBytes(), 1, "False negative"},
-		{"GroupBy", "ListBooksRequest", "group_by", builder.FieldTypeString(), 0, "False positive"},
-		{"GroupByInvalid", "ListBooksRequest", "group_by", builder.FieldTypeBytes(), 1, "False negative"},
-		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), 0, "False positive"},
-		{"ReadMask", "ListBooksRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), 0, "False positive"},
-		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), 0, "False positive"},
-		{"Invalid", "ListBooksRequest", "application_id", builder.FieldTypeString(), 1, "False negative"},
-		{"Irrelevant", "EnumerteBooksRequest", "application_id", builder.FieldTypeString(), 0, "False positive"},
+		{"PageSize", "ListBooksRequest", "page_size", builder.FieldTypeInt32(), testutils.Problems{}},
+		{"PageToken", "ListBooksRequest", "page_token", builder.FieldTypeString(), testutils.Problems{}},
+		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), testutils.Problems{}},
+		{"FilterInvalid", "ListBooksRequest", "filter", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
+		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
+		{"OrderByInvalid", "ListBooksRequest", "order_by", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
+		{"GroupBy", "ListBooksRequest", "group_by", builder.FieldTypeString(), testutils.Problems{}},
+		{"GroupByInvalid", "ListBooksRequest", "group_by", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
+		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), testutils.Problems{}},
+		{"ReadMask", "ListBooksRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
+		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
+		{"Invalid", "ListBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{Message: "explicitly described"}}},
+		{"Irrelevant", "EnumerteBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -104,8 +120,9 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			if problems := unknownFields.LintMessage(message); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, unknownFields.Name, problems)
+			problems := unknownFields.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(message.GetFields()[1]).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

@@ -23,15 +23,10 @@ import (
 )
 
 var requestPaginationPageSize = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0158", "request-message", "page_size-field"),
-	URI:  "https://aip.dev/158",
+	Name:   lint.NewRuleName("core", "0158", "request-message", "page-size-field"),
+	URI:    "https://aip.dev/158",
+	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListRequestMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a page_size field is present.
 		pageSize := m.FindFieldByName("page_size")
 		if pageSize == nil {
@@ -40,6 +35,7 @@ var requestPaginationPageSize = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name page_size is the correct type.
 		if pageSize.GetType() != builder.FieldTypeInt32().GetType() {
 			return []lint.Problem{{
@@ -53,15 +49,10 @@ var requestPaginationPageSize = &lint.MessageRule{
 }
 
 var requestPaginationPageToken = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0158", "request-message", "page_token-field"),
-	URI:  "https://aip.dev/158",
+	Name:   lint.NewRuleName("core", "0158", "request-message", "page-token-field"),
+	URI:    "https://aip.dev/158",
+	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListRequestMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a page_size field is present.
 		pageToken := m.FindFieldByName("page_token")
 		if pageToken == nil {
@@ -70,6 +61,7 @@ var requestPaginationPageToken = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name page_size is the correct type.
 		if pageToken.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
@@ -83,15 +75,10 @@ var requestPaginationPageToken = &lint.MessageRule{
 }
 
 var responsePaginationNextPageToken = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0158", "request-message", "next_page_token-field"),
-	URI:  "https://aip.dev/158",
+	Name:   lint.NewRuleName("core", "0158", "response-message", "next-page-token-field"),
+	URI:    "https://aip.dev/158",
+	OnlyIf: isListResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// We only care about Get methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListResponseMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a next_page_token field is present.
 		nextPageToken := m.FindFieldByName("next_page_token")
 		if nextPageToken == nil {
@@ -100,6 +87,7 @@ var responsePaginationNextPageToken = &lint.MessageRule{
 				Descriptor: m,
 			}}
 		}
+
 		// Rule check: Ensure that the name next_page_token is the correct type.
 		if nextPageToken.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{

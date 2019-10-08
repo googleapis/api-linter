@@ -17,6 +17,8 @@ package aip0158
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -31,12 +33,31 @@ func TestRequestPaginationPageSize(t *testing.T) {
 		testName      string
 		messageName   string
 		messageFields []field
-		problemCount  int
-		errPrefix     string
+		problems      testutils.Problems
+		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
-		{"Valid", "ListFooRequest", []field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}}, 0, "False positive"},
-		{"MissingField", "ListFooRequest", []field{{"page_token", builder.FieldTypeString()}}, 1, "False positive"},
-		{"InvalidType", "ListFooRequest", []field{{"page_size", builder.FieldTypeDouble()}}, 1, "False positive"},
+		{
+			"Valid",
+			"ListFooRequest",
+			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
+			testutils.Problems{},
+			nil},
+		{
+			"MissingField",
+			"ListFooRequest",
+			[]field{{"page_token", builder.FieldTypeString()}},
+			testutils.Problems{{Message: "page_size"}},
+			nil,
+		},
+		{
+			"InvalidType",
+			"ListFooRequest",
+			[]field{{"page_size", builder.FieldTypeDouble()}},
+			testutils.Problems{{Message: "int32"}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("page_size")
+			},
+		},
 	}
 
 	// Run each test individually.
@@ -56,10 +77,16 @@ func TestRequestPaginationPageSize(t *testing.T) {
 				t.Fatalf("Could not build %s message.", test.messageName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := requestPaginationPageSize.LintMessage(message); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestPaginationPageSize.Name, problems)
+			// Determine the descriptor that a failing test will attach to.
+			var problemDesc desc.Descriptor = message
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(message)
+			}
+
+			// Run the lint rule, and establish that it returns the correct problems.
+			problems := requestPaginationPageSize.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
@@ -71,12 +98,32 @@ func TestRequestPaginationPageToken(t *testing.T) {
 		testName      string
 		messageName   string
 		messageFields []field
-		problemCount  int
-		errPrefix     string
+		problems      testutils.Problems
+		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
-		{"Valid", "ListFooRequest", []field{{"page_token", builder.FieldTypeString()}}, 0, "False positive"},
-		{"MissingField", "ListFooRequest", []field{{"name", builder.FieldTypeString()}}, 1, "False positive"},
-		{"InvalidType", "ListFooRequest", []field{{"page_token", builder.FieldTypeDouble()}}, 1, "False positive"},
+		{
+			"Valid",
+			"ListFooRequest",
+			[]field{{"page_token", builder.FieldTypeString()}},
+			testutils.Problems{},
+			nil,
+		},
+		{
+			"MissingField",
+			"ListFooRequest",
+			[]field{{"name", builder.FieldTypeString()}},
+			testutils.Problems{{Message: "page_token"}},
+			nil,
+		},
+		{
+			"InvalidType",
+			"ListFooRequest",
+			[]field{{"page_token", builder.FieldTypeDouble()}},
+			testutils.Problems{{Message: "string"}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("page_token")
+			},
+		},
 	}
 
 	// Run each test individually.
@@ -96,10 +143,16 @@ func TestRequestPaginationPageToken(t *testing.T) {
 				t.Fatalf("Could not build %s message.", test.messageName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := requestPaginationPageToken.LintMessage(message); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, requestPaginationPageToken.Name, problems)
+			// Determine the descriptor that a failing test will attach to.
+			var problemDesc desc.Descriptor = message
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(message)
+			}
+
+			// Run the lint rule, and establish that it returns the correct problems.
+			problems := requestPaginationPageToken.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
@@ -111,12 +164,32 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 		testName      string
 		messageName   string
 		messageFields []field
-		problemCount  int
-		errPrefix     string
+		problems      testutils.Problems
+		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
-		{"Valid", "ListFooResponse", []field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeString()}}, 0, "False positive"},
-		{"MissingField", "ListFooResponse", []field{{"name", builder.FieldTypeString()}}, 1, "False positive"},
-		{"InvalidType", "ListFooResponse", []field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}}, 1, "False positive"},
+		{
+			"Valid",
+			"ListBooksResponse",
+			[]field{{"books", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeString()}},
+			testutils.Problems{},
+			nil,
+		},
+		{
+			"MissingField",
+			"ListBooksResponse",
+			[]field{{"books", builder.FieldTypeString()}},
+			testutils.Problems{{Message: "next_page_token"}},
+			nil,
+		},
+		{
+			"InvalidType",
+			"ListFooResponse",
+			[]field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}},
+			testutils.Problems{{Message: "string"}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("next_page_token")
+			},
+		},
 	}
 
 	// Run each test individually.
@@ -136,10 +209,16 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 				t.Fatalf("Could not build %s message.", test.messageName)
 			}
 
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			if problems := responsePaginationNextPageToken.LintMessage(message); len(problems) != test.problemCount {
-				t.Errorf("%s on rule %s: %#v", test.errPrefix, responsePaginationNextPageToken.Name, problems)
+			// Determine the descriptor that a failing test will attach to.
+			var problemDesc desc.Descriptor = message
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(message)
+			}
+
+			// Run the lint rule, and establish that it returns the correct problems.
+			problems := responsePaginationNextPageToken.Lint(message.GetFile())
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

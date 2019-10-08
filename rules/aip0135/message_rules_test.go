@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0135
 
 import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	fpb "google.golang.org/genproto/protobuf/field_mask"
 )
 
 func TestStandardFields(t *testing.T) {
@@ -31,9 +29,9 @@ func TestStandardFields(t *testing.T) {
 		nameFieldName string
 		problems      testutils.Problems
 	}{
-		{"Valid", "GetBookRequest", "name", testutils.Problems{}},
-		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "name"}}},
-		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
+		{"Valid", "DeleteBookRequest", "name", testutils.Problems{}},
+		{"InvalidName", "DeleteBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Irrelevant", "RemoveBookRequest", "id", testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -58,7 +56,7 @@ func TestStandardFields(t *testing.T) {
 
 func TestStandardFieldsInvalidType(t *testing.T) {
 	// Create an appropriate message descriptor.
-	message, err := builder.NewMessage("GetBookRequest").AddField(
+	message, err := builder.NewMessage("DeleteBookRequest").AddField(
 		builder.NewField("name", builder.FieldTypeBytes()),
 	).Build()
 	if err != nil {
@@ -78,12 +76,6 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 }
 
 func TestUnknownFields(t *testing.T) {
-	// Get the correct message type for google.protobuf.FieldMask.
-	fieldMask, err := desc.LoadMessageDescriptorForMessage(&fpb.FieldMask{})
-	if err != nil {
-		t.Fatalf("Unable to load the field mask message.")
-	}
-
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
@@ -92,12 +84,12 @@ func TestUnknownFields(t *testing.T) {
 		fieldType   *builder.FieldType
 		problems    testutils.Problems
 	}{
-		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
-		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
-		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
+		{"Force", "DeleteBookRequest", "force", builder.FieldTypeBool(), testutils.Problems{}},
+		{"Etag", "DeleteBookRequest", "etag", builder.FieldTypeString(), testutils.Problems{}},
+		{"Invalid", "DeleteBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
 			Message: "Unexpected field",
 		}}},
-		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
+		{"Irrelevant", "RemoveBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -110,7 +102,7 @@ func TestUnknownFields(t *testing.T) {
 				builder.NewField(test.fieldName, test.fieldType),
 			).Build()
 			if err != nil {
-				t.Fatalf("Could not build GetBookRequest message.")
+				t.Fatalf("Could not build DeleteBookRequest message.")
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.

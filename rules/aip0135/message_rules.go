@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0135
 
 import (
 	"fmt"
@@ -22,11 +22,11 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The Get standard method should only have expected fields.
+// The Delete standard method should only have expected fields.
 var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message", "name-field"),
-	URI:    "https://aip.dev/131#request-message",
-	OnlyIf: isGetRequestMessage,
+	Name:   lint.NewRuleName("core", "0135", "request-message", "name-field"),
+	URI:    "https://aip.dev/135#request-message",
+	OnlyIf: isDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a name field is present.
 		name := m.FindFieldByName("name")
@@ -49,23 +49,23 @@ var standardFields = &lint.MessageRule{
 	},
 }
 
-// Get methods should not have unrecognized fields.
+// Delete methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
-	URI:    "https://aip.dev/131#request-message",
-	OnlyIf: isGetRequestMessage,
+	Name:   lint.NewRuleName("core", "0135", "request-message", "unknown-fields"),
+	URI:    "https://aip.dev/135#request-message",
+	OnlyIf: isDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"name":      {}, // AIP-131
-			"read_mask": {}, // AIP-157
-			"view":      {}, // AIP-157
+			"name":  {}, // AIP-135
+			"force": {}, // AIP-135
+			"etag":  {}, // AIP-154
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Unexpected field: Get RPCs must only contain fields explicitly described in AIPs, not %q.",
+						"Unexpected field: Delete RPCs must only contain fields explicitly described in AIPs, not %q.",
 						string(field.GetName()),
 					),
 					Descriptor: field,

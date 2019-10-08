@@ -16,6 +16,7 @@ package aip0132
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
@@ -24,15 +25,10 @@ import (
 
 // The List standard method should contain a parent field.
 var standardFields = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0132", "request-message", "parent-field"),
-	URI:  "https://aip.dev/132#request-message",
+	Name:   lint.NewRuleName("core", "0132", "request-message", "parent-field"),
+	URI:    "https://aip.dev/132#request-message",
+	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListRequestMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a `parent` field is present.
 		parentField := m.FindFieldByName("parent")
 		if parentField == nil {
@@ -56,15 +52,10 @@ var standardFields = &lint.MessageRule{
 
 // List methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0132", "request-message", "unknown-fields"),
-	URI:  "https://aip.dev/132#request-message",
+	Name:   lint.NewRuleName("core", "0132", "request-message", "unknown-fields"),
+	URI:    "https://aip.dev/132#request-message",
+	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListRequestMessage(m) {
-			return
-		}
-
 		// Rule check: Establish that there are no unexpected fields.
 		//
 		// Additionally, we type check only the fields defined in AIP-132,
@@ -93,7 +84,8 @@ var unknownFields = &lint.MessageRule{
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Field %q is the wrong type; expected %q.",
-						field.GetName(), fieldType.GetTypeName()),
+						// fieldType.GetType().String() returns TYPE_STRING, TYPE_INT32, etc.
+						field.GetName(), strings.ToLower(fieldType.GetType().String()[len("TYPE_"):])),
 					Descriptor: field,
 				})
 			}

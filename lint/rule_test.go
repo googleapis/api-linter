@@ -67,11 +67,11 @@ func TestMessageRule(t *testing.T) {
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
+				OnlyIf: func(m *desc.MessageDescriptor) bool {
+					return m.GetName() == "Author"
+				},
 				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					if m.GetName() == "Author" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -99,11 +99,11 @@ func TestMessageRuleNested(t *testing.T) {
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
+				OnlyIf: func(m *desc.MessageDescriptor) bool {
+					return m.GetName() == "Author"
+				},
 				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					if m.GetName() == "Author" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -134,11 +134,11 @@ func TestFieldRule(t *testing.T) {
 			rule := &FieldRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  uri,
+				OnlyIf: func(f *desc.FieldDescriptor) bool {
+					return f.GetName() == "edition_count"
+				},
 				LintField: func(f *desc.FieldDescriptor) []Problem {
-					if f.GetName() == "edition_count" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -204,11 +204,11 @@ func TestMethodRule(t *testing.T) {
 			rule := &MethodRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
+				OnlyIf: func(m *desc.MethodDescriptor) bool {
+					return m.GetName() == "CreateBook"
+				},
 				LintMethod: func(m *desc.MethodDescriptor) []Problem {
-					if m.GetName() == "CreateBook" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -235,11 +235,11 @@ func TestEnumRule(t *testing.T) {
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
+				OnlyIf: func(e *desc.EnumDescriptor) bool {
+					return e.GetName() == "Edition"
+				},
 				LintEnum: func(e *desc.EnumDescriptor) []Problem {
-					if e.GetName() == "Edition" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -268,11 +268,11 @@ func TestEnumRuleNested(t *testing.T) {
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
 				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
+				OnlyIf: func(e *desc.EnumDescriptor) bool {
+					return e.GetName() == "Edition"
+				},
 				LintEnum: func(e *desc.EnumDescriptor) []Problem {
-					if e.GetName() == "Edition" {
-						return test.problems
-					}
-					return nil
+					return test.problems
 				},
 			}
 
@@ -363,7 +363,7 @@ type lintRuleTest struct {
 }
 
 // runRule runs a rule within a test environment.
-func (test *lintRuleTest) runRule(rule protoRule, fd *desc.FileDescriptor, t *testing.T) {
+func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *testing.T) {
 	// Establish that the metadata methods work.
 	if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
 		t.Errorf("Got %q for GetName(), expected %q", got, want)

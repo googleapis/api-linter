@@ -22,8 +22,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// protoRule defines a lint rule that checks Google Protobuf APIs.
-type protoRule interface {
+// ProtoRule defines a lint rule that checks Google Protobuf APIs.
+type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
 
@@ -74,6 +74,10 @@ type MessageRule struct {
 	// of Problems it finds.
 	LintMessage func(*desc.MessageDescriptor) []Problem
 
+	// OnlyIf accepts a MessageDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.MessageDescriptor) bool
+
 	noPositional struct{}
 }
 
@@ -94,7 +98,9 @@ func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 	// Iterate over each message and process rules for each message.
 	for _, message := range getAllMessages(fd) {
-		problems = append(problems, r.LintMessage(message)...)
+		if r.OnlyIf == nil || r.OnlyIf(message) {
+			problems = append(problems, r.LintMessage(message)...)
+		}
 	}
 	return problems
 }
@@ -107,6 +113,10 @@ type FieldRule struct {
 	// LintField accepts a FieldDescriptor and lints it, returning a slice of
 	// Problems it finds.
 	LintField func(*desc.FieldDescriptor) []Problem
+
+	// OnlyIf accepts a FieldDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.FieldDescriptor) bool
 
 	noPositional struct{}
 }
@@ -129,7 +139,9 @@ func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
 	// message.
 	for _, message := range getAllMessages(fd) {
 		for _, field := range message.GetFields() {
-			problems = append(problems, r.LintField(field)...)
+			if r.OnlyIf == nil || r.OnlyIf(field) {
+				problems = append(problems, r.LintField(field)...)
+			}
 		}
 	}
 	return problems
@@ -142,6 +154,10 @@ type ServiceRule struct {
 
 	// LintService accepts a ServiceDescriptor and lints it.
 	LintService func(*desc.ServiceDescriptor) []Problem
+
+	// OnlyIf accepts a ServiceDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.ServiceDescriptor) bool
 
 	noPositional struct{}
 }
@@ -160,7 +176,9 @@ func (r *ServiceRule) GetURI() string {
 func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 	for _, service := range fd.GetServices() {
-		problems = append(problems, r.LintService(service)...)
+		if r.OnlyIf == nil || r.OnlyIf(service) {
+			problems = append(problems, r.LintService(service)...)
+		}
 	}
 	return problems
 }
@@ -172,6 +190,10 @@ type MethodRule struct {
 
 	// LintMethod accepts a MethodDescriptor and lints it.
 	LintMethod func(*desc.MethodDescriptor) []Problem
+
+	// OnlyIf accepts a MethodDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.MethodDescriptor) bool
 
 	noPositional struct{}
 }
@@ -191,7 +213,9 @@ func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 	for _, service := range fd.GetServices() {
 		for _, method := range service.GetMethods() {
-			problems = append(problems, r.LintMethod(method)...)
+			if r.OnlyIf == nil || r.OnlyIf(method) {
+				problems = append(problems, r.LintMethod(method)...)
+			}
 		}
 	}
 	return problems
@@ -204,6 +228,10 @@ type EnumRule struct {
 
 	// LintEnum accepts a EnumDescriptor and lints it.
 	LintEnum func(*desc.EnumDescriptor) []Problem
+
+	// OnlyIf accepts an EnumDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.EnumDescriptor) bool
 
 	noPositional struct{}
 }
@@ -225,13 +253,17 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 	// Lint enums that are at the top level of the file.
 	for _, enum := range fd.GetEnumTypes() {
-		problems = append(problems, r.LintEnum(enum)...)
+		if r.OnlyIf == nil || r.OnlyIf(enum) {
+			problems = append(problems, r.LintEnum(enum)...)
+		}
 	}
 
 	// Lint enums that are nested within messages.
 	for _, message := range getAllMessages(fd) {
 		for _, enum := range message.GetNestedEnumTypes() {
-			problems = append(problems, r.LintEnum(enum)...)
+			if r.OnlyIf == nil || r.OnlyIf(enum) {
+				problems = append(problems, r.LintEnum(enum)...)
+			}
 		}
 	}
 	return problems
@@ -239,7 +271,7 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule protoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName}

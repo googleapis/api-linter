@@ -23,15 +23,10 @@ import (
 
 // List messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0132", "request-message", "name"),
-	URI:  "https://aip.dev/132#guidance",
+	Name:   lint.NewRuleName("core", "0132", "request-message", "name"),
+	URI:    "https://aip.dev/132#guidance",
+	OnlyIf: isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListMethod(m) {
-			return nil
-		}
-
 		// Rule check: Establish that for methods such as `ListFoos`, the request
 		// message is named `ListFoosRequest`.
 		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
@@ -51,15 +46,10 @@ var requestMessageName = &lint.MethodRule{
 
 // List messages should use a `ListFoosResponse` response message.
 var responseMessageName = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0132", "response-message", "name"),
-	URI:  "https://aip.dev/132#guidance",
+	Name:   lint.NewRuleName("core", "0132", "response-message", "name"),
+	URI:    "https://aip.dev/132#guidance",
+	OnlyIf: isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
-		if !isListMethod(m) {
-			return nil
-		}
-
 		// Rule check: Establish that for methods such as `ListFoos`, the response
 		// message is named `ListFoosResponse`.
 		if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {

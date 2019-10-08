@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0134
 
 import (
 	"strings"
@@ -21,8 +21,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	lro "google.golang.org/genproto/googleapis/longrunning"
 )
 
 func TestRequestMessageName(t *testing.T) {
@@ -33,16 +35,15 @@ func TestRequestMessageName(t *testing.T) {
 		reqMessageName string
 		problems       testutils.Problems
 	}{
-		{"Valid", "GetBook", "GetBookRequest", testutils.Problems{}},
-		{"Invalid", "GetBook", "Book", testutils.Problems{{Suggestion: "GetBookRequest"}}},
-		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutils.Problems{}},
+		{"Valid", "UpdateBook", "UpdateBookRequest", testutils.Problems{}},
+		{"Invalid", "UpdateBook", "Book", testutils.Problems{{Suggestion: "UpdateBookRequest"}}},
 		{"Irrelevant", "AcquireBook", "Book", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-131 Get method
+			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
 				builder.RpcTypeMessage(builder.NewMessage(test.reqMessageName), false),
@@ -62,26 +63,36 @@ func TestRequestMessageName(t *testing.T) {
 }
 
 func TestResponseMessageName(t *testing.T) {
+	op, err := desc.LoadMessageDescriptorForMessage(&lro.Operation{})
+	if err != nil {
+		t.Fatalf("Unable to load the Operation message.")
+	}
+	opbldr, err := builder.FromMessage(op)
+	if err != nil {
+		t.Fatalf("Unable to construct builder from op desc.")
+	}
+
 	// Set up the testing permutations.
 	tests := []struct {
-		testName        string
-		methodName      string
-		respMessageName string
-		problems        testutils.Problems
+		testName    string
+		methodName  string
+		respMessage *builder.MessageBuilder
+		problems    testutils.Problems
 	}{
-		{"Valid", "GetBook", "Book", testutils.Problems{}},
-		{"Invalid", "GetBook", "GetBookResponse", testutils.Problems{{Suggestion: "Book"}}},
-		{"Irrelevant", "AcquireBook", "AcquireBookResponse", testutils.Problems{}},
+		{"ValidResource", "UpdateBook", builder.NewMessage("Book"), testutils.Problems{}},
+		{"ValidLRO", "UpdateBook", opbldr, testutils.Problems{}},
+		{"Invalid", "UpdateBook", builder.NewMessage("UpdateBookResponse"), testutils.Problems{{Suggestion: "Book"}}},
+		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-131 Get method
+			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage(test.respMessageName), false),
+				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
+				builder.RpcTypeMessage(test.respMessage, false),
 			)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)
@@ -98,15 +109,15 @@ func TestResponseMessageName(t *testing.T) {
 }
 
 func TestHttpVerb(t *testing.T) {
-	// Set up GET and POST HTTP annotations.
-	httpGet := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Get{
-			Get: "/v1/{name=publishers/*/books/*}",
-		},
-	}
+	// Set up POST and PATCH HTTP annotations.
 	httpPost := &annotations.HttpRule{
 		Pattern: &annotations.HttpRule_Post{
-			Post: "/v1/{name=publishers/*/books/*}",
+			Post: "/v1/{book.name=publishers/*/books/*}",
+		},
+	}
+	httpPatch := &annotations.HttpRule{
+		Pattern: &annotations.HttpRule_Patch{
+			Patch: "/v1/{book.name=publishers/*/books/*}",
 		},
 	}
 
@@ -117,8 +128,8 @@ func TestHttpVerb(t *testing.T) {
 		methodName string
 		msg        string
 	}{
-		{"Valid", httpGet, "GetBook", ""},
-		{"Invalid", httpPost, "GetBook", "HTTP GET"},
+		{"Valid", httpPatch, "UpdateBook", ""},
+		{"Invalid", httpPost, "UpdateBook", "HTTP PATCH"},
 		{"Irrelevant", httpPost, "AcquireBook", ""},
 	}
 
@@ -131,10 +142,10 @@ func TestHttpVerb(t *testing.T) {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-131 Get method
+			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
 				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
@@ -159,8 +170,10 @@ func TestHttpBody(t *testing.T) {
 		methodName string
 		msg        string
 	}{
-		{"Valid", "", "GetBook", ""},
-		{"Invalid", "*", "GetBook", "HTTP body"},
+		{"Valid", "book", "UpdateBook", ""},
+		{"InvalidFoo", "foo", "UpdateBook", "HTTP body"},
+		{"InvalidStar", "*", "UpdateBook", "HTTP body"},
+		{"InvalidEmpty", "", "UpdateBook", "HTTP body"},
 		{"Irrelevant", "*", "AcquireBook", ""},
 	}
 
@@ -169,8 +182,8 @@ func TestHttpBody(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
 			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: "/v1/{name=publishers/*/books/*}",
+				Pattern: &annotations.HttpRule_Patch{
+					Patch: "/v1/{book.name=publishers/*/books/*}",
 				},
 				Body: test.body,
 			}
@@ -178,10 +191,10 @@ func TestHttpBody(t *testing.T) {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-131 Get method
+			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
 				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
@@ -206,10 +219,20 @@ func TestHttpNameField(t *testing.T) {
 		methodName string
 		msg        string
 	}{
-		{"Valid", "/v1/{name=publishers/*/books/*}", "GetBook", ""},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "GetBook", "`name` field"},
-		{"NoVarName", "/v1/publishers/*/books/*", "GetBook", "`name` field"},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", ""},
+		{"Valid", "/v1/{big_book.name=publishers/*/books/*}",
+			"UpdateBigBook", ""},
+		{"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameName", "/v1/{name=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"InvalidVarNameReversed", "/v1/{name.big_book=publishers/*/books/*}",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"NoVarName", "/v1/publishers/*/books/*",
+			"UpdateBigBook", "`big_book.name` field"},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}",
+			"AcquireBigBook", ""},
 	}
 
 	for _, test := range tests {
@@ -217,19 +240,19 @@ func TestHttpNameField(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
 			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: test.uri,
+				Pattern: &annotations.HttpRule_Patch{
+					Patch: test.uri,
 				},
 			}
 			if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-131 Get method
+			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
+				builder.RpcTypeMessage(builder.NewMessage("UpdateBigBookRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BigBook"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)

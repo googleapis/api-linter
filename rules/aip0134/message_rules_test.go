@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0131
+package aip0134
 
 import (
 	"testing"
@@ -24,24 +24,34 @@ import (
 )
 
 func TestStandardFields(t *testing.T) {
+	// Get the correct message type for google.protobuf.FieldMask.
+	fieldMask, err := desc.LoadMessageDescriptorForMessage(&fpb.FieldMask{})
+	if err != nil {
+		t.Fatalf("Unable to load the field mask message.")
+	}
+
 	// Set up the testing permutations.
 	tests := []struct {
-		testName      string
-		messageName   string
-		nameFieldName string
-		problems      testutils.Problems
+		testName    string
+		messageName string
+		fieldName   string
+		problems    testutils.Problems
 	}{
-		{"Valid", "GetBookRequest", "name", testutils.Problems{}},
-		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "name"}}},
-		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
+		// We use BigBook instead of Book in order to test correct casing logic
+		{"Valid", "UpdateBigBookRequest", "big_book", testutils.Problems{}},
+		{"NoResource", "UpdateBigBookRequest", "id", testutils.Problems{{Message: "book"}}},
+		{"Irrelevant", "AcquireBigBookRequest", "id", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
+			bookMsg := builder.NewMessage("BigBook")
 			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField(test.nameFieldName, builder.FieldTypeString()),
+				builder.NewField(test.fieldName, builder.FieldTypeMessage(bookMsg)),
+			).AddField(
+				builder.NewField("update_mask", builder.FieldTypeImportedMessage(fieldMask)),
 			).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s message.", test.messageName)
@@ -56,10 +66,33 @@ func TestStandardFields(t *testing.T) {
 	}
 }
 
+func TestStandardFieldsMissingUpdateMask(t *testing.T) {
+	// Create an appropriate message descriptor.
+	bookMsg := builder.NewMessage("Book")
+	message, err := builder.NewMessage("UpdateBookRequest").AddField(
+		builder.NewField("book", builder.FieldTypeMessage(bookMsg)),
+	).Build()
+	if err != nil {
+		t.Fatalf("Could not build descriptor.")
+	}
+
+	// Run the lint rule, and establish that it returns the correct
+	// number of problems.
+	wantProblems := testutils.Problems{{
+		Descriptor: message,
+		Message:    "Method UpdateBookRequest has no `update_mask` field",
+	}}
+	gotProblems := standardFields.Lint(message.GetFile())
+	if diff := wantProblems.Diff(gotProblems); diff != "" {
+		t.Errorf(diff)
+	}
+}
+
 func TestStandardFieldsInvalidType(t *testing.T) {
 	// Create an appropriate message descriptor.
-	message, err := builder.NewMessage("GetBookRequest").AddField(
-		builder.NewField("name", builder.FieldTypeBytes()),
+	parchmentMsg := builder.NewMessage("Parchment")
+	message, err := builder.NewMessage("UpdateBookRequest").AddField(
+		builder.NewField("book", builder.FieldTypeMessage(parchmentMsg)),
 	).Build()
 	if err != nil {
 		t.Fatalf("Could not build descriptor.")
@@ -69,7 +102,7 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 	// number of problems.
 	wantProblems := testutils.Problems{{
 		Descriptor: message.GetFields()[0],
-		Message:    "string",
+		Message:    "`book` field on Update RPCs should be of type `Book`",
 	}}
 	gotProblems := standardFields.Lint(message.GetFile())
 	if diff := wantProblems.Diff(gotProblems); diff != "" {
@@ -92,12 +125,15 @@ func TestUnknownFields(t *testing.T) {
 		fieldType   *builder.FieldType
 		problems    testutils.Problems
 	}{
-		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
-		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
-		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
-			Message: "Unexpected field",
-		}}},
-		{"Irrelevant", "AcquireBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
+		// Use BigBook instead of Book to test correct casing logic
+		{"UpdateMask", "UpdateBigBookRequest", "update_mask",
+			builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
+		{"Invalid", "UpdateBigBookRequest", "application_id",
+			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
+		{"InvalidCasing", "UpdateBigBookRequest", "bigbook",
+			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
+		{"Irrelevant", "AcquireBigBookRequest", "application_id",
+			builder.FieldTypeString(), testutils.Problems{}},
 	}
 
 	// Run each test individually.
@@ -105,12 +141,12 @@ func TestUnknownFields(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
 			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField("name", builder.FieldTypeString()),
+				builder.NewField("big_book", builder.FieldTypeMessage(builder.NewMessage("BigBook"))),
 			).AddField(
 				builder.NewField(test.fieldName, test.fieldType),
 			).Build()
 			if err != nil {
-				t.Fatalf("Could not build GetBookRequest message.")
+				t.Fatalf("Could not build UpdateBookRequest message.")
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
