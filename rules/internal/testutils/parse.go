@@ -108,7 +108,7 @@ func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescr
 //
 // This is used to handle google.api common protos, which some tests need
 // to use.
-func decompile(filenames ...string) map[string]string {
+func decompile(filenames ...string) (map[string]string, error) {
 	var fdps []*dpb.FileDescriptorProto
 	for _, filename := range filenames {
 		// Compiled golang protos include a compressed descriptor, which must be
@@ -116,21 +116,26 @@ func decompile(filenames ...string) map[string]string {
 		compressedDesc := proto.FileDescriptor(filename)
 		r, err := gzip.NewReader(bytes.NewReader(compressedDesc))
 		if err != nil {
-			panic(fmt.Errorf("Corrupted compressed file %q: %v", filename, err))
+			return nil, err
 		}
-		descBytes, _ := ioutil.ReadAll(r) // Error case is unreachable; inputs are trusted.
+		descBytes, err := ioutil.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
 
 		// Unmarshal the byte string into a FileDescriptorProto.
 		fdp := &dpb.FileDescriptorProto{}
-		proto.Unmarshal(descBytes, fdp)
+		if err := proto.Unmarshal(descBytes, fdp); err != nil {
+			return nil, err
+		}
 		fdps = append(fdps, fdp)
 	}
 	fds, err := desc.CreateFileDescriptors(fdps)
 	if err != nil {
-		panic(fmt.Errorf(dedent.Dedent(`
+		return nil, fmt.Errorf(dedent.Dedent(`
 			Unable to create protoreflect descriptors
 			(missing import in args to decompile?): %v
-		`), err))
+		`), err)
 	}
 
 	// Iterate over the values in the map and populate the original contents
@@ -138,13 +143,15 @@ func decompile(filenames ...string) map[string]string {
 	printer := &protoprint.Printer{}
 	answer := make(map[string]string)
 	for filename, fd := range fds {
-		// Error case is unreachable; inputs are trusted.
-		protoStr, _ := printer.PrintProtoToString(fd)
+		protoStr, err := printer.PrintProtoToString(fd)
+		if err != nil {
+			return nil, err
+		}
 		answer[filename] = protoStr
 	}
 
 	// Done; return the answer.
-	return answer
+	return answer, nil
 }
 
 // Common protos likely to need to be imported in tests.
@@ -154,17 +161,25 @@ func decompile(filenames ...string) map[string]string {
 // Note that any file that needs to be included here must also have each
 // of its imports here, and the corresponding compiled Go protos must be
 // imported up top.
-var commonProtos = decompile(
-	"google/api/annotations.proto",
-	"google/api/client.proto",
-	"google/api/field_behavior.proto",
-	"google/api/http.proto",
-	"google/api/resource.proto",
-	"google/longrunning/operations.proto",
-	"google/protobuf/any.proto",
-	"google/protobuf/descriptor.proto",
-	"google/protobuf/duration.proto",
-	"google/protobuf/empty.proto",
-	"google/protobuf/timestamp.proto",
-	"google/rpc/status.proto",
-)
+var commonProtos map[string]string
+
+func init() {
+	cp, err := decompile(
+		"google/api/annotations.proto",
+		"google/api/client.proto",
+		"google/api/field_behavior.proto",
+		"google/api/http.proto",
+		"google/api/resource.proto",
+		"google/longrunning/operations.proto",
+		"google/protobuf/any.proto",
+		"google/protobuf/descriptor.proto",
+		"google/protobuf/duration.proto",
+		"google/protobuf/empty.proto",
+		"google/protobuf/timestamp.proto",
+		"google/rpc/status.proto",
+	)
+	if err != nil {
+		panic(err)
+	}
+	commonProtos = cp
+}
