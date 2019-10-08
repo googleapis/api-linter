@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0140 contains rules defined in https://aip.dev/140.
-package aip0140
+package aip0126
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
 
-// AddRules adds all of the AIP-140 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
-		abbreviationsEnum,
-		abbreviationsField,
-		abbreviationsMessage,
-		abbreviationsMethod,
-		abbreviationsService,
-		lowerSnake,
-	)
-}
+var unspecified = &lint.EnumRule{
+	Name: lint.NewRuleName("core", "0126", "unspecified"),
+	URI:  "https://aip.dev/126#guidance",
+	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
+		firstValue := e.GetValues()[0]
+		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")
+		if firstValue.GetName() != want {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("The first enum value should be %q", want),
+				Suggestion: want,
+				Descriptor: firstValue,
+				Location:   lint.DescriptorNameLocation(firstValue),
+			}}
+		}
 
-// toLowerSnakeCase converts s to lower_snake_case.
-func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.SnakeCase(s))
+		return nil
+	},
 }
