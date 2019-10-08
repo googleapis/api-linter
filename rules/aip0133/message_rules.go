@@ -21,19 +21,15 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/stoewer/go-strcase"
 )
 
 // The create request message should have parent field.
 var parentField = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0133", "request-message", "parent-field"),
-	URI:  "https://aip.dev/133#request-message",
+	Name:   lint.NewRuleName("core", "0133", "request-message", "parent-field"),
+	URI:    "https://aip.dev/133#request-message",
+	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// We only care about List- methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateRequestMessage(m) {
-			return nil
-		}
-
 		// Rule check: Establish that a `parent` field is present.
 		parentField := m.FindFieldByName("parent")
 		if parentField == nil {
@@ -57,14 +53,10 @@ var parentField = &lint.MessageRule{
 
 // The create request message should have resource field.
 var resourceField = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0133", "request-message", "resource-field"),
-	URI:  "https://aip.dev/133#request-message",
+	Name:   lint.NewRuleName("core", "0133", "request-message", "resource-field"),
+	URI:    "https://aip.dev/133#request-message",
+	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// OnlyIf: isCreateRequestMessage
-		if !isCreateRequestMessage(m) {
-			return nil
-		}
-
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// The rule (resource field name must map to the POST body) is checked by AIP-0133 ("core::0133::http-body")
@@ -84,21 +76,17 @@ var resourceField = &lint.MessageRule{
 
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0133", "request-message", "unknown-fields"),
-	URI:  "https://aip.dev/133#request-message",
+	Name:   lint.NewRuleName("core", "0133", "request-message", "unknown-fields"),
+	URI:    "https://aip.dev/133#request-message",
+	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// OnlyIf: isCreateRequestMessage
-		if !isCreateRequestMessage(m) {
-			return
-		}
-
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]*builder.FieldType{
 			"parent":     nil, // AIP-133
 			"request_id": nil, // AIP-155
-			fmt.Sprintf("%s_id", strings.ToLower(resourceMsgName)): nil,
+			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
 		for _, fieldDesc := range m.GetFields() {

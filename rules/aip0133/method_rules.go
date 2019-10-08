@@ -25,15 +25,10 @@ import (
 
 // Create methods should use the HTTP POST verb.
 var httpVerb = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "http-verb"),
-	URI:  "https://aip.dev/133#guidance",
+	Name:   lint.NewRuleName("core", "0133", "http-verb"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
-
 		// Rule check: Establish that the RPC uses HTTP POST.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.GetPost() == "" {
@@ -50,14 +45,10 @@ var httpVerb = &lint.MethodRule{
 
 // Create methods should have a proper HTTP pattern.
 var httpUriField = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "http-uri"),
-	URI:  "https://aip.dev/133#guidance",
+	Name:   lint.NewRuleName("core", "0133", "http-uri"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
 		// Establish that the RPC uri should include the `parent` field.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if uri := httpRule.GetPost(); uri != "" {
@@ -76,8 +67,9 @@ var httpUriField = &lint.MethodRule{
 
 // Create methods should have an HTTP body, and the body value should be resource.
 var httpBody = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "http-body"),
-	URI:  "https://aip.dev/133#guidance",
+	Name:   lint.NewRuleName("core", "0133", "http-body"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We only care about Create methods for the purpose of this rule;
 		// ignore everything else.
@@ -121,15 +113,10 @@ var httpBody = &lint.MethodRule{
 
 // Create method should have a properly named input message.
 var inputName = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "request-message", "name"),
-	URI:  "https://aip.dev/133#guidance",
+	Name:   lint.NewRuleName("core", "0133", "request-message", "name"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
-
 		resourceMsgName := getResourceMsgName(m)
 
 		// Rule check: Establish that for methods such as `CreateFoo`, the request
@@ -152,14 +139,10 @@ var inputName = &lint.MethodRule{
 
 // Create method should use the resource as the output message
 var outputName = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "response-message", "name"),
-	URI:  "https://aip.dev/133#guidance",
+	Name:   lint.NewRuleName("core", "0133", "response-message", "name"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
 		output := m.GetOutputType()
 
 		// AIP-0151

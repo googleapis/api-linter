@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	//fpb "google.golang.org/genproto/protobuf/field_mask"
 )
 
 type field struct {
@@ -167,6 +166,13 @@ func TestUnknownFields(t *testing.T) {
 			nil,
 		},
 		{
+			"ResourceRelatedField",
+			"CreateBookStoreRequest",
+			[]field{{"book_store_id", builder.FieldTypeString()}},
+			testutils.Problems{},
+			nil,
+		},
+		{
 			"RequestIdField",
 			"CreateBookRequest",
 			[]field{{"request_id", builder.FieldTypeString()}},
@@ -180,6 +186,15 @@ func TestUnknownFields(t *testing.T) {
 			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"name\"."}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("name")
+			},
+		},
+		{
+			"InvalidResourceRelatedField",
+			"CreateBookStoreRequest",
+			[]field{{"book_id", builder.FieldTypeString()}},
+			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"book_id\"."}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("book_id")
 			},
 		},
 		{
