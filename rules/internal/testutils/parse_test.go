@@ -174,26 +174,22 @@ func TestParseProto3TmplDataError(t *testing.T) {
 	}
 }
 
-func TestDecompileMissingImport(t *testing.T) {
+func TestDecompileErrors(t *testing.T) {
 	// Note: I prefer to test only public interfaces, but because the common
 	// protos are added at module initialization, there is no way to test
 	// the failure cases without hitting the decompile method directly.
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Decompiling with an import not provided should fail.")
-		}
-	}()
-	decompile("google/longrunning/operations.proto")
-}
-
-func TestDecompileBogusFile(t *testing.T) {
-	// Note: I prefer to test only public interfaces, but because the common
-	// protos are added at module initialization, there is no way to test
-	// the failure cases without hitting the decompile method directly.
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Decompiling with an import not provided should fail.")
-		}
-	}()
-	decompile("bogus.proto")
+	tests := []struct {
+		testName string
+		filename string
+	}{
+		{"MissingImport", "google/longrunning/operations.proto"},
+		{"BogusFile", "bogus.proto"},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if _, err := decompile(test.filename); err == nil {
+				t.Errorf("Unexpected success: %q", test.filename)
+			}
+		})
+	}
 }
