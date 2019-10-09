@@ -25,6 +25,8 @@ func TestParseProtoString(t *testing.T) {
 	fd := ParseProtoString(t, `
 		syntax = "proto3";
 
+		import "google/protobuf/timestamp.proto";
+
 		message Foo {
 			int32 bar = 1;
 			int64 baz = 2;
@@ -32,6 +34,7 @@ func TestParseProtoString(t *testing.T) {
 
 		message Spam {
 			string eggs = 2;
+			google.protobuf.Timestamp create_time = 3;
 		}
 	`)
 	if !fd.IsProto3() {
@@ -46,6 +49,7 @@ func TestParseProtoString(t *testing.T) {
 		{"baz", fd.GetMessageTypes()[0].GetFields()[1]},
 		{"Spam", fd.GetMessageTypes()[1]},
 		{"eggs", fd.GetMessageTypes()[1].GetFields()[0]},
+		{"create_time", fd.GetMessageTypes()[1].GetFields()[1]},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -167,5 +171,25 @@ func TestParseProto3TmplDataError(t *testing.T) {
 	// Verify that the testing.T object was given a failure.
 	if !canary.Failed() {
 		t.Errorf("Expected missing data to cause a fatal error.")
+	}
+}
+
+func TestDecompileErrors(t *testing.T) {
+	// Note: I prefer to test only public interfaces, but because the common
+	// protos are added at module initialization, there is no way to test
+	// the failure cases without hitting the decompile method directly.
+	tests := []struct {
+		testName string
+		filename string
+	}{
+		{"MissingImport", "google/longrunning/operations.proto"},
+		{"BogusFile", "bogus.proto"},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if _, err := decompile(test.filename); err == nil {
+				t.Errorf("Unexpected success: %q", test.filename)
+			}
+		})
 	}
 }
