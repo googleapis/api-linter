@@ -247,3 +247,41 @@ func TestHttpNameField(t *testing.T) {
 		})
 	}
 }
+
+func TestSynonyms(t *testing.T) {
+	tmpl := `
+		import "google/api/annotations.proto";
+
+		service Library {
+		  rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
+				option (google.api.http) = {
+					get: "/v1/{name=publishers/*/books/*}"
+				};
+			}
+		}
+
+		message {{.MethodName}}Request {
+			string name = 1;
+		}
+
+		message Book {}
+	`
+	tests := []struct {
+		MethodName string
+		problems   testutils.Problems
+	}{
+		{"GetBook", testutils.Problems{}},
+		{"AcquireBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"FetchBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"LookupBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"ReadBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"RetrieveBook", testutils.Problems{{Suggestion: "GetBook"}}},
+	}
+	for _, test := range tests {
+		file := testutils.ParseProto3Tmpl(t, tmpl, test)
+		method := file.GetServices()[0].GetMethods()[0]
+		if diff := test.problems.SetDescriptor(method).Diff(synonyms.Lint(file)); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}
