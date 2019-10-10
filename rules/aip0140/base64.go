@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0140 contains rules defined in https://aip.dev/140.
 package aip0140
 
 import (
@@ -20,28 +19,20 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
-	"github.com/stoewer/go-strcase"
 )
 
-// AddRules adds all of the AIP-140 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
-		abbreviationsEnum,
-		abbreviationsField,
-		abbreviationsMessage,
-		abbreviationsMethod,
-		abbreviationsService,
-		lowerSnake,
-	)
-}
-
-// toLowerSnakeCase converts s to lower_snake_case.
-func toLowerSnakeCase(s string) string {
-	return strings.ToLower(strcase.SnakeCase(s))
-}
-
-// isStringField returns true if the field is a string field.
-func isStringField(f *desc.FieldDescriptor) bool {
-	return f.GetType() == builder.FieldTypeString().GetType()
+var base64 = &lint.FieldRule{
+	Name:   lint.NewRuleName("core", "0140", "base64"),
+	URI:    "https://aip.dev/140",
+	OnlyIf: isStringField,
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())
+		if strings.Contains(comment, "base64") || strings.Contains(comment, "base-64") {
+			return []lint.Problem{{
+				Message:    "Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.",
+				Descriptor: f,
+			}}
+		}
+		return nil
+	},
 }
