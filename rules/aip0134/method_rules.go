@@ -16,9 +16,10 @@ package aip0134
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -106,7 +107,7 @@ var httpNameField = &lint.MethodRule{
 		// Establish that the RPC has expected HTTP pattern.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if uri := httpRule.GetPatch(); uri != "" {
-				matches := updateURINameRegexp.FindStringSubmatch(uri);
+				matches := updateURINameRegexp.FindStringSubmatch(uri)
 				if matches == nil || matches[1] != fieldName {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
@@ -137,6 +138,29 @@ var httpBody = &lint.MethodRule{
 			}
 		}
 
+		return nil
+	},
+}
+
+// Update methods should use the word "update", not synonyms.
+var synonyms = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0134", "synonyms"),
+	URI:  "https://aip.dev/134#guidance",
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		name := m.GetName()
+		for _, syn := range []string{"Patch", "Put", "Set"} {
+			if strings.HasPrefix(name, syn) {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						`%q can be a synonym for "Update". Should this be a Update method?`,
+						syn,
+					),
+					Descriptor: m,
+					Location:   lint.DescriptorNameLocation(m),
+					Suggestion: strings.Replace(name, syn, "Update", 1),
+				}}
+			}
+		}
 		return nil
 	},
 }
