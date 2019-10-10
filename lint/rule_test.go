@@ -282,6 +282,55 @@ func TestEnumRuleNested(t *testing.T) {
 	}
 }
 
+func TestDescriptorRule(t *testing.T) {
+	// Create a file with one of everything in it.
+	book := builder.NewMessage("Book").AddNestedEnum(
+		builder.NewEnum("Format").AddValue(builder.NewEnumValue("FORMAT_UNSPECIFIED")),
+	).AddField(builder.NewField("name", builder.FieldTypeString())).AddNestedMessage(
+		builder.NewMessage("Author"),
+	)
+	fd, err := builder.NewFile("library.proto").AddMessage(book).AddService(
+		builder.NewService("Library").AddMethod(
+			builder.NewMethod(
+				"ConjureBook",
+				builder.RpcTypeMessage(book, false),
+				builder.RpcTypeMessage(book, false),
+			),
+		),
+	).AddEnum(builder.NewEnum("State")).Build()
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+
+	// Create a rule that lets us verify that each descriptor was visited.
+	visited := make(map[string]desc.Descriptor)
+	rule := &DescriptorRule{
+		Name: NewRuleName("test"),
+		LintDescriptor: func(d desc.Descriptor) []Problem {
+			visited[d.GetName()] = d
+			return nil
+		},
+	}
+
+	// Run the rule.
+	rule.Lint(fd)
+
+	// Verify that each descriptor was visited.
+	// We do not care what order they were visited in.
+	wantDescriptors := []string{
+		"Author", "Book", "ConjureBook", "Format", "FORMAT_UNSPECIFIED",
+		"name", "Library", "State",
+	}
+	if got, want := len(visited), len(wantDescriptors); got != want {
+		t.Errorf("Got %d descriptors, wanted %d.", got, want)
+	}
+	for _, name := range wantDescriptors {
+		if _, ok := visited[name]; !ok {
+			t.Errorf("Missing descriptor %q.", name)
+		}
+	}
+}
+
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
