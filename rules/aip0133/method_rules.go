@@ -44,7 +44,7 @@ var httpVerb = &lint.MethodRule{
 }
 
 // Create methods should have a proper HTTP pattern.
-var httpUriField = &lint.MethodRule{
+var httpURIField = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0133", "http-uri"),
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
@@ -166,6 +166,29 @@ var outputName = &lint.MethodRule{
 			}}
 		}
 
+		return nil
+	},
+}
+
+// Create methods should use "create", not synonyms.
+var synonyms = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0133", "synonyms"),
+	URI:  "https://aip.dev/133",
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		name := m.GetName()
+		for _, syn := range []string{"Insert", "Make", "Post"} {
+			if strings.HasPrefix(name, syn) {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						`%q can be a synonym for "Create". Should this be a Create method?`,
+						syn,
+					),
+					Descriptor: m,
+					Location:   lint.DescriptorNameLocation(m),
+					Suggestion: strings.Replace(name, syn, "Create", 1),
+				}}
+			}
+		}
 		return nil
 	},
 }

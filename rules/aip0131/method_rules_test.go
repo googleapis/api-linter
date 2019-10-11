@@ -247,3 +247,30 @@ func TestHttpNameField(t *testing.T) {
 		})
 	}
 }
+
+func TestSynonyms(t *testing.T) {
+	tests := []struct {
+		MethodName string
+		problems   testutils.Problems
+	}{
+		{"GetBook", testutils.Problems{}},
+		{"AcquireBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"FetchBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"LookupBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"ReadBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"RetrieveBook", testutils.Problems{{Suggestion: "GetBook"}}},
+	}
+	for _, test := range tests {
+		file := testutils.ParseProto3Tmpl(t, `
+			service Library {
+				rpc {{.MethodName}}({{.MethodName}}Request) returns (Book);
+			}
+			message {{.MethodName}}Request {}
+			message Book {}
+		`, test)
+		m := file.GetServices()[0].GetMethods()[0]
+		if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(file)); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}
