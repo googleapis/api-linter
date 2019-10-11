@@ -20,6 +20,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
@@ -116,7 +117,7 @@ func TestHttpUriField(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpUriField.Lint(service.GetFile())
+			problems := httpURIField.Lint(service.GetFile())
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && len(problems) == 0 {
@@ -259,6 +260,33 @@ func TestOutputMessageName(t *testing.T) {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
 				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			}
+		})
+	}
+}
+
+func TestSynonyms(t *testing.T) {
+	tests := []struct {
+		MethodName string
+		problems   testutils.Problems
+	}{
+		{"CreateBook", testutils.Problems{}},
+		{"InsertBook", testutils.Problems{{Suggestion: "CreateBook"}}},
+		{"MakeBook", testutils.Problems{{Suggestion: "CreateBook"}}},
+		{"PostBook", testutils.Problems{{Suggestion: "CreateBook"}}},
+	}
+	for _, test := range tests {
+		t.Run(test.MethodName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book);
+				}
+				message {{.MethodName}}Request {}
+				message Book {}
+			`, test)
+			m := file.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(file)); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

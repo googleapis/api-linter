@@ -32,6 +32,7 @@ func AddRules(r lint.RuleRegistry) {
 		responseMessageName,
 		requestMessageName,
 		standardFields,
+		synonyms,
 		unknownFields,
 	)
 }

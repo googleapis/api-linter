@@ -16,9 +16,10 @@ package aip0131
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -126,6 +127,29 @@ var httpBody = &lint.MethodRule{
 			}
 		}
 
+		return nil
+	},
+}
+
+// Get methods should not generally use synonyms for "get".
+var synonyms = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0131", "synonyms"),
+	URI:  "https://aip.dev/131#guidance",
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		name := m.GetName()
+		for _, syn := range []string{"Acquire", "Fetch", "Lookup", "Read", "Retrieve"} {
+			if strings.HasPrefix(name, syn) {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						`%q can be a synonym for "Get". Should this be a Get method?`,
+						syn,
+					),
+					Suggestion: strings.Replace(name, syn, "Get", 1),
+					Descriptor: m,
+					Location:   lint.DescriptorNameLocation(m),
+				}}
+			}
+		}
 		return nil
 	},
 }

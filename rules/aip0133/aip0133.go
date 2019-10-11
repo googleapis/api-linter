@@ -27,13 +27,14 @@ import (
 // this AIP's rules to it.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
-		httpUriField,
+		httpURIField,
 		httpVerb,
 		httpBody,
 		inputName,
 		outputName,
 		resourceField,
 		parentField,
+		synonyms,
 		unknownFields,
 	)
 }
@@ -59,9 +60,8 @@ func getResourceMsgName(m *desc.MethodDescriptor) string {
 	// method or output naming doesn't follow the right principles)
 	if strings.Contains(m.GetName()[6:], m.GetOutputType().GetName()) {
 		return m.GetOutputType().GetName()
-	} else {
-		return m.GetName()[6:]
 	}
+	return m.GetName()[6:]
 }
 
 // get resource message type name from request message
