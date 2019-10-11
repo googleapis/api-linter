@@ -19,6 +19,8 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -30,6 +32,7 @@ func AddRules(r lint.RuleRegistry) {
 		abbreviationsMessage,
 		abbreviationsMethod,
 		abbreviationsService,
+		base64,
 		lowerSnake,
 	)
 }
@@ -37,4 +40,9 @@ func AddRules(r lint.RuleRegistry) {
 // toLowerSnakeCase converts s to lower_snake_case.
 func toLowerSnakeCase(s string) string {
 	return strings.ToLower(strcase.SnakeCase(s))
+}
+
+// isStringField returns true if the field is a string field.
+func isStringField(f *desc.FieldDescriptor) bool {
+	return f.GetType() == builder.FieldTypeString().GetType()
 }

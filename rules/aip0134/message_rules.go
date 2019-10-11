@@ -25,7 +25,7 @@ import (
 
 func extractResource(reqName string) string {
 	// Strips "Update" from the beginning and "Request" from the end.
-	return reqName[6:len(reqName)-7]
+	return reqName[6 : len(reqName)-7]
 }
 
 func fieldNameFromResource(resource string) string {
@@ -34,7 +34,7 @@ func fieldNameFromResource(resource string) string {
 
 // The Update standard method should only have expected fields.
 var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0134", "request-message", "name-field"),
+	Name:   lint.NewRuleName("core", "0134", "request-message", "required-fields"),
 	URI:    "https://aip.dev/134#request-message",
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
@@ -77,7 +77,7 @@ var unknownFields = &lint.MessageRule{
 	URI:    "https://aip.dev/134#request-message",
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		resource := extractResource(m.GetName());
+		resource := extractResource(m.GetName())
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
 			fieldNameFromResource(resource): {}, // AIP-134
