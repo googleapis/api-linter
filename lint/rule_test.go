@@ -305,7 +305,8 @@ func TestDescriptorRule(t *testing.T) {
 	// Create a rule that lets us verify that each descriptor was visited.
 	visited := make(map[string]desc.Descriptor)
 	rule := &DescriptorRule{
-		Name: NewRuleName("test"),
+		Name: NewRuleName("test", "test"),
+		URI:  "https://aip.dev/1",
 		LintDescriptor: func(d desc.Descriptor) []Problem {
 			visited[d.GetName()] = d
 			return nil
@@ -320,6 +321,12 @@ func TestDescriptorRule(t *testing.T) {
 	wantDescriptors := []string{
 		"Author", "Book", "ConjureBook", "Format", "FORMAT_UNSPECIFIED",
 		"name", "Library", "State",
+	}
+	if got, want := rule.GetName(), "test::test"; string(got) != want {
+		t.Errorf("Got name %q, wanted %q", got, want)
+	}
+	if got, want := rule.GetURI(), "https://aip.dev/1"; got != want {
+		t.Errorf("Got URI %q, wanted %q.", got, want)
 	}
 	if got, want := len(visited), len(wantDescriptors); got != want {
 		t.Errorf("Got %d descriptors, wanted %d.", got, want)
