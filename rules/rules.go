@@ -19,17 +19,25 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/aip0131"
 	"github.com/googleapis/api-linter/rules/aip0132"
+	"github.com/googleapis/api-linter/rules/aip0133"
+	"github.com/googleapis/api-linter/rules/aip0134"
+	"github.com/googleapis/api-linter/rules/aip0135"
 	"github.com/googleapis/api-linter/rules/aip0140"
 	"github.com/googleapis/api-linter/rules/aip0158"
 	"github.com/googleapis/api-linter/rules/aip0191"
+	"github.com/googleapis/api-linter/rules/aip0203"
 )
 
 func init() {
 	aip0131.AddRules(coreRules)
 	aip0132.AddRules(coreRules)
+	aip0133.AddRules(coreRules)
+	aip0134.AddRules(coreRules)
+	aip0135.AddRules(coreRules)
 	aip0140.AddRules(coreRules)
 	aip0158.AddRules(coreRules)
 	aip0191.AddRules(coreRules)
+	aip0203.AddRules(coreRules)
 }
 
 var coreRules, _ = lint.NewRuleRegistry()
