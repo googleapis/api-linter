@@ -46,7 +46,7 @@ func separateInternalComments(comments ...string) struct {
 			if len(open) > 1 {
 				c = strings.TrimSpace(open[1])
 			} else {
-				c = ""
+				break
 			}
 
 			// Now that the opening component is tokenized, anything before
@@ -58,7 +58,7 @@ func separateInternalComments(comments ...string) struct {
 			if len(close) > 1 {
 				c = strings.TrimSpace(close[1])
 			} else {
-				c = ""
+				break
 			}
 		}
 	}

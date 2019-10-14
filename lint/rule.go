@@ -287,6 +287,9 @@ func (r *DescriptorRule) GetURI() string {
 
 // Lint accepts a FileDescriptor and iterates over the descriptors within
 // it, and runs the LintDescriptor function on each.
+//
+// It visits every service, method, message, field, enum, and enum value.
+// This order is not guaranteed.
 func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 

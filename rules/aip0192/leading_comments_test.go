@@ -29,8 +29,8 @@ func TestOnlyLeadingComments(t *testing.T) {
 	}{
 		{"ValidNone", "", "", testutils.Problems{}},
 		{"ValidInternalDetached", "// (-- detached --)", "", testutils.Problems{}},
-		{"ValidInternalTrailing", "// (-- trailing --)", "", testutils.Problems{}},
-		{"ValidInternalTrailingNoClose", "// (-- trailing", "", testutils.Problems{}},
+		{"ValidInternalTrailing", "", "// (-- trailing --)", testutils.Problems{}},
+		{"ValidInternalTrailingNoClose", "", "// (-- trailing", testutils.Problems{}},
 		{
 			"ValidInternalBoth",
 			"// (-- detached --)",
