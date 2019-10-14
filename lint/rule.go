@@ -251,21 +251,73 @@ func (r *EnumRule) GetURI() string {
 func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
-	// Lint enums that are at the top level of the file.
-	for _, enum := range fd.GetEnumTypes() {
+	// Lint all enums, either at the top of the file, or nested within messages.
+	for _, enum := range getAllEnums(fd) {
 		if r.OnlyIf == nil || r.OnlyIf(enum) {
 			problems = append(problems, r.LintEnum(enum)...)
 		}
 	}
+	return problems
+}
 
-	// Lint enums that are nested within messages.
-	for _, message := range getAllMessages(fd) {
-		for _, enum := range message.GetNestedEnumTypes() {
-			if r.OnlyIf == nil || r.OnlyIf(enum) {
-				problems = append(problems, r.LintEnum(enum)...)
-			}
+// DescriptorRule defines a lint rule that is run on every descriptor
+// in the file (but not the file itself).
+type DescriptorRule struct {
+	Name RuleName
+	URI  string
+
+	// LintDescriptor accepts a generic descriptor and lints it.
+	//
+	// Note: Unless the descriptor is typecast to a more specific type,
+	// only a subset of methods are available to it.
+	LintDescriptor func(desc.Descriptor) []Problem
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *DescriptorRule) GetName() RuleName {
+	return r.Name
+}
+
+// GetURI returns the URI where the applicable guideline is documented.
+func (r *DescriptorRule) GetURI() string {
+	return r.URI
+}
+
+// Lint accepts a FileDescriptor and iterates over the descriptors within
+// it, and runs the LintDescriptor function on each.
+//
+// It visits every service, method, message, field, enum, and enum value.
+// This order is not guaranteed.
+func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
+
+	// Iterate over all services and methods.
+	for _, service := range fd.GetServices() {
+		problems = append(problems, r.LintDescriptor(service)...)
+		for _, method := range service.GetMethods() {
+			problems = append(problems, r.LintDescriptor(method)...)
 		}
 	}
+
+	// Iterate over all messages, and all fields within each message.
+	for _, message := range getAllMessages(fd) {
+		problems = append(problems, r.LintDescriptor(message)...)
+		for _, field := range message.GetFields() {
+			problems = append(problems, r.LintDescriptor(field)...)
+		}
+	}
+
+	// Iterate over all enums and enum values.
+	for _, enum := range getAllEnums(fd) {
+		problems = append(problems, r.LintDescriptor(enum)...)
+		for _, value := range enum.GetValues() {
+			problems = append(problems, r.LintDescriptor(value)...)
+		}
+	}
+
+	// Done; return the full set of problems.
 	return problems
 }
 
@@ -320,6 +372,20 @@ func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDe
 		messages = append(messages, getAllNestedMessages(nested)...)
 	}
 	return messages
+}
+
+// getAllEnums returns a slice with every enum (not just top-level enums)
+// in the file.
+func getAllEnums(f *desc.FileDescriptor) (enums []*desc.EnumDescriptor) {
+	// Append all enums at the top level.
+	enums = append(enums, f.GetEnumTypes()...)
+
+	// Append all enums nested within messages.
+	for _, m := range getAllMessages(f) {
+		enums = append(enums, m.GetNestedEnumTypes()...)
+	}
+
+	return
 }
 
 // fileHeader attempts to get the comment at the top of the file, but it
