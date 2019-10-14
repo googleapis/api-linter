@@ -18,6 +18,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	lrpb "google.golang.org/genproto/googleapis/longrunning"
 )
 
 // GetFieldBehavior returns a slice of FieldBehavior annotations for
@@ -26,6 +27,15 @@ func GetFieldBehavior(f *desc.FieldDescriptor) []apb.FieldBehavior {
 	opts := f.GetFieldOptions()
 	if x, err := proto.GetExtension(opts, apb.E_FieldBehavior); err == nil {
 		return x.([]apb.FieldBehavior)
+	}
+	return nil
+}
+
+// GetOperationInfo returns the LRO annotation.
+func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
+	opts := m.GetMethodOptions()
+	if x, err := proto.GetExtension(opts, lrpb.E_OperationInfo); err == nil {
+		return x.(*lrpb.OperationInfo)
 	}
 	return nil
 }

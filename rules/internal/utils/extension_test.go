@@ -54,3 +54,39 @@ func TestGetFieldBehavior(t *testing.T) {
 		})
 	}
 }
+
+func TestGetOperationInfo(t *testing.T) {
+	fd := testutils.ParseProto3String(t, `
+		import "google/longrunning/operations.proto";
+		service Library {
+			rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+				option (google.longrunning.operation_info) = {
+					response_type: "WriteBookResponse"
+					metadata_type: "WriteBookMetadata"
+				};
+			}
+		}
+		message WriteBookRequest {}
+	`)
+	lro := GetOperationInfo(fd.GetServices()[0].GetMethods()[0])
+	if got, want := lro.ResponseType, "WriteBookResponse"; got != want {
+		t.Errorf("Response type - got %q, want %q.", got, want)
+	}
+	if got, want := lro.MetadataType, "WriteBookMetadata"; got != want {
+		t.Errorf("Metadata type - got %q, want %q.", got, want)
+	}
+}
+
+func TestGetOperationInfoNone(t *testing.T) {
+	fd := testutils.ParseProto3String(t, `
+		service Library {
+			rpc GetBook(GetBookRequest) returns (Book);
+		}
+		message GetBookRequest {}
+		message Book {}
+	`)
+	lro := GetOperationInfo(fd.GetServices()[0].GetMethods()[0])
+	if lro != nil {
+		t.Errorf("Got %v, expected nil LRO annotation.", lro)
+	}
+}
