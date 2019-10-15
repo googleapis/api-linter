@@ -33,6 +33,7 @@ func TestCount(t *testing.T) {
 		{"NumResults", "num_results", "result_count", true},
 		{"NumErrors", "num_errors", "error_count", true},
 		{"NumMoose", "num_moose", "moose_count", true}, // singular of "moose" is "moose"
+		{"NumGeese", "num_geese", "goose_count", true}, // singular of "geese" is "goose"
 	}
 	for _, test := range tests {
 		file := testutils.ParseProto3Tmpl(t, `
