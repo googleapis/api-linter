@@ -65,12 +65,12 @@ var optionalBehaviorConflict = &lint.FieldRule{
 	},
 }
 
-// If a field is described as optional, ensure that every optional field on the
-// message has this indicator.
+// If a message has a field which is described as optional, ensure that every
+// optional field on the message has this indicator.
 var optionalBehaviorConsistency = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0203", "optional-consistency"),
 	URI:    "https://aip.dev/203#optional",
-	OnlyIf: hasOptionalFieldBehavior,
+	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 
 		for _, f := range m.GetFields() {
@@ -96,7 +96,7 @@ func withoutOptionalFieldBehavior(f *desc.FieldDescriptor) bool {
 	return true
 }
 
-func hasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
+func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
 	for _, f := range m.GetFields() {
 		for _, v := range utils.GetFieldBehavior(f) {
 			if v == annotations.FieldBehavior_OPTIONAL {
