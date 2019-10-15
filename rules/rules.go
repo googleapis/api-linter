@@ -23,8 +23,11 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0134"
 	"github.com/googleapis/api-linter/rules/aip0135"
 	"github.com/googleapis/api-linter/rules/aip0140"
+	"github.com/googleapis/api-linter/rules/aip0141"
+	"github.com/googleapis/api-linter/rules/aip0151"
 	"github.com/googleapis/api-linter/rules/aip0158"
 	"github.com/googleapis/api-linter/rules/aip0191"
+	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
 )
 
@@ -35,8 +38,11 @@ func init() {
 	aip0134.AddRules(coreRules)
 	aip0135.AddRules(coreRules)
 	aip0140.AddRules(coreRules)
+	aip0141.AddRules(coreRules)
+	aip0151.AddRules(coreRules)
 	aip0158.AddRules(coreRules)
 	aip0191.AddRules(coreRules)
+	aip0192.AddRules(coreRules)
 	aip0203.AddRules(coreRules)
 }
 

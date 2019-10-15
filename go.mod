@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/bmatcuk/doublestar v1.1.5
+	github.com/gertd/go-pluralize v0.1.1
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-cmp v0.3.1
 	github.com/jhump/protoreflect v1.5.0
