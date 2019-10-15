@@ -38,7 +38,7 @@ import (
 //	}
 var immutable = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "immutable"),
-	URI:    "http://api.dev/203#guidance",
+	URI:    "http://aip.dev/203#immutable",
 	OnlyIf: withoutImmutableFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, immutableRegexp, "IMMUTABLE")
