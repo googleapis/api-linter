@@ -38,8 +38,8 @@ import (
 //	}
 var required = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "required"),
-	URI:    "http://api.dev/203#guidance",
-	OnlyIf: withoutRequiredRegexpFieldBehavior,
+	URI:    "http://aip.dev/203#required",
+	OnlyIf: withoutRequiredFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, requiredRegexp, "REQUIRED")
 	},
@@ -47,7 +47,7 @@ var required = &lint.FieldRule{
 
 var requiredRegexp = regexp.MustCompile("(?i).*required.*")
 
-func withoutRequiredRegexpFieldBehavior(f *desc.FieldDescriptor) bool {
+func withoutRequiredFieldBehavior(f *desc.FieldDescriptor) bool {
 	for _, v := range utils.GetFieldBehavior(f) {
 		if v == annotations.FieldBehavior_REQUIRED {
 			return false
