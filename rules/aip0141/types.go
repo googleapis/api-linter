@@ -16,10 +16,10 @@ package aip0141
 
 import (
 	"fmt"
-	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -37,7 +37,7 @@ var forbiddenTypes = &lint.FieldRule{
 			builder.FieldTypeUInt64(),
 		} {
 			// Change "TYPE_TYPENAME" to "typename".
-			nope[t.GetType()] = strings.ToLower(t.GetType().String()[len("TYPE_"):])
+			nope[t.GetType()] = utils.GetScalarTypeName(t)
 		}
 		if typeName, ok := nope[f.GetType()]; ok {
 			// Preserve original intent w/r/t 32-bit vs. 64-bit.
