@@ -130,8 +130,7 @@ func TestHttpUriField(t *testing.T) {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-133 Create method
-			// (or with a different method, in the "Irrelevant" case).
+			// Create a minimal service with a AIP-0122
 			service, err := builder.NewService("InstanceGroup").AddMethod(builder.NewMethod(test.methodName,
 				builder.RpcTypeMessage(builder.NewMessage(test.input), false),
 				builder.RpcTypeMessage(builder.NewMessage(test.output), false),
