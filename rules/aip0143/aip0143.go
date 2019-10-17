@@ -21,7 +21,10 @@ import (
 
 // AddRules adds all of the AIP-141 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
-	r.Register()
+	r.Register(
+		fieldNames,
+		fieldTypes,
+	)
 }
 
 var standardFields = make(map[string]struct{})
