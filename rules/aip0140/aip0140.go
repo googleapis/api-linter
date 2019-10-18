@@ -34,6 +34,7 @@ func AddRules(r lint.RuleRegistry) {
 		abbreviationsService,
 		base64,
 		lowerSnake,
+		noPrepositions,
 	)
 }
 

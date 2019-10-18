@@ -3,6 +3,7 @@ module github.com/googleapis/api-linter
 go 1.12
 
 require (
+	bitbucket.org/creachadair/stringset v0.0.8
 	github.com/bmatcuk/doublestar v1.1.5
 	github.com/gertd/go-pluralize v0.1.1
 	github.com/golang/protobuf v1.3.2

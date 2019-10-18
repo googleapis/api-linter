@@ -17,6 +17,7 @@ package aip0143
 import (
 	"fmt"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -53,8 +54,13 @@ var fieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0143", "field-types"),
 	URI:  "https://aip.dev/143",
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		_, ok := standardFields[f.GetName()]
-		return ok
+		return stringset.New(
+			"country_code",
+			"currency_code",
+			"language_code",
+			"mime_type",
+			"time_zone",
+		).Contains(f.GetName())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if typeName := utils.GetScalarTypeName(f); typeName != "string" {

@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0143 contains rules defined in https://aip.dev/143.
-package aip0143
+package aip0142
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules adds all of the AIP-141 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
-		fieldNames,
-		fieldTypes,
-	)
+func TestAddRules(t *testing.T) {
+	rules := make(lint.RuleRegistry)
+	AddRules(rules)
+	for ruleName := range rules {
+		if !strings.HasPrefix(string(ruleName), "core::0142") {
+			t.Errorf("Rule %s is not namespaced to core::0142.", ruleName)
+		}
+	}
 }

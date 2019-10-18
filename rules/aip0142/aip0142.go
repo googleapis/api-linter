@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0143 contains rules defined in https://aip.dev/143.
-package aip0143
+// Package aip0142 contains rules defined in https://aip.dev/142.
+package aip0142
 
 import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules adds all of the AIP-141 rules to the provided registry.
+// AddRules adds all of the AIP-142 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		fieldNames,
-		fieldTypes,
 	)
 }
