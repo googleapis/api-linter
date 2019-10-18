@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/jhump/protoreflect/desc"
 )
 
 type hasGetType interface {
@@ -27,4 +28,12 @@ type hasGetType interface {
 // GetScalarTypeName returns the name of the type of the field, as a string.
 func GetScalarTypeName(t hasGetType) string {
 	return strings.ToLower(t.GetType().String()[len("TYPE_"):])
+}
+
+// GetMessageTypeName returns the name of the type of the field, as a string.
+func GetMessageTypeName(f *desc.FieldDescriptor) string {
+	if messageType := f.GetMessageType(); messageType != nil {
+		return messageType.GetFullyQualifiedName()
+	}
+	return ""
 }
