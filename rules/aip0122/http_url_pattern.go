@@ -24,36 +24,51 @@ import (
 
 // HTTP URL pattern shouldn't include underscore("_")
 var httpURLPattern = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0122", "http-url-pattern"),
-	URI:  "https://aip.dev/122#guidance",
+	Name:   lint.NewRuleName("core", "0122", "http-url-pattern"),
+	URI:    "https://aip.dev/122#guidance",
+	OnlyIf: isUnderscoreExisted,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri shouldn't include the `_`.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetGet(); uri != "" {
-				return getURLProblems(uri, m)
-			} else if uri := httpRule.GetPut(); uri != "" {
-				return getURLProblems(uri, m)
-			} else if uri := httpRule.GetPost(); uri != "" {
-				return getURLProblems(uri, m)
-			} else if uri := httpRule.GetDelete(); uri != "" {
-				return getURLProblems(uri, m)
-			} else if uri := httpRule.GetPatch(); uri != "" {
-				return getURLProblems(uri, m)
-			} else if custom := httpRule.GetCustom(); custom != nil && custom.GetPath() != "" {
-				return getURLProblems(custom.GetPath(), m)
-			}
-		}
-
-		return nil
+		return []lint.Problem{{
+			Message:    "HTTP URL should use camel case, but not snake case.",
+			Descriptor: m,
+		}}
 	},
 }
 
-func getURLProblems(uri string, m *desc.MethodDescriptor) []lint.Problem {
-	if strings.Contains(uri, "_") {
-		return []lint.Problem{{
-			Message:    "HTTP URL pattern shouldn't include underscore(`_`).",
-			Descriptor: m,
-		}}
+func isUnderscoreExisted(m *desc.MethodDescriptor) bool {
+
+	for _, httpRule := range utils.GetHTTPRules(m) {
+		if uri := httpRule.GetGet(); uri != "" {
+			if strings.Contains(uri, "_") {
+				return true
+			}
+		}
+		if uri := httpRule.GetPut(); uri != "" {
+			if strings.Contains(uri, "_") {
+				return true
+			}
+		}
+		if uri := httpRule.GetPost(); uri != "" {
+			if strings.Contains(uri, "_") {
+				return true
+			}
+		}
+		if uri := httpRule.GetDelete(); uri != "" {
+			if strings.Contains(uri, "_") {
+				return true
+			}
+		}
+		if uri := httpRule.GetPatch(); uri != "" {
+			if strings.Contains(uri, "_") {
+				return true
+			}
+		}
+		if custom := httpRule.GetCustom(); custom != nil && custom.GetPath() != "" {
+			if strings.Contains(custom.GetPath(), "_") {
+				return true
+			}
+		}
 	}
-	return nil
+	return false
 }
