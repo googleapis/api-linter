@@ -18,22 +18,22 @@ import (
 	"fmt"
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/scylladb/go-set/strset"
 )
 
 var noPrepositions = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0140", "prepositions"),
 	URI:  "https://aip.dev/140#prepositions",
 	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
-		banned := strset.New(
+		banned := stringset.New(
 			"after", "at", "before", "between", "but", "by", "except",
 			"for", "in", "including", "into", "of", "over", "since", "to",
 			"toward", "under", "upon", "with", "within", "without",
 		)
 		for _, word := range strings.Split(f.GetName(), "_") {
-			if banned.Has(word) {
+			if banned.Contains(word) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Avoid using %q in field names.", word),
 					Descriptor: f,
