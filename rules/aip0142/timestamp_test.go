@@ -48,3 +48,30 @@ func TestFieldName(t *testing.T) {
 		})
 	}
 }
+
+func TestFieldType(t *testing.T) {
+	tests := []struct {
+		testName  string
+		FieldType string
+		FieldName string
+		problems  testutils.Problems
+	}{
+		{"Valid", "google.protobuf.Timestamp", "create_time", testutils.Problems{}},
+		{"Invalid", "int32", "created_ms", testutils.Problems{{Message: "Timestamp"}}},
+		{"Irrelevant", "int32", "foo", testutils.Problems{}},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/protobuf/timestamp.proto";
+				message Book {
+					{{.FieldType}} {{.FieldName}} = 1;
+				}
+			`, test)
+			field := file.GetMessageTypes()[0].GetFields()[0]
+			if diff := test.problems.SetDescriptor(field).Diff(fieldType.Lint(file)); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
