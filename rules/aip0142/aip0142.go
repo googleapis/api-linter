@@ -23,5 +23,6 @@ import (
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		fieldNames,
+		fieldType,
 	)
 }
