@@ -26,17 +26,3 @@ func AddRules(r lint.RuleRegistry) {
 		fieldTypes,
 	)
 }
-
-var standardFields = make(map[string]struct{})
-
-func init() {
-	for _, n := range []string{
-		"mime_type",
-		"country_code",
-		"currency_code",
-		"language_code",
-		"time_zone",
-	} {
-		standardFields[n] = struct{}{}
-	}
-}
