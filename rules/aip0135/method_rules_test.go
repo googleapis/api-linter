@@ -20,8 +20,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
 	epb "github.com/golang/protobuf/ptypes/empty"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -84,10 +84,10 @@ func TestResponseMessageName(t *testing.T) {
 
 	// Set up the testing permutations.
 	tests := []struct {
-		testName     string
-		methodName   string
-		respMessage  *builder.MessageBuilder
-		problems     testutils.Problems
+		testName    string
+		methodName  string
+		respMessage *builder.MessageBuilder
+		problems    testutils.Problems
 	}{
 		{"ValidEmpty", "DeleteBook", emptybldr, testutils.Problems{}},
 		{"ValidLRO", "DeleteBook", opbldr, testutils.Problems{}},
@@ -118,7 +118,7 @@ func TestResponseMessageName(t *testing.T) {
 	}
 }
 
-func TestHttpVerb(t *testing.T) {
+func TestHttpMethod(t *testing.T) {
 	// Set up GET and DELETE HTTP annotations.
 	httpGet := &annotations.HttpRule{
 		Pattern: &annotations.HttpRule_Get{
@@ -163,7 +163,7 @@ func TestHttpVerb(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpVerb.Lint(service.GetFile())
+			problems := httpMethod.Lint(service.GetFile())
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {

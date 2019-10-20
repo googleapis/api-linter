@@ -70,8 +70,8 @@ var responseMessageName = &lint.MethodRule{
 }
 
 // Get methods should use the HTTP GET verb.
-var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "http-verb"),
+var httpMethod = &lint.MethodRule{
+	Name:   lint.NewRuleName("core", "0131", "http-method"),
 	URI:    "https://aip.dev/131#guidance",
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {

@@ -27,8 +27,8 @@ import (
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		httpBody,
+		httpMethod,
 		httpNameField,
-		httpVerb,
 		responseMessageName,
 		requestMessageName,
 		standardFields,
