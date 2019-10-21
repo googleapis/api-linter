@@ -23,20 +23,22 @@ import (
 )
 
 // HTTP URL pattern shouldn't include underscore("_")
-var httpURLPattern = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0122", "http-url-pattern"),
-	URI:    "https://aip.dev/122#guidance",
-	OnlyIf: isUnderscoreExisted,
+var camelCase = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0122", "http-url-pattern"),
+	URI:  "https://aip.dev/122#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri shouldn't include the `_`.
-		return []lint.Problem{{
-			Message:    "HTTP URL should use camel case, but not snake case.",
-			Descriptor: m,
-		}}
+		if hasUnderscore(m) {
+			return []lint.Problem{{
+				Message:    "HTTP URL should use camel case, but not snake case.",
+				Descriptor: m,
+			}}
+		}
+		return nil
 	},
 }
 
-func isUnderscoreExisted(m *desc.MethodDescriptor) bool {
+func hasUnderscore(m *desc.MethodDescriptor) bool {
 
 	for _, httpRule := range utils.GetHTTPRules(m) {
 		if uri := httpRule.GetGet(); uri != "" {

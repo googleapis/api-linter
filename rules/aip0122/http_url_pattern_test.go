@@ -176,7 +176,7 @@ message InstanceGroup{}
 			file := testutils.ParseProto3String(t, test.src)
 
 			f := file.GetServices()[0].GetMethods()[0]
-			problems := httpURLPattern.Lint(file)
+			problems := camelCase.Lint(file)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
