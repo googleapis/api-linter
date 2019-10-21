@@ -31,10 +31,10 @@
 // A simple rule therefore looks like this:
 //
 //   var myRule = &lint.MessageRule{
-//	   Name: lint.NewRuleName("core", "1234", "my-rule"),
+//     Name: lint.NewRuleName("core", "1234", "my-rule"),
 //     URI:  "https://aip.dev/1234",
 //     LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-//	     if isBad(m) {
+//       if isBad(m) {
 //         return []lint.Problem{{
 //           Message: "This message is bad.",
 //           Descriptor: m,
