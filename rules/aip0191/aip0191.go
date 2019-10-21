@@ -16,12 +16,17 @@
 package aip0191
 
 import (
+	"regexp"
+
 	"github.com/googleapis/api-linter/lint"
 )
 
 // AddRules adds all of the AIP-191 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		filename,
 		syntax,
 	)
 }
+
+var versionRegexp = regexp.MustCompile("^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$")
