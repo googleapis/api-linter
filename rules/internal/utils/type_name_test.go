@@ -35,3 +35,28 @@ func TestGetScalarTypeName(t *testing.T) {
 		})
 	}
 }
+
+func TestGetMessageTypeName(t *testing.T) {
+	tests := []struct {
+		testName string
+		Type     string
+		want     string
+	}{
+		{"Message", "google.protobuf.Timestamp", "google.protobuf.Timestamp"},
+		{"Scalar", "int32", ""},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/protobuf/timestamp.proto";
+				message Book {
+					{{.Type}} field = 1;
+				}
+			`, test)
+			field := file.GetMessageTypes()[0].GetFields()[0]
+			if got := GetMessageTypeName(field); got != test.want {
+				t.Errorf("Got %q, expected %q.", got, test.want)
+			}
+		})
+	}
+}
