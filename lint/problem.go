@@ -22,21 +22,34 @@ import (
 )
 
 // Problem contains information about a result produced by an API Linter.
+//
+// All rules return []Problem. Most lint rules return 0 or 1 problems, but
+// occasionally there are rules that may return more than one.
 type Problem struct {
 	// Message provides a short description of the problem.
+	// This should be no more than a single sentence.
 	Message string
 
 	// Suggestion provides a suggested fix, if applicable.
+	//
+	// This integrates with certain IDEs to provide "push-button" fixes,
+	// so these need to be machine-readable, not just human-readable.
+	// Additionally, when setting `Suggestion`, one should almost always set
+	// `Location` also, to ensure that the text being replaced is sufficiently
+	// precise.
 	Suggestion string
 
-	// Descriptor provides the descriptor related
-	// to the problem. If present and `Location` is not
-	// specified, then the starting location of the descriptor
-	// is used as the location of the problem.
+	// Descriptor provides the descriptor related to the problem.
+	//
+	// If present and `Location` is not specified, then the starting location of
+	// the descriptor is used as the location of the problem.
 	Descriptor desc.Descriptor
 
 	// Location provides the location of the problem.
-	// DO NOT SET: Set the descriptor instead.
+	//
+	// If unset, this defaults to the value of `Descriptor.GetSourceInfo()`.
+	// This should almost always be set if `Suggestion` is set. The best way to
+	// do this is by using the helper methods in `location.go`.
 	Location *dpb.SourceCodeInfo_Location
 
 	// RuleID provides the ID of the rule that this problem belongs to.
