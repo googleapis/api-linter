@@ -97,13 +97,11 @@ var httpNameField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Method != "GET" {
-				if !getURINameRegexp.MatchString(httpRule.URI) {
-					return []lint.Problem{{
-						Message:    "Get methods should include the `name` field in the URI.",
-						Descriptor: m,
-					}}
-				}
+			if !getURINameRegexp.MatchString(httpRule.URI) {
+				return []lint.Problem{{
+					Message:    "Get methods should include the `name` field in the URI.",
+					Descriptor: m,
+				}}
 			}
 		}
 
