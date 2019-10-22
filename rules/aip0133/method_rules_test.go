@@ -226,40 +226,49 @@ func TestInputName(t *testing.T) {
 	}
 }
 
-// Test does not cover the case when Output is "google.longrunning.Operation"
 func TestOutputMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName   string
-		methodName string
-		outputName string
-		msg        string
+		testName     string
+		MethodName   string
+		RespTypeName string
+		LRO          bool
+		problems     testutils.Problems
 	}{
-		{"Valid", "CreateBook", "Book", ""},
-		{"Invalid", "CreateBook", "CreateBookResponse",
-			"Create RPCs should have the corresponding resource as the response message, such as \"Book\"."},
-		{"Irrelevant", "BuildBook", "BuildBookResponse", ""},
+		{"ValidResource", "CreateBook", "Book", false, testutils.Problems{}},
+		{"ValidLRO", "CreateBook", "Book", true, testutils.Problems{}},
+		{"Invalid", "CreateBook", "CreateBookResponse", false, testutils.Problems{{Message: "Book"}}},
+		{"InvalidLRO", "CreateBook", "CreateBookResponse", true, testutils.Problems{{Message: "Book"}}},
+		{"Irrelevant", "BuildBook", "BuildBookResponse", false, testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-133 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage(test.outputName), false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
+			// Create a minimal service with a AIP-134 Update method
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request)
+							returns ({{ if .LRO }}google.longrunning.Operation{{ else }}{{ .RespTypeName }}{{ end }}) {
+						{{ if .LRO -}}
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.RespTypeName}}"
+							metadata_type: "{{.MethodName}}Metadata"
+						};
+						{{ end -}}
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.RespTypeName}} {}
+			`, test)
 
-			// Run the lint rule, and establish that it returns the expected problems.
-			problems := outputName.Lint(service.GetFile())
-			if test.msg == "" && len(problems) > 0 {
-				t.Errorf("Got %v, expected no problems.", problems)
-			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
-				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			// Run the lint rule, and establish that it returns the correct
+			// number of problems.
+			problems := outputName.Lint(file)
+			method := file.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}
