@@ -31,8 +31,6 @@ import (
 // should use an "unspecified" value beginning with the name of the enum
 // itself as the first (0) value.
 //
-// Details
-//
 // This rule finds all enumerations and ensures that the first one is
 // named after the enum itself with an `_UNSPECIFIED` suffix attached.
 //
