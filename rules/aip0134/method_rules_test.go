@@ -21,10 +21,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	lro "google.golang.org/genproto/googleapis/longrunning"
 )
 
 func TestRequestMessageName(t *testing.T) {
@@ -63,45 +61,47 @@ func TestRequestMessageName(t *testing.T) {
 }
 
 func TestResponseMessageName(t *testing.T) {
-	op, err := desc.LoadMessageDescriptorForMessage(&lro.Operation{})
-	if err != nil {
-		t.Fatalf("Unable to load the Operation message.")
-	}
-	opbldr, err := builder.FromMessage(op)
-	if err != nil {
-		t.Fatalf("Unable to construct builder from op desc.")
-	}
-
 	// Set up the testing permutations.
 	tests := []struct {
-		testName    string
-		methodName  string
-		respMessage *builder.MessageBuilder
-		problems    testutils.Problems
+		testName     string
+		MethodName   string
+		RespTypeName string
+		LRO          bool
+		problems     testutils.Problems
 	}{
-		{"ValidResource", "UpdateBook", builder.NewMessage("Book"), testutils.Problems{}},
-		{"ValidLRO", "UpdateBook", opbldr, testutils.Problems{}},
-		{"Invalid", "UpdateBook", builder.NewMessage("UpdateBookResponse"), testutils.Problems{{Suggestion: "Book"}}},
-		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), testutils.Problems{}},
+		{"ValidResource", "UpdateBook", "Book", false, testutils.Problems{}},
+		{"ValidLRO", "UpdateBook", "Book", true, testutils.Problems{}},
+		{"Invalid", "UpdateBook", "UpdateBookResponse", false, testutils.Problems{{Suggestion: "Book"}}},
+		{"InvalidLRO", "UpdateBook", "UpdateBookResponse", true, testutils.Problems{{Suggestion: "Book"}}},
+		{"Irrelevant", "MutateBook", "MutateBookResponse", false, testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create a minimal service with a AIP-134 Update method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("UpdateBookRequest"), false),
-				builder.RpcTypeMessage(test.respMessage, false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request)
+							returns ({{ if .LRO }}google.longrunning.Operation{{ else }}{{ .RespTypeName }}{{ end }}) {
+						{{ if .LRO -}}
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.RespTypeName}}"
+							metadata_type: "{{.MethodName}}Metadata"
+						};
+						{{ end -}}
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.RespTypeName}} {}
+			`, test)
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			problems := responseMessageName.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			problems := responseMessageName.Lint(file)
+			method := file.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

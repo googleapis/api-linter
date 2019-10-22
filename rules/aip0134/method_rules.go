@@ -55,25 +55,31 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		got := m.GetOutputType().GetFullyQualifiedName()
-		want := []string{
-			m.GetName()[6:],
-			"google.longrunning.Operation",
+		want := strings.Replace(m.GetName(), "Update", "", 1)
+		got := m.GetOutputType().GetName()
+
+		// If the return type is an LRO, use the annotated response type instead.
+		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+			got = utils.GetOperationInfo(m).GetResponseType()
 		}
-		for _, v := range want {
-			if got == v {
-				return nil
-			}
+
+		// Return a problem if we did not get the expected return name.
+		//
+		// Note: If `got` is empty string, this is an unannotated LRO.
+		// The AIP-151 rule will whine about that, and this rule should not as it
+		// would be confusing.
+		if got != want && got != "" {
+			return []lint.Problem{{
+				Message: fmt.Sprintf(
+					"Update RPCs should have response message type %q, not %q.",
+					want,
+					got,
+				),
+				Suggestion: want,
+				Descriptor: m,
+			}}
 		}
-		return []lint.Problem{{
-			Message: fmt.Sprintf(
-				"Update RPCs should have response message type in %q, not %q.",
-				want,
-				got,
-			),
-			Suggestion: want[0],
-			Descriptor: m,
-		}}
+		return nil
 	},
 }
 
