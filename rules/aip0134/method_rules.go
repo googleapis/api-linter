@@ -55,7 +55,7 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := m.GetName()[6:]
+		want := strings.Replace(m.GetName(), "Update", "", 1)
 		got := m.GetOutputType().GetName()
 
 		// If the return type is an LRO, use the annotated response type instead.

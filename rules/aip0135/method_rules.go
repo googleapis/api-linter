@@ -16,6 +16,7 @@ package aip0135
 
 import (
 	"fmt"
+	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
@@ -60,7 +61,7 @@ var responseMessageName = &lint.MethodRule{
 		}
 		want := stringset.New(
 			"google.protobuf.Empty",
-			m.GetName()[6:],
+			strings.Replace(m.GetName(), "Delete", "", 1),
 		)
 
 		// If the return type is an Operation, use the annotated response type.
