@@ -15,70 +15,85 @@
 package utils
 
 import (
-	"reflect"
+	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/jhump/protoreflect/desc/builder"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestGetHTTPRules(t *testing.T) {
-	// Create a MethodOptions with the annotation set.
-	opts := &dpb.MethodOptions{}
-	httpRule := &apb.HttpRule{
-		Pattern: &apb.HttpRule_Get{
-			Get: "/v1/{name=publishers/*/books/*}",
-		},
-		AdditionalBindings: []*apb.HttpRule{{
-			Pattern: &apb.HttpRule_Get{
-				Get: "/v1/{name=books/*}",
-			},
-		}},
-	}
+	for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
+		t.Run(method, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
+						option (google.api.http) = {
+							{{.M}}: "/v1/publishers/*/books/*"
+							additional_bindings {
+								{{.M}}: "/v1/books/*"
+							}
+						};
+					}
+				}
+				message FrobBookRequest {}
+				message FrobBookResponse {}
+			`, struct{ M string }{M: strings.ToLower(method)})
 
-	if err := proto.SetExtension(opts, apb.E_Http, httpRule); err != nil {
-		t.Fatalf("Failed to set google.api.http annotation.")
-	}
+			// Get the rules.
+			resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0])
 
-	// Create a method with the options set.
-	service, err := builder.NewService("Library").AddMethod(
-		builder.NewMethod(
-			"WriteBook",
-			builder.RpcTypeMessage(builder.NewMessage("WriteBookRequest"), false),
-			builder.RpcTypeMessage(builder.NewMessage("WriteBookResponse"), false),
-		).SetOptions(opts),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build service.")
-	}
-
-	// Establish that we get back both HTTP rules.
-	resp := GetHTTPRules(service.GetMethods()[0])
-	if got, want := resp[0], httpRule; got != want {
-		t.Errorf("Expected the first rule to be %v; got %v.", want, got)
-	}
-	if got, want := resp[1], httpRule.GetAdditionalBindings()[0]; got != want {
-		t.Errorf("Expected the second rule ot be %v; got %v.", want, got)
+			// Establish that we get back both HTTP rules, in order.
+			if got, want := resp[0].URI, "/v1/publishers/*/books/*"; got != want {
+				t.Errorf("Rule 1: Got URI %q, expected %q.", got, want)
+			}
+			if got, want := resp[1].URI, "/v1/books/*"; got != want {
+				t.Errorf("Rule 2: Got URI %q, expected %q.", got, want)
+			}
+			for _, httpRules := range resp {
+				if got, want := httpRules.Method, method; got != want {
+					t.Errorf("Got method %q, expected %q.", got, want)
+				}
+			}
+		})
 	}
 }
 
 func TestGetHTTPRulesEmpty(t *testing.T) {
-	// Create a method with no actual HTTP rules.
-	service, err := builder.NewService("Library").AddMethod(
-		builder.NewMethod(
-			"WriteBook",
-			builder.RpcTypeMessage(builder.NewMessage("WriteBookRequest"), false),
-			builder.RpcTypeMessage(builder.NewMessage("WriteBookResponse"), false),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build service.")
+	file := testutils.ParseProto3String(t, `
+		import "google/api/annotations.proto";
+		service Library {
+			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse);
+		}
+		message FrobBookRequest {}
+		message FrobBookResponse {}
+	`)
+	if resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0]); len(resp) > 0 {
+		t.Errorf("Got %v; expected no rules.", resp)
 	}
+}
 
-	// Establish that we get back an empty list of rules.
-	if got, want := GetHTTPRules(service.GetMethods()[0]), []*apb.HttpRule{}; !reflect.DeepEqual(got, want) {
-		t.Errorf("Expected empty slice of rules; got %v.", got)
+func TestGetHTTPRulesCustom(t *testing.T) {
+	file := testutils.ParseProto3String(t, `
+		import "google/api/annotations.proto";
+		service Library {
+			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
+				option (google.api.http) = {
+					custom: {
+						kind: "HEAD"
+						path: "/v1/books/*"
+					}
+				};
+			}
+		}
+		message FrobBookRequest {}
+		message FrobBookResponse {}
+	`)
+	rule := GetHTTPRules(file.GetServices()[0].GetMethods()[0])[0]
+	if got, want := rule.Method, "HEAD"; got != want {
+		t.Errorf("Got %q; expected %q.", got, want)
+	}
+	if got, want := rule.URI, "/v1/books/*"; got != want {
+		t.Errorf("Got %q; expected %q.", got, want)
 	}
 }

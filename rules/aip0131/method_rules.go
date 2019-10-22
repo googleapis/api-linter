@@ -77,7 +77,7 @@ var httpVerb = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP GET.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetGet() == "" {
+			if httpRule.Method != "GET" {
 				return []lint.Problem{{
 					Message:    "Get methods must use the HTTP GET verb.",
 					Descriptor: m,
@@ -97,7 +97,7 @@ var httpNameField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetGet(); uri != "" {
+			if httpRule.Method != "GET" {
 				if !getURINameRegexp.MatchString(uri) {
 					return []lint.Problem{{
 						Message:    "Get methods should include the `name` field in the URI.",
@@ -119,7 +119,7 @@ var httpBody = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetBody() != "" {
+			if httpRule.Body != "" {
 				return []lint.Problem{{
 					Message:    "Get methods should not have an HTTP body.",
 					Descriptor: m,
