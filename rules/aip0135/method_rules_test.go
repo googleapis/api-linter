@@ -21,11 +21,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	epb "github.com/golang/protobuf/ptypes/empty"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	lro "google.golang.org/genproto/googleapis/longrunning"
 )
 
 func TestRequestMessageName(t *testing.T) {
@@ -64,54 +61,59 @@ func TestRequestMessageName(t *testing.T) {
 }
 
 func TestResponseMessageName(t *testing.T) {
-	// Get the correct message type for google.protobuf.Empty
-	empty, err := desc.LoadMessageDescriptorForMessage(&epb.Empty{})
-	if err != nil {
-		t.Fatalf("Unable to load the empty message.")
-	}
-	emptybldr, err := builder.FromMessage(empty)
-	if err != nil {
-		t.Fatalf("Unable to construct builder from empty desc.")
-	}
-	op, err := desc.LoadMessageDescriptorForMessage(&lro.Operation{})
-	if err != nil {
-		t.Fatalf("Unable to load the Operation message.")
-	}
-	opbldr, err := builder.FromMessage(op)
-	if err != nil {
-		t.Fatalf("Unable to construct builder from op desc.")
+	tmpl := map[string]string{
+		"sync": `
+			package test;
+			import "google/protobuf/empty.proto";
+			service Library {
+				rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespTypeName}});
+			}
+			message {{.MethodName}}Request {}
+			{{ if (ne .RespTypeName "google.protobuf.Empty") }}message {{.RespTypeName}} {}{{ end }}
+		`,
+		"lro": `
+			package test;
+			import "google/longrunning/operations.proto";
+			service Library {
+				rpc {{.MethodName}}({{.MethodName}}Request)
+				    returns (google.longrunning.Operation) {
+					option (google.longrunning.operation_info) = {
+						response_type: "{{.RespTypeName}}"
+						metadata_type: "{{.MethodName}}Metadata"
+					};
+				}
+			}
+			message {{.MethodName}}Request {}
+		`,
 	}
 
 	// Set up the testing permutations.
 	tests := []struct {
 		testName     string
-		methodName   string
-		respMessage  *builder.MessageBuilder
+		tmpl         string
+		MethodName   string
+		RespTypeName string
 		problems     testutils.Problems
 	}{
-		{"ValidEmpty", "DeleteBook", emptybldr, testutils.Problems{}},
-		{"ValidLRO", "DeleteBook", opbldr, testutils.Problems{}},
-		{"ValidResource", "DeleteBook", builder.NewMessage("Book"), testutils.Problems{}},
-		{"Invalid", "DeleteBook", builder.NewMessage("DeleteBookResponse"), testutils.Problems{{Suggestion: "google.protobuf.Empty"}}},
-		{"Irrelevant", "AcquireBook", builder.NewMessage("AcquireBookResponse"), testutils.Problems{}},
+		{"ValidEmpty", tmpl["sync"], "DeleteBook", "google.protobuf.Empty", testutils.Problems{}},
+		{"ValidResource", tmpl["sync"], "DeleteBook", "Book", testutils.Problems{}},
+		{"ValidLROEmpty", tmpl["lro"], "DeleteBook", "google.protobuf.Empty", testutils.Problems{}},
+		{"ValidLROResource", tmpl["lro"], "DeleteBook", "Book", testutils.Problems{}},
+		{"Invalid", tmpl["sync"], "DeleteBook", "DeleteBookResponse", testutils.Problems{{Suggestion: "google.protobuf.Empty"}}},
+		{"InvalidLRO", tmpl["lro"], "DeleteBook", "DeleteBookResponse", testutils.Problems{{Suggestion: "google.protobuf.Empty"}}},
+		{"Irrelevant", tmpl["sync"], "DestroyBook", "DestroyBookResponse", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create a minimal service with a AIP-135 Delete method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("DeleteBookRequest"), false),
-				builder.RpcTypeMessage(test.respMessage, false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
+			file := testutils.ParseProto3Tmpl(t, test.tmpl, test)
 
 			// Run the lint rule, and establish that it returns the expected problems.
-			problems := responseMessageName.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := responseMessageName.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
@@ -138,7 +140,7 @@ func TestHttpVerb(t *testing.T) {
 		methodName string
 		msg        string
 	}{
-		{"Valid", httpDelete, "GeDeleteBook", ""},
+		{"Valid", httpDelete, "DeleteBook", ""},
 		{"Invalid", httpGet, "DeleteBook", "HTTP DELETE"},
 		{"Irrelevant", httpGet, "AcquireBook", ""},
 	}
