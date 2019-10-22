@@ -15,6 +15,7 @@
 package aip0191
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -25,10 +26,7 @@ var filename = &lint.FileRule{
 	Name: lint.NewRuleName("core", "0191", "filename"),
 	URI:  "https://aip.dev/191#guidance",
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(f.GetName(), ".proto", "")
-		if segments := strings.Split(fn, "/"); len(segments) > 1 {
-			fn = segments[len(segments)-1]
-		}
+		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
 		if versionRegexp.MatchString(fn) {
 			return []lint.Problem{{
 				Message:    "The proto version must not be used as the filename.",
