@@ -100,7 +100,11 @@ var httpBody = &lint.MethodRule{
 				// "core::0133::request-message::resource-field"
 			} else if resourceFieldName != "" && httpRule.Body != resourceFieldName {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The content of body %q must map to the resource field %q in the request message", body, resourceFieldName),
+					Message: fmt.Sprintf(
+						"The content of body %q must map to the resource field %q in the request message",
+						httpRule.Body,
+						resourceFieldName,
+					),
 					Descriptor: m,
 				}}
 			}
