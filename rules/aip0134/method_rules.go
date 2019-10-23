@@ -91,7 +91,7 @@ var httpVerb = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP PATCH.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetPatch() == "" {
+			if httpRule.Method != "PATCH" {
 				return []lint.Problem{{
 					Message:    "Update methods must use the HTTP PATCH verb.",
 					Descriptor: m,
@@ -112,14 +112,12 @@ var httpNameField = &lint.MethodRule{
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has expected HTTP pattern.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetPatch(); uri != "" {
-				matches := updateURINameRegexp.FindStringSubmatch(uri)
-				if matches == nil || matches[1] != fieldName {
-					return []lint.Problem{{
-						Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
-						Descriptor: m,
-					}}
-				}
+			matches := updateURINameRegexp.FindStringSubmatch(httpRule.URI)
+			if matches == nil || matches[1] != fieldName {
+				return []lint.Problem{{
+					Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
+					Descriptor: m,
+				}}
 			}
 		}
 
@@ -136,7 +134,7 @@ var httpBody = &lint.MethodRule{
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has HTTP body equal to fieldName.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetBody() != fieldName {
+			if httpRule.Body != fieldName {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Update methods should have an HTTP body equal to `%q`.", fieldName),
 					Descriptor: m,

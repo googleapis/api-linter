@@ -97,7 +97,7 @@ var httpVerb = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP DELETE.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetDelete() == "" {
+			if httpRule.Method != "DELETE" {
 				return []lint.Problem{{
 					Message:    "Delete methods must use the HTTP DELETE verb.",
 					Descriptor: m,
@@ -117,13 +117,11 @@ var httpNameField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetDelete(); uri != "" {
-				if !deleteURINameRegexp.MatchString(uri) {
-					return []lint.Problem{{
-						Message:    "Delete methods should include the `name` field in the URI.",
-						Descriptor: m,
-					}}
-				}
+			if !deleteURINameRegexp.MatchString(httpRule.URI) {
+				return []lint.Problem{{
+					Message:    "Delete methods should include the `name` field in the URI.",
+					Descriptor: m,
+				}}
 			}
 		}
 
@@ -139,7 +137,7 @@ var httpBody = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetBody() != "" {
+			if httpRule.Body != "" {
 				return []lint.Problem{{
 					Message:    "Delete methods should not have an HTTP body.",
 					Descriptor: m,
