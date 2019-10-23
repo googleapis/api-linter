@@ -52,6 +52,7 @@ package rules
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/aip0122"
 	"github.com/googleapis/api-linter/rules/aip0131"
 	"github.com/googleapis/api-linter/rules/aip0132"
 	"github.com/googleapis/api-linter/rules/aip0133"
@@ -70,6 +71,7 @@ import (
 )
 
 func init() {
+	aip0122.AddRules(coreRules)
 	aip0131.AddRules(coreRules)
 	aip0132.AddRules(coreRules)
 	aip0133.AddRules(coreRules)

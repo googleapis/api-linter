@@ -23,19 +23,56 @@ import (
 )
 
 // HTTP URL pattern shouldn't include underscore("_")
-var camelCase = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0122", "http-url-pattern"),
+var httpURICase = &lint.MethodRule{
+	Name: lint.NewRuleName("core", "0122", "http-uri-case"),
 	URI:  "https://aip.dev/122#guidance",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		// Establish that the URI does not include a `_` character.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if strings.Contains(httpRule.URI, "_") {
-				return []lint.Problem{{
-					Message:    "HTTP URL should use camel case, but not snake case.",
+			parsedURI := parseURI(httpRule.URI)
+			if strings.Contains(parsedURI.pattern, "_") {
+				problems = append(problems, lint.Problem{
+					Message:    "HTTP URI patterns should use camel case, not snake case.",
 					Descriptor: m,
-				}}
+				})
+			}
+			for _, v := range parsedURI.vars {
+				if strings.ToLower(v) != v {
+					problems = append(problems, lint.Problem{
+						Message:    "Variable names in URI patterns should use snake case, not camel case.",
+						Descriptor: m,
+					})
+				}
+			}
+
+			// FIXME: We intentionally only return at most one of each type of `Problem` here.
+			// When we can attach problems to the particular annotation, remove this.
+			if len(problems) > 0 {
+				return
 			}
 		}
-		return nil
+		return
 	},
+}
+
+// extractURI separates variable names from the URI pattern.
+//
+// It does not maintain the relationship between variable names and what
+// part of the pattern they apply to (we do not need that to lint here).
+func parseURI(uri string) (parsed struct {
+	vars    []string
+	pattern string
+}) {
+	parsed.pattern = uri
+	for strings.Contains(parsed.pattern, "{") && strings.Contains(parsed.pattern, "}") {
+		// Find the first {variable=pattern} segment and pull the variable out of it.
+		start, end := strings.Index(uri, "{"), strings.Index(uri, "}")
+		p := parsed.pattern[start+1 : end]
+		if keyVal := strings.Split(p, "="); len(keyVal) > 1 {
+			parsed.vars = append(parsed.vars, keyVal[0])
+			p = keyVal[1]
+		}
+		parsed.pattern = strings.Replace(parsed.pattern, parsed.pattern[start:end+1], p, 1)
+	}
+	return
 }
