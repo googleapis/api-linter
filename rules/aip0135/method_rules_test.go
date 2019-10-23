@@ -20,9 +20,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	epb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
