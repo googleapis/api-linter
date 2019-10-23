@@ -26,8 +26,8 @@ import (
 // and then flattens the values in `additional_bindings`.
 // This allows rule authors to simply range over all of the HTTP rules,
 // since the common case is to want to apply the checks to all of them.
-func GetHTTPRules(m *desc.MethodDescriptor) []*apb.HttpRule {
-	rules := []*apb.HttpRule{}
+func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
+	rules := []*HTTPRule{}
 
 	// Get the method options.
 	opts := m.GetMethodOptions()
@@ -35,12 +35,56 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*apb.HttpRule {
 	// Get the "primary" rule (the direct google.api.http annotation).
 	if x, err := proto.GetExtension(opts, apb.E_Http); err == nil {
 		httpRule := x.(*apb.HttpRule)
-		rules = append(rules, httpRule)
+		if parsedRule := parseRule(httpRule); parsedRule != nil {
+			rules = append(rules, parsedRule)
 
-		// Add any additional bindings and flatten them into `rules`.
-		rules = append(rules, httpRule.GetAdditionalBindings()...)
+			// Add any additional bindings and flatten them into `rules`.
+			for _, binding := range httpRule.GetAdditionalBindings() {
+				rules = append(rules, parseRule(binding))
+			}
+		}
 	}
 
 	// Done; return the rules.
 	return rules
+}
+
+func parseRule(rule *apb.HttpRule) *HTTPRule {
+	oneof := map[string]string{
+		"GET":    rule.GetGet(),
+		"POST":   rule.GetPost(),
+		"PUT":    rule.GetPut(),
+		"PATCH":  rule.GetPatch(),
+		"DELETE": rule.GetDelete(),
+	}
+	if custom := rule.GetCustom(); custom != nil {
+		oneof[custom.GetKind()] = custom.GetPath()
+	}
+	for method, uri := range oneof {
+		if uri != "" {
+			return &HTTPRule{
+				Method:       method,
+				URI:          uri,
+				Body:         rule.GetBody(),
+				ResponseBody: rule.GetResponseBody(),
+			}
+		}
+	}
+	return nil
+}
+
+// HTTPRule defines a parsed, easier-to-query equivalent to `apb.HttpRule`.
+type HTTPRule struct {
+	// The HTTP method. Guaranteed to be in all caps.
+	// This is set to "CUSTOM" if the Custom property is set.
+	Method string
+
+	// The HTTP URI (the value corresponding to the selected HTTP method).
+	URI string
+
+	// The `body` value forwarded from the generated proto's HttpRule.
+	Body string
+
+	// The `response_body` value forwarded from the generated proto's HttpRule.
+	ResponseBody string
 }

@@ -24,14 +24,14 @@ import (
 )
 
 // Create methods should use the HTTP POST verb.
-var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "http-verb"),
+var httpMethod = &lint.MethodRule{
+	Name:   lint.NewRuleName("core", "0133", "http-method"),
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP POST.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetPost() == "" {
+			if httpRule.Method != "POST" {
 				return []lint.Problem{{
 					Message:    "Create methods must use the HTTP POST verb.",
 					Descriptor: m,
@@ -51,13 +51,11 @@ var httpURIField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri should include the `parent` field.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetPost(); uri != "" {
-				if !createURINameRegexp.MatchString(uri) {
-					return []lint.Problem{{
-						Message:    "Post methods should include the `parent` field in the URI.",
-						Descriptor: m,
-					}}
-				}
+			if !createURINameRegexp.MatchString(httpRule.URI) {
+				return []lint.Problem{{
+					Message:    "Create methods should include the `parent` field in the URI.",
+					Descriptor: m,
+				}}
 			}
 		}
 
@@ -84,7 +82,7 @@ var httpBody = &lint.MethodRule{
 
 		// Establish that HTTP body the RPC should map the resource field name in the request message.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if body := httpRule.GetBody(); body == "" {
+			if httpRule.Body == "" {
 				// Establish that the RPC should have HTTP body
 				return []lint.Problem{{
 					Message:    "Post methods should have an HTTP body.",
@@ -94,9 +92,13 @@ var httpBody = &lint.MethodRule{
 				// will not be triggered by the rule"core::0133::http-body". It will be
 				// triggered by another rule
 				// "core::0133::request-message::resource-field"
-			} else if resourceFieldName != "" && body != resourceFieldName {
+			} else if resourceFieldName != "" && httpRule.Body != resourceFieldName {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The content of body %q must map to the resource field %q in the request message", body, resourceFieldName),
+					Message: fmt.Sprintf(
+						"The content of body %q must map to the resource field %q in the request message",
+						httpRule.Body,
+						resourceFieldName,
+					),
 					Descriptor: m,
 				}}
 			}
