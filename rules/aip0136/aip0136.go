@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		https://www.apache.org/licenses/LICENSE-2.0
+//     https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,30 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0140
+// Package aip0136 contains rules defined in https://aip.dev/136.
+package aip0136
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/data"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var noPrepositions = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0140", "prepositions"),
-	URI:  "https://aip.dev/140#prepositions",
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
-		for _, word := range strings.Split(f.GetName(), "_") {
-			if data.Prepositions.Contains(word) {
-				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Avoid using %q in field names.", word),
-					Descriptor: f,
-					Location:   lint.DescriptorNameLocation(f),
-				})
-			}
+// AddRules accepts a register function and registers each of
+// this AIP's rules to it.
+func AddRules(r lint.RuleRegistry) {
+	r.Register(
+		httpMethod,
+		noPrepositions,
+		verbNoun,
+	)
+}
+
+func isCustomMethod(m *desc.MethodDescriptor) bool {
+	for _, prefix := range []string{"Get", "List", "Create", "Update", "Delete", "Replace"} {
+		if strings.HasPrefix(m.GetName(), prefix) {
+			return false
 		}
-		return
-	},
+	}
+	return true
 }

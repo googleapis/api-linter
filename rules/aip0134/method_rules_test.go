@@ -108,7 +108,7 @@ func TestResponseMessageName(t *testing.T) {
 	}
 }
 
-func TestHttpVerb(t *testing.T) {
+func TestHttpMethod(t *testing.T) {
 	// Set up POST and PATCH HTTP annotations.
 	httpPost := &annotations.HttpRule{
 		Pattern: &annotations.HttpRule_Post{
@@ -153,7 +153,7 @@ func TestHttpVerb(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpVerb.Lint(service.GetFile())
+			problems := httpMethod.Lint(service.GetFile())
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {

@@ -24,8 +24,8 @@ import (
 )
 
 // Create methods should use the HTTP POST verb.
-var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "http-verb"),
+var httpMethod = &lint.MethodRule{
+	Name:   lint.NewRuleName("core", "0133", "http-method"),
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {

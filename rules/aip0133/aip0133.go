@@ -27,9 +27,9 @@ import (
 // this AIP's rules to it.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
-		httpURIField,
-		httpVerb,
 		httpBody,
+		httpURIField,
+		httpMethod,
 		inputName,
 		outputName,
 		resourceField,
