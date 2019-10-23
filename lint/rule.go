@@ -23,6 +23,9 @@ import (
 )
 
 // ProtoRule defines a lint rule that checks Google Protobuf APIs.
+//
+// Anything that satisfies this interface can be used as a rule,
+// but most rule authors will want to use the implementations provided.
 type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
@@ -64,8 +67,9 @@ func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
 	return r.LintFile(fd)
 }
 
-// MessageRule defines a lint rule that is run on each message (top-level or
-// nested) within a file.
+// MessageRule defines a lint rule that is run on each message in the file.
+//
+// Both top-level messages and nested messages are visited.
 type MessageRule struct {
 	Name RuleName
 	URI  string
@@ -91,8 +95,10 @@ func (r *MessageRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and iterates over every message in the
-// file, and lints each message in the file.
+// Lint visits every message in the file, and runs `LintMessage`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// message, and if it returns false, the `LintMessage` function is not called.
 func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
@@ -131,7 +137,10 @@ func (r *FieldRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and lints every field in the file.
+// Lint visits every field in the file and runs `LintField`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// field, and if it returns false, the `LintField` function is not called.
 func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
@@ -172,7 +181,10 @@ func (r *ServiceRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and lints every service in the file.
+// Lint visits every service in the file and runs `LintService`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// service, and if it returns false, the `LintService` function is not called.
 func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 	for _, service := range fd.GetServices() {
@@ -208,7 +220,10 @@ func (r *MethodRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and lints every method in the file.
+// Lint visits every method in the file and runs `LintMethod`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// method, and if it returns false, the `LintMethod` function is not called.
 func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 	for _, service := range fd.GetServices() {
@@ -246,8 +261,10 @@ func (r *EnumRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and lints every enum in the file
-// (including enums nested within messages).
+// Lint visits every service in the file and runs `LintEnum`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// enum, and if it returns false, the `LintEnum` function is not called.
 func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
@@ -285,11 +302,10 @@ func (r *DescriptorRule) GetURI() string {
 	return r.URI
 }
 
-// Lint accepts a FileDescriptor and iterates over the descriptors within
-// it, and runs the LintDescriptor function on each.
+// Lint visits every descriptor in the file and runs `LintDescriptor`.
 //
 // It visits every service, method, message, field, enum, and enum value.
-// This order is not guaranteed.
+// This order is not guaranteed. It does NOT visit the file itself.
 func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
