@@ -16,7 +16,9 @@ package aip0135
 
 import (
 	"fmt"
+	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -52,27 +54,38 @@ var responseMessageName = &lint.MethodRule{
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
-		// message is `google.protobuf.Empty`, `google.longrunning.Operation`, or `Foo`.
-		got := m.GetOutputType().GetFullyQualifiedName()
-		want := []string{
+		// message is `google.protobuf.Empty` or `Foo`.
+		got := m.GetOutputType().GetName()
+		if stringset.New("Empty", "Operation").Contains(got) {
+			got = m.GetOutputType().GetFullyQualifiedName()
+		}
+		want := stringset.New(
 			"google.protobuf.Empty",
-			"google.longrunning.Operation",
-			m.GetName()[6:],
+			strings.Replace(m.GetName(), "Delete", "", 1),
+		)
+
+		// If the return type is an Operation, use the annotated response type.
+		if got == "google.longrunning.Operation" {
+			got = utils.GetOperationInfo(m).GetResponseType()
 		}
-		for _, v := range want {
-			if got == v {
-				return nil
-			}
+
+		// If we did not get a permitted value, return a problem.
+		//
+		// Note: If `got` is empty string, this is an unannotated LRO.
+		// The AIP-151 rule will whine about that, and this rule should not as it
+		// would be confusing.
+		if !want.Contains(got) && got != "" {
+			return []lint.Problem{{
+				Message: fmt.Sprintf(
+					"Delete RPCs should have response message type of Empty or the resource, not %q.",
+					got,
+				),
+				Suggestion: "google.protobuf.Empty",
+				Descriptor: m,
+			}}
 		}
-		return []lint.Problem{{
-			Message: fmt.Sprintf(
-				"Delete RPCs should have response message type in %q, not %q.",
-				want,
-				got,
-			),
-			Suggestion: want[0],
-			Descriptor: m,
-		}}
+
+		return nil
 	},
 }
 

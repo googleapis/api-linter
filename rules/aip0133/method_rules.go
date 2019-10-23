@@ -69,12 +69,6 @@ var httpBody = &lint.MethodRule{
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
-
 		resourceMsgName := getResourceMsgName(m)
 		resourceFieldName := strings.ToLower(resourceMsgName)
 		for _, fieldDesc := range m.GetInputType().GetFields() {
@@ -145,22 +139,26 @@ var outputName = &lint.MethodRule{
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		output := m.GetOutputType()
+		want := getResourceMsgName(m)
 
-		// AIP-0151
-		if output.GetFullyQualifiedName() == "google.longrunning.Operation" {
-			return nil
+		// If this is an LRO, then use the annotated response type instead of
+		// the actual RPC return type.
+		got := m.GetOutputType().GetName()
+		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+			got = utils.GetOperationInfo(m).GetResponseType()
 		}
-
-		resourceMsgName := getResourceMsgName(m)
 
 		// Rule check: Establish that for methods such as `CreateFoo`, the response
 		// message should be named `Foo`
-		if output.GetName() != resourceMsgName {
+		//
+		// Note: If `got` is empty string, this is an unannotated LRO.
+		// The AIP-151 rule will whine about that, and this rule should not as it
+		// would be confusing.
+		if got != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Create RPCs should have the corresponding resource as the response message, such as %q.",
-					resourceMsgName,
+					want,
 				),
 				// TODO: suggestion will be set after the location is set properly
 				// Suggestion: want,
