@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetHTTPRules(t *testing.T) {
@@ -70,6 +71,13 @@ func TestGetHTTPRulesEmpty(t *testing.T) {
 	`)
 	if resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0]); len(resp) > 0 {
 		t.Errorf("Got %v; expected no rules.", resp)
+	}
+}
+
+func TestParseRuleEmpty(t *testing.T) {
+	http := &apb.HttpRule{}
+	if got := parseRule(http); got != nil {
+		t.Errorf("Got %v, expected nil.", got)
 	}
 }
 

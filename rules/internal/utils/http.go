@@ -50,31 +50,27 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
 }
 
 func parseRule(rule *apb.HttpRule) *HTTPRule {
-	answer := &HTTPRule{}
-	if uri := rule.GetGet(); uri != "" {
-		answer.Method = "GET"
-		answer.URI = uri
-	} else if uri := rule.GetPost(); uri != "" {
-		answer.Method = "POST"
-		answer.URI = uri
-	} else if uri := rule.GetPut(); uri != "" {
-		answer.Method = "PUT"
-		answer.URI = uri
-	} else if uri := rule.GetPatch(); uri != "" {
-		answer.Method = "PATCH"
-		answer.URI = uri
-	} else if uri := rule.GetDelete(); uri != "" {
-		answer.Method = "DELETE"
-		answer.URI = uri
-	} else if custom := rule.GetCustom(); custom != nil {
-		answer.Method = custom.GetKind()
-		answer.URI = custom.GetPath()
+	oneof := map[string]string{
+		"GET":    rule.GetGet(),
+		"POST":   rule.GetPost(),
+		"PUT":    rule.GetPut(),
+		"PATCH":  rule.GetPatch(),
+		"DELETE": rule.GetDelete(),
 	}
-
-	// Set the body and response body, and return the answer.
-	answer.Body = rule.GetBody()
-	answer.ResponseBody = rule.GetResponseBody()
-	return answer
+	if custom := rule.GetCustom(); custom != nil {
+		oneof[custom.GetKind()] = custom.GetPath()
+	}
+	for method, uri := range oneof {
+		if uri != "" {
+			return &HTTPRule{
+				Method:       method,
+				URI:          uri,
+				Body:         rule.GetBody(),
+				ResponseBody: rule.GetResponseBody(),
+			}
+		}
+	}
+	return nil
 }
 
 // HTTPRule defines a parsed, easier-to-query equivalent to `apb.HttpRule`.
