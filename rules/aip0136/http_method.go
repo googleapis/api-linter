@@ -26,7 +26,7 @@ var httpMethod = &lint.MethodRule{
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetPost() == "" && httpRule.GetGet() == "" {
+			if httpRule.Method != "POST" && httpRule.Method != "GET" {
 				return []lint.Problem{{
 					Message:    "Custom methods should use the HTTP POST or GET method.",
 					Descriptor: m,
