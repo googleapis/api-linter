@@ -31,7 +31,7 @@ var httpMethod = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP POST.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetPost() == "" {
+			if httpRule.Method != "POST" {
 				return []lint.Problem{{
 					Message:    "Create methods must use the HTTP POST verb.",
 					Descriptor: m,
@@ -51,13 +51,11 @@ var httpURIField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri should include the `parent` field.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetPost(); uri != "" {
-				if !createURINameRegexp.MatchString(uri) {
-					return []lint.Problem{{
-						Message:    "Post methods should include the `parent` field in the URI.",
-						Descriptor: m,
-					}}
-				}
+			if !createURINameRegexp.MatchString(httpRule.URI) {
+				return []lint.Problem{{
+					Message:    "Create methods should include the `parent` field in the URI.",
+					Descriptor: m,
+				}}
 			}
 		}
 
@@ -71,12 +69,6 @@ var httpBody = &lint.MethodRule{
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// We only care about Create methods for the purpose of this rule;
-		// ignore everything else.
-		if !isCreateMethod(m) {
-			return nil
-		}
-
 		resourceMsgName := getResourceMsgName(m)
 		resourceFieldName := strings.ToLower(resourceMsgName)
 		for _, fieldDesc := range m.GetInputType().GetFields() {
@@ -90,7 +82,7 @@ var httpBody = &lint.MethodRule{
 
 		// Establish that HTTP body the RPC should map the resource field name in the request message.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if body := httpRule.GetBody(); body == "" {
+			if httpRule.Body == "" {
 				// Establish that the RPC should have HTTP body
 				return []lint.Problem{{
 					Message:    "Post methods should have an HTTP body.",
@@ -100,9 +92,13 @@ var httpBody = &lint.MethodRule{
 				// will not be triggered by the rule"core::0133::http-body". It will be
 				// triggered by another rule
 				// "core::0133::request-message::resource-field"
-			} else if resourceFieldName != "" && body != resourceFieldName {
+			} else if resourceFieldName != "" && httpRule.Body != resourceFieldName {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The content of body %q must map to the resource field %q in the request message", body, resourceFieldName),
+					Message: fmt.Sprintf(
+						"The content of body %q must map to the resource field %q in the request message",
+						httpRule.Body,
+						resourceFieldName,
+					),
 					Descriptor: m,
 				}}
 			}
@@ -143,22 +139,26 @@ var outputName = &lint.MethodRule{
 	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		output := m.GetOutputType()
+		want := getResourceMsgName(m)
 
-		// AIP-0151
-		if output.GetFullyQualifiedName() == "google.longrunning.Operation" {
-			return nil
+		// If this is an LRO, then use the annotated response type instead of
+		// the actual RPC return type.
+		got := m.GetOutputType().GetName()
+		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+			got = utils.GetOperationInfo(m).GetResponseType()
 		}
-
-		resourceMsgName := getResourceMsgName(m)
 
 		// Rule check: Establish that for methods such as `CreateFoo`, the response
 		// message should be named `Foo`
-		if output.GetName() != resourceMsgName {
+		//
+		// Note: If `got` is empty string, this is an unannotated LRO.
+		// The AIP-151 rule will whine about that, and this rule should not as it
+		// would be confusing.
+		if got != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Create RPCs should have the corresponding resource as the response message, such as %q.",
-					resourceMsgName,
+					want,
 				),
 				// TODO: suggestion will be set after the location is set properly
 				// Suggestion: want,

@@ -55,25 +55,31 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		got := m.GetOutputType().GetFullyQualifiedName()
-		want := []string{
-			m.GetName()[6:],
-			"google.longrunning.Operation",
+		want := strings.Replace(m.GetName(), "Update", "", 1)
+		got := m.GetOutputType().GetName()
+
+		// If the return type is an LRO, use the annotated response type instead.
+		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+			got = utils.GetOperationInfo(m).GetResponseType()
 		}
-		for _, v := range want {
-			if got == v {
-				return nil
-			}
+
+		// Return a problem if we did not get the expected return name.
+		//
+		// Note: If `got` is empty string, this is an unannotated LRO.
+		// The AIP-151 rule will whine about that, and this rule should not as it
+		// would be confusing.
+		if got != want && got != "" {
+			return []lint.Problem{{
+				Message: fmt.Sprintf(
+					"Update RPCs should have response message type %q, not %q.",
+					want,
+					got,
+				),
+				Suggestion: want,
+				Descriptor: m,
+			}}
 		}
-		return []lint.Problem{{
-			Message: fmt.Sprintf(
-				"Update RPCs should have response message type in %q, not %q.",
-				want,
-				got,
-			),
-			Suggestion: want[0],
-			Descriptor: m,
-		}}
+		return nil
 	},
 }
 
@@ -85,7 +91,7 @@ var httpMethod = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP PATCH.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetPatch() == "" {
+			if httpRule.Method != "PATCH" {
 				return []lint.Problem{{
 					Message:    "Update methods must use the HTTP PATCH verb.",
 					Descriptor: m,
@@ -106,14 +112,12 @@ var httpNameField = &lint.MethodRule{
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has expected HTTP pattern.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if uri := httpRule.GetPatch(); uri != "" {
-				matches := updateURINameRegexp.FindStringSubmatch(uri)
-				if matches == nil || matches[1] != fieldName {
-					return []lint.Problem{{
-						Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
-						Descriptor: m,
-					}}
-				}
+			matches := updateURINameRegexp.FindStringSubmatch(httpRule.URI)
+			if matches == nil || matches[1] != fieldName {
+				return []lint.Problem{{
+					Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
+					Descriptor: m,
+				}}
 			}
 		}
 
@@ -130,7 +134,7 @@ var httpBody = &lint.MethodRule{
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has HTTP body equal to fieldName.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.GetBody() != fieldName {
+			if httpRule.Body != fieldName {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Update methods should have an HTTP body equal to `%q`.", fieldName),
 					Descriptor: m,
