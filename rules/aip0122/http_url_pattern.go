@@ -67,12 +67,15 @@ func parseURI(uri string) (parsed struct {
 	for strings.Contains(parsed.pattern, "{") && strings.Contains(parsed.pattern, "}") {
 		// Find the first {variable=pattern} segment and pull the variable out of it.
 		start, end := strings.Index(uri, "{"), strings.Index(uri, "}")
-		p := parsed.pattern[start+1 : end]
-		if keyVal := strings.Split(p, "="); len(keyVal) > 1 {
-			parsed.vars = append(parsed.vars, keyVal[0])
-			p = keyVal[1]
+		repl := ""
+		for i, segment := range strings.SplitN(parsed.pattern[start+1:end], "=", 2) {
+			if i == 0 {
+				parsed.vars = append(parsed.vars, segment)
+			} else {
+				repl = segment
+			}
 		}
-		parsed.pattern = strings.Replace(parsed.pattern, parsed.pattern[start:end+1], p, 1)
+		parsed.pattern = strings.Replace(parsed.pattern, parsed.pattern[start:end+1], repl, 1)
 	}
 	return
 }
