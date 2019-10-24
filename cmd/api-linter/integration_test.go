@@ -55,6 +55,19 @@ var testCases = []struct {
 				}
 			`,
 	},
+	{
+		testName: "ImportFileDescriptorSet",
+		rule:     "core::0140::lower-snake",
+		proto: `
+				syntax = "proto3";
+				import "dummy.proto";
+				message Test {
+					// disable-me-here
+					string badName = 1;
+					dummy.Dummy dummy = 2;
+				}
+			`,
+	},
 }
 
 func TestRules_Enabled(t *testing.T) {
@@ -176,16 +189,14 @@ func runLinter(t *testing.T, proto, config string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Chdir(workdir); err != nil {
-		t.Fatal(err)
-	}
 	defer os.RemoveAll(workdir)
 
 	protoPath := "test.proto"
-	configPath := "test_config.json"
-	outPath := "test.out"
+	configPath := filepath.Join(workdir, "test_config.json")
+	outPath := filepath.Join(workdir, "test.out")
+	protoDesc := "internal/testdata/dummy.protoset"
 
-	if err := writeFile(protoPath, proto); err != nil {
+	if err := writeFile(filepath.Join(workdir, protoPath), proto); err != nil {
 		t.Fatal(err)
 	}
 	if err := writeFile(configPath, config); err != nil {
@@ -194,10 +205,11 @@ func runLinter(t *testing.T, proto, config string) string {
 
 	args := []string{
 		"api-linter-test",
-		"checkproto",
+		"check",
 		"--cfg=" + configPath,
 		"--out=" + outPath,
 		"--proto_path=" + workdir,
+		"--proto_desc=" + protoDesc,
 		protoPath}
 	if err := runCLI(rules(), configs(), args); err != nil {
 		t.Fatal(err)

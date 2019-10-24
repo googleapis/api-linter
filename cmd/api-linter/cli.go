@@ -16,9 +16,14 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
 
+	"github.com/golang/protobuf/proto"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
@@ -31,8 +36,8 @@ func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error 
 	app.Version = "0.1"
 	app.Commands = []cli.Command{
 		{
-			Name:      "checkproto",
-			Aliases:   []string{"cp"},
+			Name:      "check",
+			Aliases:   []string{"c"},
 			Usage:     "Check protobuf files that define an API",
 			ArgsUsage: "files...",
 			Flags: []cli.Flag{
@@ -54,7 +59,12 @@ func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error 
 				cli.StringSliceFlag{
 					Name:  "proto_path",
 					Value: &cli.StringSlice{"."},
-					Usage: "the directories in which for protoc to search for imports",
+					Usage: "the directories in which for proto parser to search for imports",
+				},
+				cli.StringFlag{
+					Name:  "proto_desc",
+					Value: "",
+					Usage: "the compiled file descriptor set for searching imports",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -67,11 +77,27 @@ func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error 
 					return nil
 				}
 
+				// Prepare lookup for proto imports, in additional to the proto paths.
+				var lookupImport func(string) (*desc.FileDescriptor, error)
+				if c.String("proto_desc") != "" {
+					descriptors, err := loadFileDescriptors(c.String("proto_desc"))
+					if err != nil {
+						return err
+					}
+					lookupImport = func(name string) (*desc.FileDescriptor, error) {
+						if d, found := descriptors[name]; found {
+							return d, nil
+						}
+						return nil, fmt.Errorf("%q is not found in the file %q", name, c.String("proto_desc"))
+					}
+				}
+
 				// Parse the provided protobuf files into a protoreflect file
 				// descriptor.
 				p := protoparse.Parser{
 					ImportPaths:           c.StringSlice("proto_path"),
 					IncludeSourceCodeInfo: true,
+					LookupImport:          lookupImport,
 				}
 				fd, err := p.ParseFiles(filenames...)
 				if err != nil {
@@ -131,4 +157,16 @@ func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error 
 	}
 
 	return app.Run(args)
+}
+
+func loadFileDescriptors(filename string) (map[string]*desc.FileDescriptor, error) {
+	in, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	fs := &dpb.FileDescriptorSet{}
+	if err := proto.Unmarshal(in, fs); err != nil {
+		return nil, err
+	}
+	return desc.CreateFileDescriptorsFromSet(fs)
 }

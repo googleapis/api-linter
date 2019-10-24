@@ -13,5 +13,6 @@ require (
 	github.com/stoewer/go-strcase v1.0.2
 	github.com/urfave/cli v1.22.1
 	google.golang.org/genproto v0.0.0-20191009194640-548a555dbc03
+	google.golang.org/protobuf v0.0.0-20191017192310-3770776dcda0 // indirect
 	gopkg.in/yaml.v2 v2.2.4
 )
