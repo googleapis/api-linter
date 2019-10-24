@@ -20,7 +20,7 @@ This installs `api-lint` into your local Go binary folder `$HOME/go/bin`. Ensure
 ## Usage
 
 ```sh
-api-lint proto_file1 proto_file2
+api-lint proto_file1 proto_file2 ...
 ```
 
 ## Rule Configuration
