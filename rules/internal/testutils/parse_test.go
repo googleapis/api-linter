@@ -173,23 +173,3 @@ func TestParseProto3TmplDataError(t *testing.T) {
 		t.Errorf("Expected missing data to cause a fatal error.")
 	}
 }
-
-func TestDecompileErrors(t *testing.T) {
-	// Note: I prefer to test only public interfaces, but because the common
-	// protos are added at module initialization, there is no way to test
-	// the failure cases without hitting the decompile method directly.
-	tests := []struct {
-		testName string
-		filename string
-	}{
-		{"MissingImport", "google/longrunning/operations.proto"},
-		{"BogusFile", "bogus.proto"},
-	}
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			if _, err := decompile(test.filename); err == nil {
-				t.Errorf("Unexpected success: %q", test.filename)
-			}
-		})
-	}
-}
