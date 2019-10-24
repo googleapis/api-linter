@@ -29,6 +29,7 @@ func AddRules(r lint.RuleRegistry) {
 		httpBody,
 		httpMethod,
 		noPrepositions,
+		uriSuffix,
 		verbNoun,
 	)
 }
