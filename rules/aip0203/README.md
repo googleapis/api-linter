@@ -1,3 +1,9 @@
+# Rules
+
+* [input-only](#input-only)
+* [output-only](#output-only)
+* [immutable](#immutable)
+
 # Input only
 
 When a field on a resource is input only, this should be described using the
@@ -177,18 +183,6 @@ message Book {
 -   You have tooling that looks for a specific format (e.g., `@OutputOnly`) and
     it **cannot** be an internal-only comment.
 
-## Change log
-
-| Date          | Change                                                      |
-| ------------- | ----------------------------------------------------------- |
-| `2019-Aug-20` | The rule previously enforced a comment format, and now      |
-:               : enforces an annotation instead.                             :
-| `2017-Sep-26` | The rule previously enforced that `Output only.` be on its  |
-:               : own line, anywhere in the comment. It now does not check    :
-:               : whether it is on its own line, but enforces that it appears :
-:               : first in the comment block.                                 :
-
-
 # Immutable
 
 When a field on a resource is required, this should be described using the
@@ -222,12 +216,12 @@ message Book {
 
 **Correct** code for this rule:
 
-````proto {.good}
+```proto {.good}
 message Book {
   // The title of the book.
   string title = 1 [(google.api.field_behavior) = IMMUTABLE];
 }
-~~~
+```
 
 Or if you must use a special annotation:
 
@@ -237,7 +231,7 @@ message Book {
   // (-- @Immutable --)
   string title = 1 [(google.api.field_behavior) = IMMUTABLE];
 }
-````
+```
 
 ## Disabling
 
