@@ -13,13 +13,13 @@ func emitSummary(responses []lint.Response) ([]byte, error) {
 	var buffer bytes.Buffer
 	summary := createSummary(responses)
 	defaultSummaryColWidth := 25
-	colOneFormat := "%-"+strconv.Itoa(max(summary.LongestRuleLen+5, defaultSummaryColWidth))+"s"
-	colTwoFormat := "%"+strconv.Itoa(defaultSummaryColWidth)+"s"
+	colOneFormat := "%-" + strconv.Itoa(max(summary.LongestRuleLen+5, defaultSummaryColWidth)) + "s"
+	colTwoFormat := "%" + strconv.Itoa(defaultSummaryColWidth) + "s"
 
 	lintSummaryTemplate, err := template.New("lintSummary").Funcs(
 		template.FuncMap{"calcPercentage": func(filePaths map[string]bool, numSourceFiles int) float64 {
-		return float64(len(filePaths))/float64(numSourceFiles) * 100
-	}}).Parse(`
+			return float64(len(filePaths)) / float64(numSourceFiles) * 100
+		}}).Parse(`
 ----------SUMMARY TABLE---------
 {{ printf "Linted %d proto files." .Summary.LongestRuleLen | printf .ColOneFormat }}
 {{ printf .ColOneFormat "Rule"}} {{ printf .ColTwoFormat "Violations (Percent)" -}}
@@ -33,7 +33,7 @@ func emitSummary(responses []lint.Response) ([]byte, error) {
 	if err != nil {
 		panic(err)
 	}
-	templateData := LintSummaryTemplateData{colOneFormat, colTwoFormat, summary }
+	templateData := LintSummaryTemplateData{colOneFormat, colTwoFormat, summary}
 	err = lintSummaryTemplate.Execute(&buffer, templateData)
 	if err != nil {
 		panic(err)
@@ -76,7 +76,7 @@ type LintSummary struct {
 type LintSummaryTemplateData struct {
 	ColOneFormat string
 	ColTwoFormat string
-	Summary LintSummary
+	Summary      LintSummary
 }
 
 func max(x, y int) int {

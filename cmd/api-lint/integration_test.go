@@ -193,13 +193,11 @@ func runLinter(t *testing.T, proto, config string) string {
 	}
 
 	args := []string{
-		"api-linter-test",
-		"checkproto",
-		"--cfg=" + configPath,
-		"--out=" + outPath,
-		"--proto_path=" + workdir,
+		"-c=" + configPath,
+		"-o=" + outPath,
+		"-I=" + workdir,
 		protoPath}
-	if err := runCLI(rules(), configs(), args); err != nil {
+	if err := runCLI(args); err != nil {
 		t.Fatal(err)
 	}
 
