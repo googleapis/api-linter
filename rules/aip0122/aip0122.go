@@ -23,6 +23,6 @@ import (
 // this AIP's rules to it.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
-		camelCase,
+		httpURICase,
 	)
 }
