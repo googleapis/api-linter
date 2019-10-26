@@ -26,6 +26,8 @@ github.com/jhump/protoreflect v1.5.0 h1:NgpVT+dX71c8hZnxHof2M7QDK7QtohIJ7DYycjnk
 github.com/jhump/protoreflect v1.5.0/go.mod h1:eaTn3RZAmMBcV0fifFvlm6VHNz3wSkYyXYWUh7ymB74=
 github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58 h1:RHSRszt3DIDwIwV1fPXtZI74OL36BkDIzsp2IOdp+Xc=
 github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58/go.mod h1:eaTn3RZAmMBcV0fifFvlm6VHNz3wSkYyXYWUh7ymB74=
+github.com/kjk/inflect v0.0.0-20190213232030-bfc9dcd6393b h1:pSKZGMcdvyNmiHxmVni0zd28IL+xf+kKAixrsMdS3Mg=
+github.com/kjk/inflect v0.0.0-20190213232030-bfc9dcd6393b/go.mod h1:dI+lsL14MLXYhREARMljP6+dati5FyM0eg9QEMUdUUU=
 github.com/lithammer/dedent v1.1.0 h1:VNzHMVCBNG1j0fh3OrsFRkVUwStdDArbgBWoPAffktY=
 github.com/lithammer/dedent v1.1.0/go.mod h1:jrXYCQtgg0nJiN+StA2KgR7w6CiQNv9Fd/Z9BP0jIOc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
