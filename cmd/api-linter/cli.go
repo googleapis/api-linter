@@ -26,42 +26,46 @@ type cli struct {
 }
 
 func newCli(args []string) *cli {
-	// Define flags.
-	var fmtFlag string
+	// Define flag variables.
 	var cfgFlag string
+	var fmtFlag string
 	var outFlag string
 	var protoImportFlag stringSlice
 	var protoDescFlag string
 
-	// Register flags.
+	// Register flag variables.
 	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
-	fs.Var(&protoImportFlag, "proto_path", "The folder to search for proto imports.")
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
 	fs.StringVar(&fmtFlag, "out_format", "", "The format of the linting results.")
 	fs.StringVar(&outFlag, "out_path", "", "The output file path.")
+	fs.Var(&protoImportFlag, "proto_path", "The folder to search for proto imports.")
 	fs.StringVar(&protoDescFlag, "proto_desc", "", "The file descriptor set for proto imports")
 
 	// Parse flags.
 	fs.Parse(args)
 
-	c := &cli{
+	return &cli{
 		configPath:    cfgFlag,
 		formatType:    fmtFlag,
 		outputPath:    outFlag,
-		protoImports:  []string{"."},
-		protoFiles:    fs.Args(),
+		protoImports:  append(protoImportFlag, "."),
 		protoDescPath: protoDescFlag,
+		protoFiles:    fs.Args(),
 	}
-
-	c.protoImports = append(c.protoImports, protoImportFlag...)
-
-	return c
 }
 
 func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
-	// Check if there are files to lint; if not, abort.
+	// Pre-check if there are files to lint.
 	if len(c.protoFiles) == 0 {
-		return fmt.Errorf("no files to lint")
+		return fmt.Errorf("no file to lint")
+	}
+	// Read linter config and append it to the default.
+	if c.configPath != "" {
+		config, err := lint.ReadConfigsFromFile(c.configPath)
+		if err != nil {
+			return err
+		}
+		configs = append(configs, config...)
 	}
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
@@ -77,7 +81,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 			return nil, fmt.Errorf("%q is not found", name)
 		}
 	}
-	// Parse files into protoreflect file descriptors.
+	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
 		ImportPaths:           c.protoImports,
 		IncludeSourceCodeInfo: true,
@@ -88,14 +92,6 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return err
 	}
 
-	if c.configPath != "" {
-		config, err := lint.ReadConfigsFromFile(c.configPath)
-		if err != nil {
-			return err
-		}
-		configs = append(configs, config...)
-	}
-
 	// Create a linter to lint the file descriptors.
 	l := lint.New(rules, configs)
 	results, err := l.LintProtos(fd...)
@@ -103,7 +99,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return err
 	}
 
-	// Determine the output to write the results.
+	// Determine the output for writing the results.
 	// Stdout is the default output.
 	w := os.Stdout
 	if c.outputPath != "" {
@@ -115,7 +111,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		defer w.Close()
 	}
 
-	// Determine the format to print the results.
+	// Determine the format for printing the results.
 	// YAML format is the default.
 	marshal := yaml.Marshal
 	switch c.formatType {

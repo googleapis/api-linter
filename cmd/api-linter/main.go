@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The command line `api-lint` checks Google APIs defined in Protobuf files.
+// The command line `api-linter` checks Google APIs defined in Protobuf files.
 // It follows the API Improvement Proposals defined in https://aip.dev.
 package main
 
@@ -24,23 +24,7 @@ import (
 	core "github.com/googleapis/api-linter/rules"
 )
 
-var rules, _ = lint.NewRuleRegistry()
-var configs lint.Configs
-
-func init() {
-	configs = lint.Configs{
-		lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				"core": {},
-			},
-		},
-	}
-
-	if err := addRules(core.Rules()); err != nil {
-		log.Fatalln(err)
-	}
-}
+var globalRules = core.Rules()
 
 func main() {
 	if err := runCLI(os.Args[1:]); err != nil {
@@ -50,9 +34,20 @@ func main() {
 
 func runCLI(args []string) error {
 	c := newCli(args)
-	return c.lint(rules, configs)
+	return c.lint(globalRules, defaultConfigs())
 }
 
-func addRules(r lint.RuleRegistry) error {
-	return rules.Register(r.All()...)
+func addRuleToGlobal(r ...lint.ProtoRule) error {
+	return globalRules.Register(r...)
+}
+
+func defaultConfigs() lint.Configs {
+	return lint.Configs{
+		lint.Config{
+			IncludedPaths: []string{"**/*.proto"},
+			RuleConfigs: map[string]lint.RuleConfig{
+				"core": {},
+			},
+		},
+	}
 }
