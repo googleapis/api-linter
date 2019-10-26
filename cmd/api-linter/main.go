@@ -37,10 +37,6 @@ func runCLI(args []string) error {
 	return c.lint(globalRules, defaultConfigs())
 }
 
-func addRuleToGlobal(r ...lint.ProtoRule) error {
-	return globalRules.Register(r...)
-}
-
 func defaultConfigs() lint.Configs {
 	return lint.Configs{
 		lint.Config{
