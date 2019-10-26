@@ -174,13 +174,13 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 		if err := writeFile(configFilePath, configContent); err != nil {
 			t.Fatal(err)
 		}
-		args = append(args, fmt.Sprintf("-c=%s", configFilePath))
+		args = append(args, fmt.Sprintf("-config=%s", configFilePath))
 	}
 	// Add a flag for the output path.
 	outPath := filepath.Join(tempDir, "test.out")
-	args = append(args, fmt.Sprintf("-o=%s", outPath))
+	args = append(args, fmt.Sprintf("-out_path=%s", outPath))
 	// Add the temp dir to the proto paths.
-	args = append(args, fmt.Sprintf("-I=%s", tempDir))
+	args = append(args, fmt.Sprintf("-proto_path=%s", tempDir))
 	// Write the proto file.
 	protoFileName := "test.proto"
 	protoFilePath := filepath.Join(tempDir, protoFileName)
