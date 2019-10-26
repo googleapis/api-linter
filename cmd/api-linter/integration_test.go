@@ -57,27 +57,13 @@ var testCases = []struct {
 	},
 }
 
-func TestRules_Enabled(t *testing.T) {
-	config := `
-	[
-		{
-			"included_paths": ["*.proto"],
-			"rule_configs": {
-				"": {
-					"status": "enabled",
-					"category": "warning"
-				}
-			}
-		}
-	]
-	`
-
+func TestRules_EnabledByDefault(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
 			proto := test.proto
-			result := runLinter(t, proto, config)
+			result := runLinter(t, proto, "")
 			if !strings.Contains(result, test.rule) {
-				t.Errorf("Rule %q should be enabled by the user config: %q", test.rule, config)
+				t.Errorf("Rule %q should be enabled by default", test.rule)
 			}
 		})
 	}
@@ -171,46 +157,47 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	}
 }
 
-func runLinter(t *testing.T, proto, config string) string {
-	workdir, err := ioutil.TempDir("", "test")
+func runLinter(t *testing.T, protoContent, configContent string) string {
+	tempDir, err := ioutil.TempDir("", "test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Chdir(workdir); err != nil {
+	defer os.RemoveAll(tempDir)
+
+	// Prepare command line flags.
+	args := []string{}
+	// Add a flag for the linter config file if the provided
+	// config content is not empty.
+	if configContent != "" {
+		configFileName := "test_config.json"
+		configFilePath := filepath.Join(tempDir, configFileName)
+		if err := writeFile(configFilePath, configContent); err != nil {
+			t.Fatal(err)
+		}
+		args = append(args, fmt.Sprintf("-c=%s", configFilePath))
+	}
+	// Add a flag for the output path.
+	outPath := filepath.Join(tempDir, "test.out")
+	args = append(args, fmt.Sprintf("-o=%s", outPath))
+	// Add the temp dir to the proto paths.
+	args = append(args, fmt.Sprintf("-I=%s", tempDir))
+	// Write the proto file.
+	protoFileName := "test.proto"
+	protoFilePath := filepath.Join(tempDir, protoFileName)
+	if err := writeFile(protoFilePath, protoContent); err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(workdir)
+	args = append(args, protoFileName)
 
-	protoPath := "test.proto"
-	configPath := "test_config.json"
-	outPath := "test.out"
-
-	if err := writeFile(protoPath, proto); err != nil {
-		t.Fatal(err)
-	}
-	if err := writeFile(configPath, config); err != nil {
-		t.Fatal(err)
-	}
-
-	args := []string{
-		"-c=" + configPath,
-		"-o=" + outPath,
-		"-I=" + workdir,
-		protoPath}
 	if err := runCLI(args); err != nil {
 		t.Fatal(err)
 	}
 
-	f, err := os.Open(outPath)
+	out, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
-	content, err := ioutil.ReadAll(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(content)
+	return string(out)
 }
 
 func writeFile(path, content string) error {
