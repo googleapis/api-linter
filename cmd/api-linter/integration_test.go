@@ -49,9 +49,11 @@ var testCases = []struct {
 		rule:     "core::0140::lower-snake",
 		proto: `
 				syntax = "proto3";
+				import "dummy.proto";
 				message Test {
 					// disable-me-here
 					string badName = 1;
+					dummy.Dummy dummy = 2;
 				}
 			`,
 	},
@@ -181,6 +183,8 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 	args = append(args, fmt.Sprintf("-out_path=%s", outPath))
 	// Add the temp dir to the proto paths.
 	args = append(args, fmt.Sprintf("-proto_path=%s", tempDir))
+	// Add a flag for the file descriptor set.
+	args = append(args, "-proto_desc=internal/testdata/dummy.protoset")
 	// Write the proto file.
 	protoFileName := "test.proto"
 	protoFilePath := filepath.Join(tempDir, protoFileName)
