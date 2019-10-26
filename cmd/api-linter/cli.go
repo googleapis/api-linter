@@ -4,83 +4,56 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"gopkg.in/yaml.v2"
 )
 
 type cli struct {
-	configPath   string
-	formatType   string
-	outputPath   string
-	protoImports []string
-	protoFiles   []string
+	configPath    string
+	formatType    string
+	outputPath    string
+	protoImports  []string
+	protoFiles    []string
+	protoDescPath string
 }
 
 func newCli(args []string) *cli {
 	// Define flags.
 	var fmtFlag string
-	var fmtShortFlag string
 	var cfgFlag string
-	var cfgShortFlag string
 	var outFlag string
-	var outShortFlag string
 	var protoImportFlag stringSlice
-	var protoImportShortFlag stringSlice
+	var protoDescFlag string
 
 	// Register flags.
-	fs := &flag.FlagSet{
-		// We provide a customized usage to put
-		// long and short flags together.
-		Usage: func() {
-			usage := `Usage of api-linter:
-	-config, -c
-		The linter config file.
-	-out_path, -o
-		The output file path.
-	-out_format, -f
-		The format of the linting results.
-	-proto_path, -I
-		The folder to search for proto imports.`
-			fmt.Fprintln(os.Stderr, usage)
-		},
-	}
-	fs.Init("api-linter", flag.ExitOnError)
+	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
 	fs.Var(&protoImportFlag, "proto_path", "The folder to search for proto imports.")
-	fs.Var(&protoImportShortFlag, "I", "Short flag for the folder to search for proto imports.")
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
-	fs.StringVar(&cfgShortFlag, "c", "", "Short flag for the config file.")
 	fs.StringVar(&fmtFlag, "out_format", "", "The format of the linting results.")
-	fs.StringVar(&fmtShortFlag, "f", "", "Short flag for the format of the linting results.")
 	fs.StringVar(&outFlag, "out_path", "", "The output file path.")
-	fs.StringVar(&outShortFlag, "o", "", "Short flag for the output file path.")
+	fs.StringVar(&protoDescFlag, "proto_desc", "", "The file descriptor set for proto imports")
 
 	// Parse flags.
 	fs.Parse(args)
 
 	c := &cli{
-		configPath:   cfgFlag,
-		formatType:   fmtFlag,
-		outputPath:   outFlag,
-		protoImports: []string{"."},
-		protoFiles:   fs.Args(),
+		configPath:    cfgFlag,
+		formatType:    fmtFlag,
+		outputPath:    outFlag,
+		protoImports:  []string{"."},
+		protoFiles:    fs.Args(),
+		protoDescPath: protoDescFlag,
 	}
 
 	c.protoImports = append(c.protoImports, protoImportFlag...)
-	c.protoImports = append(c.protoImports, protoImportShortFlag...)
-
-	if cfgShortFlag != "" {
-		c.configPath = cfgShortFlag
-	}
-	if fmtShortFlag != "" {
-		c.formatType = fmtShortFlag
-	}
-	if outShortFlag != "" {
-		c.outputPath = outShortFlag
-	}
 
 	return c
 }
@@ -90,10 +63,25 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	if len(c.protoFiles) == 0 {
 		return fmt.Errorf("no files to lint")
 	}
+	// Prepare proto import lookup.
+	var lookupImport func(string) (*desc.FileDescriptor, error)
+	if c.protoDescPath != "" {
+		fs, err := loadFileDescriptors(c.protoDescPath)
+		if err != nil {
+			return err
+		}
+		lookupImport = func(name string) (*desc.FileDescriptor, error) {
+			if f, found := fs[name]; found {
+				return f, nil
+			}
+			return nil, fmt.Errorf("%q is not found", name)
+		}
+	}
 	// Parse files into protoreflect file descriptors.
 	p := protoparse.Parser{
 		ImportPaths:           c.protoImports,
 		IncludeSourceCodeInfo: true,
+		LookupImport:          lookupImport,
 	}
 	fd, err := p.ParseFiles(c.protoFiles...)
 	if err != nil {
@@ -164,4 +152,16 @@ func (p *stringSlice) String() string {
 func (p *stringSlice) Set(value string) error {
 	*p = append(*p, strings.Split(value, ",")...)
 	return nil
+}
+
+func loadFileDescriptors(filePath string) (map[string]*desc.FileDescriptor, error) {
+	in, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	fs := &dpb.FileDescriptorSet{}
+	if err := proto.Unmarshal(in, fs); err != nil {
+		return nil, err
+	}
+	return desc.CreateFileDescriptorsFromSet(fs)
 }
