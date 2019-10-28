@@ -31,12 +31,12 @@ import (
 )
 
 type cli struct {
-	configPath    string
-	formatType    string
-	outputPath    string
-	protoImports  []string
-	protoFiles    []string
-	protoDescPath string
+	ConfigPath       string
+	FormatType       string
+	OutputPath       string
+	ProtoImportPaths []string
+	ProtoFiles       []string
+	ProtoDescPath    string
 }
 
 func newCli(args []string) *cli {
@@ -59,23 +59,23 @@ func newCli(args []string) *cli {
 	fs.Parse(args)
 
 	return &cli{
-		configPath:    cfgFlag,
-		formatType:    fmtFlag,
-		outputPath:    outFlag,
-		protoImports:  append(protoImportFlag, "."),
-		protoDescPath: protoDescFlag,
-		protoFiles:    fs.Args(),
+		ConfigPath:       cfgFlag,
+		FormatType:       fmtFlag,
+		OutputPath:       outFlag,
+		ProtoImportPaths: append(protoImportFlag, "."),
+		ProtoDescPath:    protoDescFlag,
+		ProtoFiles:       fs.Args(),
 	}
 }
 
 func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Pre-check if there are files to lint.
-	if len(c.protoFiles) == 0 {
+	if len(c.ProtoFiles) == 0 {
 		return fmt.Errorf("no file to lint")
 	}
 	// Read linter config and append it to the default.
-	if c.configPath != "" {
-		config, err := lint.ReadConfigsFromFile(c.configPath)
+	if c.ConfigPath != "" {
+		config, err := lint.ReadConfigsFromFile(c.ConfigPath)
 		if err != nil {
 			return err
 		}
@@ -83,8 +83,8 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
-	if c.protoDescPath != "" {
-		fs, err := loadFileDescriptors(c.protoDescPath)
+	if c.ProtoDescPath != "" {
+		fs, err := loadFileDescriptors(c.ProtoDescPath)
 		if err != nil {
 			return err
 		}
@@ -97,11 +97,11 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
-		ImportPaths:           c.protoImports,
+		ImportPaths:           c.ProtoImportPaths,
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 	}
-	fd, err := p.ParseFiles(c.protoFiles...)
+	fd, err := p.ParseFiles(c.ProtoFiles...)
 	if err != nil {
 		return err
 	}
@@ -116,9 +116,9 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Determine the output for writing the results.
 	// Stdout is the default output.
 	w := os.Stdout
-	if c.outputPath != "" {
+	if c.OutputPath != "" {
 		var err error
-		w, err = os.Create(c.outputPath)
+		w, err = os.Create(c.OutputPath)
 		if err != nil {
 			return err
 		}
@@ -128,7 +128,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Determine the format for printing the results.
 	// YAML format is the default.
 	marshal := yaml.Marshal
-	switch c.formatType {
+	switch c.FormatType {
 	case "json":
 		marshal = json.Marshal
 	case "summary":
