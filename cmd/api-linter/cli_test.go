@@ -15,7 +15,7 @@ func TestNewCli(t *testing.T) {
 	}{
 		{
 			name:      "AllFlags",
-			inputArgs: strings.Split("-config=config -out_format=json -out_path=out -proto_desc=proto_desc -proto_path=proto_path_a -proto_path=proto_path_b a.proto b.proto", " "),
+			inputArgs: strings.Split("-config=config -output_format=json -output_path=out -proto_descriptor_set=proto_desc -proto_path=proto_path_a -proto_path=proto_path_b a.proto b.proto", " "),
 			wantCli: &cli{
 				ConfigPath:       "config",
 				OutputPath:       "out",

@@ -180,11 +180,11 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 	}
 	// Add a flag for the output path.
 	outPath := filepath.Join(tempDir, "test.out")
-	args = append(args, fmt.Sprintf("-out_path=%s", outPath))
+	args = append(args, fmt.Sprintf("-output_path=%s", outPath))
 	// Add the temp dir to the proto paths.
 	args = append(args, fmt.Sprintf("-proto_path=%s", tempDir))
 	// Add a flag for the file descriptor set.
-	args = append(args, "-proto_desc=internal/testdata/dummy.protoset")
+	args = append(args, "-proto_descriptor_set=internal/testdata/dummy.protoset")
 	// Write the proto file.
 	protoFileName := "test.proto"
 	protoFilePath := filepath.Join(tempDir, protoFileName)
