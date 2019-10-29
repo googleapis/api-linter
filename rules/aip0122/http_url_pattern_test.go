@@ -23,161 +23,35 @@ import (
 func TestHttpUriField(t *testing.T) {
 	tests := []struct {
 		testName string
-		src      string
+		URI      string
 		problems testutils.Problems
 	}{
-		{
-			testName: "Valid",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc CreateInstanceGroup(CreateInstanceGroupsRequest) returns (InstanceGroup) {
-		option (google.api.http) = {
-			post:"/v1/{parent=publishers/*/instanceGroups/*}"
-			body:"instanceGroup"
-		};
+		{"Valid", "/v1/{name=publishers/*/books/*}:frob", testutils.Problems{}},
+		{"ValidCamelPattern", "/v1/{name=publishers/*/frobbableBooks/*}:frob", testutils.Problems{}},
+		{"InvalidSnakePattern", "/v1/{name=publishers/*/frobbable_books/*}:frob", testutils.Problems{{Message: "URI patterns"}}},
+		{"InvalidCamelVariable", "/v1/{bookName=publishers/*/books/*}:frob", testutils.Problems{{Message: "Variable names"}}},
+		{"ValidSnakeVariable", "/v1/{book_name=publishers/*/books/*}:frob", testutils.Problems{}},
+		{"ValidSnakeSoloVariable", "/v1/{book_name}:frob", testutils.Problems{}},
+		{"InvalidCamelSoloVariable", "/v1/{bookName}:frob", testutils.Problems{{Message: "Variable names"}}},
 	}
-}
-
-message CreateInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: nil,
-		},
-		{
-			testName: "InValid-Get",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc GetInstanceGroup(GetInstanceGroupsRequest) returns (InstanceGroup) {
-	 option (google.api.http) = {
-		 get: "/v1/{name=publishers/*/instance_groups/*}"
-	 };
-	}
-}
-
-message GetInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-		{
-			testName: "InValid-Create",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc CreateInstanceGroup(CreateInstanceGroupsRequest) returns (InstanceGroup) {
-	 option (google.api.http) = {
-		 post: "/v1/{parent=publishers/*/instance_groups/*}"
-		 body: "instanceGroup"
-	 };
-	}
-}
-
-message CreateInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-		{
-			testName: "InValid-Delete",
-			//addionalImport:`import "google/protobuf/empty.proto";`,
-			src: `import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
-
-service InstanceGroupService {
-	rpc DeleteInstanceGroup(DeleteInstanceGroupsRequest) returns (google.protobuf.Empty) {
-	 option (google.api.http) = {
-		 delete: "/v1/{name=publishers/*/instance_groups/*}"
-	 };
-	}
-}
-
-message DeleteInstanceGroupsRequest {}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-		{
-			testName: "InValid-Update_Patch",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc UpdateInstanceGroup(UpdateInstanceGroupsRequest) returns (InstanceGroup) {
-	 option (google.api.http) = {
-		 patch: "/v1/{book.name=publishers/*/instance_groups/*}"
-		 body: "instanceGroup"
-	 };
-	}
-}
-
-message UpdateInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-		{
-			testName: "InValid-Update_Put",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc UpdateInstanceGroup(UpdateInstanceGroupsRequest) returns (InstanceGroup) {
-	 option (google.api.http) = {
-		 put: "/v1/{book.name=publishers/*/instance_groups/*}"
-		 body: "book"
-	 };
-	}
-}
-
-message UpdateInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-		{
-
-			testName: "InValid-Custom",
-			src: `import "google/api/annotations.proto";
-
-service InstanceGroupService {
-	rpc MoveInstanceGroup(MoveInstanceGroupsRequest) returns (InstanceGroup) {
-	 option (google.api.http) = {
-			custom: { path: "/v1/{book.name=publishers/*/instance_groups/*}" }
-	 };
-	}
-}
-
-message MoveInstanceGroupsRequest {}
-
-message InstanceGroup{}
-`,
-			problems: testutils.Problems{{
-				Message: "HTTP URL should use camel case, but not snake case.",
-			}},
-		},
-	}
-
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3String(t, test.src)
-
-			f := file.GetServices()[0].GetMethods()[0]
-			problems := camelCase.Lint(file)
-			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
+						option (google.api.http) = {
+							post: "{{.URI}}"
+							body: "*"
+						};
+					}
+				}
+				message FrobBookRequest {}
+				message FrobBookResponse {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := httpURICase.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
