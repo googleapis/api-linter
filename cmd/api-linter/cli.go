@@ -16,119 +16,162 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
+	"fmt"
+	"io/ioutil"
 	"os"
+	"strings"
 
+	"github.com/golang/protobuf/proto"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
-	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
 
-func runCLI(rules lint.RuleRegistry, configs lint.Configs, args []string) error {
-	app := cli.NewApp()
-	app.Name = "api-linter"
-	app.Usage = "A linter for APIs"
-	app.Version = "0.1"
-	app.Commands = []cli.Command{
-		{
-			Name:      "checkproto",
-			Aliases:   []string{"cp"},
-			Usage:     "Check protobuf files that define an API",
-			ArgsUsage: "files...",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "cfg",
-					Value: "",
-					Usage: "configuration file path",
-				},
-				cli.StringFlag{
-					Name:  "out",
-					Value: "",
-					Usage: "output file path (default: stdout)",
-				},
-				cli.StringFlag{
-					Name:  "fmt",
-					Value: "yaml",
-					Usage: "output format",
-				},
-				cli.StringSliceFlag{
-					Name:  "proto_path",
-					Value: &cli.StringSlice{"."},
-					Usage: "the directories in which for protoc to search for imports",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				filenames := c.Args()
+type cli struct {
+	ConfigPath       string
+	FormatType       string
+	OutputPath       string
+	ProtoImportPaths []string
+	ProtoFiles       []string
+	ProtoDescPath    string
+}
 
-				// Sanity check: Were we given any files to parse at all?
-				// If not, abort.
-				if len(filenames) == 0 {
-					os.Stderr.WriteString("No files specified to lint.\n")
-					return nil
-				}
+func newCli(args []string) *cli {
+	// Define flag variables.
+	var cfgFlag string
+	var fmtFlag string
+	var outFlag string
+	var protoImportFlag stringSlice
+	var protoDescFlag string
 
-				// Parse the provided protobuf files into a protoreflect file
-				// descriptor.
-				p := protoparse.Parser{
-					ImportPaths:           c.StringSlice("proto_path"),
-					IncludeSourceCodeInfo: true,
-				}
-				fd, err := p.ParseFiles(filenames...)
-				if err != nil {
-					return err
-				}
+	// Register flag variables.
+	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
+	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
+	fs.StringVar(&fmtFlag, "output_format", "", "The format of the linting results.\nSupported formats include YAML, JSON and summary text.\nYAML is the default.")
+	fs.StringVar(&outFlag, "output_path", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
+	fs.Var(&protoImportFlag, "proto_path", "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
+	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "The file descriptor set for searching proto imports.")
 
-				// If a configuration file was provided, parse it.
-				if c.String("cfg") != "" {
-					userConfigs, err := lint.ReadConfigsFromFile(c.String("cfg"))
-					if err != nil {
-						return err
-					}
-					configs = append(configs, userConfigs...)
-				}
+	// Parse flags.
+	fs.Parse(args)
 
-				// Instantiate the linter object, and lint the protos.
-				l := lint.New(rules, configs)
-				lintResponses, err := l.LintProtos(fd...)
-				if err != nil {
-					return err
-				}
+	return &cli{
+		ConfigPath:       cfgFlag,
+		FormatType:       fmtFlag,
+		OutputPath:       outFlag,
+		ProtoImportPaths: append(protoImportFlag, "."),
+		ProtoDescPath:    protoDescFlag,
+		ProtoFiles:       fs.Args(),
+	}
+}
 
-				// If writing output to a file, set that up.
-				// If no file was specified, use stdout.
-				w := os.Stdout
-				if c.String("out") != "" {
-					var err error
-					w, err = os.Create(c.String("out"))
-					if err != nil {
-						return err
-					}
-					defer w.Close()
-				}
-
-				// Determine what format we are using to print the results.
-				marshal := yaml.Marshal
-				switch c.String("fmt") {
-				case "json":
-					marshal = json.Marshal
-				case "summary":
-					marshal = func(i interface{}) ([]byte, error) {
-						return emitSummary(i.([]lint.Response))
-					}
-				}
-
-				// Print the actual results.
-				b, err := marshal(lintResponses)
-				if err != nil {
-					return err
-				}
-				if _, err = w.Write(b); err != nil {
-					return err
-				}
-				return nil
-			},
-		},
+func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
+	// Pre-check if there are files to lint.
+	if len(c.ProtoFiles) == 0 {
+		return fmt.Errorf("no file to lint")
+	}
+	// Read linter config and append it to the default.
+	if c.ConfigPath != "" {
+		config, err := lint.ReadConfigsFromFile(c.ConfigPath)
+		if err != nil {
+			return err
+		}
+		configs = append(configs, config...)
+	}
+	// Prepare proto import lookup.
+	var lookupImport func(string) (*desc.FileDescriptor, error)
+	if c.ProtoDescPath != "" {
+		fs, err := loadFileDescriptors(c.ProtoDescPath)
+		if err != nil {
+			return err
+		}
+		lookupImport = func(name string) (*desc.FileDescriptor, error) {
+			if f, found := fs[name]; found {
+				return f, nil
+			}
+			return nil, fmt.Errorf("%q is not found", name)
+		}
+	}
+	// Parse proto files into `protoreflect` file descriptors.
+	p := protoparse.Parser{
+		ImportPaths:           c.ProtoImportPaths,
+		IncludeSourceCodeInfo: true,
+		LookupImport:          lookupImport,
+	}
+	fd, err := p.ParseFiles(c.ProtoFiles...)
+	if err != nil {
+		return err
 	}
 
-	return app.Run(args)
+	// Create a linter to lint the file descriptors.
+	l := lint.New(rules, configs)
+	results, err := l.LintProtos(fd...)
+	if err != nil {
+		return err
+	}
+
+	// Determine the output for writing the results.
+	// Stdout is the default output.
+	w := os.Stdout
+	if c.OutputPath != "" {
+		var err error
+		w, err = os.Create(c.OutputPath)
+		if err != nil {
+			return err
+		}
+		defer w.Close()
+	}
+
+	// Determine the format for printing the results.
+	// YAML format is the default.
+	marshal := yaml.Marshal
+	switch c.FormatType {
+	case "json":
+		marshal = json.Marshal
+	case "summary":
+		marshal = func(i interface{}) ([]byte, error) {
+			return emitSummary(i.([]lint.Response))
+		}
+	}
+
+	// Print the results.
+	b, err := marshal(results)
+	if err != nil {
+		return err
+	}
+	if _, err = w.Write(b); err != nil {
+		return err
+	}
+	return nil
+}
+
+type stringSlice []string
+
+// String is the method to format the flag's value, part of the flag.Value interface.
+// The String method's output will be used in diagnostics.
+func (p *stringSlice) String() string {
+	return fmt.Sprint(*p)
+}
+
+// Set is the method to set the flag value, part of the flag.Value interface.
+// Set's argument is a string to be parsed to set the flag.
+// It's a comma-separated list, so we split it.
+func (p *stringSlice) Set(value string) error {
+	*p = append(*p, strings.Split(value, ",")...)
+	return nil
+}
+
+func loadFileDescriptors(filePath string) (map[string]*desc.FileDescriptor, error) {
+	in, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	fs := &dpb.FileDescriptorSet{}
+	if err := proto.Unmarshal(in, fs); err != nil {
+		return nil, err
+	}
+	return desc.CreateFileDescriptorsFromSet(fs)
 }

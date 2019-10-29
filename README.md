@@ -19,24 +19,9 @@ This installs `api-linter` into your local Go binary folder `$HOME/go/bin`. Ensu
 
 ## Usage
 
-Run `api-linter help` to see the usage. Or run `api-linter help checkproto` to see how to check API protobuf files:
-
 ```sh
-NAME:
-   api-linter checkproto - Check protobuf files that define an API
-
-USAGE:
-   api-linter checkproto [command options] files...
-
-OPTIONS:
-   --cfg value          configuration file path
-   --out value          output file path (default: stdout)
-   --fmt value          output format (default: "yaml")
-   --protoc value       protocol compiler path (default: "protoc")
-   --proto_path value   the directory in which for protoc to search for imports (default: ".")
+api-linter proto_file1 proto_file2 ...
 ```
-
-See this [example](cmd/api-linter/examples/example.sh).
 
 ## Rule Configuration
 

@@ -12,17 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Binary api-linter is a linter that checks Google APIs according to the API Improvement Proposals
-// defined in https://aip.dev
+// The command line `api-linter` checks Google APIs defined in Protobuf files.
+// It follows the API Improvement Proposals defined in https://aip.dev.
 package main
 
 import (
 	"log"
 	"os"
+
+	"github.com/googleapis/api-linter/lint"
+	core "github.com/googleapis/api-linter/rules"
 )
 
+var globalRules = core.Rules()
+
 func main() {
-	if err := runCLI(rules(), configs(), os.Args); err != nil {
-		log.Fatal(err)
+	if err := runCLI(os.Args[1:]); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func runCLI(args []string) error {
+	c := newCli(args)
+	return c.lint(globalRules, defaultConfigs())
+}
+
+func defaultConfigs() lint.Configs {
+	return lint.Configs{
+		lint.Config{
+			IncludedPaths: []string{"**/*.proto"},
+			RuleConfigs: map[string]lint.RuleConfig{
+				"core": {},
+			},
+		},
 	}
 }
