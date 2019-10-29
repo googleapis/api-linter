@@ -58,33 +58,3 @@ func isBatchGetRequestMessage(m *desc.MessageDescriptor) bool {
 func isBatchGetResponseMessage(m *desc.MessageDescriptor) bool {
 	return batchGetResMessageRegexp.MatchString(m.GetName())
 }
-
-//// get resource message type name from method
-//func getResourceMsgName(m *desc.MethodDescriptor) string {
-//	// Usually the response message will be the resource message, and its name will
-//	// be part of method name (make a double check here to avoid the issue when
-//	// method or output naming doesn't follow the right principles)
-//	if strings.Contains(m.GetName()[6:], m.GetOutputType().GetName()) {
-//		return m.GetOutputType().GetName()
-//	}
-//	return m.GetName()[6:]
-//}
-//
-//// get resource message type name from request message
-//func getResourceMsgNameFromReq(m *desc.MessageDescriptor) string {
-//	// retrieve the string between the prefix "Create" and suffix "Request" from
-//	// the name "Create<XXX>Request", and this part will usually be the resource
-//	// message name(if its naming follows the right principle)
-//	resourceMsgName := m.GetName()[6 : len(m.GetName())-7]
-//
-//	// Get the resource field of the request message if it exist, this part will
-//	// be exactly the resource message name (make a double check here to avoid the
-//	// issues when request message naming doesn't follow the right principles)
-//	for _, fieldDesc := range m.GetFields() {
-//		if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && strings.Contains(resourceMsgName, msgDesc.GetName()) {
-//			resourceMsgName = msgDesc.GetName()
-//		}
-//	}
-//
-//	return resourceMsgName
-//}
