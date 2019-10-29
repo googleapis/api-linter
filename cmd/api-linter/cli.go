@@ -50,10 +50,10 @@ func newCli(args []string) *cli {
 	// Register flag variables.
 	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
-	fs.StringVar(&fmtFlag, "out_format", "", "The format of the linting results.")
-	fs.StringVar(&outFlag, "out_path", "", "The output file path.")
-	fs.Var(&protoImportFlag, "proto_path", "The folder to search for proto imports.")
-	fs.StringVar(&protoDescFlag, "proto_desc", "", "The file descriptor set for proto imports")
+	fs.StringVar(&fmtFlag, "output_format", "", "The format of the linting results.\nSupported formats include YAML, JSON and summary text.\nYAML is the default.")
+	fs.StringVar(&outFlag, "output_path", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
+	fs.Var(&protoImportFlag, "proto_path", "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
+	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "The file descriptor set for searching proto imports.")
 
 	// Parse flags.
 	fs.Parse(args)
