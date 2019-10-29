@@ -16,12 +16,11 @@ package aip0231
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/kjk/inflect"
 )
 
 var pluralMethodResourceName = &lint.MethodRule{
@@ -29,14 +28,18 @@ var pluralMethodResourceName = &lint.MethodRule{
 	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `BatchGetFoos`
+		// Note: m.GetName()[8:] is used to retrieve the resource name from the
+		// method name. For example, "BatchGetFoos" -> "Foos"
 		pluralMethodResourceName := m.GetName()[8:]
 
-		if !inflect.IsPlural(pluralMethodResourceName) {
+		pluralize := pluralize.NewClient()
+
+		// Rule check: Establish that for methods such as `BatchGetFoos`
+		if !pluralize.IsPlural(pluralMethodResourceName) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					`The resource part in method name %q shouldn't %q, but should be its plural form %q`,
-					m.GetName(), pluralMethodResourceName, inflect.ToPlural(pluralMethodResourceName),
+					m.GetName(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
 				),
 				Descriptor: m,
 			}}
@@ -52,9 +55,7 @@ var inputName = &lint.MethodRule{
 	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `BatchGetFoos`, the request
-		// message is named `BatchGetFoosRequest`.\
-		pluralInputResourceName := strings.Title(inflect.ToPlural(m.GetName()[8:]))
+		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[8:])
 
 		// Rule check: Establish that for methods such as `BatchGetFoos`, the request
 		// message is named `BatchGetFoosRequest`.
@@ -78,9 +79,7 @@ var outputName = &lint.MethodRule{
 	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `BatchGetFoos`, the response
-		// message is named `BatchGetFoosResponse`.
-		pluralInputResourceName := strings.Title(inflect.ToPlural(m.GetName()[8:]))
+		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[8:])
 
 		// Rule check: Establish that for methods such as `BatchGetFoos`, the request
 		// message is named `BatchGetFoosResponse`.

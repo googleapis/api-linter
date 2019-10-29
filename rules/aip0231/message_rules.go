@@ -17,10 +17,10 @@ package aip0231
 import (
 	"fmt"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	"github.com/kjk/inflect"
 )
 
 // The Batch Get request message should have parent field.
@@ -100,8 +100,12 @@ var namesField = &lint.MessageRule{
 				Descriptor: getReqMsg,
 			})
 		}
-		// Rule check: Ensure that the standard get request message field is the correct type.
-		rightTypeName := fmt.Sprintf("Get%sRequest", inflect.ToSingular(m.GetName()[8:len(m.GetName())-7]))
+
+		// Rule check: Ensure that the standard get request message field is the
+		// correct type. Note: Use m.GetName()[8:len(m.GetName())-7]) to retrieve
+		// the resource name from the the batch get request, for example:
+		// "BatchGetBooksRequest" -> "Books"
+		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.GetName()[8:len(m.GetName())-7]))
 		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().GetName() != rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
@@ -118,8 +122,11 @@ var resourceField = &lint.MessageRule{
 	URI:    "https://aip.dev/231#response-message",
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// the singular form the resource name, the first letter is Capitalized
-		resourceMsgName := inflect.ToSingular(m.GetName()[8 : len(m.GetName())-9])
+		// the singular form the resource name, the first letter is Capitalized.
+		// Note: Use m.GetName()[8 : len(m.GetName())-9] to retrieve the resource
+		// name from the the batch get response, for example:
+		// "BatchGetBooksResponse" -> "Books"
+		resourceMsgName := pluralize.NewClient().Singular(m.GetName()[8 : len(m.GetName())-9])
 
 		for _, fieldDesc := range m.GetFields() {
 			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
@@ -128,9 +135,9 @@ var resourceField = &lint.MessageRule{
 						Message:    fmt.Sprintf("The %q type field on Batch Get Response message should be repeated", msgDesc.GetName()),
 						Descriptor: fieldDesc,
 					}}
-				} else {
-					return nil
 				}
+
+				return nil
 			}
 		}
 

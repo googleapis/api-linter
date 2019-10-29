@@ -260,7 +260,7 @@ func TestOutputName(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchGetBooksRequest",
+			testName: "Valid-BatchGetBooksResponse",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
@@ -278,7 +278,7 @@ message BatchGetBooksResponse{}
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-BatchGetMenRequest",
+			testName: "Valid-BatchGetBooksResponse",
 			src: `import "google/api/annotations.proto";
 
 service ManService {
