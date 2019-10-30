@@ -1,0 +1,25 @@
+.api-linter-rule-listing {
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    &.glue-table--datatable.glue-table--stacked {
+      border-top: 0px;
+    }
+  }
+
+  &.glue-table--stacked {
+    @media (min-width: 1024px) {
+      td {
+        width: 50%;
+      }
+    }
+
+    td:before {
+      display: none;
+    }
+  }
+}
+
+.glue-expansion-panels .glue-expansion-panel-content > div.has-rule-listing {
+  padding: 0px;
+}
