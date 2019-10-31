@@ -29,7 +29,41 @@ Each linter rule has its own [rule documentation][], and rules can be
 
 ## Installation
 
-Lorem ipsum dolor set amet...
+To install `api-linter`, use `go get`:
+
+```golang
+go get -u github.com/googleapis/api-linter/cmd/api-linter
+```
+
+It will install `api-linter` into your local Go binary directory `$HOME/go/bin`.
+Ensure that your operating system's `PATH` contains the Go binary directory.
+
+## Usage
+
+```sh
+api-linter proto_file1 proto_file2 ...
+```
+
+To see the help message, run `api-linter -h`
+
+```text
+Usage of api-linter:
+  -config string
+      The linter config file.
+  -output_format string
+      The format of the linting results.
+      Supported formats include YAML, JSON and summary text.
+      YAML is the default.
+  -output_path string
+      The output file path.
+      If not given, the linting results will be printed out to STDOUT.
+  -proto_descriptor_set string
+      The file descriptor set for searching proto imports.
+  -proto_path value
+      The folder for searching proto imports.
+      May be specified multiple times; directories will be searched in order.
+      The current working directory is always used.
+```
 
 ## License
 
