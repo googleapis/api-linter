@@ -31,7 +31,7 @@ Each linter rule has its own [rule documentation][], and rules can be
 
 To install `api-linter`, use `go get`:
 
-```golang
+```sh
 go get -u github.com/googleapis/api-linter/cmd/api-linter
 ```
 
