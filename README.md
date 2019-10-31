@@ -1,26 +1,65 @@
-# API Linter
+# Google API Linter
 
-API linter checks APIs defined in protobuf files. It follows [Google API Design Guide](https://cloud.google.com/apis/design/).
+The API linter provides real-time checks for compliance with many of Google's
+API standards, documented using [API Improvement Proposals][]. It operates on
+API surfaces defined in [protocol buffers][].
 
-## Requirements
+It identifies common mistakes and inconsistencies in API surfaces:
 
-* Install `git` from [https://git-scm.com](https://git-scm.com/);
-* Install `go` from [https://golang.org/doc/install](https://golang.org/doc/install);
+```proto
+// Incorrect.
+message GetBookRequest {
+  // This is wrong; it should be spelled `name`.
+  string book = 1;
+}
+```
+
+When able, it also offers a suggestion for the correct fix.
+
+**Note:** Not every piece of AIP guidance is able to be expressed as lint rules
+(and some things that are able to be expressed may not be written yet). The
+linter should be used as a useful tool, but not as a substitute for reading and
+understanding API guidance.
+
+Each linter rule has its own [rule documentation][], and rules can be
+[configured][configuration] using a config file, or in a proto file itself.
 
 ## Installation
 
-* Install `api-linter` using `go get`:
+To install `api-linter`, use `go get`:
 
 ```sh
 go get -u github.com/googleapis/api-linter/cmd/api-linter
 ```
 
-This installs `api-linter` into your local Go binary folder `$HOME/go/bin`. Ensure that your operating system's `PATH` contains the folder.
+It will install `api-linter` into your local Go binary directory `$HOME/go/bin`.
+Ensure that your operating system's `PATH` contains the Go binary directory.
 
 ## Usage
 
 ```sh
 api-linter proto_file1 proto_file2 ...
+```
+
+To see the help message, run `api-linter -h`
+
+```text
+Usage of api-linter:
+  -config string
+      The linter config file.
+  -output_format string
+      The format of the linting results.
+      Supported formats include YAML, JSON and summary text.
+      YAML is the default.
+  -output_path string
+      The output file path.
+      If not given, the linting results will be printed out to STDOUT.
+  -proto_descriptor_set string
+      The file descriptor set for searching proto imports.
+  -proto_path value
+      The folder for searching proto imports.
+      May be specified multiple times; directories will be searched in order.
+      The current working directory is always used.
 ```
 
 ## Configuration
@@ -95,11 +134,11 @@ message Example {
 }
 ```
 
-
-## Contributing
-
-To contribute your rules, please open an issue first and follow [those existing rules](https://github.com/googleapis/api-linter/tree/master/rules) as examples. Pull requests are always welcome.
-
 ## License
 
-[Apache License 2.0](LICENSE)
+This software is made available under the [Apache 2.0][] license.
+
+[apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0
+[api improvement proposals]: https://aip.dev/
+[protocol buffers]: https://developers.google.com/protocol-buffers
+[rule documentation]: ./rules/index.md
