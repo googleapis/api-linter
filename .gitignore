@@ -1,2 +1,7 @@
 .idea
 .vscode
+
+# Jekyll
+docs/default.profraw
+docs/_site
+docs/.jekyll-metadata

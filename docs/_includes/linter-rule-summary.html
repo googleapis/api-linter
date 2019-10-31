@@ -1,0 +1,22 @@
+<table id="linter-rule-summary">
+  <tr>
+    <th colspan="2">{{ page.rule.name | last }}</th>
+  </tr>
+  {% if page.rule -%}
+  <tr>
+    <td>Rule Group</td>
+    <td>{{ page.rule.name | first }}</td>
+  </tr>
+  <tr>
+    <td>AIP</td>
+    <td>
+      <a href="https://aip.dev/{{ page.rule.aip }}">{{ page.rule.aip }}</a>
+    </td>
+  </tr>
+  {% if page.rule.updated -%}
+  <tr>
+    <td>Updated</td>
+    <td>{{ page.rule.updated }}</td>
+  </tr>
+  {% endif -%} {% endif -%}
+</table>

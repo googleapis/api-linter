@@ -1,0 +1,11 @@
+---
+markdown: kramdown
+plugins:
+  - jekyll-redirect-from
+url: https://googleapis.github.io/api-linter
+defaults:
+  - scope:
+      path: ''
+    values:
+      js:
+        - /assets/js/proto-syntax.js

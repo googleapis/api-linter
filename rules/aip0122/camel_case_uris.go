@@ -24,7 +24,7 @@ import (
 
 // HTTP URL pattern shouldn't include underscore("_")
 var httpURICase = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0122", "http-uri-case"),
+	Name: lint.NewRuleName("core", "0122", "camel-case-uris"),
 	URI:  "https://aip.dev/122#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		// Establish that the URI does not include a `_` character.

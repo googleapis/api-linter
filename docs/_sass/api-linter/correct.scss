@@ -1,0 +1,15 @@
+@import 'colors';
+
+.api-linter-incorrect pre.highlight {
+  border-left: 4px solid $h-google-red-700;
+}
+
+.api-linter-correct pre.highlight {
+  border-left: 4px solid $h-google-green-700;
+}
+
+@media screen {
+  .c1.hide-screen {
+    display: none;
+  }
+}

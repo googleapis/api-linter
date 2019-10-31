@@ -1,0 +1,39 @@
+@import 'glue';
+
+// Headers
+.docs-component-main {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @extend .glue-headline;
+    @extend .glue-has-top-margin;
+
+    // This creates a "fake block" above the header that does not show up
+    // anywhere but tricks the browser into thinking that the anchor is 80px
+    // higher than it actually is.
+    &::before {
+      display: block;
+      content: ' ';
+      height: 80px;
+      margin-top: -80px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+  }
+  h1 {
+    @extend .glue-headline--two;
+    @extend .glue-has-bottom-margin;
+  }
+  h2 {
+    @extend .glue-headline--three;
+    @extend .glue-has-bottom-margin;
+  }
+  h3 {
+    @extend .glue-headline--four;
+    @extend .glue-has-bottom-margin;
+  }
+  h4 {
+    @extend .glue-headline--four;
+  }
+}

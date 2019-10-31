@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}" class="glue-flexbox">
+  <head>
+    <title>{% if page.aip %}AIP-{{ page.aip.id }}: {% endif %}{{ page.title }}</title>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,maximum-scale=2">
+    <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,700|Google+Sans:400,500|Product+Sans:400&amp;lang=en" rel="stylesheet"></link>
+    <link rel="stylesheet" type="text/css" media="screen" href="//www.gstatic.com/glue/v21_0/glue.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    {% for stylesheet in page.css -%}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ stylesheet }}?v={{ site.github.build_revision }}">
+    {% endfor -%}
+    <link rel="stylesheet" type="text/css" media="print" href="{{ '/assets/css/print.css?v=' | append: site.github.build_revision | relative_url }}">
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.4.0.min.js"></script>
+    <script type="text/javascript" src="//www.gstatic.com/glue/latest/glue-detect.min.js"></script>
+    <script type="text/javascript">
+      $('html').css('visibility', 'hidden');
+      $.when($.ready).then(() => {
+        $('html').css('visibility', 'visible');
+      });
+    </script>
+    <script type="text/javascript" src="{{ '/assets/js/global.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+    {% for js_script in page.js -%}
+    <script type="text/javascript" src="{{ js_script }}?v={{ site.github.build_revision }}"></script>
+    {% endfor -%}
+    {% seo %}
+  </head>
+  <body class="glue-page">
+    {% include svgs.html %}
+
+    <div class="glue-header glue-header--product-marketing-one-tier">
+      <div class="glue-header__bar">
+        <div class="glue-header__hamburger glue-header__hamburger--first-tier">
+          <div class="glue-header__hamburger-wrapper">
+            <button type="button"
+                class="glue-js-header__drawer-toggle-link glue-header__hamburger-link"
+                aria-controls="glue-js-header__drawer"
+                aria-expanded="false"
+                title="Open the navigation drawer">
+              <svg role="img" aria-label="Navigation" class="glue-header__hamburger-img
+                  glue-header__hamburger-img--standard">
+                <use xlink:href="#glue-burger"></use>
+              </svg>
+              <svg role="img" aria-label="Navigation" class="glue-header__hamburger-img
+                  glue-header__hamburger-img--reversed">
+                <use xlink:href="#glue-burger"></use>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="glue-header__lockup">
+          <div class="glue-header__company-logo">
+            <a href="/" class="glue-header__company-logo-link title="Google">
+              <svg role="img" aria-label="Google" class="glue-header__company-logo-img
+                  glue-header__company-logo-img--standard">
+                <use xlink:href="#glue-color-google-logo"></use>
+              </svg>
+              <svg role="img" aria-label="Google" class="glue-header__company-logo-img
+                  glue-header__company-logo-img--reversed">
+                <use xlink:href="#glue-white-google-logo"></use>
+              </svg>
+            </a>
+          </div>
+          <div class="glue-header__product-logo">
+            <a href="/" class="glue-header__product-logo-link">
+              <span class="glue-header__product-logo-text">API Linter</span>
+            </a>
+          </div>
+          <a href="#jump-content" class="glue-header__jump-to-content"
+              data-glue-jump-link>
+            <span class="glue-header__jump-to-content-text">Skip to content</span>
+          </a>
+        </div>
+        <div class="glue-header__hamburger glue-header__hamburger--second-tier">
+          <div class="glue-header__hamburger-wrapper">
+            <button type="button"
+                class="glue-header__hamburger-link"
+                aria-controls="glue-js-header__drawer"
+                aria-expanded="false"
+                title="Open the navigation drawer">
+              <svg role="img" aria-label="Navigation" class="glue-header__hamburger-img
+                  glue-header__hamburger-img--standard">
+                <use xlink:href="#glue-burger"></use>
+              </svg>
+              <svg role="img" aria-label="Navigation" class="glue-header__hamburger-img
+                  glue-header__hamburger-img--reversed">
+                <use xlink:href="#glue-burger"></use>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="glue-header__initiative-logo">
+          <a href="#"
+              class="glue-header__initiative-logo-link">
+            <span class="glue-header__initiative-logo-text">Initiative</span>
+          </a>
+        </div>
+        <nav class="glue-header__nav">
+          <ul class="glue-header__nav-list">
+            <li class="glue-header__nav-li" aria-level="1">
+              <a href="/rules/" class="glue-header__nav-li-link{% if page.url contains '/rules/' %} glue-is-active{% endif %}">
+                Rule Documentation
+              </a>
+            </li>
+            <li class="glue-header__nav-li" aria-level="1">
+              <a href="#" class="glue-header__nav-li-link">
+                Configuration
+              </a>
+            </li>
+            <li class="glue-header__nav-li" aria-level="1">
+              <a href="#" class="glue-header__nav-li-link">
+                Contributing
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="glue-header__cta">
+          <ul class="glue-header__cta-list">
+            <li class="glue-header__cta-li glue-header__cta-li--secondary">
+              <a href="https://aip.dev" class="glue-header__cta-li-link
+                  glue-header__cta-li-link--secondary " tabindex="0">
+                    API Improvement Proposals
+              </a>
+            </li>
+            <li class="glue-header__cta-li glue-header__cta-li--primary">
+              <a href="https://github.com/googleapis/api-linter" class="glue-header__cta-li-link
+                  glue-header__cta-li-link--primary">
+                <img src="/assets/images/github.png" class="github-logo">
+                View on GitHub
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="glue-header__bar-underside"></div>
+      </div>
+      <div id="glue-js-header__drawer" class="glue-header__drawer" tabindex="0"
+          aria-label="Navigation drawer">
+        <div class="glue-header__drawer-content">
+          <div class="glue-header__drawer-bar">
+            <div class="glue-header__drawer-lockup">
+              <div class="glue-header__drawer-company-logo">
+                <div class="glue-header__drawer-company-logo-link" title="Google">
+                  <svg role="img" class="glue-header__drawer-company-logo-img">
+                    <use xlink:href="#glue-color-google-logo"></use>
+                  </svg>
+                </div>
+              </div>
+              <div class="glue-header__drawer-product-logo">
+                <div class="glue-header__drawer-product-logo-link">
+                  <span class="glue-header__drawer-product-logo-text">API Linter</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% include linter-nav-mobile.html %}
+        </div>
+        <div class="glue-header__drawer-cta">
+          <ul class="glue-header__drawer-cta-list">
+            <li class="glue-header__drawer-cta-li glue-header__drawer-cta-li--secondary">
+              <a href="https://github.com/googleapis/api-linter/issues" class="glue-header__drawer-cta-li-link
+                  glue-header__drawer-cta-li-link--secondary">
+                File an Issue
+              </a>
+            </li>
+            <li class="glue-header__drawer-cta-li glue-header__drawer-cta-li--primary">
+              <a href="https://github.com/googleapis/api-linter" class="glue-header__drawer-cta-li-link
+                  glue-header__drawer-cta-li-link--primary">
+                <img src="/assets/images/github.png" class="github-logo">
+                View on GitHub
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- TODO (joshmarsh): include drawer backdrop as :before pseudo-element of
+            drawer for simplicity and clarity of code
+      -->
+      <div id="glue-js-header__drawer-backdrop" class="glue-header__drawer-backdrop"></div>
+    </div> <!-- end header -->
+
+    <main role="main" class="hd-o-main" id="main">
+      <section id="jump-content">
+        <aside id="api-linter-sidebar" class="docs-component-sidebar">
+          {% if page.rule -%}
+            {% include linter-rule-summary.html %}
+          {% endif -%}
+          <section id="linter-toc" class="docs-component-sidebar-toc">
+            {% include toc.html html=content h_min=2 h_max=3 %}
+          </section>
+          <section class="docs-component-sidebar-actions">
+            <ul>
+                {%- if page.rule %}
+                <li>
+                  <a href="https://github.com/googleapis/api-linter/blob/master/rules/aip{{ page.rule.name[1] }}/{{ page.rule.name[2] | replace: '-', '_' }}.go">
+                    View implementation
+                  </a>
+                </li>
+                {%- endif %}
+                <li>
+                <a href="https://github.com/googleapis/api-linter/issues/">
+                  File Bug
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/googleapis/api-linter/edit/master/{{ page.path }}">
+                  Edit this page
+                </a>
+              </li>
+            </ul>
+          </section>
+        </aside>
+        <section id="linter-main" class="docs-component-main">
+          {% include linter-breadcrumb.html %}
+          {{ content }}
+          <footer>
+            {% if page.footer %}
+            {{ page.footer }}
+            {% else %}
+            The Google API linter, including its documentation, is licensed under the
+            <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a>.
+            {% endif %}
+          </footer>
+        </section>
+      </section>
+    </main>
+
+    <!-- Closing scripts -->
+    <script src="https://www.gstatic.com/external_hosted/hammerjs/v2_0_2/hammer.min.js"></script>
+    <script src="//www.gstatic.com/glue/v21_0/glue-vanilla.min.js"></script>
+    <script type="text/javascript">
+      glue.ui.header.Header.attachTo(document.querySelector('.glue-header'));
+      if ($('.glue-expansion-panels').length > 0) {
+        new glue.ui.GlueExpansionPanelsPanelGroup(
+          document.querySelector('.glue-expansion-panels')
+        );
+      }
+    </script>
+    </body>
+</html>

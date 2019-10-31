@@ -1,0 +1,40 @@
+@import 'colors';
+
+table#linter-rule-summary {
+  background-color: $h-gm-grey-50;
+  border: 1px solid $h-gm-grey-200;
+  float: right;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+  width: 220px;
+
+  @media (max-width: 800px) {
+    display: none;
+  }
+
+  th {
+    color: $h-gm-grey-800;
+    font-size: 14px;
+    padding: 8px 0px;
+    text-align: center;
+  }
+
+  tr {
+    td {
+      font-size: 12px;
+      padding: 2px 5px;
+
+      &:first-child {
+        @extend .glue-mod-font-weight-bold;
+        color: $h-gm-grey-700;
+        width: 60px;
+        padding-left: 12px;
+      }
+    }
+
+    &:last-child td {
+      padding-bottom: 8px;
+    }
+  }
+}
