@@ -23,36 +23,52 @@ This installs `api-linter` into your local Go binary folder `$HOME/go/bin`. Ensu
 api-linter proto_file1 proto_file2 ...
 ```
 
-## Rule Configuration
+## Configuration
 
-The linter contains a list of [core rules](rules), and by default, they are all enabled. However, one can disable a rule by using a configuration file or in-file(line) comments.
+The linter contains a list of core rules, and by default, they are all enabled.
+However, one can disable a rule by using a configuration file or the file
+comments.
 
 ### Disable a rule using a configuration file
 
-Example:
+Examples:
 
-Disable rule `core::proto_version` for any `.proto` files.
+* Disable the rule `core::0140::lower-snake` for any proto files under the
+directory `tests` using a JSON config file:
 
 ```json
 [
    {
-      "included_paths": ["**/*.proto"],
+      "included_paths": ["tests/*.proto"],
       "rule_configs": {
-         "core::proto_version": {"status": "disabled"}
+         "core::0140::lower-snake": {"status": "disabled"}
       }
    }
 ]
 ```
 
-### Disable a rule using in-file(line) comments
+* Disable the same rule using a YAML config file:
 
-Example:
+```yaml
+---
+- included_paths:
+  - "**/*.proto"
+  rule_configs:
+    core::proto_version:
+      status: disabled
+```
 
-* Disable rule `core::naming_formats::field_names` entirely for a file in the file comments.
+### Disable a rule in the file comments
+
+Examples:
+
+* Disable the rule `core::0140::lower-snake` for the entire file:
 
 ```protobuf
-// file comments
-// api-linter: core::naming_formats::field_names=disabled
+// The file comments.
+// api-linter: core::0140::lower-snake=disabled
+// The above comment will disable the rule
+// core::0140::lower-snake for the entire file.
 
 syntax = "proto3";
 
@@ -64,7 +80,7 @@ message Example {
 }
 ```
 
-* Disable rule `core::naming_formats::field_names` only for a field in its leading or trailing comments.
+* Disable the same rule only for a field in its leading comments:
 
 ```protobuf
 syntax = "proto3";
@@ -73,11 +89,12 @@ package google.api.linter.examples;
 
 message Example {
     string badFieldName = 1;
-    // leading comments for field `anotherBadFieldName`
-    // api-linter: core::naming_formats::field_names=disabled
-    string anotherBadFieldName = 2; // trailing comments (-- api-linter: core::naming_formats::field_names=disabled --)
+    // The leading comments for the field `anotherBadFieldName`
+    // api-linter: core::0140::lower-snake=disabled
+    string anotherBadFieldName = 2;
 }
 ```
+
 
 ## Contributing
 
