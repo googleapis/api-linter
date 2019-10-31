@@ -1,88 +1,28 @@
-# API Linter
+# Google API Linter
 
-API linter checks APIs defined in protobuf files. It follows [Google API Design Guide](https://cloud.google.com/apis/design/).
+The API linter provides real-time checks for compliance with many of Google's
+API standards, documented using [API Improvement Proposals][]. It operates on
+API surfaces defined in [protocol buffers][].
 
-## Requirements
+It identifies common mistakes and inconsistencies in API surfaces:
 
-* Install `git` from [https://git-scm.com](https://git-scm.com/);
-* Install `go` from [https://golang.org/doc/install](https://golang.org/doc/install);
-
-## Installation
-
-* Install `api-linter` using `go get`:
-
-```sh
-go get -u github.com/googleapis/api-linter/cmd/api-linter
-```
-
-This installs `api-linter` into your local Go binary folder `$HOME/go/bin`. Ensure that your operating system's `PATH` contains the folder.
-
-## Usage
-
-```sh
-api-linter proto_file1 proto_file2 ...
-```
-
-## Rule Configuration
-
-The linter contains a list of [core rules](rules), and by default, they are all enabled. However, one can disable a rule by using a configuration file or in-file(line) comments.
-
-### Disable a rule using a configuration file
-
-Example:
-
-Disable rule `core::proto_version` for any `.proto` files.
-
-```json
-[
-   {
-      "included_paths": ["**/*.proto"],
-      "rule_configs": {
-         "core::proto_version": {"status": "disabled"}
-      }
-   }
-]
-```
-
-### Disable a rule using in-file(line) comments
-
-Example:
-
-* Disable rule `core::naming_formats::field_names` entirely for a file in the file comments.
-
-```protobuf
-// file comments
-// api-linter: core::naming_formats::field_names=disabled
-
-syntax = "proto3";
-
-package google.api.linter.examples;
-
-message Example {
-    string badFieldName = 1;
-    string anotherBadFieldName = 2;
+```proto
+// Incorrect.
+message GetBookRequest {
+  // This is wrong; it should be spelled `name`.
+  string book = 1;
 }
 ```
 
-* Disable rule `core::naming_formats::field_names` only for a field in its leading or trailing comments.
+When able, it also offers a suggestion for the correct fix.
 
-```protobuf
-syntax = "proto3";
-
-package google.api.linter.examples;
-
-message Example {
-    string badFieldName = 1;
-    // leading comments for field `anotherBadFieldName`
-    // api-linter: core::naming_formats::field_names=disabled
-    string anotherBadFieldName = 2; // trailing comments (-- api-linter: core::naming_formats::field_names=disabled --)
-}
-```
-
-## Contributing
-
-To contribute your rules, please open an issue first and follow [those existing rules](https://github.com/googleapis/api-linter/tree/master/rules) as examples. Pull requests are always welcome.
+[Read more ≫](https://googleapis.github.io/api-linter/)
 
 ## License
 
-[Apache License 2.0](LICENSE)
+This software is made available under the [Apache 2.0][] license.
+
+[apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0
+[api improvement proposals]: https://aip.dev/
+[protocol buffers]: https://developers.google.com/protocol-buffers
+[rule documentation]: ./rules/index.md

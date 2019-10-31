@@ -35,8 +35,9 @@ To install `api-linter`, use `go get`:
 go get -u github.com/googleapis/api-linter/cmd/api-linter
 ```
 
-It will install `api-linter` into your local Go binary directory `$HOME/go/bin`.
-Ensure that your operating system's `PATH` contains the Go binary directory.
+It will install `api-linter` into your local Go binary directory
+`$HOME/go/bin`. Ensure that your operating system's `PATH` contains the Go
+binary directory.
 
 ## Usage
 
