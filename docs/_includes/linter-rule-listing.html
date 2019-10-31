@@ -40,7 +40,7 @@ values are inclusive. {% endcomment -%}
           {% for p in pbr.items -%}
           <tr>
             <td style="vertical-align: top;">
-              <a href="{{ p.url }}">
+              <a href="{{ p.url | remove_first: '/' }}">
               <tt>{{ p.rule.name | join: '::' }}</tt>
               </a>
             </td>
