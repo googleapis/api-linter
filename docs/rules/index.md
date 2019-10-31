@@ -12,7 +12,7 @@ into the "core" group of rules, and remaining blocks are grouped based on the
 <ul class="glue-tile-set glue-mod-mt-std" style="margin-top: 40px;">
   <li>
     <a class="glue-tile glue-tile--border glue-tile--hoverable"
-        aria-label="Image tile" href="/rules/core/" tabindex="0">
+        aria-label="Image tile" href="rules/core/" tabindex="0">
       <div class="glue-tile__header glue-tile__header--icon">
         <svg role="img" class="glue-tile__icon">
           <use xlink:href="#glue-color-google-logo" x="-76"></use>
