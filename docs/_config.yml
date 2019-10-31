@@ -8,4 +8,4 @@ defaults:
       path: ''
     values:
       js:
-        - /assets/js/proto-syntax.js
+        - assets/js/proto-syntax.js

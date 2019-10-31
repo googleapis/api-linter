@@ -5,27 +5,25 @@
   <!-- prettier-ignore -->
   <ol class="glue-breadcrumbs__list api-linter-breadcrumbs">
     <li class="glue-breadcrumbs__item" aria-level="1">
-      <a class="glue-breadcrumbs__link" href="/">
+      <a class="glue-breadcrumbs__link" href="{{ site.url }}">
         API Linter
       </a>
     </li>
     {%- if (page.url | slice: 0, 7) == '/rules/' %}
     {%- assign url_segments = page.url | split: '/' %}
     {%- assign url_limit = url_segments | size | minus: 2 %}
-    {%- assign cursor = '/' %}
+    {%- assign cursor = '' %}
     {%- for segment in url_segments offset: 1 limit: url_limit %}
       {%- assign cursor = cursor | append: segment | append: '/' %}
       <li class="glue-breadcrumbs__item" aria-level="2">
         <a class="glue-breadcrumbs__link" href="{{ cursor }}">
-          {%- unless segment contains "e" %}
-          AIP-{{ segment }}
-          {%- elsif segment == "rules" %}
+          {%- if segment == "rules" %}
           Rule Documentation
           {%- elsif segment == "core" %}
           Core rules
           {%- else %}
           {{ segment | replace: ('-', ' ') | capitalize }}
-          {% endunless %}
+          {% endif %}
         </a>
       </li>
     {%- endfor %}
