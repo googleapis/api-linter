@@ -23,29 +23,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Get messages should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message", "name"),
-	URI:    "https://aip.dev/131#guidance",
-	OnlyIf: isGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `GetFoo`, the request
-		// message is named `GetFooRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Get RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-			}}
-		}
-
-		return nil
-	},
-}
-
 // Get messages should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0131", "response-message", "name"),

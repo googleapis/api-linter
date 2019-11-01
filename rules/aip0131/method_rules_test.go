@@ -25,41 +25,6 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-func TestRequestMessageName(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName       string
-		methodName     string
-		reqMessageName string
-		problems       testutils.Problems
-	}{
-		{"Valid", "GetBook", "GetBookRequest", testutils.Problems{}},
-		{"Invalid", "GetBook", "Book", testutils.Problems{{Suggestion: "GetBookRequest"}}},
-		{"GetIamPolicy", "GetIamPolicy", "GetIamPolicyRequest", testutils.Problems{}},
-		{"Irrelevant", "AcquireBook", "Book", testutils.Problems{}},
-	}
-
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-131 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage(test.reqMessageName), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the lint rule, and establish that it returns the expected problems.
-			problems := requestMessageName.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}
 
 func TestResponseMessageName(t *testing.T) {
 	// Set up the testing permutations.
