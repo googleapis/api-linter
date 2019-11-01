@@ -49,7 +49,8 @@ the `name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-name-field=disabled --)
+// (-- api-linter: core::0131::request-name-field=disabled
+//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
 message GetBookRequest {
   string book = 1;
 }
