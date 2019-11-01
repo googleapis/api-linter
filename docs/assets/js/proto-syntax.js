@@ -47,13 +47,28 @@ $.when($.ready).then(() => {
 
   // Highlight correct and incorrect proto code blocks.
   for (let desc of ['Correct', 'Incorrect']) {
-    $(`.language-proto .c1:first-child:contains(// ${desc}.)`).each(
-      (_, el) => {
-        $(el)
-          .addClass('hide-screen')
-          .parents('.language-proto')
-          .addClass(`api-linter-${desc.toLowerCase()}`);
+    let magic = `// ${desc}.\n`;
+    $(`.language-proto .c1:first-child:contains('${magic}')`).each((_, el) => {
+      let text = $(el).text();
+
+      // Sanity check. This has to be the leading text.
+      if (!text.startsWith(magic)) {
+        return null;
       }
-    );
+
+      // Hide the comment and add the CSS class to create the border.
+      $(el)
+        .addClass('hide-screen')
+        .parents('.language-proto')
+        .addClass(`api-linter-${desc.toLowerCase()}`);
+
+      // If there is any other text, add it to a new comment <span> so it
+      // is not hidden.
+      if (text != magic) {
+        $(el).after(
+          $(`<span class="c1">${text.substring(magic.length)}</span>`)
+        );
+      }
+    });
   }
 });

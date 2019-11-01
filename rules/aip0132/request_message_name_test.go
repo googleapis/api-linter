@@ -56,39 +56,3 @@ func TestRequestMessageName(t *testing.T) {
 		})
 	}
 }
-
-func TestResponseMessageName(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName        string
-		methodName      string
-		respMessageName string
-		problems        testutils.Problems
-	}{
-		{"Valid", "ListBooks", "ListBooksResponse", testutils.Problems{}},
-		{"Invalid", "ListBooks", "Books", testutils.Problems{{Suggestion: "ListBooksResponse"}}},
-		{"Irrelevant", "EnumerateBooks", "EnumerateBooksResponse", testutils.Problems{}},
-	}
-
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-131 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("ListBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage(test.respMessageName), false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			problems := responseMessageName.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}

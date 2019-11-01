@@ -21,32 +21,9 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// List messages should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0132", "request-message", "name"),
-	URI:    "https://aip.dev/132#guidance",
-	OnlyIf: isListMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `ListFoos`, the request
-		// message is named `ListFoosRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"List RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-			}}
-		}
-
-		return nil
-	},
-}
-
 // List messages should use a `ListFoosResponse` response message.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0132", "response-message", "name"),
+	Name:   lint.NewRuleName("core", "0132", "response-message-name"),
 	URI:    "https://aip.dev/132#guidance",
 	OnlyIf: isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
