@@ -59,7 +59,7 @@ Usage of api-linter:
       The output file path.
       If not given, the linting results will be printed out to STDOUT.
   -proto_descriptor_set string
-      The file descriptor set for searching proto imports.
+      A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.
   -proto_path value
       The folder for searching proto imports.
       May be specified multiple times; directories will be searched in order.
