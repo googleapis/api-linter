@@ -53,7 +53,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&fmtFlag, "output_format", "", "The format of the linting results.\nSupported formats include YAML, JSON and summary text.\nYAML is the default.")
 	fs.StringVar(&outFlag, "output_path", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.Var(&protoImportFlag, "proto_path", "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "The file descriptor set for searching proto imports.")
+	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
 
 	// Parse flags.
 	fs.Parse(args)
@@ -84,7 +84,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
 	if c.ProtoDescPath != "" {
-		fs, err := loadFileDescriptors(c.ProtoDescPath)
+		fs, err := loadFileDescriptors(strings.Split(c.ProtoDescPath, ":")...)
 		if err != nil {
 			return err
 		}
@@ -164,7 +164,19 @@ func (p *stringSlice) Set(value string) error {
 	return nil
 }
 
-func loadFileDescriptors(filePath string) (map[string]*desc.FileDescriptor, error) {
+func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {
+	fds := []*dpb.FileDescriptorProto{}
+	for _, filePath := range filePaths {
+		fs, err := readFileDescriptorSet(filePath)
+		if err != nil {
+			return nil, err
+		}
+		fds = append(fds, fs.GetFile()...)
+	}
+	return desc.CreateFileDescriptors(fds)
+}
+
+func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
 	in, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -173,5 +185,5 @@ func loadFileDescriptors(filePath string) (map[string]*desc.FileDescriptor, erro
 	if err := proto.Unmarshal(in, fs); err != nil {
 		return nil, err
 	}
-	return desc.CreateFileDescriptorsFromSet(fs)
+	return fs, nil
 }
