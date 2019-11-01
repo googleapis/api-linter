@@ -1,20 +1,25 @@
 ---
 rule:
   aip: 131
-  name: [core, '0131', request-message-name]
-  summary: Get methods must have standardized request message names.
+  name: [core, '0131', synonyms]
+  summary: Get methods must be named starting with "Get"
 ---
 
 # Get methods: Request message
 
-This rule enforces that all `Get*` RPCs have a request message name of
-`Get*Request`, as mandated in [AIP-131][].
+This rule enforces that single-resource lookup methods are named `Get*`, as
+mandated in [AIP-131][].
 
 ## Details
 
-This rule looks at any message matching beginning with `Get`, and complains if
-the name of the corresponding input message does not match the name of the RPC
-with the suffix `Request` appended.
+This rule looks at any message with names similar to `Get`, and suggests using
+`Get` instead. It complains if it sees the following synonyms:
+
+- Acquire
+- Fetch
+- Lookup
+- Read
+- Retrieve
 
 ## Examples
 
@@ -22,7 +27,7 @@ with the suffix `Request` appended.
 
 ```proto
 // Incorrect.
-rpc GetBook(GetBookReq) returns (Book) {  // Should be `GetBookRequest`.
+rpc FetchBook(FetchBookRequest) returns (Book) {  // Should be `GetBook`.
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
   }
@@ -46,9 +51,9 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-message-name=disabled
+// (-- api-linter: core::0131::synonyms=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
-rpc GetBook(GetBookReq) returns (Book) {
+rpc FetchBook(GetBookReq) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
   }
