@@ -36,7 +36,7 @@ rpc ListBooks(ListBooksReq) returns (ListBooksResponse) {
 // Correct.
 rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*}/books"
+    get: "/v1/{parent=publishers/*}/books"
   }
 }
 ```
@@ -51,7 +51,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc ListBooks(ListBooksReq) returns (ListBooksResponse) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*}/books"
+    get: "/v1/{parent=publishers/*}/books"
   }
 }
 ```
