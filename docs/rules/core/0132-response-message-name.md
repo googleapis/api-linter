@@ -13,8 +13,8 @@ This rule enforces that all `List` RPCs have a response message name of
 ## Details
 
 This rule looks at any message matching beginning with `List`, and complains if
-the name of the corresponding returned message does not match the name of the RPC
-with the suffix `Response` appended.
+the name of the corresponding returned message does not match the name of the
+RPC with the suffix `Response` appended.
 
 ## Examples
 
