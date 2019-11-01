@@ -32,7 +32,7 @@ var testCases = []struct {
 }{
 	{
 		testName: "GetRequestMessage",
-		rule:     "core::0131::request-message::name",
+		rule:     "core::0131::request-message-name",
 		proto: `
 		syntax = "proto3";
 
