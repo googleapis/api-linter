@@ -25,7 +25,7 @@ if they are present.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}"  // Should be `get:`.
-  }
+  };
 }
 ```
 
@@ -36,7 +36,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -51,7 +51,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
