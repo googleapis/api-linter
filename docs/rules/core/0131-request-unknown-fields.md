@@ -43,13 +43,14 @@ message GetBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the field.
+Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-name-field=disabled --)
 message GetBookRequest {
   string book = 1;
 
-  // (-- api-linter: core::0131::request-unknown-fields=disabled --)
+  // (-- api-linter: core::0131::request-unknown-fields=disabled
+  //     aip.dev/not-precedent: We really need this field because reaosns. --)
   string library_id = 2;
 }
 ```
@@ -59,3 +60,4 @@ top of the file.
 
 [aip-131]: https://aip.dev/131
 [aip-157]: https://aip.dev/157
+[aip.dev/not-precedent]: https://aip.dev/not-precedent

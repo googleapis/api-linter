@@ -46,6 +46,7 @@ message GetBookRequest {
 
 If you need to violate this rule, use a leading comment above the message (if
 the `name` field is missing) or above the field (if it is the wrong type).
+Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0131::request-name-field=disabled --)
@@ -56,3 +57,5 @@ message GetBookRequest {
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
+
+[aip.dev/not-precedent]: https://aip.dev/not-precedent
