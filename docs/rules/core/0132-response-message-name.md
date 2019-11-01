@@ -5,15 +5,15 @@ rule:
   summary: List methods must have standardized response message names.
 ---
 
-# List methods: Request message
+# List methods: Response message
 
-This rule enforces that all `List` RPCs have a request message name of
+This rule enforces that all `List` RPCs have a response message name of
 `List*Response`, as mandated in [AIP-132][].
 
 ## Details
 
 This rule looks at any message matching beginning with `List`, and complains if
-the name of the corresponding input message does not match the name of the RPC
+the name of the corresponding returned message does not match the name of the RPC
 with the suffix `Response` appended.
 
 ## Examples
