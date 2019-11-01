@@ -19,39 +19,11 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
-
-// The Get standard method should only have expected fields.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message", "name-field"),
-	URI:    "https://aip.dev/131#request-message",
-	OnlyIf: isGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a name field is present.
-		name := m.FindFieldByName("name")
-		if name == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name field is the correct type.
-		if name.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`name` field on Get RPCs should be a string",
-				Descriptor: name,
-			}}
-		}
-
-		return nil
-	},
-}
 
 // Get methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message", "unknown-fields"),
+	Name:   lint.NewRuleName("core", "0131", "request-unknown-fields"),
 	URI:    "https://aip.dev/131#request-message",
 	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
