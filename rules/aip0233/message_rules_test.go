@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0233
 
 import (
 	"testing"
@@ -38,20 +38,20 @@ func TestParentField(t *testing.T) {
 	}{
 		{
 			"Valid",
-			"BatchGetBooksRequest",
+			"BatchCreateBooksRequest",
 			&field{"parent", builder.FieldTypeString()},
 			testutils.Problems{},
 			nil},
 		{
 			"MissingField",
-			"BatchGetBooksRequest",
+			"BatchCreateBooksRequest",
 			nil,
 			testutils.Problems{{Message: "parent"}},
 			nil,
 		},
 		{
 			"InvalidType",
-			"BatchGetBooksRequest",
+			"BatchCreateBooksRequest",
 			&field{"parent", builder.FieldTypeDouble()},
 			testutils.Problems{{Message: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
@@ -99,6 +99,92 @@ func TestParentField(t *testing.T) {
 	}
 }
 
+func TestRequestsField(t *testing.T) {
+	// Set up the testing permutations.
+	tests := []struct {
+		testName    string
+		src         string
+		problems    testutils.Problems
+		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
+	}{
+		{
+			testName: "Valid",
+			src: `
+message BatchCreateBooksRequest {
+	repeated CreateBookRequest requests = 1;
+}
+
+message CreateBookRequest {}
+`,
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Invalid-MissingRequestsField",
+			src: `
+message BatchCreateBooksRequest {
+	string parent = 1;
+}`,
+			problems: testutils.Problems{{Message: `Message "BatchCreateBooksRequest" has no "requests" field`}},
+		},
+		{
+			testName: "Invalid-RequestsFieldIsNotRepeated",
+			src: `
+message BatchCreateBooksRequest {
+	CreateBookRequest requests = 1;
+}
+message CreateBookRequest {}`,
+			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
+			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("requests")
+			},
+		},
+		{
+			testName: "Invalid-RequestsFieldWrongType",
+			src: `
+message BatchCreateBooksRequest {
+	repeated int32 requests = 1;
+}`,
+			problems: testutils.Problems{{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
+			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("requests")
+			},
+		},
+		{
+			testName: "Invalid-RequestsNotRepeatedWrongType",
+			src: `
+message BatchCreateBooksRequest {
+	int32 requests = 1;
+}`,
+			problems: testutils.Problems{
+				{Message: `The "requests" field should be repeated`},
+				{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
+			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("requests")
+			},
+		},
+	}
+
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3String(t, test.src)
+
+			m := file.GetMessageTypes()[0]
+
+			// Determine the descriptor that a failing test will attach to.
+			var problemDesc desc.Descriptor = m
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(m)
+			}
+
+			problems := requestsField.Lint(file)
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
 func TestResourceField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
@@ -110,28 +196,28 @@ func TestResourceField(t *testing.T) {
 		{
 			testName: "Valid",
 			src: `
-message BatchGetBooksResponse {
-  // Books requested.
-  repeated Book books = 1;
+message BatchCreateBooksResponse {
+ // Books requested.
+ repeated Book books = 1;
 }`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "FieldIsNotRepeated",
 			src: `
-message BatchGetBooksResponse {
-  // Book requested.
-  Book book = 1;
+message BatchCreateBooksResponse {
+ // Book requested.
+ Book book = 1;
 }`,
-			problems: testutils.Problems{{Message: "The \"Book\" type field on Batch Get Response message should be repeated"}},
+			problems: testutils.Problems{{Message: "The \"Book\" type field on Batch Create Response message should be repeated"}},
 		},
 		{
 			testName: "MissingField",
 			src: `
-message BatchGetBooksResponse {
-  string response = 1;
+message BatchCreateBooksResponse {
+ string response = 1;
 }`,
-			problems: testutils.Problems{{Message: "Message \"BatchGetBooksResponse\" has no \"Book\" type field"}},
+			problems: testutils.Problems{{Message: "Message \"BatchCreateBooksResponse\" has no \"Book\" type field"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m
 			},
@@ -156,124 +242,6 @@ message Book {
 			}
 
 			problems := resourceField.Lint(file)
-			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}
-
-func TestNamesField(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName    string
-		src         string
-		problems    testutils.Problems
-		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
-	}{
-		{
-			testName: "Valid-Names",
-			src: `
-message BatchGetBooksRequest {
-repeated string names = 1;
-}`,
-			problems: testutils.Problems{},
-		},
-		{
-			testName: "Valid-StandardGetReq",
-			src: `
-message BatchGetBooksRequest {
-repeated GetBookRequest requests = 1;
-}
-
-message GetBookRequest {}
-`,
-			problems: testutils.Problems{},
-		},
-		{
-			testName: "Invalid-MissingNamesField",
-			src: `
-message BatchGetBooksRequest {
- string parent = 1;
-}`,
-			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" has no "names" field`}},
-		},
-		{
-			testName: "Invalid-KeepingNamesFieldOnly",
-			src: `
-message BatchGetBooksRequest {
-repeated string names = 1;
-repeated GetBookRequest requests = 2;
-}
-
-message GetBookRequest {}`,
-			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" should delete "requests" field, only keep the "names" field`}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("requests")
-			},
-		},
-		{
-			testName: "Invalid-NamesFieldIsNotRepeated",
-			src: `
-message BatchGetBooksRequest {
-string names = 1;
-}`,
-			problems: testutils.Problems{{Message: `The "names" field should be repeated`}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("names")
-			},
-		},
-		{
-			testName: "Invalid-NamesFieldWrongType",
-			src: `
-message BatchGetBooksRequest {
-repeated int32 names = 1;
-}`,
-			problems: testutils.Problems{{Message: `"names" field on Batch Get Request should be a "string" type`}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("names")
-			},
-		},
-		{
-			testName: "Invalid-GetReqFieldIsNotRepeated",
-			src: `
-message BatchGetBooksRequest {
-GetBookRequest requests = 1;
-}
-
-message GetBookRequest {}`,
-			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("requests")
-			},
-		},
-		{
-			testName: "Invalid-NamesFieldWrongType",
-			src: `
-message BatchGetBooksRequest {
-	repeated string requests = 1;
-}`,
-			problems: testutils.Problems{{Message: `The "requests" field on Batch Get Request should be a "GetBookRequest" type`}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("requests")
-			},
-		},
-	}
-
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3String(t, test.src)
-
-			m := file.GetMessageTypes()[0]
-
-			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = m
-			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(m)
-			}
-
-			problems := namesField.Lint(file)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

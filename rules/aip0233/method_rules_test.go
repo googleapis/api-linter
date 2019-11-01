@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0233
 
 import (
 	"testing"
@@ -32,38 +32,40 @@ func TestPluralMethodResourceName(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchGetBooks",
+			testName: "Valid-BatchCreateBooks",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
+	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/books:batchGet"
+			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBooksRequest {}
+message BatchCreateBooksRequest {}
 
-message BatchGetBooksResponse{}
+message BatchCreateBooksResponse{}
 `,
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-BatchGetMen",
+			testName: "Valid-BatchCreateMen",
 			src: `import "google/api/annotations.proto";
 
 service ManService {
-	rpc BatchGetMen(BatchGetMenRequest) returns (BatchGetMenResponse) {
+	rpc BatchCreateMen(BatchCreateMenRequest) returns (BatchCreateMenResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/men:batchGet"
+			post: "/v1/{parent=publishers/*}/men:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetMenRequest {}
+message BatchCreateMenRequest {}
 
-message BatchGetMenResponse{}
+message BatchCreateMenResponse{}
 `,
 			problems: testutils.Problems{},
 		},
@@ -72,50 +74,52 @@ message BatchGetMenResponse{}
 			src: `import "google/api/annotations.proto";
 
 service BusService {
-	rpc BatchGetBus(BatchGetBusRequest) returns (BatchGetBusResponse) {
+	rpc BatchCreateBus(BatchCreateBusRequest) returns (BatchCreateBusResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/buses:batchGet"
+			post: "/v1/{parent=publishers/*}/buses:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBusRequest {}
+message BatchCreateBusRequest {}
 
-message BatchGetBusResponse{}
+message BatchCreateBusResponse{}
 `,
-			problems: testutils.Problems{{Message: `The resource part in method name "BatchGetBus" shouldn't be "Bus", but should be its plural form "Buses"`}},
+			problems: testutils.Problems{{Message: `The resource part in method name "BatchCreateBus" shouldn't be "Bus", but should be its plural form "Buses"`}},
 		},
 		{
 			testName: "Invalid-SingularCorpPerson",
 			src: `import "google/api/annotations.proto";
 
 service CorpPersonService {
-	rpc BatchGetCorpPerson(BatchGetCorpPersonRequest) returns (BatchGetCorpPersonResponse) {
+	rpc BatchCreateCorpPerson(BatchCreateCorpPersonRequest) returns (BatchCreateCorpPersonResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/corpPerson:batchGet"
+			post: "/v1/{parent=publishers/*}/corpPerson:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetCorpPersonRequest {}
+message BatchCreateCorpPersonRequest {}
 
-message BatchGetCorpPersonResponse{}
+message BatchCreateCorpPersonResponse{}
 `,
-			problems: testutils.Problems{{Message: `The resource part in method name "BatchGetCorpPerson" shouldn't be "CorpPerson", but should be its plural form "CorpPeople"`}},
+			problems: testutils.Problems{{Message: `The resource part in method name "BatchCreateCorpPerson" shouldn't be "CorpPerson", but should be its plural form "CorpPeople"`}},
 		},
 		{
 			testName: "Invalid-Irrelevant",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc GetBook(GetBookRequest) returns (Book) {
+	rpc CreateBook(CreateBookRequest) returns (Book) {
 		option (google.api.http) = {
 			get: "/v1/{name=publishers/*/books/*}"
 		};
 	}
 }
 
-message GetBookRequest {}
+message CreateBookRequest {}
 
 message Book{}
 `,
@@ -146,38 +150,40 @@ func TestInputName(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchGetBooksRequest",
+			testName: "Valid-BatchCreateBooksRequest",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
+	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/books:batchGet"
+			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBooksRequest {}
+message BatchCreateBooksRequest {}
 
-message BatchGetBooksResponse{}
+message BatchCreateBooksResponse{}
 `,
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-BatchGetMenRequest",
+			testName: "Valid-BatchCreateMenRequest",
 			src: `import "google/api/annotations.proto";
 
 service ManService {
-	rpc BatchGetMen(BatchGetMenRequest) returns (BatchGetMenResponse) {
+	rpc BatchCreateMen(BatchCreateMenRequest) returns (BatchCreateMenResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/men:batchGet"
+			post: "/v1/{parent=publishers/*}/men:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetMenRequest {}
+message BatchCreateMenRequest {}
 
-message BatchGetMenResponse{}
+message BatchCreateMenResponse{}
 `,
 			problems: testutils.Problems{},
 		},
@@ -186,50 +192,53 @@ message BatchGetMenResponse{}
 			src: `import "google/api/annotations.proto";
 
 service BusService {
-	rpc BatchGetBuses(BatchGetBusRequest) returns (BatchGetBusResponse) {
+	rpc BatchCreateBuses(BatchCreateBusRequest) returns (BatchCreateBusResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/buses:batchGet"
+			post: "/v1/{parent=publishers/*}/buses:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBusRequest {}
+message BatchCreateBusRequest {}
 
-message BatchGetBusResponse{}
+message BatchCreateBusResponse{}
 `,
-			problems: testutils.Problems{{Message: `Batch Get RPCs should have a properly named request message "BatchGetBusesRequest", but not "BatchGetBusRequest"`}},
+			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named request message "BatchCreateBusesRequest", but not "BatchCreateBusRequest"`}},
 		},
 		{
 			testName: "Invalid-SingularCorpPerson",
 			src: `import "google/api/annotations.proto";
 
 service CorpPersonService {
-	rpc BatchGetCorpPerson(BatchGetCorpPersonRequest) returns (BatchGetCorpPersonResponse) {
+	rpc BatchCreateCorpPerson(BatchCreateCorpPersonRequest) returns (BatchCreateCorpPersonResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/corpPerson:batchGet"
+			post: "/v1/{parent=publishers/*}/corpPerson:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetCorpPersonRequest {}
+message BatchCreateCorpPersonRequest {}
 
-message BatchGetCorpPersonResponse{}
+message BatchCreateCorpPersonResponse{}
 `,
-			problems: testutils.Problems{{Message: `Batch Get RPCs should have a properly named request message "BatchGetCorpPeopleRequest", but not "BatchGetCorpPersonRequest"`}},
+			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named request message "BatchCreateCorpPeopleRequest", but not "BatchCreateCorpPersonRequest"`}},
 		},
 		{
 			testName: "Irrelevant",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc GetBook(GetBookRequest) returns (Book) {
+	rpc CreateBook(CreateBookRequest) returns (Book) {
 		option (google.api.http) = {
-			get: "/v1/{name=publishers/*/books/*}"
+			post: "/v1/{name=publishers/*/books/*}"
+			body: "*"
 		};
 	}
 }
 
-message GetBookRequest {}
+message CreateBookRequest {}
 
 message Book{}
 `,
@@ -260,38 +269,79 @@ func TestOutputName(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchGetBooksResponse",
+			testName: "Valid-BatchCreateBooksResponse",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
+	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/books:batchGet"
+			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBooksRequest {}
+message BatchCreateBooksRequest {}
 
-message BatchGetBooksResponse{}
+message BatchCreateBooksResponse{}
 `,
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-BatchGetMenResponse",
+			testName: "Valid-LongRunning",
 			src: `import "google/api/annotations.proto";
+import "google/longrunning/operations.proto";
 
-service ManService {
-	rpc BatchGetMen(BatchGetMenRequest) returns (BatchGetMenResponse) {
+service BookService {
+	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/men:batchGet"
+			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
+		};
+		option (google.longrunning.operation_info) = {
+      response_type: "BatchCreateBooksResponse"
+    };
+	}
+}
+
+message BatchCreateBooksRequest {}
+`,
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Valid-LongRunningEmptyResponseType",
+			src: `import "google/api/annotations.proto";
+import "google/longrunning/operations.proto";
+
+service BookService {
+	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
+		option (google.api.http) = {
+			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetMenRequest {}
+message BatchCreateBooksRequest {}
+`,
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Valid-BatchCreateMenResponse",
+			src: `import "google/api/annotations.proto";
 
-message BatchGetMenResponse{}
+service ManService {
+	rpc BatchCreateMen(BatchCreateMenRequest) returns (BatchCreateMenResponse) {
+		option (google.api.http) = {
+			post: "/v1/{parent=publishers/*}/men:batchCreate"
+			body: "*"
+		};
+	}
+}
+
+message BatchCreateMenRequest {}
+
+message BatchCreateMenResponse{}
 `,
 			problems: testutils.Problems{},
 		},
@@ -300,50 +350,53 @@ message BatchGetMenResponse{}
 			src: `import "google/api/annotations.proto";
 
 service BusService {
-	rpc BatchGetBuses(BatchGetBusRequest) returns (BatchGetBusResponse) {
+	rpc BatchCreateBuses(BatchCreateBusRequest) returns (BatchCreateBusResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/buses:batchGet"
+			post: "/v1/{parent=publishers/*}/buses:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetBusRequest {}
+message BatchCreateBusRequest {}
 
-message BatchGetBusResponse{}
+message BatchCreateBusResponse{}
 `,
-			problems: testutils.Problems{{Message: `Batch Get RPCs should have a properly named response message "BatchGetBusesResponse", but not "BatchGetBusResponse"`}},
+			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named response message "BatchCreateBusesResponse", but not "BatchCreateBusResponse"`}},
 		},
 		{
 			testName: "Invalid-SingularCorpPerson",
 			src: `import "google/api/annotations.proto";
 
 service CorpPersonService {
-	rpc BatchGetCorpPerson(BatchGetCorpPersonRequest) returns (BatchGetCorpPersonResponse) {
+	rpc BatchCreateCorpPerson(BatchCreateCorpPersonRequest) returns (BatchCreateCorpPersonResponse) {
 		option (google.api.http) = {
-			get: "/v1/{parent=publishers/*}/corpPerson:batchGet"
+			post: "/v1/{parent=publishers/*}/corpPerson:batchCreate"
+			body: "*"
 		};
 	}
 }
 
-message BatchGetCorpPersonRequest {}
+message BatchCreateCorpPersonRequest {}
 
-message BatchGetCorpPersonResponse{}
+message BatchCreateCorpPersonResponse{}
 `,
-			problems: testutils.Problems{{Message: `Batch Get RPCs should have a properly named response message "BatchGetCorpPeopleResponse", but not "BatchGetCorpPersonResponse"`}},
+			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named response message "BatchCreateCorpPeopleResponse", but not "BatchCreateCorpPersonResponse"`}},
 		},
 		{
 			testName: "Irrelevant",
 			src: `import "google/api/annotations.proto";
 
 service BookService {
-	rpc GetBook(GetBookRequest) returns (Book) {
+	rpc CreateBook(CreateBookRequest) returns (Book) {
 		option (google.api.http) = {
-			get: "/v1/{name=publishers/*/books/*}"
+			post: "/v1/{name=publishers/*/books/*}"
+			body: "*"
 		};
 	}
 }
 
-message GetBookRequest {}
+message CreateBookRequest {}
 
 message Book{}
 `,
@@ -373,10 +426,11 @@ func TestHttpVerb(t *testing.T) {
 			Get: "/v1/{parent=publishers/*}/books:batchGet",
 		},
 	}
-	httpPost := &annotations.HttpRule{
+	httpCreate := &annotations.HttpRule{
 		Pattern: &annotations.HttpRule_Post{
-			Post: "/v1/{name=publishers/*/books/*}",
+			Post: "/v1/{parent=publishers/*}/books:batchCreate",
 		},
+		Body: "*",
 	}
 
 	// Set up testing permutations.
@@ -386,9 +440,9 @@ func TestHttpVerb(t *testing.T) {
 		methodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", httpGet, "BatchGetBooks", nil},
-		{"Invalid", httpPost, "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods must use the HTTP GET verb."}}},
-		{"Irrelevant", httpPost, "AcquireBook", nil},
+		{"Valid", httpCreate, "BatchCreateBooks", nil},
+		{"Invalid", httpGet, "BatchCreateBooks", testutils.Problems{{Message: "Batch Create methods must use the HTTP POST verb."}}},
+		{"Irrelevant", httpGet, "AcquireBook", nil},
 	}
 
 	// Run each test.
@@ -400,11 +454,11 @@ func TestHttpVerb(t *testing.T) {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-231 Get method
+			// Create a minimal service with a AIP-233 Create method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksResponse"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksResponse"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)
@@ -426,8 +480,8 @@ func TestHttpUrl(t *testing.T) {
 		methodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{parent=publishers/*}/books:batchGet", "BatchGetBooks", nil},
-		{"InvalidVarName", "/v1/{parent=publishers/*}/books", "BatchGetBooks", testutils.Problems{{Message: `Batch Get methods URI should be end with ":batchGet".`}}},
+		{"Valid", "/v1/{parent=publishers/*}/books:batchCreate", "BatchCreateBooks", nil},
+		{"InvalidVarName", "/v1/{parent=publishers/*}/books", "BatchCreateBooks", testutils.Problems{{Message: `Batch Create methods URI should be end with ":batchCreate".`}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 
@@ -436,19 +490,20 @@ func TestHttpUrl(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
 			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: test.uri,
+				Pattern: &annotations.HttpRule_Post{
+					Post: test.uri,
 				},
+				Body: "*",
 			}
 			if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-231 Get method
+			// Create a minimal service with a AIP-233 Create method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksResponse"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksResponse"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)
@@ -470,8 +525,8 @@ func TestHttpBody(t *testing.T) {
 		methodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", "", "BatchGetBooks", nil},
-		{"Invalid", "*", "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods should not have an HTTP body."}}},
+		{"Valid", "*", "BatchCreateBooks", nil},
+		{"Invalid", "", "BatchCreateBooks", testutils.Problems{{Message: `Batch Create methods should use "*" as the HTTP body.`}}},
 		{"Irrelevant", "*", "AcquireBook", nil},
 	}
 
@@ -480,8 +535,8 @@ func TestHttpBody(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
 			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: "/v1/{name=publishers/*/books/*}",
+				Pattern: &annotations.HttpRule_Post{
+					Post: "/v1/{parent=publishers/*}/books:batchCreate",
 				},
 				Body: test.body,
 			}
@@ -489,11 +544,11 @@ func TestHttpBody(t *testing.T) {
 				t.Fatalf("Failed to set google.api.http annotation.")
 			}
 
-			// Create a minimal service with a AIP-231 Get method
+			// Create a minimal service with a AIP-233 Create method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksResponse"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksRequest"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksResponse"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
 				t.Fatalf("Could not build %s method.", test.methodName)

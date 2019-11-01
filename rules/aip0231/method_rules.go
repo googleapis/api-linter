@@ -38,7 +38,7 @@ var pluralMethodResourceName = &lint.MethodRule{
 		if !pluralize.IsPlural(pluralMethodResourceName) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
-					`The resource part in method name %q shouldn't %q, but should be its plural form %q`,
+					`The resource part in method name %q shouldn't be %q, but should be its plural form %q`,
 					m.GetName(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
 				),
 				Descriptor: m,
@@ -127,7 +127,7 @@ var httpUrl = &lint.MethodRule{
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{
-					Message:    `Get methods URI should be end with ":batchGet".`,
+					Message:    `Batch Get methods URI should be end with ":batchGet".`,
 					Descriptor: m,
 				}}
 			}
