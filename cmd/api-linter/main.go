@@ -25,6 +25,7 @@ import (
 )
 
 var globalRules = core.Rules()
+var globalConfigs = defaultConfigs()
 
 func main() {
 	if err := runCLI(os.Args[1:]); err != nil {
@@ -34,7 +35,7 @@ func main() {
 
 func runCLI(args []string) error {
 	c := newCli(args)
-	return c.lint(globalRules, defaultConfigs())
+	return c.lint(globalRules, globalConfigs)
 }
 
 func defaultConfigs() lint.Configs {
