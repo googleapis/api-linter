@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0134
 
 import (
 	"fmt"
@@ -24,14 +24,14 @@ import (
 
 // The create request message should have resource field.
 var resourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0133", "request-resource-field"),
-	URI:    "https://aip.dev/133#request-message",
-	OnlyIf: isCreateRequestMessage,
+	Name:   lint.NewRuleName("core", "0134", "request--resource-field"),
+	URI:    "https://aip.dev/134#request-message",
+	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resourceMsgName := getResourceMsgNameFromReq(m)
+		resourceMsgName := extractResource(m.GetName())
 
 		// The rule (resource field name must map to the POST body) is
-		// checked by AIP-0133 ("core::0133::http-body")
+		// checked by AIP-0134 ("core::0134::http-body")
 		for _, fieldDesc := range m.GetFields() {
 			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
 				// Rule check: Is the field named properly?
