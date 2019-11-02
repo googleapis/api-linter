@@ -26,7 +26,7 @@ comes across any fields other than:
 
 It only checks field names; it does not validate type correctness. This is
 handled by other rules, such as
-[request field types](./request-field-types.md).
+[request field types](./0132-request-field-types.md).
 
 ## Examples
 
@@ -65,7 +65,7 @@ message ListBooksRequest {
   string page_token = 3;
 
   // (-- api-linter: core::0132::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reaosns. --)
+  //     aip.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 4;
 }
 ```
