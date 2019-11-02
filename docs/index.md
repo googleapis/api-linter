@@ -72,5 +72,6 @@ This software is made available under the [Apache 2.0][] license.
 
 [apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 [api improvement proposals]: https://aip.dev/
+[configuration]: ./configuration.md
 [protocol buffers]: https://developers.google.com/protocol-buffers
 [rule documentation]: ./rules/index.md
