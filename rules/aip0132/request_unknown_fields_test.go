@@ -23,58 +23,6 @@ import (
 	fpb "google.golang.org/genproto/protobuf/field_mask"
 )
 
-func TestStandardFields(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName      string
-		messageName   string
-		nameFieldName string
-		nameFieldType *builder.FieldType
-		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
-	}{
-		{"Valid", "ListBooksRequest", "parent", builder.FieldTypeString(), testutils.Problems{}, nil},
-		{"InvalidName", "ListBooksRequest", "publisher", builder.FieldTypeString(), testutils.Problems{{Message: "no `parent` field"}}, nil},
-		{
-			"InvalidType",
-			"ListBooksRequest",
-			"parent",
-			builder.FieldTypeBytes(),
-			testutils.Problems{{Message: "string"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.GetFields()[0]
-			},
-		},
-		{"Irrelevant", "EnumerateBooksRequest", "id", builder.FieldTypeString(), testutils.Problems{}, nil},
-	}
-
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField(test.nameFieldName, test.nameFieldType),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
-			// What descriptor is the problem expected to be attached to?
-			var problemDesc desc.Descriptor = message
-			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(message)
-			}
-
-			// Run the lint rule, and establish that it returns the correct problems.
-			// number of problems.
-			problems := standardFields.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}
-
 func TestUnknownFields(t *testing.T) {
 	// Get the correct message type for google.protobuf.FieldMask.
 	fieldMask, err := desc.LoadMessageDescriptorForMessage(&fpb.FieldMask{})
@@ -93,11 +41,7 @@ func TestUnknownFields(t *testing.T) {
 		{"PageSize", "ListBooksRequest", "page_size", builder.FieldTypeInt32(), testutils.Problems{}},
 		{"PageToken", "ListBooksRequest", "page_token", builder.FieldTypeString(), testutils.Problems{}},
 		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), testutils.Problems{}},
-		{"FilterInvalid", "ListBooksRequest", "filter", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
 		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
-		{"OrderByInvalid", "ListBooksRequest", "order_by", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
-		{"GroupBy", "ListBooksRequest", "group_by", builder.FieldTypeString(), testutils.Problems{}},
-		{"GroupByInvalid", "ListBooksRequest", "group_by", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
 		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), testutils.Problems{}},
 		{"ReadMask", "ListBooksRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
 		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
