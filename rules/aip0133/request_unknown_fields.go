@@ -24,56 +24,6 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-// The create request message should have parent field.
-var parentField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0133", "request-message", "parent-field"),
-	URI:    "https://aip.dev/133#request-message",
-	OnlyIf: isCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `parent` field is present.
-		parentField := m.FindFieldByName("parent")
-		if parentField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the parent field is a string.
-		if parentField.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`parent` field on create request message must be a string",
-				Descriptor: parentField,
-			}}
-		}
-
-		return nil
-	},
-}
-
-// The create request message should have resource field.
-var resourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0133", "request-message", "resource-field"),
-	URI:    "https://aip.dev/133#request-message",
-	OnlyIf: isCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resourceMsgName := getResourceMsgNameFromReq(m)
-
-		// The rule (resource field name must map to the POST body) is checked by AIP-0133 ("core::0133::http-body")
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				return nil
-			}
-		}
-
-		// Rule check: Establish that a resource field must be included.
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
-			Descriptor: m,
-		}}
-	},
-}
-
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0133", "request-message", "unknown-fields"),

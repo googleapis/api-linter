@@ -7,8 +7,8 @@ rule:
 
 # Get methods: Request message
 
-This rule enforces that all `Get*` RPCs map the `name` field to the HTTP URI,
-as mandated in [AIP-131][].
+This rule enforces that all `Get` RPCs map the `name` field to the HTTP URI, as
+mandated in [AIP-131][].
 
 ## Details
 
@@ -46,7 +46,7 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::http-method=disabled
+// (-- api-linter: core::0131::http-uri-name=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {

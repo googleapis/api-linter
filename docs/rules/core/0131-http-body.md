@@ -7,7 +7,7 @@ rule:
 
 # Get methods: Request message
 
-This rule enforces that all `Get*` RPCs omit the HTTP `body`, as mandated in
+This rule enforces that all `Get` RPCs omit the HTTP `body`, as mandated in
 [AIP-131][].
 
 ## Details
