@@ -26,7 +26,7 @@ RPC with the suffix `Response` appended.
 rpc ListBooks(ListBooksRequest) returns (Books) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 
@@ -37,7 +37,7 @@ rpc ListBooks(ListBooksRequest) returns (Books) {
 rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 
@@ -52,7 +52,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc ListBooks(ListBooksRequest) returns (Books) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 

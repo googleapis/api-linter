@@ -30,7 +30,7 @@ This rule looks at any message with names similar to `Get`, and suggests using
 rpc FetchBook(FetchBookRequest) returns (Book) {  // Should be `GetBook`.
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -41,7 +41,7 @@ rpc FetchBook(FetchBookRequest) returns (Book) {  // Should be `GetBook`.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -56,7 +56,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc FetchBook(GetBookReq) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
