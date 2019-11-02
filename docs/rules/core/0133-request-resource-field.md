@@ -5,7 +5,7 @@ rule:
   summary: Create RPCs must have a field for the resource in the request.
 ---
 
-# Create methods: Parent field
+# Create methods: Resource field
 
 This rule enforces that all `Create` standard methods have a field in the
 request message for the resource itself, as mandated in
