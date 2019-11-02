@@ -8,8 +8,7 @@ rule:
 # Create methods: Resource field
 
 This rule enforces that all `Create` standard methods have a field in the
-request message for the resource itself, as mandated in
-[AIP-133](http://aip.dev/133).
+request message for the resource itself, as mandated in [AIP-133][].
 
 ## Details
 
@@ -31,7 +30,7 @@ message CreateBookRequest {
 
 ```proto
 // Incorrect.
-message GetBookRequest {
+message CreateBookRequest {
   bytes parent = 1;
   Book payload = 2;  // Field name should be `book`.
   string book_id = 3;
@@ -52,7 +51,7 @@ message CreateBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+the resource field is missing) or above the field (if it is improperly named).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
@@ -68,4 +67,5 @@ message CreateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-133]: https://aip.dev/133
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

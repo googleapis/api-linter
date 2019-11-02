@@ -7,8 +7,8 @@ rule:
 
 # Create methods: HTTP URI parent field
 
-This rule enforces that all `Create` RPCs contain the `parent` field to the HTTP URI,
-as mandated in [AIP-133][].
+This rule enforces that all `Create` RPCs map the `parent` field to the HTTP
+URI, as mandated in [AIP-133][].
 
 ## Details
 

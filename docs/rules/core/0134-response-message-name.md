@@ -1,25 +1,25 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', response-message-name]
-  summary: Create methods must return the resource.
+  name: [core, '0134', response-message-name]
+  summary: Update methods must return the resource.
 ---
 
-# Create methods: Resource response message
+# Update methods: Resource response message
 
-This rule enforces that all `Create` RPCs have a response message of the
-resource, as mandated in [AIP-133][].
+This rule enforces that all `Update` RPCs have a response message of the
+resource, as mandated in [AIP-134][].
 
 ## Details
 
-This rule looks at any message matching beginning with `Create`, and complains
+This rule looks at any message matching beginning with `Update`, and complains
 if the name of the corresponding output message does not match the name of the
-RPC with the prefix `Create` removed.
+RPC with the prefix `Update` removed.
 
 It also permits a response of `google.longrunning.Operation`; in this case, it
 checks the `response_type` in the `google.longrunning.operation_info`
 annotation and ensures that _it_ corresponds to the name of the RPC with the
-prefix `Create` removed.
+prefix `Update` removed.
 
 ## Examples
 
@@ -30,9 +30,9 @@ prefix `Create` removed.
 ```proto
 // Incorrect.
 // Should be `Book`.
-rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
+rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -42,9 +42,9 @@ rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
 
 ```proto
 // Correct.
-rpc CreateBook(CreateBookRequest) returns (Book) {
+rpc UpdateBook(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -54,14 +54,14 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 
 ```proto
 // Incorrect.
-rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{book.name=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
   option (google.longrunning.operation_info) = {
-    response_type: "CreateBookResponse"  // Should be "Book".
-    metadata_type: "CreateBookMetadata"
+    response_type: "UpdateBookResponse"  // Should be "Book".
+    metadata_type: "UpdateBookMetadata"
   }
 }
 ```
@@ -70,14 +70,14 @@ rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 
 ```proto
 // Correct.
-rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{book.name=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
   option (google.longrunning.operation_info) = {
     response_type: "Book"
-    metadata_type: "CreateBookMetadata"
+    metadata_type: "UpdateBookMetadata"
   }
 }
 ```
@@ -88,11 +88,11 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0133::response-message-name=disabled
+// (-- api-linter: core::0134::response-message-name=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
-rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
+rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -101,5 +101,5 @@ rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-133]: https://aip.dev/133
+[aip-134]: https://aip.dev/134
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
