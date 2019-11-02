@@ -187,11 +187,7 @@
             {% include linter-rule-summary.html %}
           {% endif -%}
           <section id="linter-toc" class="docs-component-sidebar-toc">
-              {% if page.index %}
-              {% include toc.html html=content h_min=2 h_max=3 %}
-              {% else %}
-              {% include toc.html html=content h_min=2 h_max=3 baseurl=page.url %}
-              {% endif %}
+            {% include toc.html html=content h_min=2 h_max=3 baseurl=page.url %}
           </section>
           <section class="docs-component-sidebar-actions">
             <ul>
@@ -208,7 +204,7 @@
                 </a>
               </li>
               <li>
-                <a href="https://github.com/googleapis/api-linter/edit/master/docs/{{ page.path }}">
+                <a href="https://github.com/googleapis/api-linter/edit/master/{{ page.path }}">
                   Edit this page
                 </a>
               </li>
