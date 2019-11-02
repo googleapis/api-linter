@@ -5,7 +5,7 @@ rule:
   summary: Create methods must return the resource.
 ---
 
-# Upper snake case values
+# Create methods: Resource response message
 
 This rule enforces that all `Create` RPCs have a response message of the
 resource, as mandated in [AIP-133][].
