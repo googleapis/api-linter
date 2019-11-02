@@ -26,3 +26,8 @@ var Prepositions = stringset.New(
 	"for", "from", "in", "including", "into", "of", "over", "since", "to",
 	"toward", "under", "upon", "with", "within", "without",
 )
+
+// ----------------------------------------------------------------------------
+// IMPORTANT: Make sure you update docs/_includes/prepositions.md if you
+// update the set of prepositions.
+// ----------------------------------------------------------------------------

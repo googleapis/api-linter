@@ -2,13 +2,13 @@
 rule:
   aip: 131
   name: [core, '0131', synonyms]
-  summary: Get methods must be named starting with "Get"
+  summary: Get methods must be named starting with "Get".
 ---
 
-# Get methods: Request message
+# Get methods: Synonym check
 
-This rule enforces that single-resource lookup methods are named `Get*`, as
-mandated in [AIP-131][].
+This rule enforces that single-resource lookup methods have names starting with
+`Get`, as mandated in [AIP-131][].
 
 ## Details
 

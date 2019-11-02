@@ -15,24 +15,27 @@
 package aip0133
 
 import (
-	"strings"
-	"testing"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-func TestAddRules(t *testing.T) {
-	rules := make(lint.RuleRegistry)
-	AddRules(rules)
-	for ruleName := range rules {
-		if !strings.HasPrefix(string(ruleName), "core::0133") {
-			t.Errorf("Rule %s is not namespaced to core::0133.", ruleName)
+// Create methods should use the HTTP POST verb.
+var httpMethod = &lint.MethodRule{
+	Name:   lint.NewRuleName("core", "0133", "http-method"),
+	URI:    "https://aip.dev/133#guidance",
+	OnlyIf: isCreateMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		// Rule check: Establish that the RPC uses HTTP POST.
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if httpRule.Method != "POST" {
+				return []lint.Problem{{
+					Message:    "Create methods must use the HTTP POST verb.",
+					Descriptor: m,
+				}}
+			}
 		}
-	}
-}
 
-type field struct {
-	fieldName string
-	fieldType *builder.FieldType
+		return nil
+	},
 }

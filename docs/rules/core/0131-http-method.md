@@ -5,9 +5,9 @@ rule:
   summary: Get methods must use the GET HTTP verb.
 ---
 
-# Get methods: Request message
+# Get methods: GET HTTP verb
 
-This rule enforces that all `Get*` RPCs use the `GET` HTTP verb, as mandated in
+This rule enforces that all `Get` RPCs use the `GET` HTTP verb, as mandated in
 [AIP-131][].
 
 ## Details
