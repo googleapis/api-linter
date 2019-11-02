@@ -1,4 +1,5 @@
 ---
+index:
 ---
 
 # Google API Linter
@@ -25,7 +26,7 @@ linter should be used as a useful tool, but not as a substitute for reading and
 understanding API guidance.
 
 Each linter rule has its own [rule documentation][], and rules can be
-[configured][configuration] using a config file, or in a proto file itself.
+[configured](./configuration.md) using a config file, or in a proto file itself.
 
 ## Installation
 
