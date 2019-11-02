@@ -13,8 +13,8 @@ This rule enforces that all `List` RPCs have a response message name of
 ## Details
 
 This rule looks at any message matching beginning with `List`, and complains if
-the name of the corresponding returned message does not match the name of the RPC
-with the suffix `Response` appended.
+the name of the corresponding returned message does not match the name of the
+RPC with the suffix `Response` appended.
 
 ## Examples
 
@@ -26,7 +26,7 @@ with the suffix `Response` appended.
 rpc ListBooks(ListBooksRequest) returns (Books) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 
@@ -37,7 +37,7 @@ rpc ListBooks(ListBooksRequest) returns (Books) {
 rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 
@@ -52,7 +52,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc ListBooks(ListBooksRequest) returns (Books) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books"
-  }
+  };
 }
 ```
 

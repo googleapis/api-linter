@@ -25,7 +25,7 @@ with the suffix `Request` appended.
 rpc GetBook(GetBookReq) returns (Book) {  // Should be `GetBookRequest`.
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -36,7 +36,7 @@ rpc GetBook(GetBookReq) returns (Book) {  // Should be `GetBookRequest`.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -51,7 +51,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc GetBook(GetBookReq) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
