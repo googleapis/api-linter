@@ -1,5 +1,4 @@
 ---
-index:
 ---
 
 # Google API Linter
@@ -26,7 +25,7 @@ linter should be used as a useful tool, but not as a substitute for reading and
 understanding API guidance.
 
 Each linter rule has its own [rule documentation][], and rules can be
-[configured](./configuration.md) using a config file, or in a proto file itself.
+[configured][configuration] using a config file, or in a proto file itself.
 
 ## Installation
 
@@ -73,5 +72,6 @@ This software is made available under the [Apache 2.0][] license.
 
 [apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 [api improvement proposals]: https://aip.dev/
+[configuration]: ./configuration.md
 [protocol buffers]: https://developers.google.com/protocol-buffers
 [rule documentation]: ./rules/index.md
