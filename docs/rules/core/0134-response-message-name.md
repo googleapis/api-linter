@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 133
+  aip: 134
   name: [core, '0134', response-message-name]
   summary: Update methods must return the resource.
 ---
