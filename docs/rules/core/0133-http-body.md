@@ -5,7 +5,7 @@ rule:
   summary: Create methods must have the HTTP body set to the resource.
 ---
 
-# Get methods: Request message
+# Create methods: HTTP body
 
 This rule enforces that all `Create` RPCs set the HTTP `body` to the resource,
 as mandated in [AIP-133][].
