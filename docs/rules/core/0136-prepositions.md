@@ -40,7 +40,7 @@ conceptual change:
 
 ```proto
 // Incorrect.
-// The "FromLibrary" suffix is vestigal and should be removed.
+// The "FromLibrary" suffix is vestigial and should be removed.
 rpc CheckoutBookFromLibrary(CheckoutBookFromLibraryRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:checkoutFromLibrary"

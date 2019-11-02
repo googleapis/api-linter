@@ -5,14 +5,14 @@ rule:
   summary: Custom methods must have the HTTP body set to `*`.
 ---
 
-# Get methods: Request message
+# Custom methods: HTTP body
 
 This rule enforces that all custom methods set the HTTP `body` to `*`, as
 mandated in [AIP-136][].
 
 ## Details
 
-This rule looks at any message matching beginning with `Create`, and complains
+This rule looks at any method that is not a standard method, and complains 
 if the HTTP `body` field is not set to the resource being created.
 
 ## Examples

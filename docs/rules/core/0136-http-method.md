@@ -5,7 +5,7 @@ rule:
   summary: Custom methods must use the POST or GET HTTP verb.
 ---
 
-# Get methods: Request message
+# Custom methods: HTTP method
 
 This rule enforces that all custom methods use the `POST` or `GET` HTTP verbs,
 as mandated in [AIP-136][].
