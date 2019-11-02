@@ -5,9 +5,9 @@ rule:
   summary: Create methods must map the parent field to the URI.
 ---
 
-# Get methods: Request message
+# Create methods: HTTP URI parent field
 
-This rule enforces that all `Create` RPCs map the `name` field to the HTTP URI,
+This rule enforces that all `Create` RPCs contain the `parent` field to the HTTP URI,
 as mandated in [AIP-133][].
 
 ## Details
