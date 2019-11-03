@@ -5,7 +5,7 @@ rule:
   summary: Delete methods must map the name field to the URI.
 ---
 
-# Get methods: Request message
+# Delete methods: HTTP URI name field
 
 This rule enforces that all `Delete` RPCs map the `name` field to the HTTP URI,
 as mandated in [AIP-135][].

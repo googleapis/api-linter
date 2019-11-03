@@ -5,7 +5,7 @@ rule:
   summary: Get methods must map the name field to the URI.
 ---
 
-# Get methods: Request message
+# Get methods: HTTP URI name field
 
 This rule enforces that all `Get` RPCs map the `name` field to the HTTP URI, as
 mandated in [AIP-131][].
