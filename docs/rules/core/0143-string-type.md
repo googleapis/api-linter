@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 143
-  name: [core, '0143', standard-codes]
-  summary: Fields representing concepts with standardized codes must use them.
+  name: [core, '0143', string-type]
+  summary: Fields representing standardized codes must be strings.
 ---
 
-# Standardized codes
+# Standardized code strings
 
 This rule attempts to enforce that standard codes for concepts like language,
 currency, etc. are strings, as mandated in [AIP-143][].
