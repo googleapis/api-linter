@@ -37,6 +37,8 @@ type cli struct {
 	ProtoImportPaths []string
 	ProtoFiles       []string
 	ProtoDescPath    string
+	EnabledRules     []string
+	DisabledRules    []string
 }
 
 func newCli(args []string) *cli {
@@ -46,6 +48,8 @@ func newCli(args []string) *cli {
 	var outFlag string
 	var protoImportFlag stringSlice
 	var protoDescFlag string
+	var ruleEnableFlag stringSlice
+	var ruleDisableFlag stringSlice
 
 	// Register flag variables.
 	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
@@ -54,6 +58,8 @@ func newCli(args []string) *cli {
 	fs.StringVar(&outFlag, "output_path", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.Var(&protoImportFlag, "proto_path", "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
 	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
+	fs.Var(&ruleEnableFlag, "enable_rule", "Enable a rule with the given name.\nMay be specified multiple times.")
+	fs.Var(&ruleDisableFlag, "disable_rule", "Disable a rule with the given name.\nMay be specified multiple times.")
 
 	// Parse flags.
 	fs.Parse(args)
@@ -64,6 +70,8 @@ func newCli(args []string) *cli {
 		OutputPath:       outFlag,
 		ProtoImportPaths: append(protoImportFlag, "."),
 		ProtoDescPath:    protoDescFlag,
+		EnabledRules:     ruleEnableFlag,
+		DisabledRules:    ruleDisableFlag,
 		ProtoFiles:       fs.Args(),
 	}
 }
@@ -80,6 +88,24 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 			return err
 		}
 		configs = append(configs, config...)
+	}
+	// Add configs for the enabled rules.
+	for _, ruleName := range c.EnabledRules {
+		configs = append(configs, lint.Config{
+			IncludedPaths: []string{"**/*.proto"},
+			RuleConfigs: map[string]lint.RuleConfig{
+				ruleName: {}, // default is enabled.
+			},
+		})
+	}
+	// Add configs for the disabled rules.
+	for _, ruleName := range c.DisabledRules {
+		configs = append(configs, lint.Config{
+			IncludedPaths: []string{"**/*.proto"},
+			RuleConfigs: map[string]lint.RuleConfig{
+				ruleName: {Disabled: true},
+			},
+		})
 	}
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
