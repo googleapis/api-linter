@@ -52,6 +52,8 @@ rpc UpdateBook(UpdateBookRequest) returns (Book) {
 
 ### Long-running operation
 
+**Incorrect** code for this rule:
+
 ```proto
 // Incorrect.
 rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {

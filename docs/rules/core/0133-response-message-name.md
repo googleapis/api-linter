@@ -52,6 +52,8 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 
 ### Long-running operation
 
+**Incorrect** code for this rule:
+
 ```proto
 // Incorrect.
 rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
