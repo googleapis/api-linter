@@ -8,7 +8,7 @@ rule:
 # Delete methods: Name field
 
 This rule enforces that all `Delete` standard methods have a `string name`
-field in the request message, as mandated in [AIP-135](http://aip.dev/135).
+field in the request message, as mandated in [AIP-135][].
 
 ## Details
 
@@ -59,4 +59,5 @@ message DeleteBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-135]: https://aip.dev/135
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
