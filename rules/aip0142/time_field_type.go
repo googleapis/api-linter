@@ -23,43 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0142", "field-names"),
-	URI:  "https://aip.dev/142#timestamps",
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		// Look for common non-imperative terms.
-		mistakes := map[string]string{
-			"created":  "create_time",
-			"expired":  "expire_time",
-			"modified": "update_time",
-			"updated":  "update_time",
-		}
-		for got, want := range mistakes {
-			if strings.Contains(f.GetName(), got) {
-				return []lint.Problem{{
-					Message:    "Use the imperative mood and a `_time` suffix for timestamps.",
-					Descriptor: f,
-					Location:   lint.DescriptorNameLocation(f),
-					Suggestion: want,
-				}}
-			}
-		}
-
-		// Look for timestamps that do not end in `_time`.
-		if utils.GetMessageTypeName(f) == "google.protobuf.Timestamp" && !strings.HasSuffix(f.GetName(), "_time") {
-			return []lint.Problem{{
-				Message:    "Timestamp fields should end in `_time`.",
-				Descriptor: f,
-				Location:   lint.DescriptorNameLocation(f),
-			}}
-		}
-
-		return nil
-	},
-}
-
 var fieldType = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0142", "field-type"),
+	Name: lint.NewRuleName("core", "0142", "time-field-type"),
 	URI:  "https://aip.dev/142#timestamps",
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		suffixes := stringset.New(
