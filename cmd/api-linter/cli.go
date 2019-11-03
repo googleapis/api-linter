@@ -133,7 +133,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		marshal = json.Marshal
 	case "summary":
 		marshal = func(i interface{}) ([]byte, error) {
-			return emitSummary(i.([]lint.Response))
+			return printSummaryTable(i.([]lint.Response))
 		}
 	}
 
