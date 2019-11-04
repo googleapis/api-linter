@@ -5,7 +5,7 @@ rule:
   summary: Get methods must not have an HTTP body.
 ---
 
-# Get methods: Request message
+# Get methods: No HTTP body
 
 This rule enforces that all `Get` RPCs omit the HTTP `body`, as mandated in
 [AIP-131][].

@@ -26,7 +26,7 @@ across any fields other than:
 ```proto
 // Incorrect.
 message GetBookRequest {
-  string book = 1;
+  string name = 1;
   string library_id = 2;  // Non-standard field.
 }
 ```

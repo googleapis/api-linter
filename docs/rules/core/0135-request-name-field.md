@@ -1,19 +1,19 @@
 ---
 rule:
-  aip: 131
-  name: [core, '0131', request-name-field]
-  summary: Get RPCs must have a `name` field in the request.
+  aip: 135
+  name: [core, '0135', request-name-field]
+  summary: Delete RPCs must have a `name` field in the request.
 ---
 
-# Get methods: Name field
+# Delete methods: Name field
 
-This rule enforces that all `Get` standard methods have a `string name` field
-in the request message, as mandated in [AIP-131][].
+This rule enforces that all `Delete` standard methods have a `string name`
+field in the request message, as mandated in [AIP-135][].
 
 ## Details
 
-This rule looks at any message matching `Get*Request` and complains if either
-the `name` field is missing, or if it has any type other than `string`.
+This rule looks at any message matching `Delete*Request` and complains if
+either the `name` field is missing, or if it has any type other than `string`.
 
 ## Examples
 
@@ -21,14 +21,14 @@ the `name` field is missing, or if it has any type other than `string`.
 
 ```proto
 // Incorrect.
-message GetBookRequest {
+message DeleteBookRequest {
   string book = 1;  // Field name should be `name`.
 }
 ```
 
 ```proto
 // Incorrect.
-message GetBookRequest {
+message DeleteBookRequest {
   bytes name = 1;  // Field type should be `string`.
 }
 ```
@@ -37,7 +37,7 @@ message GetBookRequest {
 
 ```proto
 // Correct.
-message GetBookRequest {
+message DeleteBookRequest {
   string name = 1;
 }
 ```
@@ -49,9 +49,9 @@ the `name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-name-field=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
-message GetBookRequest {
+// (-- api-linter: core::0135::request-name-field=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
+message DeleteBookRequest {
   string book = 1;
 }
 ```
@@ -59,5 +59,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-131]: https://aip.dev/131
+[aip-135]: https://aip.dev/135
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

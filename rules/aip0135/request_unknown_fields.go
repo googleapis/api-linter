@@ -19,47 +19,20 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
-
-// The Delete standard method should only have expected fields.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0135", "request-message", "name-field"),
-	URI:    "https://aip.dev/135#request-message",
-	OnlyIf: isDeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a name field is present.
-		name := m.FindFieldByName("name")
-		if name == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name field is the correct type.
-		if name.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`name` field on Get RPCs should be a string",
-				Descriptor: name,
-			}}
-		}
-
-		return nil
-	},
-}
 
 // Delete methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0135", "request-message", "unknown-fields"),
+	Name:   lint.NewRuleName("core", "0135", "request-unknown-fields"),
 	URI:    "https://aip.dev/135#request-message",
 	OnlyIf: isDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"name":      {}, // AIP-135
-			"force":     {}, // AIP-135
-			"etag":      {}, // AIP-154
+			"name":       {}, // AIP-135
+			"force":      {}, // AIP-135
+			"etag":       {}, // AIP-154
+			"request_id": {}, // AIP-155
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
