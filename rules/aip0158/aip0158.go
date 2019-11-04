@@ -31,15 +31,15 @@ func AddRules(r lint.RuleRegistry) {
 	)
 }
 
-var listReqMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
-var listResMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Response$")
+var paginatedReq = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Request$")
+var paginatedRes = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Response$")
 
 // Return true if this is an AIP-158 List request message, false otherwise.
-func isListRequestMessage(m *desc.MessageDescriptor) bool {
-	return listReqMessageRegexp.MatchString(m.GetName())
+func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
+	return paginatedReq.MatchString(m.GetName())
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
-func isListResponseMessage(m *desc.MessageDescriptor) bool {
-	return listResMessageRegexp.MatchString(m.GetName())
+func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
+	return paginatedRes.MatchString(m.GetName())
 }
