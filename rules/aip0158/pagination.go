@@ -24,7 +24,6 @@ import (
 
 var requestPaginationPageSize = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0158", "request-message", "page-size-field"),
-	URI:    "https://aip.dev/158",
 	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a page_size field is present.
@@ -50,7 +49,6 @@ var requestPaginationPageSize = &lint.MessageRule{
 
 var requestPaginationPageToken = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0158", "request-message", "page-token-field"),
-	URI:    "https://aip.dev/158",
 	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a page_size field is present.
@@ -76,7 +74,6 @@ var requestPaginationPageToken = &lint.MessageRule{
 
 var responsePaginationNextPageToken = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0158", "response-message", "next-page-token-field"),
-	URI:    "https://aip.dev/158",
 	OnlyIf: isListResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a next_page_token field is present.

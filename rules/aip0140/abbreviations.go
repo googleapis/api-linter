@@ -22,76 +22,48 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// checkAbbreviations checks for each long name in the descriptor's name,
-// and returns problems if one is found that suggests the abbreviation instead.
-func checkAbbreviations(d desc.Descriptor, caseFunc func(string) string) (problems []lint.Problem) {
-	abbv := map[string]string{
-		"configuration": "config",
-		"identifier":    "id",
-		"information":   "info",
-		"specification": "spec",
-		"statistics":    "stats",
-	}
+var expectedAbbreviations = map[string]string{
+	"configuration": "config",
+	"identifier":    "id",
+	"information":   "info",
+	"specification": "spec",
+	"statistics":    "stats",
+}
 
-	// Iterate over each abbreviation and determine whether the descriptor's
-	// name includes the long name.
-	for long, short := range abbv {
-		if strings.Contains(d.GetName(), caseFunc(long)) {
-			problems = append(problems, lint.Problem{
-				Message: fmt.Sprintf(
-					"Use the common abbreviation %q instead of %q.",
-					caseFunc(short),
-					caseFunc(long),
-				),
-				Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
-				Descriptor: d,
-				Location:   lint.DescriptorNameLocation(d),
-			})
+var abbreviations = &lint.DescriptorRule{
+	Name: lint.NewRuleName("core", "0140", "abbreviations"),
+	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
+		// Determine the correct case function to use.
+		// Most things in protobuf are PascalCase; the two exceptions are
+		// fields (snake case) and enum values (UPPER_CAMEL_CASE).
+		//
+		// We do not need to worry about word separators though, since
+		// we are checking for single words only.
+		var caseFunc func(string) string = strings.Title
+		switch d.(type) {
+		case *desc.FieldDescriptor:
+			caseFunc = strings.ToLower
+		case *desc.EnumValueDescriptor:
+			caseFunc = strings.ToUpper
 		}
-	}
-	return
-}
 
-var abbreviationsField = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0140", "field-names", "abbreviations"),
-	URI:  "https://aip.dev/140#abbreviations",
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkAbbreviations(f, strings.ToLower)
-	},
-}
-
-var abbreviationsMessage = &lint.MessageRule{
-	Name: lint.NewRuleName("core", "0140", "message-names", "abbreviations"),
-	URI:  "https://aip.dev/140#abbreviations",
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		return checkAbbreviations(m, strings.Title)
-	},
-}
-
-var abbreviationsEnum = &lint.EnumRule{
-	Name: lint.NewRuleName("core", "0140", "enum-names", "abbreviations"),
-	URI:  "https://aip.dev/140#abbreviations",
-	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		problems := checkAbbreviations(e, strings.Title)
-		for _, ev := range e.GetValues() {
-			problems = append(problems, checkAbbreviations(ev, strings.ToUpper)...)
+		// Iterate over each abbreviation and determine whether the descriptor's
+		// name includes the long name.
+		for long, short := range expectedAbbreviations {
+			if strings.Contains(d.GetName(), caseFunc(long)) {
+				problems = append(problems, lint.Problem{
+					Message: fmt.Sprintf(
+						"Use the common abbreviation %q instead of %q.",
+						caseFunc(short),
+						caseFunc(long),
+					),
+					Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
+					Descriptor: d,
+					Location:   lint.DescriptorNameLocation(d),
+				})
+			}
 		}
-		return problems
-	},
-}
+		return
 
-var abbreviationsService = &lint.ServiceRule{
-	Name: lint.NewRuleName("core", "0140", "serivice-names", "abbreviations"),
-	URI:  "https://aip.dev/140#abbreviations",
-	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
-		return checkAbbreviations(s, strings.Title)
-	},
-}
-
-var abbreviationsMethod = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0140", "method-names", "abbreviations"),
-	URI:  "https://aip.dev/140#abbreviations",
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		return checkAbbreviations(m, strings.Title)
 	},
 }

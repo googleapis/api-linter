@@ -25,6 +25,7 @@ import (
 // AddRules adds all of the AIP-132 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		requestFieldTypes,
 		requestMessageName,
 		responseMessageName,
 		standardFields,

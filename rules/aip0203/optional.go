@@ -38,7 +38,6 @@ import (
 //	}
 var optional = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "optional"),
-	URI:    "http://aip.dev/203#optional",
 	OnlyIf: withoutOptionalFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, optionalRegexp, "OPTIONAL")
@@ -47,7 +46,6 @@ var optional = &lint.FieldRule{
 
 var optionalBehaviorConflict = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0203", "optional-conflict"),
-	URI:  "http://aip.dev/203#optional",
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return !withoutOptionalFieldBehavior(f)
 	},
@@ -69,7 +67,6 @@ var optionalBehaviorConflict = &lint.FieldRule{
 // optional field on the message has this indicator.
 var optionalBehaviorConsistency = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0203", "optional-consistency"),
-	URI:    "https://aip.dev/203#optional",
 	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 

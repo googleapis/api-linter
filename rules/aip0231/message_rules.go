@@ -26,7 +26,6 @@ import (
 // The Batch Get request message should have parent field.
 var parentField = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0231", "request-message", "parent-field"),
-	URI:    "https://aip.dev/231#request-message",
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.
@@ -54,7 +53,6 @@ var parentField = &lint.MessageRule{
 // standard get request message field, but the latter one is not suggested.
 var namesField = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0231", "request-message", "name-field"),
-	URI:    "https://aip.dev/231#request-message",
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
@@ -119,7 +117,6 @@ var namesField = &lint.MessageRule{
 // The Batch Get response message should have resource field.
 var resourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0231", "response-message", "resource-field"),
-	URI:    "https://aip.dev/231#response-message",
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// the singular form the resource name, the first letter is Capitalized.

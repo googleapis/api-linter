@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestAddRules(t *testing.T) {
@@ -29,4 +30,9 @@ func TestAddRules(t *testing.T) {
 			t.Errorf("Rule %s is not namespaced to core::0133.", ruleName)
 		}
 	}
+}
+
+type field struct {
+	fieldName string
+	fieldType *builder.FieldType
 }

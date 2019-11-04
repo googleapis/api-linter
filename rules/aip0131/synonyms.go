@@ -25,7 +25,6 @@ import (
 // Get methods should not generally use synonyms for "get".
 var synonyms = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0131", "synonyms"),
-	URI:  "https://aip.dev/131#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		name := m.GetName()
 		for _, syn := range []string{"Acquire", "Fetch", "Lookup", "Read", "Retrieve"} {

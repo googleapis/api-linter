@@ -23,7 +23,6 @@ import (
 // Get methods should not have an HTTP body.
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0131", "http-body"),
-	URI:    "https://aip.dev/131#guidance",
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

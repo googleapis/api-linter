@@ -27,11 +27,7 @@ import (
 // AddRules adds all of the AIP-140 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
-		abbreviationsEnum,
-		abbreviationsField,
-		abbreviationsMessage,
-		abbreviationsMethod,
-		abbreviationsService,
+		abbreviations,
 		base64,
 		lowerSnake,
 		noPrepositions,

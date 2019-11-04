@@ -8,7 +8,7 @@ rule:
 # Get methods: Name field
 
 This rule enforces that all `Get` standard methods have a `string name` field
-in the request message, as mandated in [AIP-131](http://aip.dev/131).
+in the request message, as mandated in [AIP-131][].
 
 ## Details
 
@@ -59,4 +59,5 @@ message GetBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-131]: https://aip.dev/131
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

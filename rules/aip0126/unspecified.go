@@ -25,7 +25,6 @@ import (
 
 var unspecified = &lint.EnumRule{
 	Name: lint.NewRuleName("core", "0126", "unspecified"),
-	URI:  "https://aip.dev/126#guidance",
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		firstValue := e.GetValues()[0]
 		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")

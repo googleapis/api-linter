@@ -25,7 +25,6 @@ import (
 // comments. (Internal trailing or detached comments are permitted.)
 var onlyLeadingComments = &lint.DescriptorRule{
 	Name: lint.NewRuleName("core", "0192", "comments", "only-leading"),
-	URI:  "https://aip.dev/192",
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
 		problems := []lint.Problem{}
 		c := d.GetSourceInfo()

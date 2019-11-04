@@ -25,7 +25,6 @@ import (
 
 var pluralMethodResourceName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "method-name", "name"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Note: m.GetName()[8:] is used to retrieve the resource name from the
@@ -52,7 +51,6 @@ var pluralMethodResourceName = &lint.MethodRule{
 // Batch Get method should have a properly named Request message.
 var inputName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "input-message", "name"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[8:])
@@ -76,7 +74,6 @@ var inputName = &lint.MethodRule{
 // Batch Get method should have a properly named Response message.
 var outputName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "output-message", "name"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[8:])
@@ -100,7 +97,6 @@ var outputName = &lint.MethodRule{
 // Batch Get methods should use the HTTP GET verb.
 var httpVerb = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "http-verb"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP GET.
@@ -120,7 +116,6 @@ var httpVerb = &lint.MethodRule{
 // Batch Get methods should have a proper HTTP pattern.
 var httpUrl = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "http-name"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
@@ -140,7 +135,6 @@ var httpUrl = &lint.MethodRule{
 // Get methods should not have an HTTP body.
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0231", "http-body"),
-	URI:    "https://aip.dev/231#guidance",
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
