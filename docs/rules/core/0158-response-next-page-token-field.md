@@ -50,7 +50,7 @@ message ListBooksResponse {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `page_size` field is missing) or above the field (if it is the wrong type).
+the `next_page_token` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
