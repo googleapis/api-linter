@@ -26,7 +26,6 @@ import (
 
 var uriSuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0136", "uri-suffix"),
-	URI:    "https://aip.dev/136#guidance",
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

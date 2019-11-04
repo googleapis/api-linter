@@ -29,7 +29,6 @@ import (
 // message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0135", "response-message-name"),
-	URI:    "https://aip.dev/135#guidance",
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response

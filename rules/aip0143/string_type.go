@@ -25,7 +25,6 @@ import (
 
 var fieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0143", "string-type"),
-	URI:  "https://aip.dev/143",
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return stringset.New(
 			"country_code",

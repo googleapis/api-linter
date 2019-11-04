@@ -24,7 +24,6 @@ import (
 // Delete methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0135", "request-unknown-fields"),
-	URI:    "https://aip.dev/135#request-message",
 	OnlyIf: isDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.

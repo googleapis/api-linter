@@ -21,7 +21,6 @@ import (
 
 var requestMaskField = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0134", "request-mask-field"),
-	URI:    "https://aip.dev/134",
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")

@@ -34,7 +34,6 @@ var allowedFields = stringset.New(
 // List methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0132", "request-unknown-fields"),
-	URI:    "https://aip.dev/132#request-message",
 	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		for _, field := range m.GetFields() {

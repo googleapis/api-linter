@@ -15,7 +15,6 @@
 package lint
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -33,10 +32,8 @@ func TestFileRule(t *testing.T) {
 	// Iterate over the tests and run them.
 	for _, test := range makeLintRuleTests(fd) {
 		t.Run(test.testName, func(t *testing.T) {
-			uri := fmt.Sprintf("https://aip.dev/%s", t.Name())
 			rule := &FileRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  uri,
 				LintFile: func(fd *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
@@ -63,10 +60,8 @@ func TestMessageRule(t *testing.T) {
 	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[1]) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
-			uri := fmt.Sprintf("https://aip.dev/%s", t.Name())
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  uri,
 				OnlyIf: func(m *desc.MessageDescriptor) bool {
 					return m.GetName() == "Author"
 				},
@@ -95,10 +90,8 @@ func TestMessageRuleNested(t *testing.T) {
 	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedMessageTypes()[0]) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
-			uri := fmt.Sprintf("https://aip.dev/%s", t.Name())
 			rule := &MessageRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  uri,
 				OnlyIf: func(m *desc.MessageDescriptor) bool {
 					return m.GetName() == "Author"
 				},
@@ -130,10 +123,8 @@ func TestFieldRule(t *testing.T) {
 	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetFields()[1]) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
-			uri := fmt.Sprintf("https://aip.dev/%s", t.Name())
 			rule := &FieldRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  uri,
 				OnlyIf: func(f *desc.FieldDescriptor) bool {
 					return f.GetName() == "edition_count"
 				},
@@ -163,7 +154,6 @@ func TestServiceRule(t *testing.T) {
 			// Create the service rule.
 			rule := &ServiceRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
 				LintService: func(s *desc.ServiceDescriptor) []Problem {
 					return test.problems
 				},
@@ -203,7 +193,6 @@ func TestMethodRule(t *testing.T) {
 			// Create the method rule.
 			rule := &MethodRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
 				OnlyIf: func(m *desc.MethodDescriptor) bool {
 					return m.GetName() == "CreateBook"
 				},
@@ -234,7 +223,6 @@ func TestEnumRule(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
 				OnlyIf: func(e *desc.EnumDescriptor) bool {
 					return e.GetName() == "Edition"
 				},
@@ -267,7 +255,6 @@ func TestEnumRuleNested(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
 				Name: NewRuleName("test", test.testName),
-				URI:  fmt.Sprintf("https://aip.dev/%s", t.Name()),
 				OnlyIf: func(e *desc.EnumDescriptor) bool {
 					return e.GetName() == "Edition"
 				},
@@ -306,7 +293,6 @@ func TestDescriptorRule(t *testing.T) {
 	visited := make(map[string]desc.Descriptor)
 	rule := &DescriptorRule{
 		Name: NewRuleName("test", "test"),
-		URI:  "https://aip.dev/1",
 		LintDescriptor: func(d desc.Descriptor) []Problem {
 			visited[d.GetName()] = d
 			return nil
@@ -324,9 +310,6 @@ func TestDescriptorRule(t *testing.T) {
 	}
 	if got, want := rule.GetName(), "test::test"; string(got) != want {
 		t.Errorf("Got name %q, wanted %q", got, want)
-	}
-	if got, want := rule.GetURI(), "https://aip.dev/1"; got != want {
-		t.Errorf("Got URI %q, wanted %q.", got, want)
 	}
 	if got, want := len(visited), len(wantDescriptors); got != want {
 		t.Errorf("Got %d descriptors, wanted %d.", got, want)
@@ -423,9 +406,6 @@ func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *te
 	// Establish that the metadata methods work.
 	if got, want := string(rule.GetName()), string(NewRuleName("test", test.testName)); got != want {
 		t.Errorf("Got %q for GetName(), expected %q", got, want)
-	}
-	if got, want := rule.GetURI(), fmt.Sprintf("https://aip.dev/%s", t.Name()); got != want {
-		t.Errorf("Got %q for GetURI(), expected %q.", got, want)
 	}
 
 	// Run the rule's lint function on the file descriptor

@@ -37,7 +37,6 @@ import (
 // }
 var inputOnly = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "input-only"),
-	URI:    "http://aip.dev/203#input-only",
 	OnlyIf: withoutInputOnlyFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, inputOnlyRegexp, "INPUT_ONLY")

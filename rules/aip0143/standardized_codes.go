@@ -23,7 +23,6 @@ import (
 
 var fieldNames = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0143", "standardized-codes"),
-	URI:  "https://aip.dev/143",
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		variants := map[string]string{
 			"content_type": "mime_type",

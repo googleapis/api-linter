@@ -23,7 +23,6 @@ import (
 
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0136", "http-body"),
-	URI:    "https://aip.dev/136",
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

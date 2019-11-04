@@ -25,7 +25,6 @@ import (
 // Update methods should use the word "update", not synonyms.
 var synonyms = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0134", "synonyms"),
-	URI:  "https://aip.dev/134#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		name := m.GetName()
 		for _, syn := range []string{"Patch", "Put", "Set"} {

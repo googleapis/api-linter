@@ -24,7 +24,6 @@ import (
 
 var filename = &lint.FileRule{
 	Name: lint.NewRuleName("core", "0191", "filename"),
-	URI:  "https://aip.dev/191#guidance",
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
 		if versionRegexp.MatchString(fn) {

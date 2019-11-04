@@ -38,7 +38,6 @@ import (
 //	}
 var outputOnly = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "output-only"),
-	URI:    "http://aip.dev/203#output-only",
 	OnlyIf: withoutOutputOnlyFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, outputOnlyRegexp, "OUTPUT_ONLY")
