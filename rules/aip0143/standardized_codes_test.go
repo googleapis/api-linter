@@ -52,34 +52,3 @@ func TestFieldNames(t *testing.T) {
 		})
 	}
 }
-
-func TestFieldTypes(t *testing.T) {
-	tests := []struct {
-		testName  string
-		FieldType string
-		FieldName string
-		problems  testutils.Problems
-	}{
-		{"Irrelevant", "int32", "book_count", testutils.Problems{}},
-		{"Valid", "string", "language_code", testutils.Problems{}},
-		{"InvalidScalar", "bytes", "language_code", testutils.Problems{{Message: "string"}}},
-		{"InvalidEnum", "Language", "language_code", testutils.Problems{{Message: "string"}}},
-	}
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
-				message Foo {
-					{{.FieldType}} {{.FieldName}} = 1;
-				}
-				enum Language {
-					LANGUAGE_UNSPECIFIED = 0;
-				}
-			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
-			problems := fieldTypes.Lint(file)
-			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}
