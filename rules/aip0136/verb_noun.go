@@ -24,7 +24,6 @@ import (
 
 var verbNoun = &lint.MethodRule{
 	Name: lint.NewRuleName("core", "0136", "verb-noun"),
-	URI:  "https://aip.dev/136#guidance",
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We can not detect this precisely without a full dictionary (probably
 		// not worth it), but we can catch some common mistakes.

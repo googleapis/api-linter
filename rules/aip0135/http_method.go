@@ -23,7 +23,6 @@ import (
 // Delete methods should use the HTTP DELETE method.
 var httpMethod = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0135", "http-method"),
-	URI:    "https://aip.dev/135#guidance",
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP DELETE.

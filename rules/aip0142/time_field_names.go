@@ -24,7 +24,6 @@ import (
 
 var fieldNames = &lint.FieldRule{
 	Name: lint.NewRuleName("core", "0142", "time-field-names"),
-	URI:  "https://aip.dev/142#timestamps",
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{

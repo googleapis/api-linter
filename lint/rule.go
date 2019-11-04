@@ -30,10 +30,6 @@ type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
 
-	// GetURI returns the URI where the applicable guideline
-	// is documented. (This should generally be an AIP on https://aip.dev/.)
-	GetURI() string
-
 	// Lint accepts a FileDescriptor and lints it,
 	// returning a slice of Problem objects it finds.
 	Lint(*desc.FileDescriptor) []Problem
@@ -42,7 +38,6 @@ type ProtoRule interface {
 // FileRule defines a lint rule that checks a file as a whole.
 type FileRule struct {
 	Name RuleName
-	URI  string
 
 	// LintFile accepts a FileDescriptor and lints it, returning a slice of
 	// Problems it finds.
@@ -56,11 +51,6 @@ func (r *FileRule) GetName() RuleName {
 	return r.Name
 }
 
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *FileRule) GetURI() string {
-	return r.URI
-}
-
 // Lint forwards the FileDescriptor to the LintFile method defined on the
 // FileRule.
 func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
@@ -72,7 +62,6 @@ func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
 // Both top-level messages and nested messages are visited.
 type MessageRule struct {
 	Name RuleName
-	URI  string
 
 	// LintMessage accepts a MessageDescriptor and lints it, returning a slice
 	// of Problems it finds.
@@ -88,11 +77,6 @@ type MessageRule struct {
 // GetName returns the name of the rule.
 func (r *MessageRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *MessageRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every message in the file, and runs `LintMessage`.
@@ -114,7 +98,6 @@ func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
 // FieldRule defines a lint rule that is run on each field within a file.
 type FieldRule struct {
 	Name RuleName
-	URI  string
 
 	// LintField accepts a FieldDescriptor and lints it, returning a slice of
 	// Problems it finds.
@@ -130,11 +113,6 @@ type FieldRule struct {
 // GetName returns the name of the rule.
 func (r *FieldRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *FieldRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every field in the file and runs `LintField`.
@@ -159,7 +137,6 @@ func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
 // ServiceRule defines a lint rule that is run on each service.
 type ServiceRule struct {
 	Name RuleName
-	URI  string
 
 	// LintService accepts a ServiceDescriptor and lints it.
 	LintService func(*desc.ServiceDescriptor) []Problem
@@ -174,11 +151,6 @@ type ServiceRule struct {
 // GetName returns the name of the rule.
 func (r *ServiceRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *ServiceRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every service in the file and runs `LintService`.
@@ -198,7 +170,6 @@ func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
 // MethodRule defines a lint rule that is run on each method.
 type MethodRule struct {
 	Name RuleName
-	URI  string
 
 	// LintMethod accepts a MethodDescriptor and lints it.
 	LintMethod func(*desc.MethodDescriptor) []Problem
@@ -213,11 +184,6 @@ type MethodRule struct {
 // GetName returns the name of the rule.
 func (r *MethodRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *MethodRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every method in the file and runs `LintMethod`.
@@ -239,7 +205,6 @@ func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
 // EnumRule defines a lint rule that is run on each enum.
 type EnumRule struct {
 	Name RuleName
-	URI  string
 
 	// LintEnum accepts a EnumDescriptor and lints it.
 	LintEnum func(*desc.EnumDescriptor) []Problem
@@ -254,11 +219,6 @@ type EnumRule struct {
 // GetName returns the name of the rule.
 func (r *EnumRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *EnumRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every service in the file and runs `LintEnum`.
@@ -281,7 +241,6 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 // in the file (but not the file itself).
 type DescriptorRule struct {
 	Name RuleName
-	URI  string
 
 	// LintDescriptor accepts a generic descriptor and lints it.
 	//
@@ -295,11 +254,6 @@ type DescriptorRule struct {
 // GetName returns the name of the rule.
 func (r *DescriptorRule) GetName() RuleName {
 	return r.Name
-}
-
-// GetURI returns the URI where the applicable guideline is documented.
-func (r *DescriptorRule) GetURI() string {
-	return r.URI
 }
 
 // Lint visits every descriptor in the file and runs `LintDescriptor`.

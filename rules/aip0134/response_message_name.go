@@ -26,7 +26,6 @@ import (
 // Update methods should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0134", "response-message-name"),
-	URI:    "https://aip.dev/134#guidance",
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response

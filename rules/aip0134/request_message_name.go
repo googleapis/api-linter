@@ -24,7 +24,6 @@ import (
 // Update methods should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0134", "request-message-name"),
-	URI:    "https://aip.dev/134#guidance",
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the request

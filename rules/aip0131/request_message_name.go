@@ -24,7 +24,6 @@ import (
 // Get messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0131", "request-message-name"),
-	URI:    "https://aip.dev/131#guidance",
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `GetFoo`, the request

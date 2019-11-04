@@ -25,7 +25,6 @@ import (
 // Update methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName("core", "0134", "request-unknown-fields"),
-	URI:    "https://aip.dev/134#request-message",
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resource := extractResource(m.GetName())

@@ -38,7 +38,6 @@ import (
 //	}
 var required = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "required"),
-	URI:    "http://aip.dev/203#required",
 	OnlyIf: withoutRequiredFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, requiredRegexp, "REQUIRED")

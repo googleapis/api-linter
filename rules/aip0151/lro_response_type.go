@@ -24,7 +24,6 @@ import (
 
 var lroResponse = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0151", "lro-response-type"),
-	URI:    "https://aip.dev/151#guidance",
 	OnlyIf: isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		lro := utils.GetOperationInfo(m)

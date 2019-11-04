@@ -26,7 +26,6 @@ import (
 // Create methods should have an HTTP body, and the body value should be resource.
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0133", "http-body"),
-	URI:    "https://aip.dev/133#guidance",
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgName(m)

@@ -26,7 +26,6 @@ import (
 // Update methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0134", "http-uri-name"),
-	URI:    "https://aip.dev/134#guidance",
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])

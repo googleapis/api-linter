@@ -23,7 +23,6 @@ import (
 // Update methods should use the HTTP PATCH verb.
 var httpMethod = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0134", "http-method"),
-	URI:    "https://aip.dev/134#patch-and-put",
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP PATCH.

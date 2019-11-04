@@ -22,7 +22,6 @@ import (
 
 var lroAnnotationExists = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0151", "operation-info"),
-	URI:    "https://aip.dev/151#guidance",
 	OnlyIf: isLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if utils.GetOperationInfo(m) == nil {
