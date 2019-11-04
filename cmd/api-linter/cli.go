@@ -16,7 +16,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,6 +26,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 )
 
@@ -46,20 +46,20 @@ func newCli(args []string) *cli {
 	var cfgFlag string
 	var fmtFlag string
 	var outFlag string
-	var protoImportFlag stringSlice
+	var protoImportFlag []string
 	var protoDescFlag string
-	var ruleEnableFlag stringSlice
-	var ruleDisableFlag stringSlice
+	var ruleEnableFlag []string
+	var ruleDisableFlag []string
 
 	// Register flag variables.
-	fs := flag.NewFlagSet("api-linter", flag.ExitOnError)
+	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
-	fs.StringVar(&fmtFlag, "output_format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
-	fs.StringVar(&outFlag, "output_path", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
-	fs.Var(&protoImportFlag, "proto_path", "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringVar(&protoDescFlag, "proto_descriptor_set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
-	fs.Var(&ruleEnableFlag, "enable_rule", "Enable a rule with the given name.\nMay be specified multiple times.")
-	fs.Var(&ruleDisableFlag, "disable_rule", "Disable a rule with the given name.\nMay be specified multiple times.")
+	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
+	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
+	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
+	fs.StringVar(&protoDescFlag, "proto-descriptor-set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
+	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
+	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 
 	// Parse flags.
 	fs.Parse(args)
@@ -171,22 +171,6 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	if _, err = w.Write(b); err != nil {
 		return err
 	}
-	return nil
-}
-
-type stringSlice []string
-
-// String is the method to format the flag's value, part of the flag.Value interface.
-// The String method's output will be used in diagnostics.
-func (p *stringSlice) String() string {
-	return fmt.Sprint(*p)
-}
-
-// Set is the method to set the flag value, part of the flag.Value interface.
-// Set's argument is a string to be parsed to set the flag.
-// It's a comma-separated list, so we split it.
-func (p *stringSlice) Set(value string) error {
-	*p = append(*p, strings.Split(value, ",")...)
 	return nil
 }
 
