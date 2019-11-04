@@ -24,7 +24,7 @@ import (
 // onlyLeadingComments ensures that a descriptor has only leading external
 // comments. (Internal trailing or detached comments are permitted.)
 var onlyLeadingComments = &lint.DescriptorRule{
-	Name: lint.NewRuleName("core", "0192", "comments", "only-leading"),
+	Name: lint.NewRuleName("core", "0192", "only-leading-comments"),
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
 		problems := []lint.Problem{}
 		c := d.GetSourceInfo()
