@@ -23,35 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0143", "field-names"),
-	URI:  "https://aip.dev/143",
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		variants := map[string]string{
-			"content_type": "mime_type",
-			"country":      "country_code",
-			"currency":     "currency_code",
-			"lang":         "language_code",
-			"language":     "language_code",
-			"mime":         "mime_type",
-			"mimetype":     "mime_type",
-			"tz":           "time_zone",
-			"timezone":     "time_zone",
-		}
-		if want, ok := variants[f.GetName()]; ok {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Use %q in place of %q.", want, f.GetName()),
-				Descriptor: f,
-				Location:   lint.DescriptorNameLocation(f),
-				Suggestion: want,
-			}}
-		}
-		return nil
-	},
-}
-
 var fieldTypes = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0143", "field-types"),
+	Name: lint.NewRuleName("core", "0143", "string-type"),
 	URI:  "https://aip.dev/143",
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return stringset.New(
