@@ -20,35 +20,6 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestFieldName(t *testing.T) {
-	tests := []struct {
-		testName  string
-		FieldType string
-		FieldName string
-		problems  testutils.Problems
-	}{
-		{"Valid", "google.protobuf.Timestamp", "create_time", testutils.Problems{}},
-		{"InvalidIsMistake", "google.protobuf.Timestamp", "created", testutils.Problems{{Suggestion: "create_time"}}},
-		{"InvalidContainsMistake", "google.protobuf.Timestamp", "last_modified", testutils.Problems{{Suggestion: "update_time"}}},
-		{"InvalidNoSuffix", "google.protobuf.Timestamp", "create", testutils.Problems{{Message: "should end"}}},
-		{"InvalidIsTypeMistake", "int32", "created", testutils.Problems{{Suggestion: "create_time"}}},
-	}
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
-				import "google/protobuf/timestamp.proto";
-				message Book {
-					{{.FieldType}} {{.FieldName}} = 1;
-				}
-			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(fieldNames.Lint(file)); diff != "" {
-				t.Errorf(diff)
-			}
-		})
-	}
-}
-
 func TestFieldType(t *testing.T) {
 	tests := []struct {
 		testName  string
