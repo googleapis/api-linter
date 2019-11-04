@@ -18,7 +18,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -27,14 +26,12 @@ import (
 func TestAbbreviations(t *testing.T) {
 	ruleGroups := []struct {
 		name     string
-		rule     lint.ProtoRule
 		tmpl     string
 		caseFunc func(string) string
 		descFunc func(*desc.FileDescriptor) desc.Descriptor
 	}{
 		{
 			name:     "Field",
-			rule:     abbreviationsField,
 			tmpl:     `message Book { string {{.Name}} = 1; }`,
 			caseFunc: strcase.SnakeCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -43,7 +40,6 @@ func TestAbbreviations(t *testing.T) {
 		},
 		{
 			name:     "Message",
-			rule:     abbreviationsMessage,
 			tmpl:     `message {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -52,7 +48,6 @@ func TestAbbreviations(t *testing.T) {
 		},
 		{
 			name:     "Service",
-			rule:     abbreviationsService,
 			tmpl:     `service {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -61,14 +56,13 @@ func TestAbbreviations(t *testing.T) {
 		},
 		{
 			name: "Method",
-			rule: abbreviationsMethod,
 			tmpl: `
 				service Library {
-					rpc {{.Name}}({{.Name}}Request) returns ({{.Name}}Response);
+					rpc {{.Name}}(Request) returns (Response);
 				}
 
-				message {{.Name}}Request {}
-				message {{.Name}}Response {}
+				message Request {}
+				message Response {}
 			`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -77,7 +71,6 @@ func TestAbbreviations(t *testing.T) {
 		},
 		{
 			name:     "Enum",
-			rule:     abbreviationsEnum,
 			tmpl:     `enum {{.Name}} { UNSPECIFIED = 0; }`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -86,7 +79,6 @@ func TestAbbreviations(t *testing.T) {
 		},
 		{
 			name: "EnumValue",
-			rule: abbreviationsEnum,
 			tmpl: `enum Thing { {{.Name}} = 0; }`,
 			caseFunc: func(s string) string {
 				return strings.ToUpper(strcase.SnakeCase(s))
@@ -106,7 +98,7 @@ func TestAbbreviations(t *testing.T) {
 					d := group.descFunc(file)
 
 					// Establish that we get the problems we expect.
-					problems := group.rule.Lint(file)
+					problems := abbreviations.Lint(file)
 					if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 						t.Errorf(diff)
 					}
