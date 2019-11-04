@@ -1,8 +1,26 @@
 # Configuration
 
 The linter contains a list of core rules, and by default, they are all enabled.
-However, one can disable a rule by using a configuration file or the file
+However, one can disable a rule by using a CLI flag, a configuration file or the file
 comments.
+
+## CLI flag
+
+We can disable a rule using the `-disable_rule` flag.
+
+Example:
+
+Disable the rule `core::0140::lower-snake`:
+
+```sh
+api-linter -disable_rule core::0140::lower-snake test.proto
+```
+
+To disable multiple rules, specify the flag multiple times respectively:
+
+```sh
+api-linter -disable_rule core::0140::lower-snake -disable_rule core::0131::request-name-field test.proto
+```
 
 ## Configuration file
 
@@ -18,7 +36,7 @@ directory `tests` using a JSON config file:
   {
     "included_paths": ["tests/*.proto"],
     "rule_configs": {
-      "core::0140::lower-snake": { "status": "disabled" }
+      "core::0140::lower-snake": { "disabled": true }
     }
   }
 ]
@@ -32,7 +50,7 @@ Disable the same rule using a YAML config file:
     - '**/*.proto'
   rule_configs:
     core::proto_version:
-      status: disabled
+      disabled: true
 ```
 
 ## Proto comments

@@ -5,9 +5,9 @@ rule:
   summary: Get methods must not have an HTTP body.
 ---
 
-# Get methods: Request message
+# Get methods: No HTTP body
 
-This rule enforces that all `Get*` RPCs omit the HTTP `body`, as mandated in
+This rule enforces that all `Get` RPCs omit the HTTP `body`, as mandated in
 [AIP-131][].
 
 ## Details
@@ -25,7 +25,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
     body: "*"  // This should be absent.
-  }
+  };
 }
 ```
 
@@ -36,7 +36,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -53,7 +53,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}"
     body: "*"
-  }
+  };
 }
 ```
 

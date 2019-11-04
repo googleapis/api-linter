@@ -17,9 +17,11 @@ package aip0134
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 // AddRules accepts a register function and registers each of
@@ -30,8 +32,9 @@ func AddRules(r lint.RuleRegistry) {
 		httpMethod,
 		httpNameField,
 		responseMessageName,
+		requestMaskField,
 		requestMessageName,
-		standardFields,
+		resourceField,
 		synonyms,
 		unknownFields,
 	)
@@ -50,4 +53,13 @@ func isUpdateMethod(m *desc.MethodDescriptor) bool {
 // Returns true if this is an AIP-134 Update request message, false otherwise.
 func isUpdateRequestMessage(m *desc.MessageDescriptor) bool {
 	return updateReqMessageRegexp.MatchString(m.GetName())
+}
+
+func extractResource(reqName string) string {
+	// Strips "Update" from the beginning and "Request" from the end.
+	return reqName[6 : len(reqName)-7]
+}
+
+func fieldNameFromResource(resource string) string {
+	return strings.ToLower(strcase.SnakeCase(resource))
 }

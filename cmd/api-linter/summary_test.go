@@ -15,9 +15,9 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/lint"
 )
 
@@ -25,11 +25,11 @@ func TestCreateSummary(t *testing.T) {
 	tests := []struct {
 		name        string
 		data        []lint.Response
-		wantSummary *LintSummary
+		wantSummary map[string]map[string]int
 	}{{
 		name:        "Empty input",
 		data:        []lint.Response{},
-		wantSummary: &LintSummary{Violations: make(map[string]map[string]bool)},
+		wantSummary: make(map[string]map[string]int),
 	}, {
 		name: "Example with a couple of responses",
 		data: []lint.Response{{
@@ -59,33 +59,24 @@ func TestCreateSummary(t *testing.T) {
 					{RuleID: "core::0132::response_message::name"},
 				},
 			}},
-		wantSummary: &LintSummary{
-			Violations: map[string]map[string]bool{
-				"core::0131::request_message::name": map[string]bool{"example2.proto": true},
-				"core::0132::response_message::name": map[string]bool{
-					"example2.proto": true,
-					"example4.proto": true,
-				},
-				"core::naming_formats::field_names": map[string]bool{
-					"example.proto":  true,
-					"example3.proto": true,
-					"example4.proto": true,
-				},
+		wantSummary: map[string]map[string]int{
+			"core::0131::request_message::name": map[string]int{"example2.proto": 1},
+			"core::0132::response_message::name": map[string]int{
+				"example2.proto": 1,
+				"example4.proto": 1,
 			},
-			LongestRuleLen: len("core::0132::response_message::name"),
-			NumSourceFiles: 4,
+			"core::naming_formats::field_names": map[string]int{
+				"example.proto":  2,
+				"example3.proto": 1,
+				"example4.proto": 1,
+			},
 		},
 	}}
 	for _, test := range tests {
-		gotSummary := createSummary(test.data)
-		if !reflect.DeepEqual(gotSummary.Violations, test.wantSummary.Violations) {
-			t.Errorf("Incorrect violation data:\nGot: %#v\n Want: %#v", gotSummary.Violations, test.wantSummary.Violations)
-		}
-		if gotSummary.LongestRuleLen != test.wantSummary.LongestRuleLen {
-			t.Errorf("Incorrect longest rule length:\nGot: %d want: %d", gotSummary.LongestRuleLen, test.wantSummary.LongestRuleLen)
-		}
-		if gotSummary.NumSourceFiles != test.wantSummary.NumSourceFiles {
-			t.Errorf("Incorrect numSourceFiles:\nGot: %d want: %d", gotSummary.NumSourceFiles, test.wantSummary.NumSourceFiles)
+		want := test.wantSummary
+		got := createSummary(test.data)
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Errorf("createSummary() mismatch (-want +got):\n%s", diff)
 		}
 	}
 }

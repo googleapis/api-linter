@@ -26,7 +26,7 @@ across any fields other than:
 ```proto
 // Incorrect.
 message GetBookRequest {
-  string book = 1;
+  string name = 1;
   string library_id = 2;  // Non-standard field.
 }
 ```
@@ -47,7 +47,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message GetBookRequest {
-  string book = 1;
+  string name = 1;
 
   // (-- api-linter: core::0131::request-unknown-fields=disabled
   //     aip.dev/not-precedent: We really need this field because reaosns. --)

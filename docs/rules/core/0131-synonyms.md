@@ -2,13 +2,13 @@
 rule:
   aip: 131
   name: [core, '0131', synonyms]
-  summary: Get methods must be named starting with "Get"
+  summary: Get methods must be named starting with "Get".
 ---
 
-# Get methods: Request message
+# Get methods: Synonym check
 
-This rule enforces that single-resource lookup methods are named `Get*`, as
-mandated in [AIP-131][].
+This rule enforces that single-resource lookup methods have names starting with
+`Get`, as mandated in [AIP-131][].
 
 ## Details
 
@@ -30,7 +30,7 @@ This rule looks at any message with names similar to `Get`, and suggests using
 rpc FetchBook(FetchBookRequest) returns (Book) {  // Should be `GetBook`.
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -41,7 +41,7 @@ rpc FetchBook(FetchBookRequest) returns (Book) {  // Should be `GetBook`.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
@@ -56,7 +56,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc FetchBook(GetBookReq) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}"
-  }
+  };
 }
 ```
 
