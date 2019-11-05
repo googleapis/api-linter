@@ -23,36 +23,10 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The Batch Get request message should have parent field.
-var parentField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0231", "request-message", "parent-field"),
-	OnlyIf: isBatchGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `parent` field is present.
-		parentField := m.FindFieldByName("parent")
-		if parentField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the parent field is a string.
-		if parentField.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`parent` field on create request message must be a string",
-				Descriptor: parentField,
-			}}
-		}
-
-		return nil
-	},
-}
-
 // The Batch Get standard method should have repeated name field or repeated
 // standard get request message field, but the latter one is not suggested.
 var namesField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0231", "request-message", "name-field"),
+	Name:   lint.NewRuleName("core", "0231", "request-names-field"),
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
@@ -111,37 +85,5 @@ var namesField = &lint.MessageRule{
 			})
 		}
 		return
-	},
-}
-
-// The Batch Get response message should have resource field.
-var resourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0231", "response-message", "resource-field"),
-	OnlyIf: isBatchGetResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// the singular form the resource name, the first letter is Capitalized.
-		// Note: Use m.GetName()[8 : len(m.GetName())-9] to retrieve the resource
-		// name from the the batch get response, for example:
-		// "BatchGetBooksResponse" -> "Books"
-		resourceMsgName := pluralize.NewClient().Singular(m.GetName()[8 : len(m.GetName())-9])
-
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				if !fieldDesc.IsRepeated() {
-					return []lint.Problem{{
-						Message:    fmt.Sprintf("The %q type field on Batch Get Response message should be repeated", msgDesc.GetName()),
-						Descriptor: fieldDesc,
-					}}
-				}
-
-				return nil
-			}
-		}
-
-		// Rule check: Establish that a resource field must be included.
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
-			Descriptor: m,
-		}}
 	},
 }

@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 136
-  name: [core, '0136', uri-suffix]
+  name: [core, '0136', http-uri-suffix]
   summary: Custom methods should have a correct URI suffix.
 ---
 
@@ -81,7 +81,7 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0136::uri-suffix=disabled
+// (-- api-linter: core::0136::http-uri-suffix=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {

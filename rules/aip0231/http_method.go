@@ -15,24 +15,26 @@
 package aip0231
 
 import (
-	"strings"
-	"testing"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-func TestAddRules(t *testing.T) {
-	rules := make(lint.RuleRegistry)
-	AddRules(rules)
-	for ruleName := range rules {
-		if !strings.HasPrefix(string(ruleName), "core::0231") {
-			t.Errorf("Rule %s is not namespaced to core::0231.", ruleName)
+// Batch Get methods should use the HTTP GET verb.
+var httpVerb = &lint.MethodRule{
+	Name:   lint.NewRuleName("core", "0231", "http-method"),
+	OnlyIf: isBatchGetMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		// Rule check: Establish that the RPC uses HTTP GET.
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if httpRule.Method != "GET" {
+				return []lint.Problem{{
+					Message:    "Batch Get methods must use the HTTP GET verb.",
+					Descriptor: m,
+				}}
+			}
 		}
-	}
-}
 
-type field struct {
-	fieldName string
-	fieldType *builder.FieldType
+		return nil
+	},
 }
