@@ -9,33 +9,6 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-// This rule inspects the leading comments of each field
-// and if anything looks similar to "Required.", it throws
-// a problem.
-//
-// Examples:
-// Incorrect code for this rule:
-//
-//	message Book {
-//	// The title of the book.
-//	// @Required
-//	string title = 1;
-//	}
-//
-// or
-//
-//	message Book {
-//	// Required. The title of the book.
-//	string title = 1;
-//	}
-//
-//
-// Correct code for this rule:
-//
-//	message Book {
-//		// The title of the book.
-//		string title = 1 [(google.api.field_behavior) = REQUIRED];
-//	}
 var required = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "required"),
 	OnlyIf: withoutRequiredFieldBehavior,
