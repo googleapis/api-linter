@@ -26,15 +26,15 @@ import (
 // this AIP's rules to it.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
-		pluralMethodResourceName,
-		inputName,
-		outputName,
+		pluralMethodName,
+		requestMessageName,
+		responseMessageName,
 		httpBody,
-		httpUrl,
+		httpUriSuffix,
 		httpVerb,
-		parentField,
-		requestsField,
-		resourceField,
+		requestParentField,
+		requestRequestsField,
+		responseResourceField,
 	)
 }
 
