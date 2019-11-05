@@ -7,7 +7,7 @@ rule:
 
 # Batch Get methods: URI suffix
 
-This rule enforces that ` BatchGet`` methods include the `:batchGet` suffix in
+This rule enforces that ` BatchGet` methods include the `:batchGet` suffix in
 the REST URI, as mandated in [AIP-231][].
 
 ## Details
