@@ -30,11 +30,11 @@ func AddRules(r lint.RuleRegistry) {
 		inputName,
 		outputName,
 		httpBody,
-		httpUrl,
 		httpVerb,
 		parentField,
 		namesField,
 		resourceField,
+		uriSuffix,
 	)
 }
 
