@@ -12,9 +12,8 @@ mandated in [AIP-233][].
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchCreate`, and
-complains if the HTTP verb is anything other than `POST`. It _does_ check
-additional bindings if they are present.
+This rule looks at any RPCs with the name beginning with `BatchCreate`, and
+complains if the HTTP verb is anything other than `POST`.
 
 ## Examples
 
