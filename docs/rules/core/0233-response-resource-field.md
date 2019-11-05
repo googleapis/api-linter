@@ -53,7 +53,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0233::response-resource-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message BatchCreateBooksResponse {
-  Book books = 1;
+  // `repeated Book books` is missing.
 }
 ```
 
