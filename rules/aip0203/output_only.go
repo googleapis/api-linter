@@ -9,33 +9,6 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-// This rule inspects the leading comments of each field
-// and if anything looks similar to "Output Only", it throws
-// a problem.
-//
-// Examples:
-// Incorrect code for this rule:
-//
-//	message Book {
-//	// A generated URI for this book.
-//	// @OutputOnly
-//	string generated_uri = 1;
-//	}
-//
-// or
-//
-//	message Book {
-//	// Output only. A generated URI for this book.
-//	string generated_uri = 1;
-//	}
-//
-//
-// Correct code for this rule:
-//
-//	message Book {
-//	// A generated URI for this book.
-//	string generated_uri = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
-//	}
 var outputOnly = &lint.FieldRule{
 	Name:   lint.NewRuleName("core", "0203", "output-only"),
 	OnlyIf: withoutOutputOnlyFieldBehavior,

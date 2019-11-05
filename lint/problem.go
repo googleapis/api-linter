@@ -16,6 +16,7 @@ package lint
 
 import (
 	"encoding/json"
+	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
@@ -87,12 +88,14 @@ func (p Problem) marshal() interface{} {
 		Suggestion string       `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
 		Location   fileLocation `json:"location" yaml:"location"`
 		RuleID     RuleName     `json:"rule_id" yaml:"rule_id"`
+		RuleDocURI string       `json:"rule_doc_uri" yaml:"rule_doc_uri"`
 		Category   string       `json:"category,omitempty" yaml:"category,omitempty"`
 	}{
 		p.Message,
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
 		p.RuleID,
+		ruleDocURI(p.RuleID),
 		p.category,
 	}
 }
@@ -150,4 +153,13 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 			Column: int(span[2]) + 1,
 		},
 	}
+}
+
+// ruleDocURI returns the link to the rule doc in https://googleapis.github.io/api-linter.
+func ruleDocURI(name RuleName) string {
+	base := "https://googleapis.github.io/api-linter/rules"
+	nameParts := strings.Split(string(name), "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
+	ruleSet := nameParts[0]
+	path := strings.Join(nameParts[1:], "-")
+	return base + "/" + ruleSet + "/" + path + ".html"
 }
