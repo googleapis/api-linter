@@ -49,21 +49,20 @@ To see the help message, run `api-linter -h`
 
 ```text
 Usage of api-linter:
-  -config string
-      The linter config file.
-  -output_format string
-      The format of the linting results.
-      Supported formats include YAML, JSON and summary text.
-      YAML is the default.
-  -output_path string
-      The output file path.
-      If not given, the linting results will be printed out to STDOUT.
-  -proto_descriptor_set string
-      A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.
-  -proto_path value
-      The folder for searching proto imports.
-      May be specified multiple times; directories will be searched in order.
-      The current working directory is always used.
+      --config string                 The linter config file.
+      --disable-rule stringArray      Disable a rule with the given name.
+                                      May be specified multiple times.
+      --enable-rule stringArray       Enable a rule with the given name.
+                                      May be specified multiple times.
+      --output-format string          The format of the linting results.
+                                      Supported formats include "yaml", "json" and "summary" table.
+                                      YAML is the default.
+  -o, --output-path string            The output file path.
+                                      If not given, the linting results will be printed out to STDOUT.
+      --proto-descriptor-set string   A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.
+  -I, --proto-path stringArray        The folder for searching proto imports.
+                                      May be specified multiple times; directories will be searched in order.
+                                      The current working directory is always used.
 ```
 
 ## License
