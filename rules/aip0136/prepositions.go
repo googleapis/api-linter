@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/data"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -32,7 +33,7 @@ var noPrepositions = &lint.MethodRule{
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Method names should not include prepositions (%q).", word),
 					Descriptor: m,
-					Location:   lint.DescriptorNameLocation(m),
+					Location:   locations.DescriptorName(m),
 				})
 			}
 		}

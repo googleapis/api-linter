@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -33,7 +34,7 @@ var unspecified = &lint.EnumRule{
 				Message:    fmt.Sprintf("The first enum value should be %q", want),
 				Suggestion: want,
 				Descriptor: firstValue,
-				Location:   lint.DescriptorNameLocation(firstValue),
+				Location:   locations.DescriptorName(firstValue),
 			}}
 		}
 

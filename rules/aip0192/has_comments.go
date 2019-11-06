@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -30,7 +31,7 @@ var hasComments = &lint.DescriptorRule{
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf("Missing comment over %q.", d.GetName()),
 				Descriptor: d,
-				Location:   lint.DescriptorNameLocation(d),
+				Location:   locations.DescriptorName(d),
 			})
 		}
 		return
