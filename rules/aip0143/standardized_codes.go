@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -39,7 +40,7 @@ var fieldNames = &lint.FieldRule{
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Use %q in place of %q.", want, f.GetName()),
 				Descriptor: f,
-				Location:   lint.DescriptorNameLocation(f),
+				Location:   locations.DescriptorName(f),
 				Suggestion: want,
 			}}
 		}

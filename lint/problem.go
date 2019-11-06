@@ -120,7 +120,10 @@ type fileLocation struct {
 // protocol buffer SourceCodeInfo_Location
 func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
-	span := l.Span
+	span := []int32{0, 0, 1}
+	if l != nil {
+		span = l.Span
+	}
 
 	// If `span` has four ints; they correspond to
 	// [start line, start column, end line, end column].

@@ -11,7 +11,7 @@ require (
 	github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58
 	github.com/lithammer/dedent v1.1.0
 	github.com/mattn/go-runewidth v0.0.5 // indirect
-	github.com/olekukonko/tablewriter v0.0.1
+	github.com/olekukonko/tablewriter v0.0.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.0.2
 	google.golang.org/genproto v0.0.0-20191028173616-919d9bdd9fe6

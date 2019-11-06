@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -39,7 +40,7 @@ var resourceField = &lint.MessageRule{
 						Message:    fmt.Sprintf("Resource field should be named %q.", want),
 						Descriptor: fieldDesc,
 						Suggestion: want,
-						Location:   lint.DescriptorNameLocation(fieldDesc),
+						Location:   locations.DescriptorName(fieldDesc),
 					}}
 				}
 				return nil
