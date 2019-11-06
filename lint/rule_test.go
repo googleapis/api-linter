@@ -33,7 +33,7 @@ func TestFileRule(t *testing.T) {
 	for _, test := range makeLintRuleTests(fd) {
 		t.Run(test.testName, func(t *testing.T) {
 			rule := &FileRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				LintFile: func(fd *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
@@ -61,7 +61,7 @@ func TestMessageRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
 			rule := &MessageRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(m *desc.MessageDescriptor) bool {
 					return m.GetName() == "Author"
 				},
@@ -91,7 +91,7 @@ func TestMessageRuleNested(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
 			rule := &MessageRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(m *desc.MessageDescriptor) bool {
 					return m.GetName() == "Author"
 				},
@@ -124,7 +124,7 @@ func TestFieldRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
 			rule := &FieldRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(f *desc.FieldDescriptor) bool {
 					return f.GetName() == "edition_count"
 				},
@@ -153,7 +153,7 @@ func TestServiceRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the service rule.
 			rule := &ServiceRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				LintService: func(s *desc.ServiceDescriptor) []Problem {
 					return test.problems
 				},
@@ -192,7 +192,7 @@ func TestMethodRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the method rule.
 			rule := &MethodRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(m *desc.MethodDescriptor) bool {
 					return m.GetName() == "CreateBook"
 				},
@@ -222,7 +222,7 @@ func TestEnumRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(e *desc.EnumDescriptor) bool {
 					return e.GetName() == "Edition"
 				},
@@ -254,7 +254,7 @@ func TestEnumRuleNested(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
-				Name: NewGenericRuleName("test", test.testName),
+				Name: RuleName("test"),
 				OnlyIf: func(e *desc.EnumDescriptor) bool {
 					return e.GetName() == "Edition"
 				},
@@ -292,7 +292,7 @@ func TestDescriptorRule(t *testing.T) {
 	// Create a rule that lets us verify that each descriptor was visited.
 	visited := make(map[string]desc.Descriptor)
 	rule := &DescriptorRule{
-		Name: NewGenericRuleName("test", "test"),
+		Name: RuleName("test"),
 		LintDescriptor: func(d desc.Descriptor) []Problem {
 			visited[d.GetName()] = d
 			return nil
@@ -308,7 +308,7 @@ func TestDescriptorRule(t *testing.T) {
 		"Author", "Book", "ConjureBook", "Format", "FORMAT_UNSPECIFIED",
 		"name", "Library", "State",
 	}
-	if got, want := rule.GetName(), "test::test"; string(got) != want {
+	if got, want := rule.GetName(), "test"; string(got) != want {
 		t.Errorf("Got name %q, wanted %q", got, want)
 	}
 	if got, want := len(visited), len(wantDescriptors); got != want {
@@ -324,7 +324,7 @@ func TestDescriptorRule(t *testing.T) {
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
-		Name: NewGenericRuleName("test"),
+		Name: RuleName("test"),
 		LintFile: func(fd *desc.FileDescriptor) []Problem {
 			return []Problem{}
 		},
@@ -371,7 +371,7 @@ func TestRuleIsEnabled(t *testing.T) {
 func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
-		Name: NewGenericRuleName("test"),
+		Name: RuleName("test"),
 		LintFile: func(fd *desc.FileDescriptor) []Problem {
 			return []Problem{}
 		},
@@ -404,7 +404,7 @@ type lintRuleTest struct {
 // runRule runs a rule within a test environment.
 func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *testing.T) {
 	// Establish that the metadata methods work.
-	if got, want := string(rule.GetName()), string(NewGenericRuleName("test", test.testName)); got != want {
+	if got, want := string(rule.GetName()), string(RuleName("test")); got != want {
 		t.Errorf("Got %q for GetName(), expected %q", got, want)
 	}
 

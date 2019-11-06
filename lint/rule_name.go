@@ -49,15 +49,11 @@ func getRuleGroup(aip int) string {
 // NewRuleName creates a RuleName from an AIP number and a unique name within
 // that AIP.
 func NewRuleName(aip int, name string) RuleName {
-	return NewGenericRuleName(getRuleGroup(aip), fmt.Sprintf("%04d", aip), name)
-}
-
-// NewGenericRuleName creates a RuleName from segments.
-// It will join the segments with the "::" separator.
-//
-// Use this function for rules not covered in public AIPs.
-func NewGenericRuleName(segments ...string) RuleName {
-	return RuleName(strings.Join(segments, nameSeparator))
+	return RuleName(strings.Join([]string{
+		getRuleGroup(aip),
+		fmt.Sprintf("%04d", aip),
+		name,
+	}, nameSeparator))
 }
 
 // IsValid checks if a RuleName is syntactically valid.

@@ -87,24 +87,6 @@ func TestNewRuleName(t *testing.T) {
 	}
 }
 
-func TestNewGenericRuleName(t *testing.T) {
-	tests := []struct {
-		segments []string
-		name     RuleName
-	}{
-		{[]string{}, ""},
-		{[]string{""}, ""},
-		{[]string{"my-namespace", "my-rule"}, "my-namespace::my-rule"},
-		{[]string{"my", "name", "space", "foo"}, "my::name::space::foo"},
-	}
-
-	for _, test := range tests {
-		if NewGenericRuleName(test.segments...) != test.name {
-			t.Errorf("NewGenericRuleName(%v)=%q; want %q", test.segments, NewGenericRuleName(test.segments...), test.name)
-		}
-	}
-}
-
 func TestRuleName_HasPrefix(t *testing.T) {
 	tests := []struct {
 		r         RuleName
