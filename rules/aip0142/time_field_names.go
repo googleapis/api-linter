@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -37,7 +38,7 @@ var fieldNames = &lint.FieldRule{
 				return []lint.Problem{{
 					Message:    "Use the imperative mood and a `_time` suffix for timestamps.",
 					Descriptor: f,
-					Location:   lint.DescriptorNameLocation(f),
+					Location:   locations.DescriptorName(f),
 					Suggestion: want,
 				}}
 			}
@@ -48,7 +49,7 @@ var fieldNames = &lint.FieldRule{
 			return []lint.Problem{{
 				Message:    "Timestamp fields should end in `_time`.",
 				Descriptor: f,
-				Location:   lint.DescriptorNameLocation(f),
+				Location:   locations.DescriptorName(f),
 			}}
 		}
 

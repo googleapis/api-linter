@@ -19,6 +19,7 @@ import (
 
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -30,7 +31,7 @@ var count = &lint.FieldRule{
 			return []lint.Problem{{
 				Message:    "Quantities: Use a _count suffix, not a num_ prefix.",
 				Descriptor: f,
-				Location:   lint.DescriptorNameLocation(f),
+				Location:   locations.DescriptorName(f),
 				Suggestion: want,
 			}}
 		}

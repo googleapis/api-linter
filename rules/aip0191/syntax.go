@@ -16,6 +16,7 @@ package aip0191
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -28,7 +29,7 @@ var syntax = &lint.FileRule{
 				Message:    "All API proto files must use proto3 syntax.",
 				Suggestion: "syntax = \"proto3\";",
 				Descriptor: f,
-				Location:   lint.SyntaxLocation(f),
+				Location:   locations.FileSyntax(f),
 			}}
 		}
 		return nil

@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -59,7 +60,7 @@ var abbreviations = &lint.DescriptorRule{
 					),
 					Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
 					Descriptor: d,
-					Location:   lint.DescriptorNameLocation(d),
+					Location:   locations.DescriptorName(d),
 				})
 			}
 		}

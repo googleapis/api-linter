@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0191
+package locations
 
 import (
-	"path/filepath"
-	"strings"
-
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var filename = &lint.FileRule{
-	Name: lint.NewRuleName(191, "filenames"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
-		if versionRegexp.MatchString(fn) {
-			return []lint.Problem{{
-				Message:    "The proto version must not be used as the filename.",
-				Descriptor: f,
-				Location:   locations.FilePackage(f),
-			}}
-		}
-		return nil
-	},
+// DescriptorName returns the precise location for a descriptor's name.
+//
+// This works for any descriptor, regardless of type (message, field, etc.).
+func DescriptorName(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
+	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+		// All descriptors seem to have `string name = 1`, so this conveniently works.
+		path := append(sourceInfo.Path, 1)
+		return pathLocation(d.GetFile(), path)
+	}
+	return nil
 }

@@ -12,41 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lint
+package locations
 
 import (
-	"strings"
 	"testing"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
-	"github.com/jhump/protoreflect/desc/protoparse"
-	"github.com/lithammer/dedent"
 )
 
 func TestLocations(t *testing.T) {
-	parser := protoparse.Parser{
-		Accessor: protoparse.FileContentsFromMap(map[string]string{
-			"test.proto": strings.TrimSpace(dedent.Dedent(`
-				// proto3 rules!
-				syntax = "proto3";
+	f := parse(t, `
+		// proto3 rules!
+		syntax = "proto3";
 
-				package google.api.linter;
+		package google.api.linter;
 
-				message Foo {
-				  string bar = 1;
-				}
-			`)),
-		}),
-		IncludeSourceCodeInfo: true,
-	}
-	fds, err := parser.ParseFiles("test.proto")
-	if err != nil {
-		t.Fatalf("%v", err)
-	}
-	f := fds[0]
+		message Foo {
+			string bar = 1;
+		}
+	`)
 
 	// Test the file location functions.
 	t.Run("File", func(t *testing.T) {
@@ -55,31 +42,12 @@ func TestLocations(t *testing.T) {
 			fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
 			wantSpan []int32
 		}{
-			{"Syntax", SyntaxLocation, []int32{1, 0, int32(len("syntax = \"proto3\";"))}},
-			{"Package", PackageLocation, []int32{3, 0, int32(len("package google.api.linter;"))}},
+			{"Syntax", FileSyntax, []int32{1, 0, int32(len("syntax = \"proto3\";"))}},
+			{"Package", FilePackage, []int32{3, 0, int32(len("package google.api.linter;"))}},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
 				if diff := cmp.Diff(test.fx(f).Span, test.wantSpan); diff != "" {
-					t.Errorf(diff)
-				}
-			})
-		}
-	})
-
-	// Test descriptor names.
-	t.Run("DescriptorNames", func(t *testing.T) {
-		tests := []struct {
-			testName string
-			d        desc.Descriptor
-			wantSpan []int32
-		}{
-			{"Message", f.GetMessageTypes()[0], []int32{5, 8, 11}},
-			{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{6, 9, 12}},
-		}
-		for _, test := range tests {
-			t.Run(test.testName, func(t *testing.T) {
-				if diff := cmp.Diff(DescriptorNameLocation(test.d).Span, test.wantSpan); diff != "" {
 					t.Errorf(diff)
 				}
 			})
@@ -96,7 +64,7 @@ func TestLocations(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
-				if loc := PathLocation(f, test.path); loc != nil {
+				if loc := pathLocation(f, test.path); loc != nil {
 					t.Errorf("%v", loc)
 				}
 			})
@@ -114,8 +82,8 @@ func TestMissingLocations(t *testing.T) {
 		testName string
 		fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
 	}{
-		{"Syntax", SyntaxLocation},
-		{"Package", PackageLocation},
+		{"Syntax", FileSyntax},
+		{"Package", FilePackage},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

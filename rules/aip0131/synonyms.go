@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -36,7 +37,7 @@ var synonyms = &lint.MethodRule{
 					),
 					Suggestion: strings.Replace(name, syn, "Get", 1),
 					Descriptor: m,
-					Location:   lint.DescriptorNameLocation(m),
+					Location:   locations.DescriptorName(m),
 				}}
 			}
 		}

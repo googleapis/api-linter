@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -20,7 +21,7 @@ var enumValueUpperSnakeCase = &lint.EnumRule{
 					Message:    fmt.Sprintf("Enum value %q must use UPPER_SNAKE_CASE.", got),
 					Suggestion: want,
 					Descriptor: v,
-					Location:   lint.DescriptorNameLocation(v),
+					Location:   locations.DescriptorName(v),
 				})
 			}
 		}

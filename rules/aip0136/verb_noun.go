@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -33,7 +34,7 @@ var verbNoun = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Custom methods should be named using a verb followed by a noun.",
 				Descriptor: m,
-				Location:   lint.DescriptorNameLocation(m),
+				Location:   locations.DescriptorName(m),
 			}}
 		}
 
