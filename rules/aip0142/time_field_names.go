@@ -23,7 +23,7 @@ import (
 )
 
 var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0142", "time-field-names"),
+	Name: lint.NewRuleName(142, "time-field-names"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{

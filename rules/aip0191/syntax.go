@@ -21,7 +21,7 @@ import (
 
 // APIs must use proto3.
 var syntax = &lint.FileRule{
-	Name: lint.NewRuleName("core", "0191", "proto-version"),
+	Name: lint.NewRuleName(191, "proto-version"),
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if !f.IsProto3() {
 			return []lint.Problem{{

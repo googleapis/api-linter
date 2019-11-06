@@ -22,7 +22,7 @@ import (
 
 // Delete methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0135", "http-uri-name"),
+	Name:   lint.NewRuleName(135, "http-uri-name"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

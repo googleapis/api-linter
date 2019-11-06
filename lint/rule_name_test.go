@@ -14,7 +14,9 @@
 
 package lint
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRuleNameValid(t *testing.T) {
 	tests := []struct {
@@ -68,6 +70,25 @@ func TestRuleNameInvalid(t *testing.T) {
 
 func TestNewRuleName(t *testing.T) {
 	tests := []struct {
+		testName string
+		aip      int
+		name     string
+		want     string
+	}{
+		{"ZeroPad", 131, "http-method", "core::0131::http-method"},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			rn := NewRuleName(test.aip, test.name)
+			if got := string(rn); got != test.want {
+				t.Errorf("Got %q, expected %q.", got, test.want)
+			}
+		})
+	}
+}
+
+func TestNewGenericRuleName(t *testing.T) {
+	tests := []struct {
 		segments []string
 		name     RuleName
 	}{
@@ -78,8 +99,8 @@ func TestNewRuleName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if NewRuleName(test.segments...) != test.name {
-			t.Errorf("NewRuleName(%v)=%q; want %q", test.segments, NewRuleName(test.segments...), test.name)
+		if NewGenericRuleName(test.segments...) != test.name {
+			t.Errorf("NewGenericRuleName(%v)=%q; want %q", test.segments, NewGenericRuleName(test.segments...), test.name)
 		}
 	}
 }

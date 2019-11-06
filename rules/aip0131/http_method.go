@@ -22,7 +22,7 @@ import (
 
 // Get methods should use the HTTP GET verb.
 var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "http-method"),
+	Name:   lint.NewRuleName(131, "http-method"),
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP GET.

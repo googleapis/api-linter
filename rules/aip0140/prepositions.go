@@ -24,7 +24,7 @@ import (
 )
 
 var noPrepositions = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0140", "prepositions"),
+	Name: lint.NewRuleName(140, "prepositions"),
 	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
 		for _, word := range strings.Split(f.GetName(), "_") {
 			if data.Prepositions.Contains(word) {

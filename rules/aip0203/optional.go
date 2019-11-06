@@ -10,7 +10,7 @@ import (
 )
 
 var optional = &lint.FieldRule{
-	Name:   lint.NewRuleName("core", "0203", "optional"),
+	Name:   lint.NewRuleName(203, "optional"),
 	OnlyIf: withoutOptionalFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, optionalRegexp, "OPTIONAL")
@@ -18,7 +18,7 @@ var optional = &lint.FieldRule{
 }
 
 var optionalBehaviorConflict = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0203", "optional-conflict"),
+	Name: lint.NewRuleName(203, "optional-conflict"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return !withoutOptionalFieldBehavior(f)
 	},
@@ -39,7 +39,7 @@ var optionalBehaviorConflict = &lint.FieldRule{
 // If a message has a field which is described as optional, ensure that every
 // optional field on the message has this indicator.
 var optionalBehaviorConsistency = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0203", "optional-consistency"),
+	Name:   lint.NewRuleName(203, "optional-consistency"),
 	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 

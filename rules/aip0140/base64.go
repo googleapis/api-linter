@@ -22,7 +22,7 @@ import (
 )
 
 var base64 = &lint.FieldRule{
-	Name:   lint.NewRuleName("core", "0140", "base64"),
+	Name:   lint.NewRuleName(140, "base64"),
 	OnlyIf: isStringField,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())

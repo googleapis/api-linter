@@ -24,7 +24,7 @@ import (
 
 // The List standard method should contain a parent field.
 var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0132", "request-message", "parent-field"),
+	Name:   lint.NewRuleName(132, "request-message", "parent-field"),
 	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.

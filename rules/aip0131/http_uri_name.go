@@ -22,7 +22,7 @@ import (
 
 // Get methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "http-uri-name"),
+	Name:   lint.NewRuleName(131, "http-uri-name"),
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

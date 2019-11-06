@@ -10,7 +10,7 @@ import (
 )
 
 var outputOnly = &lint.FieldRule{
-	Name:   lint.NewRuleName("core", "0203", "output-only"),
+	Name:   lint.NewRuleName(203, "output-only"),
 	OnlyIf: withoutOutputOnlyFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, outputOnlyRegexp, "OUTPUT_ONLY")

@@ -23,7 +23,7 @@ import (
 )
 
 var requestPaginationPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0158", "request-page-token-field"),
+	Name:   lint.NewRuleName(158, "request-page-token-field"),
 	OnlyIf: isPaginatedRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a page_size field is present.

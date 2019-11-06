@@ -23,7 +23,7 @@ import (
 
 // List messages should use a `ListFoosResponse` response message.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0132", "response-message-name"),
+	Name:   lint.NewRuleName(132, "response-message-name"),
 	OnlyIf: isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `ListFoos`, the response

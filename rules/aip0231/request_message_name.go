@@ -23,7 +23,7 @@ import (
 
 // Batch Get method should have a properly named Request message.
 var inputName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0231", "request-message-name"),
+	Name:   lint.NewRuleName(231, "request-message-name"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `BatchGetFoos`, the request
