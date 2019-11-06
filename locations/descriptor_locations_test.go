@@ -12,28 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0191
+package locations
 
 import (
-	"path/filepath"
-	"strings"
+	"testing"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	"github.com/google/go-cmp/cmp"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var filename = &lint.FileRule{
-	Name: lint.NewRuleName("core", "0191", "filenames"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
-		if versionRegexp.MatchString(fn) {
-			return []lint.Problem{{
-				Message:    "The proto version must not be used as the filename.",
-				Descriptor: f,
-				Location:   locations.FilePackage(f),
-			}}
+func TestDescriptorName(t *testing.T) {
+	f := parse(t, `
+		message Foo {
+		  string bar = 1;
 		}
-		return nil
-	},
+	`)
+
+	tests := []struct {
+		testName string
+		d        desc.Descriptor
+		wantSpan []int32
+	}{
+		{"Message", f.GetMessageTypes()[0], []int32{2, 8, 11}},
+		{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{3, 9, 12}},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			if diff := cmp.Diff(DescriptorName(test.d).Span, test.wantSpan); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
 }

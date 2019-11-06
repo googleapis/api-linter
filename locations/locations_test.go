@@ -12,28 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0191
+package locations
 
 import (
-	"path/filepath"
 	"strings"
+	"testing"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/lithammer/dedent"
 )
 
-var filename = &lint.FileRule{
-	Name: lint.NewRuleName("core", "0191", "filenames"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
-		if versionRegexp.MatchString(fn) {
-			return []lint.Problem{{
-				Message:    "The proto version must not be used as the filename.",
-				Descriptor: f,
-				Location:   locations.FilePackage(f),
-			}}
-		}
-		return nil
-	},
+func parse(t *testing.T, s string) *desc.FileDescriptor {
+	s = strings.TrimSpace(dedent.Dedent(s))
+	if !strings.Contains(s, "syntax = ") {
+		s = "syntax = \"proto3\";\n\n" + s
+	}
+	parser := protoparse.Parser{
+		Accessor: protoparse.FileContentsFromMap(map[string]string{
+			"test.proto": strings.TrimSpace(dedent.Dedent(s)),
+		}),
+		IncludeSourceCodeInfo: true,
+	}
+	fds, err := parser.ParseFiles("test.proto")
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	return fds[0]
 }

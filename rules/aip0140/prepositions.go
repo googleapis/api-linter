@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/data"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -31,7 +32,7 @@ var noPrepositions = &lint.FieldRule{
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Avoid using %q in field names.", word),
 					Descriptor: f,
-					Location:   lint.DescriptorNameLocation(f),
+					Location:   locations.DescriptorName(f),
 				})
 			}
 		}

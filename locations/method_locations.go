@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0191
+package locations
 
 import (
-	"path/filepath"
-	"strings"
-
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var filename = &lint.FileRule{
-	Name: lint.NewRuleName("core", "0191", "filenames"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
-		if versionRegexp.MatchString(fn) {
-			return []lint.Problem{{
-				Message:    "The proto version must not be used as the filename.",
-				Descriptor: f,
-				Location:   locations.FilePackage(f),
-			}}
-		}
-		return nil
-	},
+// MethodRequestType returns the precise location of the method's input type.
+func MethodRequestType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+	path := append(m.GetSourceInfo().Path, 2) // input_type == 2
+	return pathLocation(m.GetFile(), path)
+}
+
+// MethodResponseType returns the precise location of the method's output type.
+func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+	path := append(m.GetSourceInfo().Path, 3) // output_type == 3
+	return pathLocation(m.GetFile(), path)
 }

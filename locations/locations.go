@@ -12,41 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lint
+// Package locations provides functions to get the location of a particular part
+// of a descriptor, allowing Problems to be attached to just a descriptor's
+// name, type, etc.. This allows for better auto-replacement functionality in
+// code review tools.
+//
+// All functions in this package accept a descriptor and return a
+// protobuf SourceCodeInfo_Location object, which can be passed directly
+// to the Location property on Problem.
+package locations
 
 import (
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// PathLocation returns the precise location within a file for a given path.
-func PathLocation(f *desc.FileDescriptor, path []int32) *dpb.SourceCodeInfo_Location {
+// pathLocation returns the precise location within a file for a given path.
+func pathLocation(f *desc.FileDescriptor, path []int32) *dpb.SourceCodeInfo_Location {
 	return sourceInfoRegistry.sourceInfo(f).findLocation(path)
-}
-
-// SyntaxLocation returns the location of the syntax definition in a file
-// descriptor.
-//
-// If the location can not be found (for example, because there is no syntax
-// statement), it returns nil.
-func SyntaxLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return PathLocation(f, []int32{12}) // syntax == 12
-}
-
-// PackageLocation returns the location of the package definition in a file
-// descriptor.
-//
-// If the location can not be found (for example, because there is no package
-// statement), it returns nil.
-func PackageLocation(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return PathLocation(f, []int32{2}) // package == 2
-}
-
-// DescriptorNameLocation returns the precise location for a descriptor's name.
-func DescriptorNameLocation(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
-	// All descriptors seem to have `string name = 1`, so this conveniently works.
-	path := append(d.GetSourceInfo().Path, 1)
-	return PathLocation(d.GetFile(), path)
 }
 
 type sourceInfo map[string]*dpb.SourceCodeInfo_Location
