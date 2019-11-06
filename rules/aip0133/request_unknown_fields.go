@@ -26,7 +26,7 @@ import (
 
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-message", "unknown-fields"),
+	Name:   lint.NewRuleName(133, "request-unknown-fields"),
 	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
