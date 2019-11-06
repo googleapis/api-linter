@@ -30,9 +30,8 @@ const nameSeparator string = "::"
 
 var ruleNameValidator = regexp.MustCompile("^([a-z0-9][a-z0-9-]*(::[a-z0-9][a-z0-9-]*)?)+$")
 
-// NewRuleName creates a RuleName from an AIP number and a unique name within
-// that AIP.
-func NewRuleName(aip int, name string) RuleName {
+// getRuleGroup takes an AIP number and returns the appropriate group.
+func getRuleGroup(aip int) string {
 	// Determine the group.
 	group := ""
 	if aip > 0 && aip < 1000 {
@@ -44,14 +43,13 @@ func NewRuleName(aip int, name string) RuleName {
 		panic("Invalid AIP; no available group.")
 	}
 
-	// Get the AIP as a four-character string.
-	aipStr := fmt.Sprintf("%d", aip)
-	for len(aipStr) < 4 {
-		aipStr = "0" + aipStr
-	}
+	return group
+}
 
-	// Return the rule name.
-	return NewGenericRuleName(group, aipStr, name)
+// NewRuleName creates a RuleName from an AIP number and a unique name within
+// that AIP.
+func NewRuleName(aip int, name string) RuleName {
+	return NewGenericRuleName(getRuleGroup(aip), fmt.Sprintf("%04d", aip), name)
 }
 
 // NewGenericRuleName creates a RuleName from segments.
@@ -61,9 +59,6 @@ func NewRuleName(aip int, name string) RuleName {
 func NewGenericRuleName(segments ...string) RuleName {
 	return RuleName(strings.Join(segments, nameSeparator))
 }
-
-// NewAIPRuleName creates a RuleName based on the AIP number and a unique name
-// within that AIP.
 
 // IsValid checks if a RuleName is syntactically valid.
 func (r RuleName) IsValid() bool {
