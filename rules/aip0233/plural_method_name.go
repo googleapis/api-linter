@@ -16,6 +16,7 @@ package aip0233
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
@@ -28,7 +29,7 @@ var pluralMethodName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Note: m.GetName()[11:] is used to retrieve the resource name from the
 		// method name. For example, "BatchCreateFoos" -> "Foos"
-		pluralMethodResourceName := m.GetName()[11:]
+		pluralMethodResourceName := strings.TrimPrefix(m.GetName(), "BatchCreate")
 
 		pluralize := pluralize.NewClient()
 

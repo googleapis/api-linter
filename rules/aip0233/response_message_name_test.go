@@ -23,32 +23,88 @@ import (
 func TestResponseMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName string
-		src      string
-		problems testutils.Problems
+		testName   string
+		methodName string
+		response   string
+		problems   testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchCreateBooksResponse",
-			src: `import "google/api/annotations.proto";
+			testName:   "Valid-BatchCreateBooksResponse",
+			methodName: "BatchCreateBooks",
+			response:   "BatchCreateBooksResponse",
+			problems:   testutils.Problems{},
+		},
+		{
+			testName:   "Invalid-MissMatchingMethodName",
+			methodName: "BatchCreateBooks",
+			response:   "BatchCreateBookResponse",
+			problems:   testutils.Problems{{Message: "have a properly named response message"}},
+		},
+		{
+			testName:   "Irrelevant",
+			methodName: "CreateBook",
+			response:   "Book",
+			problems:   testutils.Problems{},
+		},
+	}
+
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			template := `import "google/api/annotations.proto";
 
 service BookService {
-	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
+	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.Response}}) {
 		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/books:batchCreate"
+			post: "/v1/{parent=publishers/*}/"
 			body: "*"
 		};
 	}
 }
 
-message BatchCreateBooksRequest {}
+message {{.MethodName}}Request {}
 
-message BatchCreateBooksResponse{}
-`,
-			problems: testutils.Problems{},
+message {{.Response}}{}
+`
+			file := testutils.ParseProto3Tmpl(t, template,
+				struct {
+					MethodName string
+					Response   string
+				}{test.methodName, test.response})
+
+			m := file.GetServices()[0].GetMethods()[0]
+
+			problems := responseMessageName.Lint(file)
+			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
+// Other cases for long running response will be handled by AIP-0151
+func TestLongRunningResponse(t *testing.T) {
+	// Set up the testing permutations.
+	tests := []struct {
+		testName     string
+		responseType string
+		problems     testutils.Problems
+	}{
+		{
+			testName:     "Valid-LongRunning",
+			responseType: "BatchCreateBooksResponse",
+			problems:     testutils.Problems{},
 		},
 		{
-			testName: "Valid-LongRunning",
-			src: `import "google/api/annotations.proto";
+			testName: "Valid-LongRunningEmptyResponseType",
+			problems: testutils.Problems{},
+		},
+	}
+
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			template := `import "google/api/annotations.proto";
 import "google/longrunning/operations.proto";
 
 service BookService {
@@ -58,115 +114,17 @@ service BookService {
 			body: "*"
 		};
 		option (google.longrunning.operation_info) = {
-      response_type: "BatchCreateBooksResponse"
-    };
-	}
-}
-
-message BatchCreateBooksRequest {}
-`,
-			problems: testutils.Problems{},
-		},
-		{
-			testName: "Valid-LongRunningEmptyResponseType",
-			src: `import "google/api/annotations.proto";
-import "google/longrunning/operations.proto";
-
-service BookService {
-	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/books:batchCreate"
-			body: "*"
+		  response_type: "{{.ResponseType}}"
 		};
 	}
 }
 
 message BatchCreateBooksRequest {}
-`,
-			problems: testutils.Problems{},
-		},
-		{
-			testName: "Valid-BatchCreateMenResponse",
-			src: `import "google/api/annotations.proto";
 
-service ManService {
-	rpc BatchCreateMen(BatchCreateMenRequest) returns (BatchCreateMenResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/men:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateMenRequest {}
-
-message BatchCreateMenResponse{}
-`,
-			problems: testutils.Problems{},
-		},
-		{
-			testName: "Invalid-SingularBus",
-			src: `import "google/api/annotations.proto";
-
-service BusService {
-	rpc BatchCreateBuses(BatchCreateBusRequest) returns (BatchCreateBusResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/buses:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateBusRequest {}
-
-message BatchCreateBusResponse{}
-`,
-			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named response message "BatchCreateBusesResponse", but not "BatchCreateBusResponse"`}},
-		},
-		{
-			testName: "Invalid-SingularCorpPerson",
-			src: `import "google/api/annotations.proto";
-
-service CorpPersonService {
-	rpc BatchCreateCorpPerson(BatchCreateCorpPersonRequest) returns (BatchCreateCorpPersonResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/corpPerson:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateCorpPersonRequest {}
-
-message BatchCreateCorpPersonResponse{}
-`,
-			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named response message "BatchCreateCorpPeopleResponse", but not "BatchCreateCorpPersonResponse"`}},
-		},
-		{
-			testName: "Irrelevant",
-			src: `import "google/api/annotations.proto";
-
-service BookService {
-	rpc CreateBook(CreateBookRequest) returns (Book) {
-		option (google.api.http) = {
-			post: "/v1/{name=publishers/*/books/*}"
-			body: "*"
-		};
-	}
-}
-
-message CreateBookRequest {}
-
-message Book{}
-`,
-			problems: testutils.Problems{},
-		},
-	}
-
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3String(t, test.src)
+message BatchCreateBooksResponse{}
+`
+			file := testutils.ParseProto3Tmpl(t, template,
+				struct{ ResponseType string }{test.responseType})
 
 			m := file.GetServices()[0].GetMethods()[0]
 

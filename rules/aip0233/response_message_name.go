@@ -17,7 +17,6 @@ package aip0233
 import (
 	"fmt"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -28,7 +27,9 @@ var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName("core", "0233", "response-message-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		want := fmt.Sprintf("BatchCreate%sResponse", pluralize.NewClient().Plural(m.GetName()[11:]))
+		// Proper response name should be the concatenation of the method name and
+		// "Response"
+		want := m.GetName() + "Response"
 
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.
@@ -37,8 +38,8 @@ var responseMessageName = &lint.MethodRule{
 			got = utils.GetOperationInfo(m).GetResponseType()
 		}
 
-		// Rule check: Establish that for methods such as `BatchCreateFoos`, the response
-		// message should be named `BatchCreateFoosResponse`
+		// Rule check: Establish that for methods such as `BatchCreateFoos`, the
+		// response message should be named `BatchCreateFoosResponse`
 		//
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it

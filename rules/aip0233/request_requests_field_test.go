@@ -25,36 +25,23 @@ func TestRequestRequestsField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
-		src         string
+		field       string
 		problems    testutils.Problems
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
 			testName: "Valid",
-			src: `
-message BatchCreateBooksRequest {
-	repeated CreateBookRequest requests = 1;
-}
-
-message CreateBookRequest {}
-`,
+			field:    "repeated CreateBookRequest requests = 1;",
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "Invalid-MissingRequestsField",
-			src: `
-message BatchCreateBooksRequest {
-	string parent = 1;
-}`,
+			field:    "string parent = 1;",
 			problems: testutils.Problems{{Message: `Message "BatchCreateBooksRequest" has no "requests" field`}},
 		},
 		{
 			testName: "Invalid-RequestsFieldIsNotRepeated",
-			src: `
-message BatchCreateBooksRequest {
-	CreateBookRequest requests = 1;
-}
-message CreateBookRequest {}`,
+			field:    "CreateBookRequest requests = 1;",
 			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
@@ -62,10 +49,7 @@ message CreateBookRequest {}`,
 		},
 		{
 			testName: "Invalid-RequestsFieldWrongType",
-			src: `
-message BatchCreateBooksRequest {
-	repeated int32 requests = 1;
-}`,
+			field:    "repeated int32 requests = 1;",
 			problems: testutils.Problems{{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
@@ -73,10 +57,7 @@ message BatchCreateBooksRequest {
 		},
 		{
 			testName: "Invalid-RequestsNotRepeatedWrongType",
-			src: `
-message BatchCreateBooksRequest {
-	int32 requests = 1;
-}`,
+			field:    "int32 requests = 1;",
 			problems: testutils.Problems{
 				{Message: `The "requests" field should be repeated`},
 				{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
@@ -89,7 +70,15 @@ message BatchCreateBooksRequest {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3String(t, test.src)
+			template := `
+message BatchCreateBooksRequest {
+	{{.Field}}
+}
+
+message CreateBookRequest {}
+`
+			file := testutils.ParseProto3Tmpl(t, template,
+				struct{ Field string }{test.field})
 
 			m := file.GetMessageTypes()[0]
 
