@@ -21,11 +21,14 @@ import (
 
 // FieldType returns the precise location for a field's type.
 func FieldType(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
-	var path []int32
-	if f.GetMessageType() != nil || f.GetEnumType() != nil {
-		path = append(f.GetSourceInfo().Path, 6) // type_name
-	} else {
-		path = append(f.GetSourceInfo().Path, 5) // type
+	if sourceInfo := f.GetSourceInfo(); sourceInfo != nil {
+		var path []int32
+		if f.GetMessageType() != nil || f.GetEnumType() != nil {
+			path = append(sourceInfo.Path, 6) // type_name
+		} else {
+			path = append(sourceInfo.Path, 5) // type
+		}
+		return pathLocation(f.GetFile(), path)
 	}
-	return pathLocation(f.GetFile(), path)
+	return nil
 }
