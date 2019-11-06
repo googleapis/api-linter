@@ -25,6 +25,7 @@ func TestDescriptorName(t *testing.T) {
 	f := parse(t, `
 		message Foo {
 		  string bar = 1;
+		  map<string, string> baz = 2;
 		}
 	`)
 
@@ -35,6 +36,7 @@ func TestDescriptorName(t *testing.T) {
 	}{
 		{"Message", f.GetMessageTypes()[0], []int32{2, 8, 11}},
 		{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{3, 9, 12}},
+		{"MapField", f.GetMessageTypes()[0].GetFields()[1], []int32{4, 22, 25}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -42,5 +44,14 @@ func TestDescriptorName(t *testing.T) {
 				t.Errorf(diff)
 			}
 		})
+	}
+}
+
+func TestFileDescriptorName(t *testing.T) {
+	f := parse(t, `
+		message Foo {}
+	`)
+	if got := DescriptorName(f); got != nil {
+		t.Errorf("%v", got)
 	}
 }
