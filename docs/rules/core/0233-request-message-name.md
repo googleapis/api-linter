@@ -12,7 +12,7 @@ This rule enforces that all `BatchCreate` RPCs have a request message name of
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchCreate`, and
+This rule looks at any RPCs whose name starts with `BatchCreate`, and
 complains if the name of the corresponding input message does not match the
 name of the RPC with the suffix `Request` appended.
 

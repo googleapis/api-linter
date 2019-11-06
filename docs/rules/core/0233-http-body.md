@@ -20,10 +20,11 @@ complains if HTTP `body` field is anything other than `*`.
 **Incorrect** code for this rule:
 
 ```proto
-// Incorrect. Http body is missing
+// Incorrect.
 rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchCreate"
+    // Http body is missing.
   };
 }
 ```
