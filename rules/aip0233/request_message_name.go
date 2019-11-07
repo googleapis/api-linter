@@ -17,7 +17,6 @@ package aip0233
 import (
 	"fmt"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -27,11 +26,9 @@ var requestMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(233, "request-message-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[11:])
-
 		// Rule check: Establish that for methods such as `BatchCreateFoos`, the request
 		// message is named `BatchCreateFoosRequest`.
-		if got, want := m.GetInputType().GetName(), fmt.Sprintf("BatchCreate%sRequest", pluralInputResourceName); got != want {
+		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Batch Create RPCs should have a properly named request message %q, but not %q",

@@ -23,111 +23,54 @@ import (
 func TestRequestMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName string
-		src      string
-		problems testutils.Problems
+		testName   string
+		methodName string
+		request    string
+		problems   testutils.Problems
 	}{
 		{
-			testName: "Valid-BatchCreateBooksRequest",
-			src: `import "google/api/annotations.proto";
-
-service BookService {
-	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/books:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateBooksRequest {}
-
-message BatchCreateBooksResponse{}
-`,
-			problems: testutils.Problems{},
+			testName:   "Valid-BatchCreateBooksRequest",
+			methodName: "BatchCreateBooks",
+			request:    "BatchCreateBooksRequest",
+			problems:   testutils.Problems{},
 		},
 		{
-			testName: "Valid-BatchCreateMenRequest",
-			src: `import "google/api/annotations.proto";
-
-service ManService {
-	rpc BatchCreateMen(BatchCreateMenRequest) returns (BatchCreateMenResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/men:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateMenRequest {}
-
-message BatchCreateMenResponse{}
-`,
-			problems: testutils.Problems{},
+			testName:   "Invalid-MissMatchingMethodName",
+			methodName: "BatchCreateBooks",
+			request:    "BatchCreateBookRequest",
+			problems:   testutils.Problems{{Message: "have a properly named request message"}},
 		},
 		{
-			testName: "Invalid-SingularBus",
-			src: `import "google/api/annotations.proto";
-
-service BusService {
-	rpc BatchCreateBuses(BatchCreateBusRequest) returns (BatchCreateBusResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/buses:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateBusRequest {}
-
-message BatchCreateBusResponse{}
-`,
-			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named request message "BatchCreateBusesRequest", but not "BatchCreateBusRequest"`}},
-		},
-		{
-			testName: "Invalid-SingularCorpPerson",
-			src: `import "google/api/annotations.proto";
-
-service CorpPersonService {
-	rpc BatchCreateCorpPerson(BatchCreateCorpPersonRequest) returns (BatchCreateCorpPersonResponse) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/corpPerson:batchCreate"
-			body: "*"
-		};
-	}
-}
-
-message BatchCreateCorpPersonRequest {}
-
-message BatchCreateCorpPersonResponse{}
-`,
-			problems: testutils.Problems{{Message: `Batch Create RPCs should have a properly named request message "BatchCreateCorpPeopleRequest", but not "BatchCreateCorpPersonRequest"`}},
-		},
-		{
-			testName: "Irrelevant",
-			src: `import "google/api/annotations.proto";
-
-service BookService {
-	rpc CreateBook(CreateBookRequest) returns (Book) {
-		option (google.api.http) = {
-			post: "/v1/{name=publishers/*/books/*}"
-			body: "*"
-		};
-	}
-}
-
-message CreateBookRequest {}
-
-message Book{}
-`,
-			problems: testutils.Problems{},
+			testName:   "Irrelevant",
+			methodName: "AcquireBook",
+			request:    "AcquireBookRequest",
+			problems:   testutils.Problems{},
 		},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3String(t, test.src)
+			template := `import "google/api/annotations.proto";
+
+service BookService {
+	rpc {{.MethodName}}({{.Request}}) returns ({{.MethodName}}Response) {
+		option (google.api.http) = {
+			post: "/v1/{parent=publishers/*}/"
+			body: "*"
+		};
+	}
+}
+
+message {{.Request}}{}
+
+message {{.MethodName}}Response{}
+`
+			file := testutils.ParseProto3Tmpl(t, template,
+				struct {
+					MethodName string
+					Request    string
+				}{test.methodName, test.request})
 
 			m := file.GetServices()[0].GetMethods()[0]
 
