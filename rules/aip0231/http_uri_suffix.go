@@ -22,7 +22,7 @@ import (
 
 // Batch Get methods should have a proper HTTP pattern.
 var uriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0231", "http-name"),
+	Name:   lint.NewRuleName(231, "http-name"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

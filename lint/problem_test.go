@@ -125,7 +125,7 @@ func TestRuleDocURI(t *testing.T) {
 		wantURI  string
 	}{{
 		name:     "CoreRule",
-		ruleName: NewRuleName("core", "0122", "camel-case-uris"),
+		ruleName: NewRuleName(122, "camel-case-uris"),
 		wantURI:  "https://googleapis.github.io/api-linter/rules/core/0122-camel-case-uris.html",
 	}}
 

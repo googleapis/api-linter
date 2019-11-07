@@ -15,6 +15,7 @@
 package lint
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -29,10 +30,30 @@ const nameSeparator string = "::"
 
 var ruleNameValidator = regexp.MustCompile("^([a-z0-9][a-z0-9-]*(::[a-z0-9][a-z0-9-]*)?)+$")
 
-// NewRuleName creates a RuleName from segments.
-// It will join the segments with the "::" separator.
-func NewRuleName(segments ...string) RuleName {
-	return RuleName(strings.Join(segments, nameSeparator))
+// getRuleGroup takes an AIP number and returns the appropriate group.
+func getRuleGroup(aip int) string {
+	// Determine the group.
+	group := ""
+	if aip > 0 && aip < 1000 {
+		group = "core"
+	}
+
+	// Sanity check: If the group does not exist, complain.
+	if group == "" {
+		panic("Invalid AIP; no available group.")
+	}
+
+	return group
+}
+
+// NewRuleName creates a RuleName from an AIP number and a unique name within
+// that AIP.
+func NewRuleName(aip int, name string) RuleName {
+	return RuleName(strings.Join([]string{
+		getRuleGroup(aip),
+		fmt.Sprintf("%04d", aip),
+		name,
+	}, nameSeparator))
 }
 
 // IsValid checks if a RuleName is syntactically valid.

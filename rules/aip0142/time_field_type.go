@@ -24,7 +24,7 @@ import (
 )
 
 var fieldType = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0142", "time-field-type"),
+	Name: lint.NewRuleName(142, "time-field-type"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		suffixes := stringset.New(
 			"date", "datetime", "ms", "msec", "msecs", "millis", "nanos", "ns",

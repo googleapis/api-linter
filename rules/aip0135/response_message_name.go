@@ -28,7 +28,7 @@ import (
 // google.longrunning.Operation, or the resource itself as the response
 // message.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0135", "response-message-name"),
+	Name:   lint.NewRuleName(135, "response-message-name"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response

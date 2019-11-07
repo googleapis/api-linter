@@ -22,7 +22,7 @@ import (
 
 // Delete methods should not have an HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0135", "http-body"),
+	Name:   lint.NewRuleName(135, "http-body"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

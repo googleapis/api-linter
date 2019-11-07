@@ -27,7 +27,7 @@ var knownFields = stringset.New("filter", "order_by")
 
 // List methods should not have unrecognized fields.
 var requestFieldTypes = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0132", "request-field-types"),
+	Name: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isListRequestMessage(f.GetOwner()) && knownFields.Contains(f.GetName())
 	},

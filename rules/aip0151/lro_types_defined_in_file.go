@@ -24,7 +24,7 @@ import (
 )
 
 var lroDefinedInFile = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0151", "lro-types-defined-in-file"),
+	Name:   lint.NewRuleName(151, "lro-types-defined-in-file"),
 	OnlyIf: isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		lro := utils.GetOperationInfo(m)

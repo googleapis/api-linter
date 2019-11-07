@@ -24,7 +24,7 @@ import (
 
 // The Get standard method should only have expected fields.
 var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-name-field"),
+	Name:   lint.NewRuleName(131, "request-name-field"),
 	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a name field is present.

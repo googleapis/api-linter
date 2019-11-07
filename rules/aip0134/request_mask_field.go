@@ -20,7 +20,7 @@ import (
 )
 
 var requestMaskField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0134", "request-mask-field"),
+	Name:   lint.NewRuleName(134, "request-mask-field"),
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")

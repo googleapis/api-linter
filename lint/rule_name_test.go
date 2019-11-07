@@ -14,7 +14,9 @@
 
 package lint
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRuleNameValid(t *testing.T) {
 	tests := []struct {
@@ -68,19 +70,20 @@ func TestRuleNameInvalid(t *testing.T) {
 
 func TestNewRuleName(t *testing.T) {
 	tests := []struct {
-		segments []string
-		name     RuleName
+		testName string
+		aip      int
+		name     string
+		want     string
 	}{
-		{[]string{}, ""},
-		{[]string{""}, ""},
-		{[]string{"my-namespace", "my-rule"}, "my-namespace::my-rule"},
-		{[]string{"my", "name", "space", "foo"}, "my::name::space::foo"},
+		{"ZeroPad", 131, "http-method", "core::0131::http-method"},
 	}
-
 	for _, test := range tests {
-		if NewRuleName(test.segments...) != test.name {
-			t.Errorf("NewRuleName(%v)=%q; want %q", test.segments, NewRuleName(test.segments...), test.name)
-		}
+		t.Run(test.testName, func(t *testing.T) {
+			rn := NewRuleName(test.aip, test.name)
+			if got := string(rn); got != test.want {
+				t.Errorf("Got %q, expected %q.", got, test.want)
+			}
+		})
 	}
 }
 

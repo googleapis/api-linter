@@ -24,7 +24,7 @@ import (
 
 // Create method should use the resource as the output message
 var outputName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "response-message-name"),
+	Name:   lint.NewRuleName(133, "response-message-name"),
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		want := getResourceMsgName(m)
