@@ -153,15 +153,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 
 	// Determine the format for printing the results.
 	// YAML format is the default.
-	marshal := yaml.Marshal
-	switch c.FormatType {
-	case "json":
-		marshal = json.Marshal
-	case "summary":
-		marshal = func(i interface{}) ([]byte, error) {
-			return printSummaryTable(i.([]lint.Response))
-		}
-	}
+	marshal := getOutputFormatFunc(c.FormatType)
 
 	// Print the results.
 	b, err := marshal(results)
@@ -196,4 +188,22 @@ func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
 		return nil, err
 	}
 	return fs, nil
+}
+
+var outputFormatFuncs = map[string]formatFunc{
+	"yaml": yaml.Marshal,
+	"yml":  yaml.Marshal,
+	"json": json.Marshal,
+	"summary": func(i interface{}) ([]byte, error) {
+		return printSummaryTable(i.([]lint.Response))
+	},
+}
+
+type formatFunc func(interface{}) ([]byte, error)
+
+func getOutputFormatFunc(formatType string) formatFunc {
+	if f, found := outputFormatFuncs[strings.ToLower(formatType)]; found {
+		return f
+	}
+	return yaml.Marshal
 }
