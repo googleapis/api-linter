@@ -17,61 +17,46 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestHttpVerb(t *testing.T) {
-	// Set up GET and POST HTTP annotations.
-	httpGet := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Get{
-			Get: "/v1/{parent=publishers/*}/books:batchGet",
-		},
-	}
-	httpCreate := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Post{
-			Post: "/v1/{parent=publishers/*}/books:batchCreate",
-		},
-		Body: "*",
-	}
-
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		httpRule   *annotations.HttpRule
+		httpVerb   string
 		methodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", httpCreate, "BatchCreateBooks", nil},
-		{"Invalid", httpGet, "BatchCreateBooks", testutils.Problems{{Message: "Batch Create methods must use the HTTP POST verb."}}},
-		{"Irrelevant", httpGet, "AcquireBook", nil},
+		{"Valid", "post", "BatchCreateBooks", nil},
+		{"Invalid", "get", "BatchCreateBooks", testutils.Problems{{Message: "HTTP POST verb"}}},
+		{"Irrelevant", "get", "AcquireBook", nil},
 	}
 
 	// Run each test.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			if err := proto.SetExtension(opts, annotations.E_Http, test.httpRule); err != nil {
-				t.Fatalf("Failed to set google.api.http annotation.")
-			}
-
-			// Create a minimal service with a AIP-233 Create method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchCreateBooksResponse"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
+			template := `import "google/api/annotations.proto";
+service BookService {
+	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+		option (google.api.http) = {
+			{{.HttpVerb}}: "/v1/{parent=publishers/*}/books:batchCreate"
+			body: "*"
+		};
+	}
+}
+message {{.MethodName}}Request{}
+message {{.MethodName}}Response{}
+`
+			file := testutils.ParseProto3Tmpl(t, template,
+				struct {
+					MethodName string
+					HttpVerb   string
+				}{test.methodName, test.httpVerb})
 
 			// Run the method, ensure we get what we expect.
-			problems := httpVerb.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			problems := httpVerb.Lint(file)
+			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
