@@ -22,7 +22,7 @@ import (
 
 // Batch Update methods should have a proper HTTP pattern.
 var httpUriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0234", "http-uri-suffix"),
+	Name:   lint.NewRuleName(234, "http-uri-suffix"),
 	OnlyIf: isBatchUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
