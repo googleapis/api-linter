@@ -53,7 +53,10 @@ func TestRequestParentField(t *testing.T) {
 			"InvalidType",
 			"BatchCreateBooksRequest",
 			&field{"parent", builder.FieldTypeDouble()},
-			testutils.Problems{{Message: "string"}},
+			testutils.Problems{{
+				Message:    "string",
+				Suggestion: "string",
+			}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("parent")
 			},

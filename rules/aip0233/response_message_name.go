@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -51,6 +52,8 @@ var responseMessageName = &lint.MethodRule{
 					want, got,
 				),
 				Descriptor: m,
+				Location:   locations.MethodResponseType(m),
+				Suggestion: want,
 			}}
 		}
 

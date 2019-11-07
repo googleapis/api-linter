@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -41,6 +42,8 @@ var requestParentField = &lint.MessageRule{
 			return []lint.Problem{{
 				Message:    `"parent" field on create request message must be a string`,
 				Descriptor: parentField,
+				Location:   locations.FieldType(parentField),
+				Suggestion: "string",
 			}}
 		}
 

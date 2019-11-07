@@ -20,6 +20,7 @@ import (
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -57,6 +58,8 @@ var requestRequestsField = &lint.MessageRule{
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Create Request should be a %q type`, rightTypeName),
 				Descriptor: requests,
+				Location:   locations.FieldType(requests),
+				Suggestion: rightTypeName,
 			})
 		}
 		return

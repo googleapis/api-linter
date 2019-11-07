@@ -44,13 +44,19 @@ func TestMethodPluralResourceName(t *testing.T) {
 			testName:   "Invalid-SingularBus",
 			methodName: "BatchCreateBus",
 			uriSuffix:  "bus:batchCreate",
-			problems:   testutils.Problems{{Message: `The resource part in method name "BatchCreateBus" shouldn't be "Bus", but should be its plural form "Buses"`}},
+			problems: testutils.Problems{{
+				Message:    `should be its plural form "Buses"`,
+				Suggestion: "BatchCreateBuses",
+			}},
 		},
 		{
 			testName:   "Invalid-SingularCorpPerson",
 			methodName: "BatchCreateCorpPerson",
 			uriSuffix:  "corpPerson:batchCreate",
-			problems:   testutils.Problems{{Message: `The resource part in method name "BatchCreateCorpPerson" shouldn't be "CorpPerson", but should be its plural form "CorpPeople"`}},
+			problems: testutils.Problems{{
+				Message:    `should be its plural form "CorpPeople"`,
+				Suggestion: "BatchCreateCorpPeople",
+			}},
 		},
 		{
 			testName:   "Invalid-Irrelevant",

@@ -38,7 +38,10 @@ func TestResponseMessageName(t *testing.T) {
 			testName:   "Invalid-MissMatchingMethodName",
 			methodName: "BatchCreateBooks",
 			response:   "BatchCreateBookResponse",
-			problems:   testutils.Problems{{Message: "have a properly named response message"}},
+			problems: testutils.Problems{{
+				Message:    "have a properly named response message",
+				Suggestion: "BatchCreateBooksResponse",
+			}},
 		},
 		{
 			testName:   "Irrelevant",

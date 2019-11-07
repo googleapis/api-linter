@@ -37,7 +37,7 @@ func TestRequestRequestsField(t *testing.T) {
 		{
 			testName: "Invalid-MissingRequestsField",
 			field:    "string parent = 1;",
-			problems: testutils.Problems{{Message: `Message "BatchCreateBooksRequest" has no "requests" field`}},
+			problems: testutils.Problems{{Message: `no "requests" field`}},
 		},
 		{
 			testName: "Invalid-RequestsFieldIsNotRepeated",
@@ -50,7 +50,10 @@ func TestRequestRequestsField(t *testing.T) {
 		{
 			testName: "Invalid-RequestsFieldWrongType",
 			field:    "repeated int32 requests = 1;",
-			problems: testutils.Problems{{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
+			problems: testutils.Problems{{
+				Message:    `should be a "CreateBookRequest" type`,
+				Suggestion: "CreateBookRequest",
+			}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},
@@ -60,7 +63,10 @@ func TestRequestRequestsField(t *testing.T) {
 			field:    "int32 requests = 1;",
 			problems: testutils.Problems{
 				{Message: `The "requests" field should be repeated`},
-				{Message: `The "requests" field on Batch Create Request should be a "CreateBookRequest" type`}},
+				{
+					Message:    `should be a "CreateBookRequest" type`,
+					Suggestion: "CreateBookRequest",
+				}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},
