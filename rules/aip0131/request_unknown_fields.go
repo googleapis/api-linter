@@ -23,7 +23,7 @@ import (
 
 // Get methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0131", "request-unknown-fields"),
+	Name:   lint.NewRuleName(131, "request-unknown-fields"),
 	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.

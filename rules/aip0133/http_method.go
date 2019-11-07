@@ -22,7 +22,7 @@ import (
 
 // Create methods should use the HTTP POST verb.
 var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "http-method"),
+	Name:   lint.NewRuleName(133, "http-method"),
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP POST.

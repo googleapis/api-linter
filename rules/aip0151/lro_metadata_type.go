@@ -21,7 +21,7 @@ import (
 )
 
 var lroMetadata = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0151", "lro-metadata-type"),
+	Name:   lint.NewRuleName(151, "lro-metadata-type"),
 	OnlyIf: isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		lro := utils.GetOperationInfo(m)

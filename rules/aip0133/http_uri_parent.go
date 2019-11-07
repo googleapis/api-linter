@@ -22,7 +22,7 @@ import (
 
 // Create methods should have a proper HTTP pattern.
 var httpURIField = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "http-uri-parent"),
+	Name:   lint.NewRuleName(133, "http-uri-parent"),
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri should include the `parent` field.

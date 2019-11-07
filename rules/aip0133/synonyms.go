@@ -25,7 +25,7 @@ import (
 
 // Create methods should use "create", not synonyms.
 var synonyms = &lint.MethodRule{
-	Name: lint.NewRuleName("core", "0133", "synonyms"),
+	Name: lint.NewRuleName(133, "synonyms"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		name := m.GetName()
 		for _, syn := range []string{"Insert", "Make", "Post"} {

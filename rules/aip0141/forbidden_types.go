@@ -25,7 +25,7 @@ import (
 )
 
 var forbiddenTypes = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0141", "forbidden-types"),
+	Name: lint.NewRuleName(141, "forbidden-types"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Make a map of the forbidden types.
 		nope := make(map[dpb.FieldDescriptorProto_Type]string)
