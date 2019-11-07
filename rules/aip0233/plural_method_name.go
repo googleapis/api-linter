@@ -24,7 +24,7 @@ import (
 )
 
 var pluralMethodName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0233", "plural-method-name"),
+	Name:   lint.NewRuleName(233, "plural-method-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Note: m.GetName()[11:] is used to retrieve the resource name from the

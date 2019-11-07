@@ -24,7 +24,7 @@ import (
 
 // Batch Create method should have a properly named Response message.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0233", "response-message-name"),
+	Name:   lint.NewRuleName(233, "response-message-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Proper response name should be the concatenation of the method name and

@@ -22,7 +22,7 @@ import (
 
 // Batch create methods should use "*" as the HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0233", "http-body"),
+	Name:   lint.NewRuleName(233, "http-body"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has correct HTTP body.

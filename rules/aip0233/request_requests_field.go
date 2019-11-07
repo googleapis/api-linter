@@ -26,7 +26,7 @@ import (
 // The Batch Create standard method should have repeated standard create request
 // message field.
 var requestRequestsField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0233", "request-requests-field"),
+	Name:   lint.NewRuleName(233, "request-requests-field"),
 	OnlyIf: isBatchCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a "requests" field is present.

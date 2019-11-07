@@ -22,7 +22,7 @@ import (
 
 // Batch Create methods should use the HTTP POST verb.
 var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0233", "http-method"),
+	Name:   lint.NewRuleName(233, "http-method"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP POST.

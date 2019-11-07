@@ -25,7 +25,7 @@ import (
 
 // The Batch Create response message should have resource field.
 var responseResourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0233", "response-resource-field"),
+	Name:   lint.NewRuleName(233, "response-resource-field"),
 	OnlyIf: isBatchCreateResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// the singular form the resource name, the first letter is Capitalized.

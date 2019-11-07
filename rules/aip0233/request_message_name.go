@@ -24,7 +24,7 @@ import (
 
 // Batch Create method should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0233", "request-message-name"),
+	Name:   lint.NewRuleName(233, "request-message-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		pluralInputResourceName := pluralize.NewClient().Plural(m.GetName()[11:])
