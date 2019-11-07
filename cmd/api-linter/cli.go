@@ -127,7 +127,12 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 	}
-	fd, err := p.ParseFiles(c.ProtoFiles...)
+	// Resolve file absolute paths to relative ones.
+	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
+	if err != nil {
+		return err
+	}
+	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
 		return err
 	}
