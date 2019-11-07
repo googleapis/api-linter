@@ -62,8 +62,8 @@ Consider a bare-bones message rule:
 
 ```go
 var myRule = &lint.MessageRule{
-  Name: lint.NewRuleName("core", "0000", "my-rule"),
-  URI:  "https://aip.dev/0000",
+  Name: lint.NewRuleName(0, "my-rule"),
+  URI:  "https://aip.dev/0",
   LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
     // This lint rule does nothing and always passes.
     return nil

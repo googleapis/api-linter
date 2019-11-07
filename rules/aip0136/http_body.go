@@ -22,7 +22,7 @@ import (
 )
 
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0136", "http-body"),
+	Name:   lint.NewRuleName(136, "http-body"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

@@ -23,7 +23,7 @@ import (
 
 // Create method should have a properly named input message.
 var inputName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0133", "request-message-name"),
+	Name:   lint.NewRuleName(133, "request-message-name"),
 	OnlyIf: isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgName(m)

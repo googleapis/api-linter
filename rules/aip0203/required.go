@@ -10,7 +10,7 @@ import (
 )
 
 var required = &lint.FieldRule{
-	Name:   lint.NewRuleName("core", "0203", "required"),
+	Name:   lint.NewRuleName(203, "required"),
 	OnlyIf: withoutRequiredFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, requiredRegexp, "REQUIRED")

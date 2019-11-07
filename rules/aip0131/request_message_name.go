@@ -23,7 +23,7 @@ import (
 
 // Get messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0131", "request-message-name"),
+	Name:   lint.NewRuleName(131, "request-message-name"),
 	OnlyIf: isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `GetFoo`, the request

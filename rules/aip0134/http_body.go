@@ -25,7 +25,7 @@ import (
 
 // Update methods should have an HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0134", "http-body"),
+	Name:   lint.NewRuleName(134, "http-body"),
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])

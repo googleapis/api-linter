@@ -23,7 +23,7 @@ import (
 )
 
 var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0143", "standardized-codes"),
+	Name: lint.NewRuleName(143, "standardized-codes"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		variants := map[string]string{
 			"content_type": "mime_type",

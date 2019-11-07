@@ -24,7 +24,7 @@ import (
 
 // The create request message should have parent field.
 var parentField = &lint.MessageRule{
-	Name:   lint.NewRuleName("core", "0133", "request-parent-field"),
+	Name:   lint.NewRuleName(133, "request-parent-field"),
 	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.

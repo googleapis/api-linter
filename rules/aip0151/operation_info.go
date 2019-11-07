@@ -21,7 +21,7 @@ import (
 )
 
 var lroAnnotationExists = &lint.MethodRule{
-	Name:   lint.NewRuleName("core", "0151", "operation-info"),
+	Name:   lint.NewRuleName(151, "operation-info"),
 	OnlyIf: isLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if utils.GetOperationInfo(m) == nil {

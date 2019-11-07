@@ -24,7 +24,7 @@ import (
 )
 
 var fieldTypes = &lint.FieldRule{
-	Name: lint.NewRuleName("core", "0143", "string-type"),
+	Name: lint.NewRuleName(143, "string-type"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return stringset.New(
 			"country_code",
