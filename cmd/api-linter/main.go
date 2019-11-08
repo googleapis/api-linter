@@ -41,10 +41,7 @@ func runCLI(args []string) error {
 func defaultConfigs() lint.Configs {
 	return lint.Configs{
 		lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				"core": {},
-			},
+			IncludedPaths: []string{"**"},
 		},
 	}
 }

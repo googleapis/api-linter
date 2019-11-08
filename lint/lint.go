@@ -65,23 +65,13 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	var errMessages []string
 
 	for name, rule := range l.rules {
-		var config RuleConfig
-
-		if c, err := l.configs.GetRuleConfig(fd.GetName(), name); err == nil {
-			config = config.withOverride(c)
-		} else {
-			errMessages = append(errMessages, err.Error())
-			continue
-		}
-
 		// Run the linter rule against this file, and throw away any problems
 		// which should have been disabled.
-		if !config.Disabled {
+		if l.configs.IsRuleEnabled(string(name), fd.GetName()) {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
 					if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
 						p.RuleID = rule.GetName()
-						p.category = config.Category
 						resp.Problems = append(resp.Problems, p)
 					}
 				}

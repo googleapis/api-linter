@@ -21,43 +21,23 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bmatcuk/doublestar"
 	"gopkg.in/yaml.v2"
 )
 
-// Configs stores a list of Config.
-//
-// Note: for a path, if multiple configs match it, the rule configs of the later one
-// will always override those in the former one. For example, given a list of configs
-//
-// [
-//		{
-//			included_paths: ["/a/**/*.proto"],
-//			rule_configs: {"my::rule": {disabled, error}},
-//		},
-//		{
-//			included_paths: ["/a/b.proto"],
-//			rule_configs: {"my::rule": {enabled}},
-//		}
-// ]
-//
-// that match path "/a/b.proto", the resulted config for rule "my::rule" will be {enabled, error}.
+// Configs determine if a rule is enabled or not on a file path.
 type Configs []Config
 
 // Config stores rule configurations for certain files
 // that the file path must match any of the included paths
 // but none of the excluded ones.
 type Config struct {
-	IncludedPaths []string              `json:"included_paths" yaml:"included_paths"`
-	ExcludedPaths []string              `json:"excluded_paths" yaml:"excluded_paths"`
-	RuleConfigs   map[string]RuleConfig `json:"rule_configs" yaml:"rule_configs"`
-}
-
-// RuleConfig stores configurable status and category of a rule.
-type RuleConfig struct {
-	Disabled bool   `json:"disabled" yaml:"disabled"`
-	Category string `json:"category" yaml:"category"`
+	IncludedPaths []string `json:"included_paths" yaml:"included_paths"`
+	ExcludedPaths []string `json:"excluded_paths" yaml:"excluded_paths"`
+	EnabledRules  []string `json:"enabled_rules" yaml:"enabled_rules"`
+	DisabledRules []string `json:"disabled_rules" yaml:"disabled_rules"`
 }
 
 // ReadConfigsFromFile reads Configs from a file.
@@ -109,55 +89,42 @@ func ReadConfigsYAML(f io.Reader) (Configs, error) {
 	return c, nil
 }
 
-// GetRuleConfig returns a RuleConfig that matches the given path and rule.
-// Returns an error if a config is not found for the path.
-func (c Configs) GetRuleConfig(path string, rule RuleName) (result RuleConfig, err error) {
-	err = fmt.Errorf("failed to find a config for path %q", path)
-	for _, cfg := range c {
-		if cfg.match(path) {
-			err = nil
-			if r, ok := cfg.getRuleConfig(rule); ok {
-				result = result.withOverride(r)
+// IsRuleEnabled returns true if a rule is enabled by the configs.
+func (configs Configs) IsRuleEnabled(rule string, path string) bool {
+	enabled := true
+	for _, c := range configs {
+		if c.matchPath(path) {
+			if matchRule(rule, c.DisabledRules...) {
+				enabled = false
+			}
+			if matchRule(rule, c.EnabledRules...) {
+				enabled = true
 			}
 		}
 	}
-	return
+
+	return enabled
 }
 
-func (c Config) getRuleConfig(rule RuleName) (RuleConfig, bool) {
-	for r := rule; ; r = r.parent() {
-		if ruleConfig, ok := c.RuleConfigs[string(r)]; ok {
-			return ruleConfig, true
-		}
-
-		if r == "" {
-			break
-		}
+func (c Config) matchPath(path string) bool {
+	if matchPath(path, c.ExcludedPaths...) {
+		return false
 	}
-
-	return RuleConfig{}, false
+	return len(c.IncludedPaths) == 0 || matchPath(path, c.IncludedPaths...)
 }
 
-// withOverride returns a copy of r, overridden with non-zero values in r2
-func (r RuleConfig) withOverride(r2 RuleConfig) RuleConfig {
-	r.Disabled = r2.Disabled
-
-	if r2.Category != "" {
-		r.Category = r2.Category
-	}
-
-	return r
-}
-
-// match returns if a Config matches path based on its included and excluded paths
-func (c Config) match(path string) bool {
-	for _, pattern := range c.ExcludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched || err != nil {
-			return false
+func matchPath(path string, pathPatterns ...string) bool {
+	for _, pattern := range pathPatterns {
+		if matched, _ := doublestar.Match(pattern, path); matched {
+			return true
 		}
 	}
-	for _, pattern := range c.IncludedPaths {
-		if matched, err := doublestar.Match(pattern, path); matched && err == nil {
+	return false
+}
+
+func matchRule(rule string, rulePrefixes ...string) bool {
+	for _, prefix := range rulePrefixes {
+		if prefix == rule || strings.HasPrefix(rule, prefix+"::") {
 			return true
 		}
 	}

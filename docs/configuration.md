@@ -34,10 +34,8 @@ directory `tests` using a JSON config file:
 ```json
 [
   {
-    "included_paths": ["tests/*.proto"],
-    "rule_configs": {
-      "core::0140::lower-snake": { "disabled": true }
-    }
+    "included_paths": ["tests/**/*.proto"],
+    "disabled_rules": ["core::0140::lower-snake"]
   }
 ]
 ```
@@ -47,10 +45,9 @@ Disable the same rule using a YAML config file:
 ```yaml
 ---
 - included_paths:
-    - '**/*.proto'
-  rule_configs:
-    core::proto_version:
-      disabled: true
+    - 'tests/**/*.proto'
+  disabled_rules:
+    - 'core::0140::lower-snake'
 ```
 
 ## Proto comments
