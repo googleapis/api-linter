@@ -31,8 +31,7 @@
 // A simple rule therefore looks like this:
 //
 //   var myRule = &lint.MessageRule{
-//     Name: lint.NewRuleName("core", "1234", "my-rule"),
-//     URI:  "https://aip.dev/1234",
+//     Name: lint.NewRuleName(1234, "my-rule"),
 //     LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 //       if isBad(m) {
 //         return []lint.Problem{{
