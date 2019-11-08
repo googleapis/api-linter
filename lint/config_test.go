@@ -69,6 +69,18 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 			disabled,
 		},
 		{
+			"PathExactMatched_DisabledRulesMatchedAll_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					DisabledRules: []string{"all"},
+				},
+			},
+			"a.proto",
+			"testrule",
+			disabled,
+		},
+		{
 			"PathDoubleStartMatched_DisabledRulesMatched_Disabled",
 			Configs{
 				{
