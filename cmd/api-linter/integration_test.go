@@ -159,6 +159,19 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	}
 }
 
+func TestBuildErrors(t *testing.T) {
+	expected := `internal/testdata/build_errors.proto:8:1: syntax error: unexpected '}', expecting ';' or '['
+internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecting ';' or '['`
+	err := runCLI([]string{"internal/testdata/build_errors.proto"})
+	if err == nil {
+		t.Fatal("expected build error for build_errors.proto")
+	}
+	actual := err.Error()
+	if expected != actual {
+		t.Fatalf("expected %q, got %q", expected, actual)
+	}
+}
+
 func runLinter(t *testing.T, protoContent, configContent string) string {
 	tempDir, err := ioutil.TempDir("", "test")
 	if err != nil {
