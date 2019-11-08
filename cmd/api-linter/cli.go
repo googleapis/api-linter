@@ -16,10 +16,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -121,11 +123,21 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 			return nil, fmt.Errorf("%q is not found", name)
 		}
 	}
+	var errorsWithPos []protoparse.ErrorWithPos
+	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
 		ImportPaths:           c.ProtoImportPaths,
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
+		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
+			// Protoparse isn't concurrent right now but just to be safe for the future.
+			lock.Lock()
+			errorsWithPos = append(errorsWithPos, errorWithPos)
+			lock.Unlock()
+			// Continue parsing. The error returned will be protoparse.ErrInvalidSource.
+			return nil
+		},
 	}
 	// Resolve file absolute paths to relative ones.
 	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
@@ -134,6 +146,17 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
+		if err == protoparse.ErrInvalidSource {
+			if len(errorsWithPos) == 0 {
+				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
+			}
+			// TODO: There's multiple ways to deal with this but this prints all the errors at least
+			errStrings := make([]string, len(errorsWithPos))
+			for i, errorWithPos := range errorsWithPos {
+				errStrings[i] = errorWithPos.Error()
+			}
+			return errors.New(strings.Join(errStrings, "\n"))
+		}
 		return err
 	}
 
