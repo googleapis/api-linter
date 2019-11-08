@@ -124,7 +124,7 @@ func matchPath(path string, pathPatterns ...string) bool {
 
 func matchRule(rule string, rulePrefixes ...string) bool {
 	for _, prefix := range rulePrefixes {
-		if prefix == rule || strings.HasPrefix(rule, prefix+"::") {
+		if prefix == "all" || prefix == rule || strings.HasPrefix(rule, prefix+"::") {
 			return true
 		}
 	}
