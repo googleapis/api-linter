@@ -38,10 +38,10 @@ func runCLI(args []string) error {
 	return c.lint(globalRules, globalConfigs)
 }
 
+// Enable all rules by default.
+// Once we have rules other than core,
+// we will determine if we want to
+// change this policy.
 func defaultConfigs() lint.Configs {
-	return lint.Configs{
-		lint.Config{
-			IncludedPaths: []string{"**"},
-		},
-	}
+	return lint.Configs{}
 }
