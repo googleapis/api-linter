@@ -3,9 +3,10 @@ workflows:
   version: 2
   workflow:
     jobs:
+      - build
       - format
       - lint
-      - build
+      - meta-lint
 jobs:
   build:
     docker:
@@ -34,7 +35,7 @@ jobs:
       - run:
           name: Run golangci-lint
           command: "! $(go env GOPATH)/bin/golangci-lint run ./... 2>&1 | read"
-  meta-linter:
+  meta-lint:
     docker:
       - image: golang:1.13-alpine
     steps:
