@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0203
 
 import (
 	"github.com/googleapis/api-linter/lint"
@@ -20,21 +20,21 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Batch Get methods should have a proper HTTP pattern.
-var uriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "http-uri-suffix"),
-	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
-				return []lint.Problem{{
-					Message:    `Get methods URI should be end with ":batchGet".`,
-					Descriptor: m,
-				}}
-			}
+var optionalBehaviorConflict = &lint.FieldRule{
+	Name: lint.NewRuleName(203, "optional-conflict"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return !withoutOptionalFieldBehavior(f)
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		// APIs may use the OPTIONAL value to describe a field which doesn't use
+		// REQUIRED, IMMUTABLE, INPUT_ONLY or OUTPUT_ONLY. If a field is described
+		// as optional, it can't be others.
+		if len(utils.GetFieldBehavior(f)) > 1 {
+			return []lint.Problem{{
+				Message:    "Field behavior `(google.api.field_behavior) = OPTIONAL` shouldn't be used together with other field behaviors.",
+				Descriptor: f,
+			}}
 		}
-
 		return nil
 	},
 }
