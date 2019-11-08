@@ -338,7 +338,9 @@ func getAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor)
 // as all nested message descriptors, traversing to arbitrary depth.
 func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDescriptor) {
 	for _, nested := range m.GetNestedMessageTypes() {
-		messages = append(messages, nested)
+		if !nested.IsMapEntry() { // Don't include the synthetic message type that represents an entry in a map field.
+			messages = append(messages, nested)
+		}
 		messages = append(messages, getAllNestedMessages(nested)...)
 	}
 	return messages
