@@ -123,8 +123,16 @@ func matchPath(path string, pathPatterns ...string) bool {
 }
 
 func matchRule(rule string, rulePrefixes ...string) bool {
+	rule = strings.ToLower(rule)
 	for _, prefix := range rulePrefixes {
-		if prefix == "all" || prefix == rule || strings.HasPrefix(rule, prefix+"::") {
+		prefix = strings.ToLower(prefix)
+		prefix = strings.TrimSuffix(prefix, nameSeparator) // "core::" -> "core"
+		prefix = strings.TrimPrefix(prefix, nameSeparator) // "::http-body" -> "http-body"
+		if prefix == "all" ||
+			prefix == rule ||
+			strings.HasPrefix(rule, prefix+nameSeparator) || // e.g., "core" matches "core::http-body", but not "core-rules::http-body"
+			strings.HasSuffix(rule, nameSeparator+prefix) || // e.g., "http-body" matches "core::http-body", but not "core::google-http-body"
+			strings.Contains(rule, nameSeparator+prefix+nameSeparator) { // e.g., "http-body" matches "core::http-body::post", but not "core::google-http-body::post"
 			return true
 		}
 	}

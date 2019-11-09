@@ -29,11 +29,7 @@ func TestLinter_run(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to build a file descriptor.")
 	}
-	defaultConfigs := Configs{
-		{
-			IncludedPaths: []string{"**"},
-		},
-	}
+	defaultConfigs := Configs{}
 
 	testRuleID := "test::rule1"
 	ruleProblems := []Problem{{
@@ -64,7 +60,6 @@ func TestLinter_run(t *testing.T) {
 			append(
 				defaultConfigs,
 				Config{
-					IncludedPaths: []string{"*"},
 					DisabledRules: []string{"foo::bar"},
 				},
 			),
@@ -75,7 +70,6 @@ func TestLinter_run(t *testing.T) {
 			append(
 				defaultConfigs,
 				Config{
-					IncludedPaths: []string{"*"},
 					DisabledRules: []string{testRuleID},
 				},
 			),
@@ -145,9 +139,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			}
 
 			// Instantiate a linter with the given rule.
-			l := New(r, []Config{{
-				IncludedPaths: []string{"**"},
-			}})
+			l := New(r, nil)
 
 			_, err = l.LintProtos(fd)
 			if err == nil || !strings.Contains(err.Error(), "panic") {

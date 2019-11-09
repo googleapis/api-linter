@@ -101,7 +101,6 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["*.proto"],
 			"disabled_rules": ["replace-me-here"]
 		}
 	]

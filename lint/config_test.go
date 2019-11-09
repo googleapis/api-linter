@@ -105,6 +105,30 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 			disabled,
 		},
 		{
+			"PathMatched_DisabledRulesSuffixMatched_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a/b/c.proto"},
+					DisabledRules: []string{"child"},
+				},
+			},
+			"a/b/c.proto",
+			"parent::child",
+			disabled,
+		},
+		{
+			"PathMatched_DisabledRulesMiddleMatched_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a/b/c.proto"},
+					DisabledRules: []string{"middle"},
+				},
+			},
+			"a/b/c.proto",
+			"parent::middle::child",
+			disabled,
+		},
+		{
 			"EmptyIncludePath_ConfigMatched_DisabledRulesMatched_Disabled",
 			Configs{
 				{

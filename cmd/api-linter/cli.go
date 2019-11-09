@@ -93,12 +93,10 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	// Add configs for the enabled rules.
 	configs = append(configs, lint.Config{
-		IncludedPaths: []string{"**"},
-		EnabledRules:  c.EnabledRules,
+		EnabledRules: c.EnabledRules,
 	})
 	// Add configs for the disabled rules.
 	configs = append(configs, lint.Config{
-		IncludedPaths: []string{"**"},
 		DisabledRules: c.DisabledRules,
 	})
 	// Prepare proto import lookup.
