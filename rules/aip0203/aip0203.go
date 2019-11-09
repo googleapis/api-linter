@@ -28,6 +28,9 @@ func AddRules(r lint.RuleRegistry) {
 	r.Register(
 		inputOnly,
 		immutable,
+		optional,
+		optionalBehaviorConflict,
+		optionalBehaviorConsistency,
 		outputOnly,
 		required,
 	)

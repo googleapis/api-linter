@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0203
 
 import (
 	"github.com/googleapis/api-linter/lint"
@@ -20,21 +20,20 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Batch Get methods should have a proper HTTP pattern.
-var uriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "http-uri-suffix"),
-	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
-				return []lint.Problem{{
-					Message:    `Get methods URI should be end with ":batchGet".`,
-					Descriptor: m,
-				}}
+// If a message has a field which is described as optional, ensure that every
+// optional field on the message has this indicator.
+var optionalBehaviorConsistency = &lint.MessageRule{
+	Name:   lint.NewRuleName(203, "optional-consistency"),
+	OnlyIf: messageHasOptionalFieldBehavior,
+	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+		for _, f := range m.GetFields() {
+			if utils.GetFieldBehavior(f) == nil {
+				problems = append(problems, lint.Problem{
+					Message:    "Within a single message, either all optional fields should be indicated, or none of them should be.",
+					Descriptor: f,
+				})
 			}
 		}
-
-		return nil
+		return
 	},
 }

@@ -31,8 +31,7 @@
 // A simple rule therefore looks like this:
 //
 //   var myRule = &lint.MessageRule{
-//     Name: lint.NewRuleName("core", "1234", "my-rule"),
-//     URI:  "https://aip.dev/1234",
+//     Name: lint.NewRuleName(1234, "my-rule"),
 //     LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 //       if isBad(m) {
 //         return []lint.Problem{{
@@ -53,6 +52,7 @@ package rules
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/aip0122"
+	"github.com/googleapis/api-linter/rules/aip0126"
 	"github.com/googleapis/api-linter/rules/aip0131"
 	"github.com/googleapis/api-linter/rules/aip0132"
 	"github.com/googleapis/api-linter/rules/aip0133"
@@ -68,10 +68,12 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0191"
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
+	"github.com/googleapis/api-linter/rules/aip0231"
 )
 
 func init() {
 	aip0122.AddRules(coreRules)
+	aip0126.AddRules(coreRules)
 	aip0131.AddRules(coreRules)
 	aip0132.AddRules(coreRules)
 	aip0133.AddRules(coreRules)
@@ -87,6 +89,7 @@ func init() {
 	aip0191.AddRules(coreRules)
 	aip0192.AddRules(coreRules)
 	aip0203.AddRules(coreRules)
+	aip0231.AddRules(coreRules)
 }
 
 var coreRules, _ = lint.NewRuleRegistry()
