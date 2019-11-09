@@ -22,6 +22,11 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
+type field struct {
+	fieldName string
+	fieldType *builder.FieldType
+}
+
 func TestParentField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {

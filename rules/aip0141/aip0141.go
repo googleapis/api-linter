@@ -22,6 +22,7 @@ import (
 // AddRules adds all of the AIP-141 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		141,
 		count,
 		forbiddenTypes,
 	)

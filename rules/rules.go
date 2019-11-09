@@ -92,7 +92,7 @@ func init() {
 	aip0231.AddRules(coreRules)
 }
 
-var coreRules, _ = lint.NewRuleRegistry()
+var coreRules = lint.NewRuleRegistry()
 
 // Rules returns all rules registered in this package.
 func Rules() lint.RuleRegistry {

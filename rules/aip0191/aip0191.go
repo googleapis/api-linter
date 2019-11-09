@@ -24,6 +24,7 @@ import (
 // AddRules adds all of the AIP-191 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		191,
 		filename,
 		syntax,
 	)

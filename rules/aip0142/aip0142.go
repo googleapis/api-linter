@@ -22,6 +22,7 @@ import (
 // AddRules adds all of the AIP-142 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) {
 	r.Register(
+		142,
 		fieldNames,
 		fieldType,
 	)
