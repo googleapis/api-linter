@@ -29,15 +29,14 @@ func TestLinter_run(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to build a file descriptor.")
 	}
-	defaultConfigs := Configs{
-		{[]string{"**"}, []string{}, map[string]RuleConfig{}},
-	}
+	defaultConfigs := Configs{}
 
+	testRuleID := "test::rule1"
 	ruleProblems := []Problem{{
 		Message:    "rule1_problem",
 		Descriptor: fd,
 		category:   "",
-		RuleID:     "test::rule1",
+		RuleID:     RuleName(testRuleID),
 	}}
 
 	tests := []struct {
@@ -52,7 +51,6 @@ func TestLinter_run(t *testing.T) {
 				defaultConfigs,
 				Config{
 					IncludedPaths: []string{"nofile"},
-					RuleConfigs:   map[string]RuleConfig{"": {Disabled: true}},
 				},
 			),
 			ruleProblems,
@@ -62,8 +60,7 @@ func TestLinter_run(t *testing.T) {
 			append(
 				defaultConfigs,
 				Config{
-					IncludedPaths: []string{"*"},
-					RuleConfigs:   map[string]RuleConfig{"foo::bar": {Disabled: true}},
+					DisabledRules: []string{"foo::bar"},
 				},
 			),
 			ruleProblems,
@@ -73,31 +70,10 @@ func TestLinter_run(t *testing.T) {
 			append(
 				defaultConfigs,
 				Config{
-					IncludedPaths: []string{"*"},
-					RuleConfigs: map[string]RuleConfig{
-						"test::rule1": {Disabled: true},
-					},
+					DisabledRules: []string{testRuleID},
 				},
 			),
 			[]Problem{},
-		},
-		{
-			"CategoryOverride",
-			append(
-				defaultConfigs,
-				Config{
-					IncludedPaths: []string{"*"},
-					RuleConfigs: map[string]RuleConfig{
-						"test::rule1": {Category: "error"},
-					},
-				},
-			),
-			[]Problem{{
-				Descriptor: fd,
-				Message:    "rule1_problem",
-				RuleID:     "test::rule1",
-				category:   "error",
-			}},
 		},
 	}
 
@@ -163,10 +139,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			}
 
 			// Instantiate a linter with the given rule.
-			l := New(r, []Config{{
-				IncludedPaths: []string{"**"},
-				RuleConfigs:   map[string]RuleConfig{"": {}},
-			}})
+			l := New(r, nil)
 
 			_, err = l.LintProtos(fd)
 			if err == nil || !strings.Contains(err.Error(), "panic") {
