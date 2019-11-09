@@ -57,15 +57,6 @@ func (r RuleRegistry) Register(aip int, rules ...ProtoRule) error {
 	return nil
 }
 
-// All returns all rules.
-func (r RuleRegistry) All() []ProtoRule {
-	rules := make([]ProtoRule, 0, len(r))
-	for _, r1 := range r {
-		rules = append(rules, r1)
-	}
-	return rules
-}
-
 // NewRuleRegistry creates a new rule registry.
 func NewRuleRegistry() RuleRegistry {
 	return make(RuleRegistry)
