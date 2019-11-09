@@ -38,7 +38,7 @@ type cli struct {
 	OutputPath       string
 	ProtoImportPaths []string
 	ProtoFiles       []string
-	ProtoDescPath    string
+	ProtoDescPath    []string
 	EnabledRules     []string
 	DisabledRules    []string
 }
@@ -49,7 +49,7 @@ func newCli(args []string) *cli {
 	var fmtFlag string
 	var outFlag string
 	var protoImportFlag []string
-	var protoDescFlag string
+	var protoDescFlag []string
 	var ruleEnableFlag []string
 	var ruleDisableFlag []string
 
@@ -59,7 +59,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringVar(&protoDescFlag, "proto-descriptor-set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
+	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 
@@ -100,18 +100,15 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		DisabledRules: c.DisabledRules,
 	})
 	// Prepare proto import lookup.
-	var lookupImport func(string) (*desc.FileDescriptor, error)
-	if c.ProtoDescPath != "" {
-		fs, err := loadFileDescriptors(strings.Split(c.ProtoDescPath, ":")...)
-		if err != nil {
-			return err
+	fs, err := loadFileDescriptors(c.ProtoDescPath...)
+	if err != nil {
+		return err
+	}
+	lookupImport := func(name string) (*desc.FileDescriptor, error) {
+		if f, found := fs[name]; found {
+			return f, nil
 		}
-		lookupImport = func(name string) (*desc.FileDescriptor, error) {
-			if f, found := fs[name]; found {
-				return f, nil
-			}
-			return nil, fmt.Errorf("%q is not found", name)
-		}
+		return nil, fmt.Errorf("%q is not found", name)
 	}
 	var errorsWithPos []protoparse.ErrorWithPos
 	var lock sync.Mutex

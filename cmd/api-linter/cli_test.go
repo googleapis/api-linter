@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -14,13 +13,23 @@ func TestNewCli(t *testing.T) {
 		wantCli   *cli
 	}{
 		{
-			name:      "AllFlags",
-			inputArgs: strings.Split("--config=config --output-format=json -o=out --proto-descriptor-set=proto_desc -I=proto_path_a -I=proto_path_b a.proto b.proto", " "),
+			name: "AllFlags",
+			inputArgs: []string{
+				"--config=config",
+				"--output-format=json",
+				"-o=out",
+				"--descriptor-set-in=proto_desc1",
+				"--descriptor-set-in=proto_desc2",
+				"--proto-path=proto_path_a",
+				"-I=proto_path_b",
+				"a.proto",
+				"b.proto",
+			},
 			wantCli: &cli{
 				ConfigPath:       "config",
 				OutputPath:       "out",
 				FormatType:       "json",
-				ProtoDescPath:    "proto_desc",
+				ProtoDescPath:    []string{"proto_desc1", "proto_desc2"},
 				ProtoImportPaths: []string{"proto_path_a", "proto_path_b", "."},
 				ProtoFiles:       []string{"a.proto", "b.proto"},
 			},
