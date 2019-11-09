@@ -92,23 +92,13 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		configs = append(configs, config...)
 	}
 	// Add configs for the enabled rules.
-	for _, ruleName := range c.EnabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {}, // default is enabled.
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		EnabledRules: c.EnabledRules,
+	})
 	// Add configs for the disabled rules.
-	for _, ruleName := range c.DisabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {Disabled: true},
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		DisabledRules: c.DisabledRules,
+	})
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
 	if c.ProtoDescPath != "" {

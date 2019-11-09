@@ -20,91 +20,203 @@ import (
 	"testing"
 )
 
-func TestRuleConfigs_getRuleConfig(t *testing.T) {
-	matchConfig := RuleConfig{Disabled: false, Category: "warning"}
+func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
+	enabled := true
+	disabled := false
 
 	tests := []struct {
+		name    string
 		configs Configs
 		path    string
-		rule    RuleName
-		result  RuleConfig
+		rule    string
+		want    bool
 	}{
-		{nil, "a", "b", RuleConfig{}},
+		{"EmptyConfig", nil, "a", "b", enabled},
 		{
+			"NoConfigMatched_Enabled",
 			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
-					RuleConfigs: map[string]RuleConfig{
-						"foo":      {},
-						"testrule": matchConfig,
-					},
+					DisabledRules: []string{"testrule"},
 				},
 			},
 			"b.proto",
 			"testrule",
-			RuleConfig{},
+			enabled,
 		},
 		{
+			"PathMatched_DisabledRulesNotMatch_Enabled",
 			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
-					RuleConfigs: map[string]RuleConfig{
-						"foo": matchConfig,
-					},
+					DisabledRules: []string{"somerule"},
 				},
 			},
 			"a.proto",
 			"testrule",
-			RuleConfig{},
+			enabled,
 		},
 		{
+			"PathExactMatched_DisabledRulesMatched_Disabled",
 			Configs{
 				{
 					IncludedPaths: []string{"a.proto"},
-					RuleConfigs: map[string]RuleConfig{
-						"foo":      {},
-						"testrule": matchConfig,
-					},
+					DisabledRules: []string{"somerule", "testrule"},
 				},
 			},
 			"a.proto",
 			"testrule",
-			matchConfig,
+			disabled,
 		},
 		{
+			"PathExactMatched_DisabledRulesMatchedAll_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					DisabledRules: []string{"all"},
+				},
+			},
+			"a.proto",
+			"testrule",
+			disabled,
+		},
+		{
+			"PathDoubleStartMatched_DisabledRulesMatched_Disabled",
 			Configs{
 				{
 					IncludedPaths: []string{"a/**/*.proto"},
-					RuleConfigs: map[string]RuleConfig{
-						"foo":     {},
-						"a::b::c": matchConfig,
-					},
+					DisabledRules: []string{"somerule", "testrule"},
 				},
 			},
 			"a/with/long/sub/dir/ect/ory/e.proto",
-			"a::b::c",
-			matchConfig,
+			"testrule",
+			disabled,
 		},
 		{
+			"PathMatched_DisabledRulesPrefixMatched_Disabled",
 			Configs{
 				{
-					IncludedPaths: []string{"a/**/*.proto"},
-					RuleConfigs: map[string]RuleConfig{
-						"foo":       {},
-						"a::module": matchConfig,
-					},
+					IncludedPaths: []string{"a/b/c.proto"},
+					DisabledRules: []string{"parent"},
 				},
 			},
-			"a/with/long/sub/dir/ect/ory/e.proto",
-			"a::module::test_rule",
-			matchConfig,
+			"a/b/c.proto",
+			"parent::test_rule",
+			disabled,
+		},
+		{
+			"PathMatched_DisabledRulesSuffixMatched_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a/b/c.proto"},
+					DisabledRules: []string{"child"},
+				},
+			},
+			"a/b/c.proto",
+			"parent::child",
+			disabled,
+		},
+		{
+			"PathMatched_DisabledRulesMiddleMatched_Disabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a/b/c.proto"},
+					DisabledRules: []string{"middle"},
+				},
+			},
+			"a/b/c.proto",
+			"parent::middle::child",
+			disabled,
+		},
+		{
+			"EmptyIncludePath_ConfigMatched_DisabledRulesMatched_Disabled",
+			Configs{
+				{
+					DisabledRules: []string{"testrule"},
+				},
+			},
+			"a.proto",
+			"testrule",
+			disabled,
+		},
+		{
+			"ExcludedPathMatch_ConfigNotMatched_DisabledRulesMatched_Enabled",
+			Configs{
+				{
+					ExcludedPaths: []string{"a.proto"},
+					DisabledRules: []string{"testrule"},
+				},
+			},
+			"a.proto",
+			"testrule",
+			enabled,
+		},
+		{
+			"TwoConfigs_Override_Enabled",
+			Configs{
+				{
+					DisabledRules: []string{"testrule"},
+				},
+				{
+					EnabledRules: []string{"testrule::a"},
+				},
+			},
+			"a.proto",
+			"testrule::a",
+			enabled,
+		},
+		{
+			"TwoConfigs_Override_Disabled",
+			Configs{
+				{
+					EnabledRules: []string{"testrule"},
+				},
+				{
+					DisabledRules: []string{"testrule::a"},
+				},
+			},
+			"a.proto",
+			"testrule::a",
+			disabled,
+		},
+		{
+			"TwoConfigs_DoubleEnable_Enabled",
+			Configs{
+				{
+					EnabledRules: []string{"testrule"},
+				},
+				{
+					EnabledRules: []string{"testrule::a"},
+				},
+			},
+			"a.proto",
+			"testrule::a",
+			enabled,
+		},
+		{
+			"TwoConfigs_DoubleDisabled_Disabled",
+			Configs{
+				{
+					DisabledRules: []string{"testrule"},
+				},
+				{
+					DisabledRules: []string{"testrule::a"},
+				},
+			},
+			"a.proto",
+			"testrule::a",
+			disabled,
 		},
 	}
-	for ind, test := range tests {
-		cfg, _ := test.configs.GetRuleConfig(test.path, test.rule)
-		if cfg != test.result {
-			t.Errorf("Test #%d: %+v.GetRuleConfig(%q, %q)=%+v; want %+v", ind+1, test.configs, test.path, test.rule, cfg, test.result)
-		}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.configs.IsRuleEnabled(test.rule, test.path)
+
+			if got != test.want {
+				t.Errorf("IsRuleEnabled: got %t, but want %t", got, test.want)
+			}
+		})
+
 	}
 }
 
@@ -112,14 +224,10 @@ func TestReadConfigsJSON(t *testing.T) {
 	content := `
 	[
 		{
-			"included_paths": ["a"],
-			"excluded_paths": ["b"],
-			"rule_configs": {
-				"rule_a": {
-					"status": "enabled",
-					"category": "warning"
-				}
-			}
+			"included_paths": ["path_a"],
+			"excluded_paths": ["path_b"],
+			"disabled_rules": ["rule_a", "rule_b"],
+			"enabled_rules": ["rule_c", "rule_d"]
 		}
 	]
 	`
@@ -131,68 +239,13 @@ func TestReadConfigsJSON(t *testing.T) {
 
 	expected := Configs{
 		{
-			IncludedPaths: []string{"a"},
-			ExcludedPaths: []string{"b"},
-			RuleConfigs: map[string]RuleConfig{
-				"rule_a": {
-					Disabled: false,
-					Category: "warning",
-				},
-			},
+			IncludedPaths: []string{"path_a"},
+			ExcludedPaths: []string{"path_b"},
+			DisabledRules: []string{"rule_a", "rule_b"},
+			EnabledRules:  []string{"rule_c", "rule_d"},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
 		t.Errorf("ReadConfigsJSON returns %v, but want %v", configs, expected)
-	}
-}
-
-func TestRuleConfig_WithOverride(t *testing.T) {
-	tests := []struct {
-		original RuleConfig
-		override RuleConfig
-		result   RuleConfig
-	}{
-		{
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Disabled: false, Category: "warning"},
-		},
-		{
-			RuleConfig{},
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Disabled: false, Category: "warning"},
-		},
-		{
-			RuleConfig{Category: ""},
-			RuleConfig{Disabled: true, Category: "warning"},
-			RuleConfig{Disabled: true, Category: "warning"},
-		},
-		{
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Disabled: true, Category: "error"},
-			RuleConfig{Disabled: true, Category: "error"},
-		},
-		{
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Category: ""},
-			RuleConfig{Disabled: false, Category: "warning"},
-		},
-		{
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Disabled: true, Category: ""},
-			RuleConfig{Disabled: true, Category: "warning"},
-		},
-		{
-			RuleConfig{Disabled: false, Category: "warning"},
-			RuleConfig{Category: "error"},
-			RuleConfig{Disabled: false, Category: "error"},
-		},
-	}
-
-	for _, test := range tests {
-		result := test.original.withOverride(test.override)
-		if result != test.result {
-			t.Errorf("%+v.WithOverride(%+v)=%+v; want %+v", test.original, test.override, result, test.result)
-		}
 	}
 }
