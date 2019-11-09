@@ -3,10 +3,19 @@ workflows:
   version: 2
   workflow:
     jobs:
+      - build
       - format
       - lint
-      - build
+      - meta-lint
 jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+      - run:
+          name: Run unit tests.
+          command: go test -mod=readonly ./...
   format:
     docker:
       - image: circleci/golang:1.13
@@ -26,22 +35,11 @@ jobs:
       - run:
           name: Run golangci-lint
           command: "! $(go env GOPATH)/bin/golangci-lint run ./... 2>&1 | read"
-  build:
+  meta-lint:
     docker:
-      - image: circleci/golang:1.13
+      - image: golang:1.13-alpine
     steps:
       - checkout
       - run:
-          name: Get submodules
-          command: git submodule update --init
-      - run:
-          name: Install protoc
-          command: >
-            PROTOC_ZIP=protoc-3.7.1-linux-x86_64.zip
-
-            curl -OL https://github.com/google/protobuf/releases/download/v3.7.1/$PROTOC_ZIP
-
-            sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc include/*
-
-            rm -f $PROTOC_ZIP
-      - run: go test -mod=readonly ./...
+          name: Run the meta-linter, ensuring in-repository consistency.
+          command: go run ./.circleci/meta-linter
