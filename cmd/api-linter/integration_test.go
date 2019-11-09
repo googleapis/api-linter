@@ -155,7 +155,7 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 	// Add the temp dir to the proto paths.
 	args = append(args, fmt.Sprintf("-I=%s", tempDir))
 	// Add a flag for the file descriptor set.
-	args = append(args, "--proto-descriptor-set=internal/testdata/dummy.protoset")
+	args = append(args, "--descriptor-set-in=internal/testdata/dummy.protoset")
 	// Write the proto file.
 	protoFileName := "test.proto"
 	protoFilePath := filepath.Join(tempDir, protoFileName)
