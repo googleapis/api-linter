@@ -16,10 +16,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -90,23 +92,13 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		configs = append(configs, config...)
 	}
 	// Add configs for the enabled rules.
-	for _, ruleName := range c.EnabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {}, // default is enabled.
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		EnabledRules: c.EnabledRules,
+	})
 	// Add configs for the disabled rules.
-	for _, ruleName := range c.DisabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {Disabled: true},
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		DisabledRules: c.DisabledRules,
+	})
 	// Prepare proto import lookup.
 	var lookupImport func(string) (*desc.FileDescriptor, error)
 	if c.ProtoDescPath != "" {
@@ -121,14 +113,40 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 			return nil, fmt.Errorf("%q is not found", name)
 		}
 	}
+	var errorsWithPos []protoparse.ErrorWithPos
+	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
 		ImportPaths:           c.ProtoImportPaths,
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
+		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
+			// Protoparse isn't concurrent right now but just to be safe for the future.
+			lock.Lock()
+			errorsWithPos = append(errorsWithPos, errorWithPos)
+			lock.Unlock()
+			// Continue parsing. The error returned will be protoparse.ErrInvalidSource.
+			return nil
+		},
 	}
-	fd, err := p.ParseFiles(c.ProtoFiles...)
+	// Resolve file absolute paths to relative ones.
+	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
 	if err != nil {
+		return err
+	}
+	fd, err := p.ParseFiles(protoFiles...)
+	if err != nil {
+		if err == protoparse.ErrInvalidSource {
+			if len(errorsWithPos) == 0 {
+				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
+			}
+			// TODO: There's multiple ways to deal with this but this prints all the errors at least
+			errStrings := make([]string, len(errorsWithPos))
+			for i, errorWithPos := range errorsWithPos {
+				errStrings[i] = errorWithPos.Error()
+			}
+			return errors.New(strings.Join(errStrings, "\n"))
+		}
 		return err
 	}
 
@@ -153,15 +171,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 
 	// Determine the format for printing the results.
 	// YAML format is the default.
-	marshal := yaml.Marshal
-	switch c.FormatType {
-	case "json":
-		marshal = json.Marshal
-	case "summary":
-		marshal = func(i interface{}) ([]byte, error) {
-			return printSummaryTable(i.([]lint.Response))
-		}
-	}
+	marshal := getOutputFormatFunc(c.FormatType)
 
 	// Print the results.
 	b, err := marshal(results)
@@ -196,4 +206,22 @@ func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
 		return nil, err
 	}
 	return fs, nil
+}
+
+var outputFormatFuncs = map[string]formatFunc{
+	"yaml": yaml.Marshal,
+	"yml":  yaml.Marshal,
+	"json": json.Marshal,
+	"summary": func(i interface{}) ([]byte, error) {
+		return printSummaryTable(i.([]lint.Response))
+	},
+}
+
+type formatFunc func(interface{}) ([]byte, error)
+
+func getOutputFormatFunc(formatType string) formatFunc {
+	if f, found := outputFormatFuncs[strings.ToLower(formatType)]; found {
+		return f
+	}
+	return yaml.Marshal
 }

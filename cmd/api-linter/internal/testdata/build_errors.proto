@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package foo;
+
+message Bar1 {
+  // first build error
+  string baz1 = 1
+}
+
+message Bar2 {
+  // second build error
+  string baz2 = 1
+}

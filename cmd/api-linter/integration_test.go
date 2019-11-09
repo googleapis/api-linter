@@ -72,25 +72,11 @@ func TestRules_EnabledByDefault(t *testing.T) {
 }
 
 func TestRules_DisabledByFileComments(t *testing.T) {
-	config := `
-	[
-		{
-			"included_paths": ["*.proto"],
-			"rule_configs": {
-				"": {
-					"status": "enabled",
-					"category": "warning"
-				}
-			}
-		}
-	]
-	`
-
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
 			disableInFile := fmt.Sprintf("// (-- api-linter: %s=disabled --)", test.rule)
 			proto := disableInFile + "\n" + test.proto
-			result := runLinter(t, proto, config)
+			result := runLinter(t, proto, "")
 			if strings.Contains(result, test.rule) {
 				t.Errorf("Rule %q should be disabled by file comments", test.rule)
 			}
@@ -99,25 +85,11 @@ func TestRules_DisabledByFileComments(t *testing.T) {
 }
 
 func TestRules_DisabledByInlineComments(t *testing.T) {
-	config := `
-	[
-		{
-			"included_paths": ["*.proto"],
-			"rule_configs": {
-				"": {
-					"status": "enabled",
-					"category": "warning"
-				}
-			}
-		}
-	]
-	`
-
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
 			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
 			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
-			result := runLinter(t, proto, config)
+			result := runLinter(t, proto, "")
 			if strings.Contains(result, test.rule) {
 				t.Errorf("Rule %q should be disabled by in-line comments", test.rule)
 			}
@@ -129,21 +101,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 	config := `
 	[
 		{
-			"included_paths": ["*.proto"],
-			"rule_configs": {
-				"": {
-					"disabled": false,
-					"category": "warning"
-				}
-			}
-		},
-		{
-			"included_paths": ["*.proto"],
-			"rule_configs": {
-				"replace-me-here": {
-					"disabled": true
-				}
-			}
+			"disabled_rules": ["replace-me-here"]
 		}
 	]
 	`
@@ -156,6 +114,19 @@ func TestRules_DisabledByConfig(t *testing.T) {
 				t.Errorf("Rule %q should be disabled by the user config: %q", test.rule, c)
 			}
 		})
+	}
+}
+
+func TestBuildErrors(t *testing.T) {
+	expected := `internal/testdata/build_errors.proto:8:1: syntax error: unexpected '}', expecting ';' or '['
+internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecting ';' or '['`
+	err := runCLI([]string{"internal/testdata/build_errors.proto"})
+	if err == nil {
+		t.Fatal("expected build error for build_errors.proto")
+	}
+	actual := err.Error()
+	if expected != actual {
+		t.Fatalf("expected %q, got %q", expected, actual)
 	}
 }
 

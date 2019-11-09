@@ -14,6 +14,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.0.2
-	google.golang.org/genproto v0.0.0-20191028173616-919d9bdd9fe6
+	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
 	gopkg.in/yaml.v2 v2.2.5
 )
