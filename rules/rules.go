@@ -69,6 +69,7 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
 	"github.com/googleapis/api-linter/rules/aip0231"
+	"github.com/googleapis/api-linter/rules/aip0233"
 )
 
 func init() {
@@ -90,6 +91,7 @@ func init() {
 	aip0192.AddRules(coreRules)
 	aip0203.AddRules(coreRules)
 	aip0231.AddRules(coreRules)
+	aip0233.AddRules(coreRules)
 }
 
 var coreRules, _ = lint.NewRuleRegistry()
