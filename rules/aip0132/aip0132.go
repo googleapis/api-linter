@@ -23,8 +23,8 @@ import (
 )
 
 // AddRules adds all of the AIP-132 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
 		132,
 		requestFieldTypes,
 		requestMessageName,

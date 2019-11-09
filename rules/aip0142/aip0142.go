@@ -20,8 +20,8 @@ import (
 )
 
 // AddRules adds all of the AIP-142 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
 		142,
 		fieldNames,
 		fieldType,
