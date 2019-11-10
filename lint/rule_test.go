@@ -324,14 +324,14 @@ func TestDescriptorRule(t *testing.T) {
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
-		Name: RuleName("test"),
+		Name: RuleName("a::b::c"),
 		LintFile: func(fd *desc.FileDescriptor) []Problem {
 			return []Problem{}
 		},
 	}
 
 	aliases := map[string]string{
-		"test": "alias",
+		"a::b::c": "d::e::f",
 	}
 
 	// Create appropriate test permutations.
@@ -342,10 +342,19 @@ func TestRuleIsEnabled(t *testing.T) {
 		enabled        bool
 	}{
 		{"Enabled", "", "", true},
-		{"FileDisabled", "api-linter: test=disabled", "", false},
-		{"MessageDisabled", "", "api-linter: test=disabled", false},
+		{"FileDisabled", "api-linter: a::b::c=disabled", "", false},
+		{"MessageDisabled", "", "api-linter: a::b::c=disabled", false},
 		{"NameNotMatch", "", "api-linter: other=disabled", true},
-		{"AliasDisabled", "", "api-linter: alias=disabled", false},
+		{"RegexpNotMatch", "", "api-lint: a::b::c=disabled", true},
+		{"AliasDisabled", "", "api-linter: d::e::f=disabled", false},
+		{"FileComments_PrefixMatched_Disabled", "api-linter: a=disabled", "", false},
+		{"FileComments_MiddleMatched_Disabled", "api-linter: b=disabled", "", false},
+		{"FileComments_SuffixMatched_Disabled", "api-linter: c=disabled", "", false},
+		{"FileComments_MultipleLinesMatched_Disabled", "api-linter: x=disabled\napi-linter: a=disabled", "", false},
+		{"MessageComments_PrefixMatched_Disabled", "", "api-linter: a=disabled", false},
+		{"MessageComments_MiddleMatched_Disabled", "", "api-linter: b=disabled", false},
+		{"MessageComments_SuffixMatched_Disabled", "", "api-linter: c=disabled", false},
+		{"MessageComments_MultipleLinesMatched_Disabled", "", "api-linter: x=disabled\napi-linter: a=disabled", false},
 	}
 
 	// Run the specific tests individually.
