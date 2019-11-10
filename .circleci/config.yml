@@ -53,5 +53,8 @@ jobs:
           name: Install staticcheck.
           command: go get honnef.co/go/tools/cmd/staticcheck
       - run:
+          name: Build
+          command: go build -mod=readonly ./...
+      - run:
           name: Run the staticcheck.
           command: staticcheck github.com/googleapis/api-linter/...
