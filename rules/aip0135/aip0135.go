@@ -38,7 +38,7 @@ func AddRules(r lint.RuleRegistry) {
 
 var deleteMethodRegexp = regexp.MustCompile("^Delete(?:[A-Z]|$)")
 var deleteReqMessageRegexp = regexp.MustCompile("^Delete[A-Za-z0-9]*Request$")
-var deleteURINameRegexp = regexp.MustCompile("\\{name=[a-zA-Z/*]+\\}$")
+var deleteURINameRegexp = regexp.MustCompile(`{name=[a-zA-Z/*]+}$`)
 
 // Returns true if this is a AIP-135 Delete method, false otherwise.
 func isDeleteMethod(m *desc.MethodDescriptor) bool {

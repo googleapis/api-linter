@@ -43,3 +43,14 @@ jobs:
       - run:
           name: Run the meta-linter, ensuring in-repository consistency.
           command: go run ./.circleci/meta-linter
+  staticcheck:
+    docker:
+      - image: golang:1.13-alpine
+    steps:
+      - checkout
+      - run:
+          name: Install staticcheck.
+          command: go get honnef.co/go/tools/cmd/staticcheck
+      - run:
+          name: Run the staticcheck.
+          command: staticcheck ./...
