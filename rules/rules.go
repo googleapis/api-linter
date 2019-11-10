@@ -71,7 +71,9 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0231"
 )
 
-var addRulesFuncs = []func(lint.RuleRegistry) error{
+type addRulesFuncType func(lint.RuleRegistry) error
+
+var aipAddRulesFuncs = []addRulesFuncType{
 	aip0122.AddRules,
 	aip0126.AddRules,
 	aip0131.AddRules,
@@ -94,6 +96,10 @@ var addRulesFuncs = []func(lint.RuleRegistry) error{
 
 // Add all rules to the given registry.
 func Add(r lint.RuleRegistry) error {
+	return addAIPRules(r, aipAddRulesFuncs)
+}
+
+func addAIPRules(r lint.RuleRegistry, addRulesFuncs []addRulesFuncType) error {
 	for _, addRules := range addRulesFuncs {
 		if err := addRules(r); err != nil {
 			return err
