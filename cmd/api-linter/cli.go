@@ -16,10 +16,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -36,7 +38,7 @@ type cli struct {
 	OutputPath       string
 	ProtoImportPaths []string
 	ProtoFiles       []string
-	ProtoDescPath    string
+	ProtoDescPath    []string
 	EnabledRules     []string
 	DisabledRules    []string
 }
@@ -47,7 +49,7 @@ func newCli(args []string) *cli {
 	var fmtFlag string
 	var outFlag string
 	var protoImportFlag []string
-	var protoDescFlag string
+	var protoDescFlag []string
 	var ruleEnableFlag []string
 	var ruleDisableFlag []string
 
@@ -57,7 +59,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringVar(&protoDescFlag, "proto-descriptor-set", "", "A delimited (':') list of files each containing a FileDescriptorSet for searching proto imports.")
+	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 
@@ -90,42 +92,39 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		configs = append(configs, config...)
 	}
 	// Add configs for the enabled rules.
-	for _, ruleName := range c.EnabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {}, // default is enabled.
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		EnabledRules: c.EnabledRules,
+	})
 	// Add configs for the disabled rules.
-	for _, ruleName := range c.DisabledRules {
-		configs = append(configs, lint.Config{
-			IncludedPaths: []string{"**/*.proto"},
-			RuleConfigs: map[string]lint.RuleConfig{
-				ruleName: {Disabled: true},
-			},
-		})
-	}
+	configs = append(configs, lint.Config{
+		DisabledRules: c.DisabledRules,
+	})
 	// Prepare proto import lookup.
-	var lookupImport func(string) (*desc.FileDescriptor, error)
-	if c.ProtoDescPath != "" {
-		fs, err := loadFileDescriptors(strings.Split(c.ProtoDescPath, ":")...)
-		if err != nil {
-			return err
-		}
-		lookupImport = func(name string) (*desc.FileDescriptor, error) {
-			if f, found := fs[name]; found {
-				return f, nil
-			}
-			return nil, fmt.Errorf("%q is not found", name)
-		}
+	fs, err := loadFileDescriptors(c.ProtoDescPath...)
+	if err != nil {
+		return err
 	}
+	lookupImport := func(name string) (*desc.FileDescriptor, error) {
+		if f, found := fs[name]; found {
+			return f, nil
+		}
+		return nil, fmt.Errorf("%q is not found", name)
+	}
+	var errorsWithPos []protoparse.ErrorWithPos
+	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
 		ImportPaths:           c.ProtoImportPaths,
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
+		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
+			// Protoparse isn't concurrent right now but just to be safe for the future.
+			lock.Lock()
+			errorsWithPos = append(errorsWithPos, errorWithPos)
+			lock.Unlock()
+			// Continue parsing. The error returned will be protoparse.ErrInvalidSource.
+			return nil
+		},
 	}
 	// Resolve file absolute paths to relative ones.
 	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
@@ -134,6 +133,17 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
+		if err == protoparse.ErrInvalidSource {
+			if len(errorsWithPos) == 0 {
+				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
+			}
+			// TODO: There's multiple ways to deal with this but this prints all the errors at least
+			errStrings := make([]string, len(errorsWithPos))
+			for i, errorWithPos := range errorsWithPos {
+				errStrings[i] = errorWithPos.Error()
+			}
+			return errors.New(strings.Join(errStrings, "\n"))
+		}
 		return err
 	}
 
