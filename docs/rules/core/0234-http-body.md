@@ -24,7 +24,7 @@ complains if HTTP `body` field is anything other than `*`.
 rpc BatchUpdateBooks(BatchUpdateBooksRequest) returns (BatchUpdateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchUpdate"
-    // Http body is missing.
+    body: "book"  // The http body should be "*".
   };
 }
 ```
@@ -52,7 +52,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc BatchUpdateBooks(BatchUpdateBooksRequest) returns (BatchUpdateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchUpdate"
-    // Http body is missing.
   };
 }
 ```
