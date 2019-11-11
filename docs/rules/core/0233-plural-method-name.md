@@ -1,6 +1,6 @@
 ---
 rule:
-  aip: 231
+  aip: 233
   name: [core, '0233', plural-method-name]
   summary: Batch Create methods must have plural names.
 ---
