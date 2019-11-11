@@ -86,12 +86,12 @@ func TestLongRunningResponse(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName     string
-		responseType string
+		ResponseType string
 		problems     testutils.Problems
 	}{
 		{
 			testName:     "Valid-LongRunning",
-			responseType: "BatchCreateBooksResponse",
+			ResponseType: "BatchCreateBooksResponse",
 			problems:     testutils.Problems{},
 		},
 		{
@@ -103,27 +103,26 @@ func TestLongRunningResponse(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-import "google/longrunning/operations.proto";
-
-service BookService {
-	rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/books:batchCreate"
-			body: "*"
-		};
-		option (google.longrunning.operation_info) = {
-		  response_type: "{{.ResponseType}}"
-		};
-	}
-}
-
-message BatchCreateBooksRequest {}
-
-message BatchCreateBooksResponse{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct{ ResponseType string }{test.responseType})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				import "google/longrunning/operations.proto";
+				
+				service BookService {
+					rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
+						option (google.api.http) = {
+							post: "/v1/{parent=publishers/*}/books:batchCreate"
+							body: "*"
+						};
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.ResponseType}}"
+						};
+					}
+				}
+				
+				message BatchCreateBooksRequest {}
+				
+				message BatchCreateBooksResponse{}
+				`, test)
 
 			m := file.GetServices()[0].GetMethods()[0]
 
