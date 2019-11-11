@@ -39,7 +39,6 @@ func TestRequestMessageName(t *testing.T) {
 			MethodName: "BatchCreateBooks",
 			Request:    "BatchCreateBookRequest",
 			problems: testutils.Problems{{
-				Message:    "have a properly named request message",
 				Suggestion: "BatchCreateBooksRequest",
 			}},
 		},
