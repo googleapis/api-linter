@@ -23,7 +23,7 @@ complains if the HTTP verb is anything other than `POST`.
 // Incorrect.
 rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
-    get: "/v1/{parent=publishers/*}/books:batchCreate" // Should be `post:`.
+    put: "/v1/{parent=publishers/*}/books:batchCreate"  // Should be `post:`.
     body: "*"
   };
 }

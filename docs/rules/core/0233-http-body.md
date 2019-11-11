@@ -52,7 +52,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchCreate"
-    // http body is not set
   };
 }
 ```
