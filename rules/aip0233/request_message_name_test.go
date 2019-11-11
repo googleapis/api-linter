@@ -24,20 +24,20 @@ func TestRequestMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName   string
-		methodName string
-		request    string
+		MethodName string
+		Request    string
 		problems   testutils.Problems
 	}{
 		{
 			testName:   "Valid-BatchCreateBooksRequest",
-			methodName: "BatchCreateBooks",
-			request:    "BatchCreateBooksRequest",
+			MethodName: "BatchCreateBooks",
+			Request:    "BatchCreateBooksRequest",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Invalid-MissMatchingMethodName",
-			methodName: "BatchCreateBooks",
-			request:    "BatchCreateBookRequest",
+			MethodName: "BatchCreateBooks",
+			Request:    "BatchCreateBookRequest",
 			problems: testutils.Problems{{
 				Message:    "have a properly named request message",
 				Suggestion: "BatchCreateBooksRequest",
@@ -45,8 +45,8 @@ func TestRequestMessageName(t *testing.T) {
 		},
 		{
 			testName:   "Irrelevant",
-			methodName: "AcquireBook",
-			request:    "AcquireBookRequest",
+			MethodName: "AcquireBook",
+			Request:    "AcquireBookRequest",
 			problems:   testutils.Problems{},
 		},
 	}
@@ -54,26 +54,22 @@ func TestRequestMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-
-service BookService {
-	rpc {{.MethodName}}({{.Request}}) returns ({{.MethodName}}Response) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/"
-			body: "*"
-		};
-	}
-}
-
-message {{.Request}}{}
-
-message {{.MethodName}}Response{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct {
-					MethodName string
-					Request    string
-				}{test.methodName, test.request})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				
+				service BookService {
+					rpc {{.MethodName}}({{.Request}}) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							post: "/v1/{parent=publishers/*}/"
+							body: "*"
+						};
+					}
+				}
+				
+				message {{.Request}}{}
+				
+				message {{.MethodName}}Response{}
+				`, test)
 
 			m := file.GetServices()[0].GetMethods()[0]
 

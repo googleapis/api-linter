@@ -25,23 +25,23 @@ func TestRequestRequestsField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
-		field       string
+		Field       string
 		problems    testutils.Problems
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
 			testName: "Valid",
-			field:    "repeated CreateBookRequest requests = 1;",
+			Field:    "repeated CreateBookRequest requests = 1;",
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "Invalid-MissingRequestsField",
-			field:    "string parent = 1;",
+			Field:    "string parent = 1;",
 			problems: testutils.Problems{{Message: `no "requests" field`}},
 		},
 		{
 			testName: "Invalid-RequestsFieldIsNotRepeated",
-			field:    "CreateBookRequest requests = 1;",
+			Field:    "CreateBookRequest requests = 1;",
 			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
@@ -49,7 +49,7 @@ func TestRequestRequestsField(t *testing.T) {
 		},
 		{
 			testName: "Invalid-RequestsFieldWrongType",
-			field:    "repeated int32 requests = 1;",
+			Field:    "repeated int32 requests = 1;",
 			problems: testutils.Problems{{
 				Message:    `should be a "CreateBookRequest" type`,
 				Suggestion: "CreateBookRequest",
@@ -60,7 +60,7 @@ func TestRequestRequestsField(t *testing.T) {
 		},
 		{
 			testName: "Invalid-RequestsNotRepeatedWrongType",
-			field:    "int32 requests = 1;",
+			Field:    "int32 requests = 1;",
 			problems: testutils.Problems{
 				{Message: `The "requests" field should be repeated`},
 				{
@@ -76,15 +76,13 @@ func TestRequestRequestsField(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `
-message BatchCreateBooksRequest {
-	{{.Field}}
-}
-
-message CreateBookRequest {}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct{ Field string }{test.field})
+			file := testutils.ParseProto3Tmpl(t, `
+				message BatchCreateBooksRequest {
+					{{.Field}}
+				}
+				
+				message CreateBookRequest {}
+				`, test)
 
 			m := file.GetMessageTypes()[0]
 

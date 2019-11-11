@@ -24,7 +24,7 @@ complains if HTTP `body` field is anything other than `*`.
 rpc BatchCreateBooks(BatchCreateBooksRequest) returns (BatchCreateBooksResponse) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books:batchCreate"
-    // Http body is missing.
+    body: "book"  // The body should be "*".
   };
 }
 ```

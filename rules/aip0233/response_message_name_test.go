@@ -24,20 +24,20 @@ func TestResponseMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName   string
-		methodName string
-		response   string
+		MethodName string
+		Response   string
 		problems   testutils.Problems
 	}{
 		{
 			testName:   "Valid-BatchCreateBooksResponse",
-			methodName: "BatchCreateBooks",
-			response:   "BatchCreateBooksResponse",
+			MethodName: "BatchCreateBooks",
+			Response:   "BatchCreateBooksResponse",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Invalid-MissMatchingMethodName",
-			methodName: "BatchCreateBooks",
-			response:   "BatchCreateBookResponse",
+			MethodName: "BatchCreateBooks",
+			Response:   "BatchCreateBookResponse",
 			problems: testutils.Problems{{
 				Message:    "have a properly named response message",
 				Suggestion: "BatchCreateBooksResponse",
@@ -45,8 +45,8 @@ func TestResponseMessageName(t *testing.T) {
 		},
 		{
 			testName:   "Irrelevant",
-			methodName: "CreateBook",
-			response:   "Book",
+			MethodName: "CreateBook",
+			Response:   "Book",
 			problems:   testutils.Problems{},
 		},
 	}
@@ -54,26 +54,22 @@ func TestResponseMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-
-service BookService {
-	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.Response}}) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/"
-			body: "*"
-		};
-	}
-}
-
-message {{.MethodName}}Request {}
-
-message {{.Response}}{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct {
-					MethodName string
-					Response   string
-				}{test.methodName, test.response})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				
+				service BookService {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.Response}}) {
+						option (google.api.http) = {
+							post: "/v1/{parent=publishers/*}/"
+							body: "*"
+						};
+					}
+				}
+				
+				message {{.MethodName}}Request {}
+				
+				message {{.Response}}{}
+				`, test)
 
 			m := file.GetServices()[0].GetMethods()[0]
 

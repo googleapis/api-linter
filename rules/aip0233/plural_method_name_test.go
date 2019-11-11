@@ -24,44 +24,42 @@ func TestMethodPluralResourceName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName   string
-		methodName string
-		uriSuffix  string
+		MethodName string
+		UriSuffix  string
 		problems   testutils.Problems
 	}{
 		{
 			testName:   "Valid-BatchCreateBooks",
-			methodName: "BatchCreateBooks",
-			uriSuffix:  "books:batchCreate",
+			MethodName: "BatchCreateBooks",
+			UriSuffix:  "books:batchCreate",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Valid-BatchCreateMen",
-			methodName: "BatchCreateMen",
-			uriSuffix:  "men:batchCreate",
+			MethodName: "BatchCreateMen",
+			UriSuffix:  "men:batchCreate",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Invalid-SingularBus",
-			methodName: "BatchCreateBus",
-			uriSuffix:  "bus:batchCreate",
+			MethodName: "BatchCreateBus",
+			UriSuffix:  "bus:batchCreate",
 			problems: testutils.Problems{{
-				Message:    `should be its plural form "Buses"`,
 				Suggestion: "BatchCreateBuses",
 			}},
 		},
 		{
 			testName:   "Invalid-SingularCorpPerson",
-			methodName: "BatchCreateCorpPerson",
-			uriSuffix:  "corpPerson:batchCreate",
+			MethodName: "BatchCreateCorpPerson",
+			UriSuffix:  "corpPerson:batchCreate",
 			problems: testutils.Problems{{
-				Message:    `should be its plural form "CorpPeople"`,
 				Suggestion: "BatchCreateCorpPeople",
 			}},
 		},
 		{
 			testName:   "Invalid-Irrelevant",
-			methodName: "AcquireBook",
-			uriSuffix:  "book",
+			MethodName: "AcquireBook",
+			UriSuffix:  "book",
 			problems:   testutils.Problems{},
 		},
 	}
@@ -69,26 +67,22 @@ func TestMethodPluralResourceName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-
-service BookService {
-	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
-		option (google.api.http) = {
-			post: "/v1/{parent=publishers/*}/{{.UriSuffix}}"
-			body: "*"
-		};
-	}
-}
-
-message {{.MethodName}}Request {}
-
-message {{.MethodName}}Response{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct {
-					MethodName string
-					UriSuffix  string
-				}{test.methodName, test.uriSuffix})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				
+				service BookService {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							post: "/v1/{parent=publishers/*}/{{.UriSuffix}}"
+							body: "*"
+						};
+					}
+				}
+				
+				message {{.MethodName}}Request {}
+				
+				message {{.MethodName}}Response{}
+				`, test)
 
 			m := file.GetServices()[0].GetMethods()[0]
 

@@ -25,23 +25,23 @@ func TestResponseResourceField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
-		src         string
+		Src         string
 		problems    testutils.Problems
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
 			testName: "Valid",
-			src:      `repeated Book books = 1;`,
+			Src:      `repeated Book books = 1;`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "FieldIsNotRepeated",
-			src:      `Book book = 1;`,
+			Src:      `Book book = 1;`,
 			problems: testutils.Problems{{Message: "The \"Book\" type field on Batch Create Response message should be repeated"}},
 		},
 		{
 			testName: "MissingField",
-			src:      `string response = 1;`,
+			Src:      `string response = 1;`,
 			problems: testutils.Problems{{Message: "Message \"BatchCreateBooksResponse\" has no \"Book\" type field"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m
@@ -52,13 +52,12 @@ func TestResponseResourceField(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `
-message BatchCreateBooksResponse {
-	{{.Src}}
-}
-message Book {
-}`
-			file := testutils.ParseProto3Tmpl(t, template, struct{ Src string }{test.src})
+			file := testutils.ParseProto3Tmpl(t, `
+				message BatchCreateBooksResponse {
+					{{.Src}}
+				}
+				message Book {
+				}`, test)
 
 			m := file.GetMessageTypes()[0]
 

@@ -23,8 +23,8 @@ import (
 func TestHttpUriSuffix(t *testing.T) {
 	tests := []struct {
 		testName   string
-		httpUri    string
-		methodName string
+		HttpUri    string
+		MethodName string
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*}/books:batchCreate", "BatchCreateBooks", nil},
@@ -34,23 +34,20 @@ func TestHttpUriSuffix(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-service BookService {
-	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
-		option (google.api.http) = {
-			post: "{{.HttpUri}}"
-			body: "*"
-		};
-	}
-}
-message {{.MethodName}}Request{}
-message {{.MethodName}}Response{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct {
-					MethodName string
-					HttpUri    string
-				}{test.methodName, test.httpUri})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				
+				service BookService {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							post: "{{.HttpUri}}"
+							body: "*"
+						};
+					}
+				}
+				message {{.MethodName}}Request{}
+				message {{.MethodName}}Response{}
+				`, test)
 
 			// Run the method, ensure we get what we expect.
 			problems := httpUriSuffix.Lint(file)

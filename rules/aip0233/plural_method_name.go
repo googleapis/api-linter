@@ -28,8 +28,8 @@ var pluralMethodName = &lint.MethodRule{
 	Name:   lint.NewRuleName(233, "plural-method-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Note: m.GetName()[11:] is used to retrieve the resource name from the
-		// method name. For example, "BatchCreateFoos" -> "Foos"
+		// Note: Retrieve the resource name from the method name. For example,
+		// "BatchCreateFoos" -> "Foos"
 		pluralMethodResourceName := strings.TrimPrefix(m.GetName(), "BatchCreate")
 
 		pluralize := pluralize.NewClient()

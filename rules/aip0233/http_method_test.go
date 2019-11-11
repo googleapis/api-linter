@@ -24,8 +24,8 @@ func TestHttpVerb(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		httpVerb   string
-		methodName string
+		HttpVerb   string
+		MethodName string
 		problems   testutils.Problems
 	}{
 		{"Valid", "post", "BatchCreateBooks", nil},
@@ -36,23 +36,20 @@ func TestHttpVerb(t *testing.T) {
 	// Run each test.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			template := `import "google/api/annotations.proto";
-service BookService {
-	rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
-		option (google.api.http) = {
-			{{.HttpVerb}}: "/v1/{parent=publishers/*}/books:batchCreate"
-			body: "*"
-		};
-	}
-}
-message {{.MethodName}}Request{}
-message {{.MethodName}}Response{}
-`
-			file := testutils.ParseProto3Tmpl(t, template,
-				struct {
-					MethodName string
-					HttpVerb   string
-				}{test.methodName, test.httpVerb})
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+
+				service BookService {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							{{.HttpVerb}}: "/v1/{parent=publishers/*}/books:batchCreate"
+							body: "*"
+						};
+					}
+				}
+				message {{.MethodName}}Request{}
+				message {{.MethodName}}Response{}
+				`, test)
 
 			// Run the method, ensure we get what we expect.
 			problems := httpVerb.Lint(file)
