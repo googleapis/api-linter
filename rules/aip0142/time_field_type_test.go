@@ -28,7 +28,7 @@ func TestFieldType(t *testing.T) {
 		problems  testutils.Problems
 	}{
 		{"Valid", "google.protobuf.Timestamp", "create_time", testutils.Problems{}},
-		{"Invalid", "int32", "created_ms", testutils.Problems{{Message: "Timestamp"}}},
+		{"Invalid", "int32", "created_ms", testutils.Problems{{Suggestion: "google.protobuf.Timestamp"}}},
 		{"Irrelevant", "int32", "foo", testutils.Problems{}},
 	}
 	for _, test := range tests {

@@ -49,7 +49,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			"InvalidType",
 			"ListFooRequest",
 			[]field{{"page_token", builder.FieldTypeDouble()}},
-			testutils.Problems{{Message: "string"}},
+			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("page_token")
 			},

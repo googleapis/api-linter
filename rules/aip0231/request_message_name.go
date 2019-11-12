@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -34,7 +35,9 @@ var inputName = &lint.MethodRule{
 					"Batch Get RPCs should have a properly named request message %q, but not %q",
 					want, got,
 				),
+				Suggestion: want,
 				Descriptor: m,
+				Location:   locations.MethodRequestType(m),
 			}}
 		}
 

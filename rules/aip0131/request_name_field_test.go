@@ -53,3 +53,24 @@ func TestStandardFields(t *testing.T) {
 		})
 	}
 }
+
+func TestStandardFieldsInvalidType(t *testing.T) {
+	// Create an appropriate message descriptor.
+	message, err := builder.NewMessage("GetBookRequest").AddField(
+		builder.NewField("name", builder.FieldTypeBytes()),
+	).Build()
+	if err != nil {
+		t.Fatalf("Could not build descriptor.")
+	}
+
+	// Run the lint rule, and establish that it returns the correct
+	// number of problems.
+	wantProblems := testutils.Problems{{
+		Descriptor: message.GetFields()[0],
+		Suggestion: "string",
+	}}
+	gotProblems := standardFields.Lint(message.GetFile())
+	if diff := wantProblems.Diff(gotProblems); diff != "" {
+		t.Errorf(diff)
+	}
+}

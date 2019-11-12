@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -41,6 +42,8 @@ var standardFields = &lint.MessageRule{
 			return []lint.Problem{{
 				Message:    "`name` field on Get RPCs should be a string",
 				Descriptor: name,
+				Location:   locations.FieldType(name),
+				Suggestion: "string",
 			}}
 		}
 

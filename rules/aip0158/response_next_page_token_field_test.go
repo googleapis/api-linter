@@ -54,7 +54,7 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 			"InvalidType",
 			"ListFooResponse",
 			[]field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}},
-			testutils.Problems{{Message: "string"}},
+			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("next_page_token")
 			},
