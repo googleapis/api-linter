@@ -42,6 +42,8 @@ type FileRule struct {
 	// LintFile accepts a FileDescriptor and lints it, returning a slice of
 	// Problems it finds.
 	LintFile func(*desc.FileDescriptor) []Problem
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
