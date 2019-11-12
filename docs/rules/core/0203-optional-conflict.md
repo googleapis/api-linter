@@ -13,7 +13,7 @@ other annotation (such as `REQUIRED`), as mandated by [AIP-203][].
 ## Details
 
 This rule looks at any field with a `google.api.field_behavior` annotation of
-`OPTIONAL`, and complains if it also finds any other field behavior..
+`OPTIONAL`, and complains if it also finds any other field behavior.
 
 ## Examples
 
@@ -26,7 +26,7 @@ message Book {
 
   // The foreword for the book.
   string foreword = 2 [
-    (google.api.field_behavior) = OPTIONAL,  // "Optional" can not co-exist.
+    (google.api.field_behavior) = OPTIONAL,  // "Optional" can not co-exist with other field behaviors.
     (google.api.field_behavior) = IMMUTABLE];
 }
 ```
