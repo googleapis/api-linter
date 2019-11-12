@@ -93,7 +93,7 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0192.AddRules,
 	aip0203.AddRules,
 	aip0231.AddRules,
-  api0233.AddRules,
+  	api0233.AddRules,
 }
 
 // Add all rules to the given registry.
