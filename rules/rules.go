@@ -69,6 +69,7 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
 	"github.com/googleapis/api-linter/rules/aip0231"
+	"github.com/googleapis/api-linter/rules/aip0233"
 )
 
 type addRulesFuncType func(lint.RuleRegistry) error
@@ -92,6 +93,7 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0192.AddRules,
 	aip0203.AddRules,
 	aip0231.AddRules,
+	aip0233.AddRules,
 }
 
 // Add all rules to the given registry.
