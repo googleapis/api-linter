@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 142
-  name: [core, '0142', time-field-type]
+  name: [core, '0142', time-field-names]
   summary: Timestamps should use `google.protobuf.Timestamp`.
 ---
 
-# Timestamp field name
+# Timestamp field names
 
 This rule enforces that timestamps are named using the imperative mood and with
 a `_time` suffix, as mandated in [AIP-142][].
