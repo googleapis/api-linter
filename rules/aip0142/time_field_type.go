@@ -19,6 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -35,7 +36,9 @@ var fieldType = &lint.FieldRule{
 		if suffixes.Contains(tokens[len(tokens)-1]) && utils.GetMessageTypeName(f) != "google.protobuf.Timestamp" {
 			return []lint.Problem{{
 				Message:    "Fields representing timestamps should use `google.protobuf.Timestamp`.",
+				Suggestion: "google.protobuf.Timestamp",
 				Descriptor: f,
+				Location:   locations.FieldType(f),
 			}}
 		}
 		return nil

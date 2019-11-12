@@ -32,39 +32,42 @@ func TestNamesField(t *testing.T) {
 		{
 			testName: "Valid-Names",
 			src: `
-message BatchGetBooksRequest {
-repeated string names = 1;
-}`,
+				message BatchGetBooksRequest {
+					repeated string names = 1;
+				}
+			`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "Valid-StandardGetReq",
 			src: `
-message BatchGetBooksRequest {
-repeated GetBookRequest requests = 1;
-}
+				message BatchGetBooksRequest {
+				repeated GetBookRequest requests = 1;
+				}
 
-message GetBookRequest {}
-`,
+				message GetBookRequest {}
+			`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "Invalid-MissingNamesField",
 			src: `
-message BatchGetBooksRequest {
- string parent = 1;
-}`,
+				message BatchGetBooksRequest {
+				string parent = 1;
+				}
+			`,
 			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" has no "names" field`}},
 		},
 		{
 			testName: "Invalid-KeepingNamesFieldOnly",
 			src: `
-message BatchGetBooksRequest {
-repeated string names = 1;
-repeated GetBookRequest requests = 2;
-}
+				message BatchGetBooksRequest {
+				repeated string names = 1;
+				repeated GetBookRequest requests = 2;
+				}
 
-message GetBookRequest {}`,
+				message GetBookRequest {}
+			`,
 			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" should delete "requests" field, only keep the "names" field`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
@@ -73,10 +76,10 @@ message GetBookRequest {}`,
 		{
 			testName: "Invalid-NamesFieldIsNotRepeated",
 			src: `
-message BatchGetBooksRequest {
-string names = 1;
-}`,
-			problems: testutils.Problems{{Message: `The "names" field should be repeated`}},
+				message BatchGetBooksRequest {
+					string names = 1;
+				}`,
+			problems: testutils.Problems{{Suggestion: "repeated string"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("names")
 			},
@@ -84,10 +87,11 @@ string names = 1;
 		{
 			testName: "Invalid-NamesFieldWrongType",
 			src: `
-message BatchGetBooksRequest {
-repeated int32 names = 1;
-}`,
-			problems: testutils.Problems{{Message: `"names" field on Batch Get Request should be a "string" type`}},
+				message BatchGetBooksRequest {
+					repeated int32 names = 1;
+				}
+			`,
+			problems: testutils.Problems{{Suggestion: "string"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("names")
 			},
@@ -95,11 +99,12 @@ repeated int32 names = 1;
 		{
 			testName: "Invalid-GetReqFieldIsNotRepeated",
 			src: `
-message BatchGetBooksRequest {
-GetBookRequest requests = 1;
-}
+				message BatchGetBooksRequest {
+				GetBookRequest requests = 1;
+				}
 
-message GetBookRequest {}`,
+				message GetBookRequest {}
+			`,
 			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
@@ -108,9 +113,10 @@ message GetBookRequest {}`,
 		{
 			testName: "Invalid-NamesFieldWrongType",
 			src: `
-message BatchGetBooksRequest {
-	repeated string requests = 1;
-}`,
+				message BatchGetBooksRequest {
+					repeated string requests = 1;
+				}
+			`,
 			problems: testutils.Problems{{Message: `The "requests" field on Batch Get Request should be a "GetBookRequest" type`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")

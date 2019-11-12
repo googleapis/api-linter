@@ -19,6 +19,7 @@ import (
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -54,6 +55,7 @@ var namesField = &lint.MessageRule{
 			problems = append(problems, lint.Problem{
 				Message:    `The "names" field should be repeated`,
 				Descriptor: names,
+				Location:   locations.FieldType(names),
 			})
 		}
 
@@ -61,7 +63,9 @@ var namesField = &lint.MessageRule{
 		if names != nil && names.GetType() != builder.FieldTypeString().GetType() {
 			problems = append(problems, lint.Problem{
 				Message:    `"names" field on Batch Get Request should be a "string" type`,
+				Suggestion: "string",
 				Descriptor: names,
+				Location:   locations.FieldType(names),
 			})
 		}
 

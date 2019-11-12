@@ -16,6 +16,7 @@ package aip0134
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -33,7 +34,9 @@ var requestMaskField = &lint.MessageRule{
 		if t := updateMask.GetMessageType(); t == nil || t.GetFullyQualifiedName() != "google.protobuf.FieldMask" {
 			return []lint.Problem{{
 				Message:    "The `update_mask` field should be a google.protobuf.FieldMask.",
+				Suggestion: "google.protobuf.FieldMask",
 				Descriptor: updateMask,
+				Location:   locations.FieldType(updateMask),
 			}}
 		}
 		return nil

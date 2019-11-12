@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -39,7 +40,9 @@ var requestPaginationPageToken = &lint.MessageRule{
 		if pageToken.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
 				Message:    "`page_token` field on List RPCs should be a string",
+				Suggestion: "string",
 				Descriptor: pageToken,
+				Location:   locations.FieldType(pageToken),
 			}}
 		}
 

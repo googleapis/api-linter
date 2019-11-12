@@ -21,11 +21,17 @@ import (
 	"os"
 
 	"github.com/googleapis/api-linter/lint"
-	core "github.com/googleapis/api-linter/rules"
+	"github.com/googleapis/api-linter/rules"
 )
 
-var globalRules = core.Rules()
+var globalRules = lint.NewRuleRegistry()
 var globalConfigs = defaultConfigs()
+
+func init() {
+	if err := rules.Add(globalRules); err != nil {
+		log.Fatalf("error when registering rules: %v", err)
+	}
+}
 
 func main() {
 	if err := runCLI(os.Args[1:]); err != nil {

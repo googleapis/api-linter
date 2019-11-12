@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -36,9 +37,9 @@ var inputName = &lint.MethodRule{
 					"Post RPCs should have a properly named request message %q, but not %q",
 					want, got,
 				),
-				// TODO: suggestion will be set after the location is set properly
-				// Suggestion: want,
+				Suggestion: want,
 				Descriptor: m,
+				Location:   locations.MethodRequestType(m),
 			}}
 		}
 

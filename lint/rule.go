@@ -15,7 +15,7 @@
 package lint
 
 import (
-	"fmt"
+	"regexp"
 	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -291,37 +291,47 @@ func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 	return problems
 }
 
+var disableRuleNameRegex = regexp.MustCompile(`api-linter:\s*(.+)\s*=\s*disabled`)
+
+func extractDisabledRuleName(commentLine string) string {
+	match := disableRuleNameRegex.FindStringSubmatch(commentLine)
+	if len(match) > 0 {
+		return match[1]
+	}
+	return ""
+}
+
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
 func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
-	names := []string{ruleName}
-	if alias := aliasMap[ruleName]; alias != "" {
-		names = append(names, alias)
-	}
+	names := []string{ruleName, aliasMap[ruleName]}
 
-	directives := []string{}
-	for _, name := range names {
-		directives = append(directives, fmt.Sprintf("api-linter: %s=disabled", name))
-	}
-
-	for _, directive := range directives {
-		// The rule may be disabled in the comments above the descriptor.
-		if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
-			if strings.Contains(sourceInfo.GetLeadingComments(), directive) {
-				return false
-			}
+	commentLines := strings.Split(fileHeader(d.GetFile()), "\n")
+	commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	disabledRules := []string{}
+	for _, commentLine := range commentLines {
+		r := extractDisabledRuleName(commentLine)
+		if r != "" {
+			disabledRules = append(disabledRules, r)
 		}
+	}
 
-		// The rule may also be disabled at the file level.
-		if strings.Contains(fileHeader(d.GetFile()), directive) {
+	for _, name := range names {
+		if matchRule(name, disabledRules...) {
 			return false
 		}
 	}
 
-	// The rule is enabled.
 	return true
+}
+
+func getLeadingComments(d desc.Descriptor) string {
+	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+		return sourceInfo.GetLeadingComments()
+	}
+	return ""
 }
 
 // getAllMessages returns a slice with every message (not just top-level

@@ -20,6 +20,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -60,6 +61,7 @@ var responseMessageName = &lint.MethodRule{
 				),
 				Suggestion: "google.protobuf.Empty",
 				Descriptor: m,
+				Location:   locations.MethodResponseType(m),
 			}}
 		}
 

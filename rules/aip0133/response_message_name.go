@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -48,9 +49,9 @@ var outputName = &lint.MethodRule{
 					"Create RPCs should have the corresponding resource as the response message, such as %q.",
 					want,
 				),
-				// TODO: suggestion will be set after the location is set properly
-				// Suggestion: want,
+				Suggestion: want,
 				Descriptor: m,
+				Location:   locations.MethodResponseType(m),
 			}}
 		}
 
