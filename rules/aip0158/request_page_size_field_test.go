@@ -48,7 +48,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			"InvalidType",
 			"ListFooRequest",
 			[]field{{"page_size", builder.FieldTypeDouble()}},
-			testutils.Problems{{Message: "int32"}},
+			testutils.Problems{{Suggestion: "int32"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("page_size")
 			},

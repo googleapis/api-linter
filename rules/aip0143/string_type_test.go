@@ -29,8 +29,8 @@ func TestFieldTypes(t *testing.T) {
 	}{
 		{"Irrelevant", "int32", "book_count", testutils.Problems{}},
 		{"Valid", "string", "language_code", testutils.Problems{}},
-		{"InvalidScalar", "bytes", "language_code", testutils.Problems{{Message: "string"}}},
-		{"InvalidEnum", "Language", "language_code", testutils.Problems{{Message: "string"}}},
+		{"InvalidScalar", "bytes", "language_code", testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidEnum", "Language", "language_code", testutils.Problems{{Suggestion: "string"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

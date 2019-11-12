@@ -67,7 +67,7 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 	// number of problems.
 	wantProblems := testutils.Problems{{
 		Descriptor: message.GetFields()[0],
-		Message:    "string",
+		Suggestion: "string",
 	}}
 	gotProblems := standardFields.Lint(message.GetFile())
 	if diff := wantProblems.Diff(gotProblems); diff != "" {
