@@ -31,12 +31,12 @@ func TestLinter_run(t *testing.T) {
 	}
 	defaultConfigs := Configs{}
 
-	testRuleID := "test::rule1"
+	testRuleName := NewRuleName(111, "test-rule")
 	ruleProblems := []Problem{{
 		Message:    "rule1_problem",
 		Descriptor: fd,
 		category:   "",
-		RuleID:     RuleName(testRuleID),
+		RuleID:     testRuleName,
 	}}
 
 	tests := []struct {
@@ -70,7 +70,7 @@ func TestLinter_run(t *testing.T) {
 			append(
 				defaultConfigs,
 				Config{
-					DisabledRules: []string{testRuleID},
+					DisabledRules: []string{string(testRuleName)},
 				},
 			),
 			[]Problem{},
@@ -79,8 +79,9 @@ func TestLinter_run(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			rules, err := NewRuleRegistry(&FileRule{
-				Name: "test::rule1",
+			rules := NewRuleRegistry()
+			err := rules.Register(111, &FileRule{
+				Name: NewRuleName(111, "test-rule"),
 				LintFile: func(f *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
@@ -107,6 +108,8 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 		t.Fatalf("Failed to build the file descriptor.")
 	}
 
+	testAIP := 111
+
 	tests := []struct {
 		testName string
 		rule     ProtoRule
@@ -114,7 +117,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 		{
 			testName: "Panic",
 			rule: &FileRule{
-				Name: "panic",
+				Name: NewRuleName(testAIP, "panic"),
 				LintFile: func(_ *desc.FileDescriptor) []Problem {
 					panic("panic")
 				},
@@ -123,7 +126,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 		{
 			testName: "PanicError",
 			rule: &FileRule{
-				Name: "panic-error",
+				Name: NewRuleName(testAIP, "panic-error"),
 				LintFile: func(_ *desc.FileDescriptor) []Problem {
 					panic(fmt.Errorf("panic"))
 				},
@@ -133,13 +136,14 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			r, err := NewRuleRegistry(test.rule)
+			rules := NewRuleRegistry()
+			err := rules.Register(testAIP, test.rule)
 			if err != nil {
 				t.Fatalf("Failed to create Rules: %q", err)
 			}
 
 			// Instantiate a linter with the given rule.
-			l := New(r, nil)
+			l := New(rules, nil)
 
 			_, err = l.LintProtos(fd)
 			if err == nil || !strings.Contains(err.Error(), "panic") {

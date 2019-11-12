@@ -19,6 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -38,7 +39,9 @@ var fieldTypes = &lint.FieldRule{
 		if typeName := utils.GetScalarTypeName(f); typeName != "string" {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field %q should be a string, not %s.", f.GetName(), typeName),
+				Suggestion: "string",
 				Descriptor: f,
+				Location:   locations.FieldType(f),
 			}}
 		}
 		return nil

@@ -69,34 +69,45 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
 	"github.com/googleapis/api-linter/rules/aip0231"
+	"github.com/googleapis/api-linter/rules/aip0233"
 	"github.com/googleapis/api-linter/rules/aip0234"
 )
 
-func init() {
-	aip0122.AddRules(coreRules)
-	aip0126.AddRules(coreRules)
-	aip0131.AddRules(coreRules)
-	aip0132.AddRules(coreRules)
-	aip0133.AddRules(coreRules)
-	aip0134.AddRules(coreRules)
-	aip0135.AddRules(coreRules)
-	aip0136.AddRules(coreRules)
-	aip0140.AddRules(coreRules)
-	aip0141.AddRules(coreRules)
-	aip0142.AddRules(coreRules)
-	aip0143.AddRules(coreRules)
-	aip0151.AddRules(coreRules)
-	aip0158.AddRules(coreRules)
-	aip0191.AddRules(coreRules)
-	aip0192.AddRules(coreRules)
-	aip0203.AddRules(coreRules)
-	aip0231.AddRules(coreRules)
-	aip0234.AddRules(coreRules)
+type addRulesFuncType func(lint.RuleRegistry) error
+
+var aipAddRulesFuncs = []addRulesFuncType{
+	aip0122.AddRules,
+	aip0126.AddRules,
+	aip0131.AddRules,
+	aip0132.AddRules,
+	aip0133.AddRules,
+	aip0134.AddRules,
+	aip0135.AddRules,
+	aip0136.AddRules,
+	aip0140.AddRules,
+	aip0141.AddRules,
+	aip0142.AddRules,
+	aip0143.AddRules,
+	aip0151.AddRules,
+	aip0158.AddRules,
+	aip0191.AddRules,
+	aip0192.AddRules,
+	aip0203.AddRules,
+	aip0231.AddRules,
+	aip0233.AddRules,
+	aip0234.AddRules,
 }
 
-var coreRules, _ = lint.NewRuleRegistry()
+// Add all rules to the given registry.
+func Add(r lint.RuleRegistry) error {
+	return addAIPRules(r, aipAddRulesFuncs)
+}
 
-// Rules returns all rules registered in this package.
-func Rules() lint.RuleRegistry {
-	return coreRules.Copy()
+func addAIPRules(r lint.RuleRegistry, addRulesFuncs []addRulesFuncType) error {
+	for _, addRules := range addRulesFuncs {
+		if err := addRules(r); err != nil {
+			return err
+		}
+	}
+	return nil
 }

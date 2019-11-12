@@ -26,6 +26,7 @@ func main() {
 	// Run each checker and run up the list of errors.
 	errors = append(errors, checkRulesRegistered()...)
 	errors = append(errors, ruleFilename()...)
+	errors = append(errors, checkRulesDocumented()...)
 
 	// If we got complaints, complain about them.
 	if len(errors) > 0 {

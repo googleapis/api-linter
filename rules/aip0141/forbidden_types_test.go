@@ -27,10 +27,10 @@ func TestForbiddenTypes(t *testing.T) {
 	}{
 		{"int32", testutils.Problems{}},
 		{"int64", testutils.Problems{}},
-		{"uint32", testutils.Problems{{Message: "int32"}}},
-		{"uint64", testutils.Problems{{Message: "int64"}}},
-		{"fixed32", testutils.Problems{{Message: "int32"}}},
-		{"fixed64", testutils.Problems{{Message: "int64"}}},
+		{"uint32", testutils.Problems{{Suggestion: "int32"}}},
+		{"uint64", testutils.Problems{{Suggestion: "int64"}}},
+		{"fixed32", testutils.Problems{{Suggestion: "int32"}}},
+		{"fixed64", testutils.Problems{{Suggestion: "int64"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.TypeName, func(t *testing.T) {

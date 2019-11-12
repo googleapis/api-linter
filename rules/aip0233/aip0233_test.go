@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0122
+package aip0233
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/googleapis/api-linter/lint"
 )
 
 func TestAddRules(t *testing.T) {
-	rules := make(lint.RuleRegistry)
-	AddRules(rules)
-	for ruleName := range rules {
-		if !strings.HasPrefix(string(ruleName), "core::0122") {
-			t.Errorf("Rule %s is not namespaced to core::0122.", ruleName)
-		}
+	if err := AddRules(lint.NewRuleRegistry()); err != nil {
+		t.Errorf("AddRules got an error: %v", err)
 	}
 }
