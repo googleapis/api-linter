@@ -22,6 +22,11 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
+type field struct {
+	fieldName string
+	fieldType *builder.FieldType
+}
+
 func TestParentField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
@@ -48,7 +53,7 @@ func TestParentField(t *testing.T) {
 			"InvalidType",
 			"BatchGetBooksRequest",
 			&field{"parent", builder.FieldTypeDouble()},
-			testutils.Problems{{Message: "string"}},
+			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("parent")
 			},

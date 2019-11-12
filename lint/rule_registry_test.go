@@ -19,31 +19,49 @@ import (
 )
 
 func TestRuleRegistryRegister(t *testing.T) {
-	r1 := &FileRule{Name: "a"}
-	r2 := &FileRule{Name: "b"}
-
-	rules, _ := NewRuleRegistry()
-	if err := rules.Register(r1, r2); err != nil {
-		t.Errorf("Register: return error %v, but want nil", err)
+	tests := []struct {
+		name      string
+		aip       int
+		ruleNames []RuleName
+		err       error
+	}{
+		{
+			name:      "Registered_Okay",
+			aip:       111,
+			ruleNames: []RuleName{NewRuleName(111, "a"), NewRuleName(111, "b")},
+			err:       nil,
+		},
+		{
+			name:      "InvalidRuleName",
+			aip:       111,
+			ruleNames: []RuleName{NewRuleName(111, "")},
+			err:       errInvalidRuleName,
+		},
+		{
+			name:      "InvalidRuleGroup",
+			aip:       111,
+			ruleNames: []RuleName{NewRuleName(100, "a")},
+			err:       errInvalidRuleGroup,
+		},
+		{
+			name:      "Duplicated",
+			aip:       111,
+			ruleNames: []RuleName{NewRuleName(111, "a"), NewRuleName(111, "a")},
+			err:       errDuplicatedRuleName,
+		},
 	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rules := []ProtoRule{}
+			for _, name := range test.ruleNames {
+				rules = append(rules, &FileRule{Name: name})
+			}
 
-	numRegistered := len(rules.All())
-	if numRegistered != 2 {
-		t.Errorf("Register: got %d rules, but want %d", numRegistered, 2)
-	}
-}
-
-func TestRulesRegister_Duplicate(t *testing.T) {
-	r1 := &FileRule{Name: "a"}
-	r2 := &FileRule{Name: "a"}
-
-	rules, _ := NewRuleRegistry()
-	if err := rules.Register(r1, r2); err == nil {
-		t.Errorf("Register with duplicate name")
-	}
-
-	numRegistered := len(rules.All())
-	if numRegistered != 1 {
-		t.Errorf("Register: got %d rules, but want %d", numRegistered, 1)
+			registry := NewRuleRegistry()
+			err := registry.Register(test.aip, rules...)
+			if err != test.err {
+				t.Errorf("Register(): got %v, but want %v", err, test.err)
+			}
+		})
 	}
 }

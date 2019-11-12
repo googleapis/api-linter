@@ -29,7 +29,7 @@ func TestOutputName(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "BatchGetBooks", "BatchGetBooksResponse", testutils.Problems{}},
-		{"Invalid", "BatchGetBooks", "Book", testutils.Problems{{Message: "BatchGetBooksResponse"}}},
+		{"Invalid", "BatchGetBooks", "Book", testutils.Problems{{Suggestion: "BatchGetBooksResponse"}}},
 		{"Irrelevant", "GetBookRequest", "Book", testutils.Problems{}},
 	}
 

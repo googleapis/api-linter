@@ -36,7 +36,7 @@ func TestRequestMaskField(t *testing.T) {
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.GetFields()[1]
 			},
-			testutils.Problems{{Message: "google.protobuf.FieldMask"}},
+			testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}},
 		},
 	}
 	for _, test := range tests {

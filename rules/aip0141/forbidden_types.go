@@ -19,6 +19,7 @@ import (
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
@@ -43,7 +44,9 @@ var forbiddenTypes = &lint.FieldRule{
 			want := "int" + typeName[len(typeName)-2:]
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Use %q instead of %q.", want, typeName),
+				Suggestion: want,
 				Descriptor: f,
+				Location:   locations.FieldType(f),
 			}}
 		}
 		return nil

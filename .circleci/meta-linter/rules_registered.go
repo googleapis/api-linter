@@ -77,7 +77,7 @@ func checkRulesRegistered() (errors []error) {
 	contents := string(contentsBytes)
 	for aip, rules := range allRules {
 		// Make sure the AIP's package's rules are registered in coreRules in rules.go.
-		if !strings.Contains(contents, fmt.Sprintf("aip%04d.AddRules(coreRules)", aip)) {
+		if !strings.Contains(contents, fmt.Sprintf("aip%04d.AddRules", aip)) {
 			errors = append(errors, fmt.Errorf("rules.go does not call AllRules for for AIP-%d", aip))
 		}
 

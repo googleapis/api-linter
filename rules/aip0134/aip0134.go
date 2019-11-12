@@ -26,8 +26,9 @@ import (
 
 // AddRules accepts a register function and registers each of
 // this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
+		134,
 		httpBody,
 		httpMethod,
 		httpNameField,

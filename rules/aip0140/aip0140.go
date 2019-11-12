@@ -25,8 +25,9 @@ import (
 )
 
 // AddRules adds all of the AIP-140 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) {
-	r.Register(
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
+		140,
 		abbreviations,
 		base64,
 		lowerSnake,

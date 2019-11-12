@@ -15,6 +15,7 @@
 package lint
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -30,16 +31,25 @@ func (r RuleRegistry) Copy() RuleRegistry {
 	return n
 }
 
-// Register registers the list of rules.
+var errInvalidRuleName = errors.New("not a valid rule name")
+var errInvalidRuleGroup = errors.New("invalid rule group")
+var errDuplicatedRuleName = errors.New("duplicate rule name")
+
+// Register registers the list of rules of the same AIP.
 // Return an error if any of the rules is found duplicate in the registry.
-func (r RuleRegistry) Register(rules ...ProtoRule) error {
+func (r RuleRegistry) Register(aip int, rules ...ProtoRule) error {
+	rulePrefix := getRuleGroup(aip) + nameSeparator + fmt.Sprintf("%04d", aip)
 	for _, rl := range rules {
 		if !rl.GetName().IsValid() {
-			return fmt.Errorf("%q is not a valid RuleName", rl.GetName())
+			return errInvalidRuleName
+		}
+
+		if !rl.GetName().HasPrefix(rulePrefix) {
+			return errInvalidRuleGroup
 		}
 
 		if _, found := r[rl.GetName()]; found {
-			return fmt.Errorf("duplicate rule name %q", rl.GetName())
+			return errDuplicatedRuleName
 		}
 
 		r[rl.GetName()] = rl
@@ -47,18 +57,7 @@ func (r RuleRegistry) Register(rules ...ProtoRule) error {
 	return nil
 }
 
-// All returns all rules.
-func (r RuleRegistry) All() []ProtoRule {
-	rules := make([]ProtoRule, 0, len(r))
-	for _, r1 := range r {
-		rules = append(rules, r1)
-	}
-	return rules
-}
-
-// NewRuleRegistry returns a rule registry initialized with the given set of rules.
-func NewRuleRegistry(rules ...ProtoRule) (RuleRegistry, error) {
-	r := make(RuleRegistry, len(rules))
-	err := r.Register(rules...)
-	return r, err
+// NewRuleRegistry creates a new rule registry.
+func NewRuleRegistry() RuleRegistry {
+	return make(RuleRegistry)
 }

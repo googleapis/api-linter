@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -38,8 +39,10 @@ var requestPaginationPageSize = &lint.MessageRule{
 		// Rule check: Ensure that the name page_size is the correct type.
 		if pageSize.GetType() != builder.FieldTypeInt32().GetType() {
 			return []lint.Problem{{
-				Message:    "`page_size` field on List RPCs should be a int32",
+				Message:    "`page_size` field on List RPCs should be an int32",
+				Suggestion: "int32",
 				Descriptor: pageSize,
+				Location:   locations.FieldType(pageSize),
 			}}
 		}
 

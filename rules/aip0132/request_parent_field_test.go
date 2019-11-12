@@ -39,7 +39,7 @@ func TestStandardFields(t *testing.T) {
 			"ListBooksRequest",
 			"parent",
 			builder.FieldTypeBytes(),
-			testutils.Problems{{Message: "string"}},
+			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.GetFields()[0]
 			},
