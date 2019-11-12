@@ -54,6 +54,7 @@ var namesField = &lint.MessageRule{
 		if names != nil && !names.IsRepeated() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "names" field should be repeated`,
+				Suggestion: "repeated string",
 				Descriptor: names,
 				Location:   locations.FieldType(names),
 			})
