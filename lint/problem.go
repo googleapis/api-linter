@@ -59,7 +59,7 @@ type Problem struct {
 
 	// The category for this problem, based on user configuration.
 	category string
-	
+
 	noPositional struct{}
 }
 
