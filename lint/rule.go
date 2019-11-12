@@ -68,6 +68,8 @@ type MessageRule struct {
 	// OnlyIf accepts a MessageDescriptor and determines whether this rule
 	// is applicable.
 	OnlyIf func(*desc.MessageDescriptor) bool
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
@@ -102,6 +104,8 @@ type FieldRule struct {
 	// OnlyIf accepts a FieldDescriptor and determines whether this rule
 	// is applicable.
 	OnlyIf func(*desc.FieldDescriptor) bool
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
@@ -138,6 +142,8 @@ type ServiceRule struct {
 	// OnlyIf accepts a ServiceDescriptor and determines whether this rule
 	// is applicable.
 	OnlyIf func(*desc.ServiceDescriptor) bool
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
@@ -169,6 +175,8 @@ type MethodRule struct {
 	// OnlyIf accepts a MethodDescriptor and determines whether this rule
 	// is applicable.
 	OnlyIf func(*desc.MethodDescriptor) bool
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
@@ -202,6 +210,8 @@ type EnumRule struct {
 	// OnlyIf accepts an EnumDescriptor and determines whether this rule
 	// is applicable.
 	OnlyIf func(*desc.EnumDescriptor) bool
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
@@ -235,6 +245,8 @@ type DescriptorRule struct {
 	// Note: Unless the descriptor is typecast to a more specific type,
 	// only a subset of methods are available to it.
 	LintDescriptor func(desc.Descriptor) []Problem
+
+	noPositional struct{}
 }
 
 // GetName returns the name of the rule.
