@@ -27,7 +27,7 @@ import (
 func TestProblemJSON(t *testing.T) {
 	problem := &Problem{
 		Message:  "foo bar",
-		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 41}},
+		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
 		RuleID:   "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
@@ -71,7 +71,7 @@ func TestProblemYAML(t *testing.T) {
 		{"LineNumberStart", `line_number: 3`},
 		{"LintNumberEnd", `line_number: 6`},
 		{"ColumnNumberStart", `column_number: 1`},
-		{"ColumnNumberEnd", `column_number: 71`},
+		{"ColumnNumberEnd", `column_number: 70`},
 		{"RuleID", `rule_id: core::0131`},
 	}
 	for _, test := range tests {
@@ -105,7 +105,7 @@ func TestProblemDescriptor(t *testing.T) {
 		{"Message", `message: foo bar`},
 		{"LineNumber", `line_number: 43`},
 		{"ColumnNumberStart", `column_number: 1`},
-		{"ColumnNumberEnd", `column_number: 80`},
+		{"ColumnNumberEnd", `column_number: 79`},
 		{"RuleID", `rule_id: core::0131`},
 	}
 	for _, test := range tests {
@@ -126,7 +126,7 @@ func TestRuleDocURI(t *testing.T) {
 	}{{
 		name:     "CoreRule",
 		ruleName: NewRuleName(122, "camel-case-uris"),
-		wantURI:  "https://googleapis.github.io/api-linter/rules/core/0122-camel-case-uris.html",
+		wantURI:  "https://linter.aip.dev/rules/core/0122-camel-case-uris.html",
 	}}
 
 	for _, test := range cases {
