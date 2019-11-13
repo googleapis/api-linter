@@ -16,7 +16,7 @@ message GetBookRequest {
 
 When able, it also offers a suggestion for the correct fix.
 
-[Read more ≫](https://googleapis.github.io/api-linter/)
+[_Read more ≫_](https://linter.aip.dev/)
 
 ## License
 
