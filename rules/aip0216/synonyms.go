@@ -12,16 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0216
 
 import (
-	"testing"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/jhump/protoreflect/desc"
 )
 
-func TestAddRules(t *testing.T) {
-	if err := AddRules(lint.NewRuleRegistry()); err != nil {
-		t.Errorf("AddRules got an error: %v", err)
-	}
+var synonyms = &lint.EnumRule{
+	Name: lint.NewRuleName(216, "synonyms"),
+	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
+		if strings.HasSuffix(e.GetName(), "Status") {
+			return []lint.Problem{{
+				Message:    `Prefer "State" over "Status" for lifecycle state enums.`,
+				Suggestion: strings.Replace(e.GetName(), "Status", "State", 1),
+				Descriptor: e,
+				Location:   locations.DescriptorName(e),
+			}}
+		}
+		return nil
+	},
 }
