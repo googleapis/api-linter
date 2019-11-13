@@ -25,10 +25,10 @@ import (
 var synonyms = &lint.EnumRule{
 	Name: lint.NewRuleName(216, "synonyms"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		if n := e.GetName(); n == "Status" || strings.HasSuffix(n, "Status") {
+		if strings.HasSuffix(e.GetName(), "Status") {
 			return []lint.Problem{{
-				Message:    "Prefer `State` over `Status` for lifecycle state enums.",
-				Suggestion: strings.Replace(n, "Status", "State", 1),
+				Message:    `Prefer "State" over "Status" for lifecycle state enums.`,
+				Suggestion: strings.Replace(e.GetName(), "Status", "State", 1),
 				Descriptor: e,
 				Location:   locations.DescriptorName(e),
 			}}
