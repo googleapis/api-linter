@@ -21,11 +21,11 @@ in the URI.
 
 ```proto
 // Incorrect.
-rpc GetElectronicBook {
+rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
     // Should be "electronicBooks", not "electronic_books".
     get: "/v1/{name=publishers/*/electronic_books/*}"
-  }
+  };
 }
 ```
 
@@ -33,10 +33,10 @@ rpc GetElectronicBook {
 
 ```proto
 // Correct.
-rpc GetElectronicBook {
+rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/electronicBooks/*}"
-  }
+  };
 }
 ```
 
@@ -46,11 +46,11 @@ If you need to violate this rule, use a leading comment above the method.
 
 ```proto
 // (-- api-linter: core::0122::camel-case-uri=disabled --)
-rpc GetElectronicBook {
+rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {
     // Should be "electronicBooks", not "electronic_books".
     get: "/v1/{name=publishers/*/electronic_books/*}"
-  }
+  };
 }
 ```
 
