@@ -128,7 +128,8 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	// If `span` has four ints; they correspond to
 	// [start line, start column, end line, end column].
 	//
-	// We add one because spans are zero-indexed.
+	// We add one because spans are zero-indexed, but not to the end column
+	// because we want the ending position to be inclusive and not exclusive.
 	if len(span) == 4 {
 		return fileLocation{
 			Start: position{
@@ -137,7 +138,7 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 			},
 			End: position{
 				Line:   int(span[2]) + 1,
-				Column: int(span[3]) + 1,
+				Column: int(span[3]),
 			},
 		}
 	}
@@ -145,7 +146,8 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	// Okay, `span` has three ints; they correspond to
 	// [start line, start column, end column].
 	//
-	// We add one because spans are zero-indexed.
+	// We add one because spans are zero-indexed, but not to the end column
+	// because we want the ending position to be inclusive and not exclusive.
 	return fileLocation{
 		Start: position{
 			Line:   int(span[0]) + 1,
@@ -153,14 +155,14 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 		},
 		End: position{
 			Line:   int(span[0]) + 1,
-			Column: int(span[2]) + 1,
+			Column: int(span[2]),
 		},
 	}
 }
 
-// ruleDocURI returns the link to the rule doc in https://googleapis.github.io/api-linter.
+// ruleDocURI returns the link to the rule doc in https://linter.aip.dev/.
 func ruleDocURI(name RuleName) string {
-	base := "https://googleapis.github.io/api-linter/rules"
+	base := "https://linter.aip.dev/rules"
 	nameParts := strings.Split(string(name), "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
 	ruleSet := nameParts[0]
 	path := strings.Join(nameParts[1:], "-")
