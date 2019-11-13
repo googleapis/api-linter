@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
@@ -103,5 +104,45 @@ func TestGetHTTPRulesCustom(t *testing.T) {
 	}
 	if got, want := rule.URI, "/v1/books/*"; got != want {
 		t.Errorf("Got %q; expected %q.", got, want)
+	}
+}
+
+func TestGetPlainURI(t *testing.T) {
+	tests := []struct {
+		name     string
+		uri      string
+		plainURI string
+	}{
+		{"KeyOnly", "/v1/publishers/{pub_id}/books/{book_id}", "/v1/publishers/*/books/*"},
+		{"KeyValue", "/v1/{name=publishers/*/books/*}", "/v1/publishers/*/books/*"},
+		{"MultiKeyValue", "/v1/{publisher=publishers/*}/{book=books/*}", "/v1/publishers/*/books/*"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &HTTPRule{URI: test.uri}
+			if diff := cmp.Diff(rule.GetPlainURI(), test.plainURI); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
+func TestGetVariables(t *testing.T) {
+	tests := []struct {
+		name string
+		uri  string
+		vars map[string]string
+	}{
+		{"KeyOnly", "/v1/publishers/{pub_id}/books/{book_id}", map[string]string{"pub_id": "*", "book_id": "*"}},
+		{"KeyValue", "/v1/{name=publishers/*/books/*}", map[string]string{"name": "publishers/*/books/*"}},
+		{"MultiKeyValue", "/v1/{publisher=publishers/*}/{book=books/*}", map[string]string{"publisher": "publishers/*", "book": "books/*"}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &HTTPRule{URI: test.uri}
+			if diff := cmp.Diff(rule.GetVariables(), test.vars); diff != "" {
+				t.Errorf(diff)
+			}
+		})
 	}
 }
