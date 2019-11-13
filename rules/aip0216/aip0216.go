@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+// Package aip0216 contains rules defined in https://aip.dev/216.
+package aip0216
 
-import (
-	"testing"
+import "github.com/googleapis/api-linter/lint"
 
-	"github.com/googleapis/api-linter/lint"
-)
-
-func TestAddRules(t *testing.T) {
-	if err := AddRules(lint.NewRuleRegistry()); err != nil {
-		t.Errorf("AddRules got an error: %v", err)
-	}
+// AddRules accepts a register function and registers each of
+// this AIP's rules to it.
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
+		216,
+		synonyms,
+	)
 }

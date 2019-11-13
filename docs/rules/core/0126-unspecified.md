@@ -53,13 +53,17 @@ enum Format {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the enum value.
+Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 enum Format {
-  // (-- api-linter: core::0126::unspecified=disabled --)
+  // (-- api-linter: core::0126::unspecified=disabled
+  //     aip.dev/not-precedent: We need to do this because reasons. --)
   HARDCOVER = 0;
 }
 ```
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
+
+[aip.dev/not-precedent]: https://aip.dev/not-precedent
