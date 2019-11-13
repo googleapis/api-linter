@@ -160,9 +160,9 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	}
 }
 
-// ruleDocURI returns the link to the rule doc in https://googleapis.github.io/api-linter.
+// ruleDocURI returns the link to the rule doc in https://linter.aip.dev/.
 func ruleDocURI(name RuleName) string {
-	base := "https://googleapis.github.io/api-linter/rules"
+	base := "https://linter.aip.dev/rules"
 	nameParts := strings.Split(string(name), "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
 	ruleSet := nameParts[0]
 	path := strings.Join(nameParts[1:], "-")
