@@ -126,7 +126,7 @@ func TestRuleDocURI(t *testing.T) {
 	}{{
 		name:     "CoreRule",
 		ruleName: NewRuleName(122, "camel-case-uris"),
-		wantURI:  "https://linter.aip.dev/rules/core/0122-camel-case-uris.html",
+		wantURI:  "https://linter.aip.dev/122/camel-case-uris",
 	}}
 
 	for _, test := range cases {

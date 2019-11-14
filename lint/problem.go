@@ -162,9 +162,8 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 
 // ruleDocURI returns the link to the rule doc in https://linter.aip.dev/.
 func ruleDocURI(name RuleName) string {
-	base := "https://linter.aip.dev/rules"
+	base := "https://linter.aip.dev/"
 	nameParts := strings.Split(string(name), "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
-	ruleSet := nameParts[0]
-	path := strings.Join(nameParts[1:], "-")
-	return base + "/" + ruleSet + "/" + path + ".html"
+	path := strings.TrimPrefix(strings.Join(nameParts[1:], "/"), "0")
+	return base + path
 }
