@@ -51,7 +51,7 @@ func ReadConfigsFromFile(path string) (Configs, error) {
 		parse = ReadConfigsYAML
 	}
 	if parse == nil {
-		return nil, fmt.Errorf("Reading Configs: unsupported format `%q` with file path `%q`", filepath.Ext(path), path)
+		return nil, fmt.Errorf("reading Configs: unsupported format `%q` with file path `%q`", filepath.Ext(path), path)
 	}
 
 	f, err := os.Open(path)

@@ -15,6 +15,8 @@
 package utils
 
 import (
+	"regexp"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
@@ -88,3 +90,23 @@ type HTTPRule struct {
 	// The `response_body` value forwarded from the generated proto's HttpRule.
 	ResponseBody string
 }
+
+// GetVariables returns the variable segments in a URI as a map.
+func (h *HTTPRule) GetVariables() map[string]string {
+	vars := map[string]string{}
+	for _, match := range plainVar.FindAllStringSubmatch(h.URI, -1) {
+		vars[match[1]] = "*"
+	}
+	for _, match := range varSegment.FindAllStringSubmatch(h.URI, -1) {
+		vars[match[1]] = match[2]
+	}
+	return vars
+}
+
+// GetPlainURI returns the URI with variable segment information removed.
+func (h *HTTPRule) GetPlainURI() string {
+	return plainVar.ReplaceAllString(varSegment.ReplaceAllString(h.URI, "$2"), "*")
+}
+
+var plainVar = regexp.MustCompile(`\{([^}=]+)}`)
+var varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)

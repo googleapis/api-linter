@@ -24,7 +24,6 @@ func TestPluralMethodResourceName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName       string
-		src            string
 		MethodName     string
 		CollectionName string
 		problems       testutils.Problems

@@ -53,6 +53,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/aip0122"
 	"github.com/googleapis/api-linter/rules/aip0126"
+	"github.com/googleapis/api-linter/rules/aip0127"
 	"github.com/googleapis/api-linter/rules/aip0131"
 	"github.com/googleapis/api-linter/rules/aip0132"
 	"github.com/googleapis/api-linter/rules/aip0133"
@@ -68,6 +69,7 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0191"
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
+	"github.com/googleapis/api-linter/rules/aip0216"
 	"github.com/googleapis/api-linter/rules/aip0231"
 	"github.com/googleapis/api-linter/rules/aip0233"
 	"github.com/googleapis/api-linter/rules/aip0234"
@@ -78,6 +80,7 @@ type addRulesFuncType func(lint.RuleRegistry) error
 var aipAddRulesFuncs = []addRulesFuncType{
 	aip0122.AddRules,
 	aip0126.AddRules,
+	aip0127.AddRules,
 	aip0131.AddRules,
 	aip0132.AddRules,
 	aip0133.AddRules,
@@ -93,6 +96,7 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0191.AddRules,
 	aip0192.AddRules,
 	aip0203.AddRules,
+	aip0216.AddRules,
 	aip0231.AddRules,
 	aip0233.AddRules,
 	aip0234.AddRules,
