@@ -38,7 +38,7 @@ func checkRulesDocumented() (errors []error) {
 		}
 
 		// Determine the expected path for documentation.
-		wantFile := fmt.Sprintf("docs/rules/core/%s-%s.md", match[1], strings.ReplaceAll(match[2], "_", "-"))
+		wantFile := fmt.Sprintf("docs/rules/%s/%s.md", match[1], strings.ReplaceAll(match[2], "_", "-"))
 		if _, err := ioutil.ReadFile(wantFile); err != nil {
 			errors = append(errors, fmt.Errorf("missing rule documentation: %s", wantFile))
 			return nil
