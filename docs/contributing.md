@@ -16,10 +16,13 @@ installed. The version of Go you need is officially documented in our
 [`go.mod`][] file. Most of the time, we will most likely support the most
 recent two versions.
 
-Once you have Go installed, you can clone the repository the usual way:
+Once you have Go installed, you can clone the repository the usual way, and
+then follow up by running the tests:
 
 ```bash
 $ git clone https://github.com/googleapis/api-linter
+$ cd api-linter
+$ go test ./...
 ```
 
 **Note:** Unless you have commit bit, you will likely need to make your own
@@ -50,7 +53,7 @@ Additionally, we observe the following guidelines around rules:
 - Every rule **must** have corresponding documentation. Documentation lives in
   the `docs/` directory, and powers this documentation site using GitHub Pages.
 
-We will lint for this in the future.
+We have a CI lint to remind you to do so.
 
 Writing a rule is straightforward: the linter employs a [visitor pattern][]
 that goes to every descriptor in the proto file and runs each lint rule against
@@ -63,7 +66,6 @@ Consider a bare-bones message rule:
 ```go
 var myRule = &lint.MessageRule{
   Name: lint.NewRuleName(0, "my-rule"),
-  URI:  "https://aip.dev/0",
   LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
     // This lint rule does nothing and always passes.
     return nil
@@ -80,15 +82,14 @@ slice of [`Problem`][] objects.
 Once a rule is written, it must be _registered_ with the rule registry, which
 is defined in [`rules.go`][].
 
-**Warning:** Forgetting to do this is a common error, and we do not yet have
-linting in place to ensure this is done.
-
 There are two steps:
 
 1. In the registry in `rules.go`, ensure that the corresponding AIP package is
    imported, and that its `AddRules` function is called.
 2. In the AIP package, ensure that the new rule is included in the `AddRules`
    function.
+
+We have a CI lint to remind you to do so.
 
 ## Documentation
 

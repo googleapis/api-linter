@@ -21,6 +21,12 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/lithammer/dedent"
+
+	// These imports cause the common protos to be registered with
+	// the protocol buffer registry, and therefore make the call to
+	// `proto.FileDescriptor` work for the imported files.
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	_ "google.golang.org/genproto/googleapis/longrunning"
 )
 
 func parse(t *testing.T, s string) *desc.FileDescriptor {
@@ -33,6 +39,7 @@ func parse(t *testing.T, s string) *desc.FileDescriptor {
 			"test.proto": strings.TrimSpace(dedent.Dedent(s)),
 		}),
 		IncludeSourceCodeInfo: true,
+		LookupImport:          desc.LoadFileDescriptor,
 	}
 	fds, err := parser.ParseFiles("test.proto")
 	if err != nil {
