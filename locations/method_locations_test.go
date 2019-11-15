@@ -47,3 +47,22 @@ func TestMethodResponseType(t *testing.T) {
 		t.Errorf(diff)
 	}
 }
+
+func TestMethodHTTPRule(t *testing.T) {
+	f := parse(t, `
+		import "google/api/annotations.proto";
+		service Library {
+		  rpc GetBook(GetBookRequest) returns (Book) {
+		    option (google.api.http) = {
+		      get: "/v1/{name=publishers/*/books/*}"
+		    };
+		  }
+		}
+		message GetBookRequest{}
+		message Book {}
+	`)
+	loc := MethodHTTPRule(f.GetServices()[0].GetMethods()[0])
+	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 7, 6}); diff != "" {
+		t.Errorf(diff)
+	}
+}
