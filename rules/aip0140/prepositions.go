@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/data"
@@ -26,6 +27,9 @@ import (
 
 var noPrepositions = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "prepositions"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return !stringset.New("order_by", "group_by").Contains(f.GetName())
+	},
 	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
 		for _, word := range strings.Split(f.GetName(), "_") {
 			if data.Prepositions.Contains(word) {
