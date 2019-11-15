@@ -16,10 +16,13 @@ installed. The version of Go you need is officially documented in our
 [`go.mod`][] file. Most of the time, we will most likely support the most
 recent two versions.
 
-Once you have Go installed, you can clone the repository the usual way:
+Once you have Go installed, you can clone the repository the usual way, and
+then follow up by running the tests:
 
 ```bash
 $ git clone https://github.com/googleapis/api-linter
+$ cd api-linter
+$ go test ./...
 ```
 
 **Note:** Unless you have commit bit, you will likely need to make your own
