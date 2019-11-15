@@ -28,6 +28,8 @@ func TestNoPrepositions(t *testing.T) {
 		{"author", testutils.Problems{}},
 		{"written_by", testutils.Problems{{Message: "by"}}},
 		{"move_toward_shelf_at_front", testutils.Problems{{Message: "toward"}, {Message: "at"}}},
+		{"order_by", testutils.Problems{}},
+		{"group_by", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
