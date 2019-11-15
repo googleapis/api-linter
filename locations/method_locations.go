@@ -17,6 +17,7 @@ package locations
 import (
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 // MethodRequestType returns the precise location of the method's input type.
@@ -32,6 +33,16 @@ func MethodRequestType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	if sourceInfo := m.GetSourceInfo(); sourceInfo != nil {
 		path := append(m.GetSourceInfo().Path, 3) // output_type == 3
+		return pathLocation(m.GetFile(), path)
+	}
+	return nil
+}
+
+// MethodHTTPRule returns the precise location of the method's `google.api.http`
+// rule, if any.
+func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+	if sourceInfo := m.GetSourceInfo(); sourceInfo != nil {
+		path := append(m.GetSourceInfo().Path, 4, apb.E_Http.Field) // options == 4
 		return pathLocation(m.GetFile(), path)
 	}
 	return nil

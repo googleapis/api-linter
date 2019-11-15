@@ -29,6 +29,7 @@ func TestMethodRequestType(t *testing.T) {
 		message Book {}
 	`)
 	loc := MethodRequestType(f.GetServices()[0].GetMethods()[0])
+	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 14, 28}); diff != "" {
 		t.Errorf(diff)
 	}
@@ -43,7 +44,28 @@ func TestMethodResponseType(t *testing.T) {
 		message Book {}
 	`)
 	loc := MethodResponseType(f.GetServices()[0].GetMethods()[0])
+	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 39, 43}); diff != "" {
+		t.Errorf(diff)
+	}
+}
+
+func TestMethodHTTPRule(t *testing.T) {
+	f := parse(t, `
+		import "google/api/annotations.proto";
+		service Library {
+		  rpc GetBook(GetBookRequest) returns (Book) {
+		    option (google.api.http) = {
+		      get: "/v1/{name=publishers/*/books/*}"
+		    };
+		  }
+		}
+		message GetBookRequest{}
+		message Book {}
+	`)
+	loc := MethodHTTPRule(f.GetServices()[0].GetMethods()[0])
+	// Four character span: start line, start column, end line, end column.
+	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 7, 6}); diff != "" {
 		t.Errorf(diff)
 	}
 }
