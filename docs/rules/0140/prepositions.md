@@ -20,6 +20,8 @@ words in the method's name:
 
 {% include prepositions.md %}
 
+**Note:** The standard fields `order_by` and `group_by` are permitted.
+
 ## Examples
 
 **Incorrect** code for this rule:
