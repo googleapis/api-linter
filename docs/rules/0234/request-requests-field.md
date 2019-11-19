@@ -11,7 +11,7 @@ redirect_from:
 # Batch Update methods: Requests field
 
 This rule enforces that all `BatchUpdate` methods have a repeated `requests`
-field, the type of which is the standard Update request(like `Update*Request`),
+field, the type of which is the standard Update request (`Update*Request`)
 in the request message, as mandated in [AIP-234][].
 
 ## Details
