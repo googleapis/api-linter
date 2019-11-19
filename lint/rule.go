@@ -58,7 +58,9 @@ func (r *FileRule) GetName() RuleName {
 // Lint forwards the FileDescriptor to the LintFile method defined on the
 // FileRule.
 func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
-	return r.LintFile(fd)
+	if r.OnlyIf == nil || r.OnlyIf(fd) {
+		return r.LintFile(fd)
+	}
 }
 
 // MessageRule defines a lint rule that is run on each message in the file.

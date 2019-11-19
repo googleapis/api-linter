@@ -23,15 +23,17 @@ import (
 func TestJavaMultipleFiles(t *testing.T) {
 	for _, test := range []struct {
 		name     string
+		Package string
 		Opt      string
 		problems testutils.Problems
 	}{
-		{"Valid", "option java_multiple_files = true;", testutils.Problems{}},
-		{"Invalid", "", testutils.Problems{{Message: "java_multiple_files"}}},
+		{"Valid", "package foo.v1;", "option java_multiple_files = true;", testutils.Problems{}},
+		{"Invalid", "package foo.v1;", "", testutils.Problems{{Message: "java_multiple_files"}}},
+		{"Ignored", "", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				package foo.v1;
+				{{.Package}}
 				{{.Opt}}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(javaMultipleFiles.Lint(f)); diff != "" {
