@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0122 contains rules defined in https://aip.dev/122.
-package aip0122
+package aip0234
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		122,
-		httpURICase,
-		nameSuffix,
-	)
+// Batch Create methods should use the HTTP POST verb.
+var httpMethod = &lint.MethodRule{
+	Name:   lint.NewRuleName(234, "http-method"),
+	OnlyIf: isBatchUpdateMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		// Rule check: Establish that the RPC uses HTTP POST.
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if httpRule.Method != "POST" {
+				return []lint.Problem{{
+					Message:    "Batch Update methods must use the HTTP POST verb.",
+					Descriptor: m,
+				}}
+			}
+		}
+
+		return nil
+	},
 }

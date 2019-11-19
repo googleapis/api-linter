@@ -275,7 +275,9 @@ func TestEnumRuleNested(t *testing.T) {
 func TestDescriptorRule(t *testing.T) {
 	// Create a file with one of everything in it.
 	book := builder.NewMessage("Book").AddNestedEnum(
-		builder.NewEnum("Format").AddValue(builder.NewEnumValue("FORMAT_UNSPECIFIED")),
+		builder.NewEnum("Format").AddValue(
+			builder.NewEnumValue("FORMAT_UNSPECIFIED"),
+		).AddValue(builder.NewEnumValue("PAPERBACK")),
 	).AddField(builder.NewField("name", builder.FieldTypeString())).AddNestedMessage(
 		builder.NewMessage("Author"),
 	)
@@ -296,6 +298,9 @@ func TestDescriptorRule(t *testing.T) {
 	visited := make(map[string]desc.Descriptor)
 	rule := &DescriptorRule{
 		Name: RuleName("test"),
+		OnlyIf: func(d desc.Descriptor) bool {
+			return d.GetName() != "FORMAT_UNSPECIFIED"
+		},
 		LintDescriptor: func(d desc.Descriptor) []Problem {
 			visited[d.GetName()] = d
 			return nil
@@ -308,7 +313,7 @@ func TestDescriptorRule(t *testing.T) {
 	// Verify that each descriptor was visited.
 	// We do not care what order they were visited in.
 	wantDescriptors := []string{
-		"Author", "Book", "ConjureBook", "Format", "FORMAT_UNSPECIFIED",
+		"Author", "Book", "ConjureBook", "Format", "PAPERBACK",
 		"name", "Library", "State",
 	}
 	if got, want := rule.GetName(), "test"; string(got) != want {
