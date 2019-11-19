@@ -43,6 +43,10 @@ type FileRule struct {
 	// Problems it finds.
 	LintFile func(*desc.FileDescriptor) []Problem
 
+	// OnlyIf accepts a FileDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.FileDescriptor) bool
+
 	noPositional struct{}
 }
 
