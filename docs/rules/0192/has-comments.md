@@ -8,7 +8,7 @@ redirect_from:
   - /0192/has-comments
 ---
 
-# Proto3 syntax
+# Omnipresent comments
 
 This rule enforces that every descriptor in every proto file has a _public_
 leading comment, as mandated in [AIP-192][].

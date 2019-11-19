@@ -248,6 +248,10 @@ type DescriptorRule struct {
 	// only a subset of methods are available to it.
 	LintDescriptor func(desc.Descriptor) []Problem
 
+	// OnlyIf accepts a Descriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(desc.Descriptor) bool
+
 	noPositional struct{}
 }
 
@@ -265,25 +269,37 @@ func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 	// Iterate over all services and methods.
 	for _, service := range fd.GetServices() {
-		problems = append(problems, r.LintDescriptor(service)...)
+		if r.OnlyIf == nil || r.OnlyIf(service) {
+			problems = append(problems, r.LintDescriptor(service)...)
+		}
 		for _, method := range service.GetMethods() {
-			problems = append(problems, r.LintDescriptor(method)...)
+			if r.OnlyIf == nil || r.OnlyIf(method) {
+				problems = append(problems, r.LintDescriptor(method)...)
+			}
 		}
 	}
 
 	// Iterate over all messages, and all fields within each message.
 	for _, message := range getAllMessages(fd) {
-		problems = append(problems, r.LintDescriptor(message)...)
+		if r.OnlyIf == nil || r.OnlyIf(message) {
+			problems = append(problems, r.LintDescriptor(message)...)
+		}
 		for _, field := range message.GetFields() {
-			problems = append(problems, r.LintDescriptor(field)...)
+			if r.OnlyIf == nil || r.OnlyIf(field) {
+				problems = append(problems, r.LintDescriptor(field)...)
+			}
 		}
 	}
 
 	// Iterate over all enums and enum values.
 	for _, enum := range getAllEnums(fd) {
-		problems = append(problems, r.LintDescriptor(enum)...)
+		if r.OnlyIf == nil || r.OnlyIf(enum) {
+			problems = append(problems, r.LintDescriptor(enum)...)
+		}
 		for _, value := range enum.GetValues() {
-			problems = append(problems, r.LintDescriptor(value)...)
+			if r.OnlyIf == nil || r.OnlyIf(value) {
+				problems = append(problems, r.LintDescriptor(value)...)
+			}
 		}
 	}
 
