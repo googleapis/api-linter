@@ -10,7 +10,7 @@ redirect_from:
 
 # Batch Update methods: URI suffix
 
-This rule enforces that ` BatchUpdate` methods include the `:batchUpdate` suffix
+This rule enforces that `BatchUpdate` methods include the `:batchUpdate` suffix
 in the REST URI, as mandated in [AIP-234][].
 
 ## Details
