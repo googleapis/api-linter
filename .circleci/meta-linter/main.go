@@ -18,21 +18,104 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"bitbucket.org/creachadair/stringset"
 )
 
 func main() {
 	errors := []error{}
 
-	// Run each checker and run up the list of errors.
-	errors = append(errors, checkRulesRegistered()...)
-	errors = append(errors, ruleFilename()...)
-	errors = append(errors, checkRulesDocumented()...)
+	// Keep track of rules processed, and which ones have one or more failures.
+	pass := stringset.New()
+	fail := stringset.New()
+
+	// Begin walking the rules directory looking for rules.
+	err := filepath.Walk("./rules", func(path string, info os.FileInfo, err error) error {
+		// Sanity check: Bubble errors.
+		if err != nil {
+			errors = append(errors, err)
+			return nil
+		}
+
+		// Weed out files that are not rules (tests, etc.).
+		for _, exempt := range []func(path string, info os.FileInfo) bool{
+			func(_ string, i os.FileInfo) bool { return i.IsDir() },
+			func(p string, _ os.FileInfo) bool { return strings.Contains(p, "/internal/") },
+			func(p string, _ os.FileInfo) bool { return p == "rules/rules.go" },
+			func(p string, _ os.FileInfo) bool { return strings.HasSuffix(p, "_test.go") },
+			func(p string, _ os.FileInfo) bool { return aipIndex.MatchString(p) },
+		} {
+			if exempt(path, info) {
+				return nil
+			}
+		}
+
+		// This represents a rule. Get the AIP and rule name from the path.
+		match := ruleFile.FindStringSubmatch(path)
+		if match == nil {
+			errors = append(errors, fmt.Errorf("unexpected path: %s", path))
+			return nil
+		}
+
+		// Get the AIP number and final rule segment.
+		aip, err := strconv.Atoi(match[1])
+		if err != nil {
+			errors = append(errors, err)
+			return nil
+		}
+		name := strings.ReplaceAll(match[2], "_", "-")
+		token := fmt.Sprintf("%04d-%s", aip, name)
+
+		// Run each checker and run up the list of errors.
+		for _, checker := range []func(aip int, name string) []error{
+			checkRuleDocumented,
+			checkRuleName,
+			checkRuleRegistered,
+		} {
+			if errs := checker(aip, name); len(errs) > 0 {
+				errors = append(errors, errs...)
+				fail.Add(token)
+			}
+		}
+
+		// All checkers are done; add this to the success list if nothing failed.
+		if !fail.Contains(token) {
+			pass.Add(token)
+		}
+
+		return nil
+	})
+
+	// Ensure the rollup error is nil. (It should be, since our walk function
+	// never returns an error but always appends instead.)
+	if err != nil {
+		errors = append(errors, err)
+	}
 
 	// If we got complaints, complain about them.
 	if len(errors) > 0 {
 		for _, e := range errors {
 			log.Println(fmt.Sprintf("ERROR: %s", e.Error()))
 		}
+	}
+
+	// Provide a summary.
+	fmt.Printf(
+		"%d rules scanned: %d passed, %d failed.\n",
+		len(pass)+len(fail),
+		len(pass),
+		len(fail),
+	)
+
+	// Exit.
+	if len(errors) > 0 {
 		os.Exit(1)
 	}
 }
+
+var ruleFile = regexp.MustCompile(`rules/aip([\d]{4})/([a-z0-9_]+).go`)
+var aipIndex = regexp.MustCompile(`rules/aip[\d]{4}/aip[\d]{4}\.go`)
