@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0122 contains rules defined in https://aip.dev/122.
-package aip0122
+package aip0234
 
 import (
+	"testing"
+
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		122,
-		httpURICase,
-		nameSuffix,
-	)
+func TestAddRules(t *testing.T) {
+	if err := AddRules(lint.NewRuleRegistry()); err != nil {
+		t.Errorf("AddRules got an error: %v", err)
+	}
 }
