@@ -61,6 +61,7 @@ func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
 	if r.OnlyIf == nil || r.OnlyIf(fd) {
 		return r.LintFile(fd)
 	}
+	return nil
 }
 
 // MessageRule defines a lint rule that is run on each message in the file.
