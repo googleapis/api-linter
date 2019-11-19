@@ -19,6 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules adds all of the AIP-191 rules to the provided registry.
@@ -29,6 +30,10 @@ func AddRules(r lint.RuleRegistry) error {
 		javaMultipleFiles,
 		syntax,
 	)
+}
+
+func hasPackage(f *desc.FileDescriptor) bool {
+	return f.GetPackage() != ""
 }
 
 var versionRegexp = regexp.MustCompile("^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$")
