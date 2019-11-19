@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0191 contains rules defined in https://aip.dev/191.
-package aip0191
+package main
 
 import (
-	"regexp"
-
-	"github.com/googleapis/api-linter/lint"
+	"fmt"
+	"io/ioutil"
 )
 
-// AddRules adds all of the AIP-191 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		191,
-		filename,
-		javaMultipleFiles,
-		syntax,
-	)
+func checkRuleDocumented(aip int, name string) []error {
+	// Ensure that the expected documentation file exists.
+	wantFile := fmt.Sprintf("docs/rules/%04d/%s.md", aip, name)
+	if _, err := ioutil.ReadFile(wantFile); err != nil {
+		return []error{fmt.Errorf("missing rule documentation: %s", wantFile)}
+	}
+	return nil
 }
-
-var versionRegexp = regexp.MustCompile("^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$")

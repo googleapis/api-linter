@@ -34,6 +34,9 @@ func TestFileRule(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			rule := &FileRule{
 				Name: RuleName("test"),
+				OnlyIf: func(fd *desc.FileDescriptor) bool {
+					return fd.GetName() == "test.proto"
+				},
 				LintFile: func(fd *desc.FileDescriptor) []Problem {
 					return test.problems
 				},
