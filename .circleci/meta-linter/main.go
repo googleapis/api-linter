@@ -26,12 +26,19 @@ import (
 	"bitbucket.org/creachadair/stringset"
 )
 
+// The set of checkers that are run on every discovered rule.
+var checkers = []func(aip int, name string) []error{
+	checkRuleDocumented,
+	checkRuleName,
+	checkRuleRegistered,
+}
+
 func main() {
 	errors := []error{}
 
 	// Keep track of rules processed, and which ones have one or more failures.
-	pass := stringset.New()
-	fail := stringset.New()
+	passedRules := stringset.New()
+	failedRules := stringset.New()
 
 	// Begin walking the rules directory looking for rules.
 	err := filepath.Walk("./rules", func(path string, info os.FileInfo, err error) error {
@@ -71,20 +78,16 @@ func main() {
 		token := fmt.Sprintf("%04d-%s", aip, name)
 
 		// Run each checker and run up the list of errors.
-		for _, checker := range []func(aip int, name string) []error{
-			checkRuleDocumented,
-			checkRuleName,
-			checkRuleRegistered,
-		} {
+		for _, checker := range checkers {
 			if errs := checker(aip, name); len(errs) > 0 {
 				errors = append(errors, errs...)
-				fail.Add(token)
+				failedRules.Add(token)
 			}
 		}
 
 		// All checkers are done; add this to the success list if nothing failed.
-		if !fail.Contains(token) {
-			pass.Add(token)
+		if !failedRules.Contains(token) {
+			passedRules.Add(token)
 		}
 
 		return nil
@@ -106,9 +109,9 @@ func main() {
 	// Provide a summary.
 	fmt.Printf(
 		"%d rules scanned: %d passed, %d failed.\n",
-		len(pass)+len(fail),
-		len(pass),
-		len(fail),
+		len(passedRules)+len(failedRules),
+		len(passedRules),
+		len(failedRules),
 	)
 
 	// Exit.
