@@ -16,8 +16,7 @@ HTML in comments, as mandated in [AIP-192][].
 ## Details
 
 This rule looks at each descriptor in each proto file (exempting oneofs and the
-file itself) and tries to pick up "HTML smell", and complains if it thinks it
-found HTML.
+file itself) and tries to find HTML tags, and complains if it finds any.
 
 **Note:** This lint rule uses a regular expression to look for HTML, which is a
 [famous anti-pattern][]. We do it anyway to avoid taking a large dependency for
@@ -44,7 +43,6 @@ message Book {
 
 ```proto
 // Correct.
-// A representation of a book.
 // A representation of a book.
 message Book {
   // The name of the book.
