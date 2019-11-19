@@ -26,6 +26,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		191,
 		filename,
+		javaMultipleFiles,
 		syntax,
 	)
 }

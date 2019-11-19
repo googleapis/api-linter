@@ -43,6 +43,10 @@ type FileRule struct {
 	// Problems it finds.
 	LintFile func(*desc.FileDescriptor) []Problem
 
+	// OnlyIf accepts a FileDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.FileDescriptor) bool
+
 	noPositional struct{}
 }
 
@@ -54,7 +58,10 @@ func (r *FileRule) GetName() RuleName {
 // Lint forwards the FileDescriptor to the LintFile method defined on the
 // FileRule.
 func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
-	return r.LintFile(fd)
+	if r.OnlyIf == nil || r.OnlyIf(fd) {
+		return r.LintFile(fd)
+	}
+	return nil
 }
 
 // MessageRule defines a lint rule that is run on each message in the file.
