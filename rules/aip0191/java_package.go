@@ -20,15 +20,15 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var javaMultipleFiles = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "java-multiple-files"),
+var javaPackage = &lint.FileRule{
+	Name:   lint.NewRuleName(191, "java-package"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if f.GetFileOptions().GetJavaMultipleFiles() == false {
+		if f.GetFileOptions().GetJavaPackage() == "" {
 			return []lint.Problem{{
 				Descriptor: f,
 				Location:   locations.FilePackage(f),
-				Message:    "Proto files must set `option java_multiple_files = true;`",
+				Message:    "Proto files must set `option java_package`.",
 			}}
 		}
 		return nil
