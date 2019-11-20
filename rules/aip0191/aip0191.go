@@ -28,6 +28,7 @@ func AddRules(r lint.RuleRegistry) error {
 		191,
 		filename,
 		javaMultipleFiles,
+		javaOuterClassname,
 		javaPackage,
 		syntax,
 	)
