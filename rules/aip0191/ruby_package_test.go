@@ -29,6 +29,7 @@ func TestRubyPackage(t *testing.T) {
 	}{
 		{"Valid", "Google::Example::V1", testutils.Problems{}},
 		{"ValidBeta", "Google::Example::V1beta1", testutils.Problems{}},
+		{"ValidTwoWords", "Google::LibraryExample::V1", testutils.Problems{}},
 		{"InvalidBadChars", "Google.Example.V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google::example::v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1"),
