@@ -22,28 +22,16 @@ import (
 
 // MethodRequestType returns the precise location of the method's input type.
 func MethodRequestType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
-	if sourceInfo := m.GetSourceInfo(); sourceInfo != nil {
-		path := append(sourceInfo.Path, 2) // input_type == 2
-		return pathLocation(m.GetFile(), path)
-	}
-	return nil
+	return pathLocation(m, 2) // MethodDecriptor.input_type == 2
 }
 
 // MethodResponseType returns the precise location of the method's output type.
 func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
-	if sourceInfo := m.GetSourceInfo(); sourceInfo != nil {
-		path := append(m.GetSourceInfo().Path, 3) // output_type == 3
-		return pathLocation(m.GetFile(), path)
-	}
-	return nil
+	return pathLocation(m, 3) // MethodDescriptor.output_type == 3
 }
 
 // MethodHTTPRule returns the precise location of the method's `google.api.http`
 // rule, if any.
 func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
-	if sourceInfo := m.GetSourceInfo(); sourceInfo != nil {
-		path := append(m.GetSourceInfo().Path, 4, apb.E_Http.Field) // options == 4
-		return pathLocation(m.GetFile(), path)
-	}
-	return nil
+	return pathLocation(m, 4, int(apb.E_Http.Field)) // MethodDescriptor.options == 4
 }

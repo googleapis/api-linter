@@ -61,13 +61,13 @@ func TestLocations(t *testing.T) {
 	t.Run("Bogus", func(t *testing.T) {
 		tests := []struct {
 			testName string
-			path     []int32
+			path     []int
 		}{
-			{"NotFound", []int32{6, 0}},
+			{"NotFound", []int{6, 0}},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
-				if loc := pathLocation(f, test.path); loc != nil {
+				if loc := pathLocation(f, test.path...); loc != nil {
 					t.Errorf("%v", loc)
 				}
 			})

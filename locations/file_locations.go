@@ -24,7 +24,7 @@ import (
 // If the location can not be found (for example, because there is no syntax
 // statement), it returns nil.
 func FileSyntax(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, []int32{12}) // syntax == 12
+	return pathLocation(f, 12) // FileDescriptor.syntax == 12
 }
 
 // FilePackage returns the location of the package definition in a file descriptor.
@@ -32,7 +32,7 @@ func FileSyntax(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // If the location can not be found (for example, because there is no package
 // statement), it returns nil.
 func FilePackage(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, []int32{2}) // package == 2
+	return pathLocation(f, 2) // FileDescriptor.package == 2
 }
 
 // FileCsharpNamespace returns the location of the csharp_namespace file option
