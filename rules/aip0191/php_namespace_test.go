@@ -31,13 +31,13 @@ func TestPhpNamespace(t *testing.T) {
 		{"ValidBeta", `Google\\Example\\V1beta1`, testutils.Problems{}},
 		{"InvalidBadChars", "Google:Example:V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", `google\\example\\v1`, testutils.Problems{{
-			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\Example\V1`),
+			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\\Example\\V1`),
 		}}},
 		{"InvalidVersion", `Google\\Example\\v1`, testutils.Problems{{
-			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\Example\V1`),
+			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\\Example\\V1`),
 		}}},
 		{"InvalidBeta", `Google\\Example\\V1Beta1`, testutils.Problems{{
-			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\Example\V1beta1`),
+			Suggestion: fmt.Sprintf("option php_namespace = %q;", `Google\\Example\\V1beta1`),
 		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
