@@ -86,7 +86,7 @@ option php_namespace = "Google\\Example\\V1beta1";
 
 This rule will improperly complain if it encounters an acronym. For example, it
 will complain about `Google\Cloud\AutoML\V1`, preferring `AutoMl`. This lint
-rule **should** be disabled in this case.
+rule **may** be disabled in this case.
 
 ## Disabling
 
