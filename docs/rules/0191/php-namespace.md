@@ -82,6 +82,12 @@ package google.example.v1beta1;
 option php_namespace = "Google\\Example\\V1beta1";
 ```
 
+## Known issues
+
+This rule will improperly complain if it encounters an acronym. For example, it
+will complain about `Google\Cloud\AutoML\V1`, preferring `AutoMl`. This lint
+rule **should** be disabled in this case.
+
 ## Disabling
 
 If you need to violate this rule, use a comment at the top of the file.
