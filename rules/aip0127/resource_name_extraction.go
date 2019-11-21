@@ -12,18 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0127 contains rules defined in https://aip.dev/127.
 package aip0127
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-127 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		127,
-		hasAnnotation,
-		resourceNameExtraction,
-	)
+var resourceNameExtraction = &lint.MethodRule{
+	Name: lint.NewRuleName(127, "resource-name-extraction"),
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		for _, rule := range utils.GetHTTPRules(m) {
+			for _, v := range rule.GetVariables() {
+				if v == "*" {
+					return []lint.Problem{{
+						Message:    "Extract a full resource name into a variable, not just IDs.",
+						Descriptor: m,
+						Location:   locations.MethodHTTPRule(m),
+					}}
+				}
+			}
+		}
+		return nil
+	},
 }
