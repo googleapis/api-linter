@@ -3,7 +3,7 @@ rule:
   aip: 191
   name: [core, '0191', csharp-namespace]
   summary: The `option csharp_namespace` annotation should be idiomatic if set.
-permalink: /191/java-package
+permalink: /191/csharp-namespace
 redirect_from:
   - /0191/csharp-namespace
 ---
@@ -88,7 +88,7 @@ If you need to violate this rule, use a comment at the top of the file.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0191::java-package=disabled
+// (-- api-linter: core::0191::csharp-namespace=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
