@@ -27,9 +27,14 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// pathLocation returns the precise location within a file for a given path.
-func pathLocation(f *desc.FileDescriptor, path []int32) *dpb.SourceCodeInfo_Location {
-	return sourceInfoRegistry.sourceInfo(f).findLocation(path)
+// pathLocation returns the precise location for a given descriptor and path.
+// It combines the path of the descriptor itself with any path provided appended.
+func pathLocation(d desc.Descriptor, path ...int) *dpb.SourceCodeInfo_Location {
+	fullPath := d.GetSourceInfo().GetPath()
+	for _, i := range path {
+		fullPath = append(fullPath, int32(i))
+	}
+	return sourceInfoRegistry.sourceInfo(d.GetFile()).findLocation(fullPath)
 }
 
 type sourceInfo map[string]*dpb.SourceCodeInfo_Location
