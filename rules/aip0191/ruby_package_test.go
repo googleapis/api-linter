@@ -28,7 +28,7 @@ func TestRubyPackage(t *testing.T) {
 		problems    testutils.Problems
 	}{
 		{"Valid", "Google::Example::V1", testutils.Problems{}},
-		{"ValidBeta", "Google::Example::V1Beta1", testutils.Problems{}},
+		{"ValidBeta", "Google::Example::V1beta1", testutils.Problems{}},
 		{"InvalidBadChars", "Google.Example.V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google::example::v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1"),
@@ -36,8 +36,8 @@ func TestRubyPackage(t *testing.T) {
 		{"InvalidVersion", "Google::Example::v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1"),
 		}}},
-		{"InvalidBeta", "Google::Example::V1beta1", testutils.Problems{{
-			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1Beta1"),
+		{"InvalidBeta", "Google::Example::V1Beta1", testutils.Problems{{
+			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1beta1"),
 		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {

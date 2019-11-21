@@ -41,14 +41,7 @@ var rubyPackage = &lint.FileRule{
 			// Check that upper camel case is used.
 			upperCamel := []string{}
 			for _, segment := range strings.Split(ns, "::") {
-				wantSegment := csharpVersionRegexp.ReplaceAllStringFunc(
-					strcase.UpperCamelCase(segment),
-					func(s string) string {
-						stability := rubyVersionRegexp.FindStringSubmatch(s)[1]
-						return strings.ReplaceAll(s, stability, strings.Title(stability))
-					},
-				)
-				upperCamel = append(upperCamel, wantSegment)
+				upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
 			}
 			if want := strings.Join(upperCamel, "::"); ns != want {
 				return []lint.Problem{{
@@ -64,4 +57,3 @@ var rubyPackage = &lint.FileRule{
 }
 
 var rubyValidChars = regexp.MustCompile("^[A-Za-z0-9:]+$")
-var rubyVersionRegexp = regexp.MustCompile("[0-9]+(alpha|beta)")

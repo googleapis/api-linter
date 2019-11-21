@@ -20,7 +20,7 @@ This rule looks at each proto file, and complains if the `ruby_package` file
 annotation uses anything other than upper camel case, or includes characters
 other than letters, numbers, and `:`.
 
-It also ensures that versions with stability (e.g. `V1Beta1`) are capitalized
+It also ensures that versions with stability (e.g. `V1beta1`) are capitalized
 appropriately.
 
 ## Examples
@@ -35,7 +35,7 @@ syntax = "proto3";
 
 package google.example.v1;
 
-option ruby_package = "google.example.v1";
+option ruby_package = "google::example::v1";  // Should be UpperCamelCase.
 ```
 
 ```proto
@@ -44,7 +44,7 @@ syntax = "proto3";
 
 package google.example.v1;
 
-option ruby_package = "Google.Example.V1";
+option ruby_package = "Google.Example.V1";  // Separator should be `::`.
 ```
 
 **Correct** code for this rule:
@@ -68,7 +68,7 @@ syntax = "proto3";
 
 package google.example.v1beta1;
 
-option ruby_package = "Google::Example::V1beta1"; // Should be V1Beta1.
+option ruby_package = "Google::Example::V1Beta1"; // Should be V1beta1.
 ```
 
 **Correct** code for this rule:
@@ -79,7 +79,7 @@ syntax = "proto3";
 
 package google.example.v1beta1;
 
-option ruby_package = "Google::Example::V1Beta1";
+option ruby_package = "Google::Example::V1beta1";
 ```
 
 ## Disabling
