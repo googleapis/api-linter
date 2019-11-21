@@ -16,24 +16,26 @@ package aip0191
 
 import (
 	"fmt"
-	"reflect"
+	"sort"
+	"strconv"
 
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
-var consistentOptions = []string{
-	"csharp_namespace",
-	"go_package",
-	"java_package",
-	"php_class_prefix",
-	"php_metadata_namespace",
-	"php_namespace",
-	"objc_class_prefix",
-	"ruby_package",
-	"swift_prefix",
+var consistentOptions = map[string]func(*dpb.FileOptions) string{
+	"csharp_namespace":       func(o *dpb.FileOptions) string { return o.GetCsharpNamespace() },
+	"go_package":             func(o *dpb.FileOptions) string { return o.GetGoPackage() },
+	"java_package":           func(o *dpb.FileOptions) string { return o.GetJavaPackage() },
+	"java_multiple_files":    func(o *dpb.FileOptions) string { return strconv.FormatBool(o.GetJavaMultipleFiles()) },
+	"php_class_prefix":       func(o *dpb.FileOptions) string { return o.GetPhpClassPrefix() },
+	"php_metadata_namespace": func(o *dpb.FileOptions) string { return o.GetPhpMetadataNamespace() },
+	"php_namespace":          func(o *dpb.FileOptions) string { return o.GetPhpNamespace() },
+	"objc_class_prefix":      func(o *dpb.FileOptions) string { return o.GetObjcClassPrefix() },
+	"ruby_package":           func(o *dpb.FileOptions) string { return o.GetRubyPackage() },
+	"swift_prefix":           func(o *dpb.FileOptions) string { return o.GetSwiftPrefix() },
 }
 
 var fileOptionConsistency = &lint.FileRule{
@@ -55,15 +57,19 @@ var fileOptionConsistency = &lint.FileRule{
 			// might be the one that is wrong, and trust the API producer to do
 			// the right thing.
 			depOpts := dep.GetFileOptions()
-			for _, opt := range consistentOptions {
-				funcName := "Get" + strcase.UpperCamelCase(opt)
-				a := reflect.ValueOf(opts).MethodByName(funcName).Call([]reflect.Value{})[0].String()
-				b := reflect.ValueOf(depOpts).MethodByName(funcName).Call([]reflect.Value{})[0].String()
-				if a != b {
+			for opt, valueFunc := range consistentOptions {
+				if valueFunc(opts) != valueFunc(depOpts) {
 					problems = append(problems, lint.Problem{
 						Message:    fmt.Sprintf("Option %q should be consistent throughout the package.", opt),
 						Descriptor: f,
 						Location:   locations.FilePackage(f),
+					})
+
+					// Sort the problems. It does not matter for actual use, but
+					// testing is hard without it since maps are iterated in randomized
+					// order.
+					sort.Slice(problems, func(i, j int) bool {
+						return problems[i].Message < problems[j].Message
 					})
 				}
 			}
