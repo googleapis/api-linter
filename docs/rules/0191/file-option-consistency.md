@@ -8,7 +8,7 @@ redirect_from:
   - /0191/file-option-consistency
 ---
 
-# Java package annotation
+# File option consistency
 
 This rule enforces that every proto file for a public API surface sets file
 packaging options consistently, as mandated in [AIP-191][].
