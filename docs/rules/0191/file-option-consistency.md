@@ -23,6 +23,7 @@ The following annotations are included:
 
 - `csharp_namespace`
 - `go_package`
+- `java_multiple_files`
 - `java_package`
 - `php_class_prefix`
 - `php_metadata_namespace`
