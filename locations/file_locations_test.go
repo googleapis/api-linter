@@ -31,6 +31,7 @@ func TestLocations(t *testing.T) {
 		package google.api.linter;
 
 		option csharp_namespace = "Google.Api.Linter";
+		option php_namespace = "Google\\Api\\Linter";
 
 		message Foo {
 			string bar = 1;
@@ -47,6 +48,7 @@ func TestLocations(t *testing.T) {
 			{"Syntax", FileSyntax, []int32{1, 0, int32(len("syntax = \"proto3\";"))}},
 			{"Package", FilePackage, []int32{3, 0, int32(len("package google.api.linter;"))}},
 			{"CsharpNamespace", FileCsharpNamespace, []int32{5, 0, int32(len(`option csharp_namespace = "Google.Api.Linter";`))}},
+			{"PhpNamespace", FilePhpNamespace, []int32{6, 0, int32(len(`option php_namespace = "Google\\Api\\Linter";`))}},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {

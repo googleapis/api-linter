@@ -43,3 +43,12 @@ func FilePackage(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 func FileCsharpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, 37) // 8 == options, 37 == csharp_namespace
 }
+
+// FilePhpNamespace returns the location of the php_namespace file option
+// in a file descriptor.
+//
+// If the location can not be found (for example, because there is no
+// csharp_namespace option), it returns nil.
+func FilePhpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 8, 41) // 8 == options, 41 == php_namespace
+}
