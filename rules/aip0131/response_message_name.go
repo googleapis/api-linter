@@ -37,7 +37,7 @@ var responseMessageName = &lint.MethodRule{
 				),
 				Suggestion: want,
 				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
+				Location:   locations.MethodResponseType(m),
 			}}
 		}
 
