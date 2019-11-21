@@ -8,7 +8,7 @@ redirect_from:
   - /0191/filenames
 ---
 
-# Proto3 syntax
+# Filenames
 
 This rule attempts to enforce reasonable filenames for proto files, as mandated
 in [AIP-191][].
@@ -29,7 +29,7 @@ This rule currently complains if the filename:
 - `v1.proto`
 - `v1beta1.proto`
 
-**Correct** code for this rule:
+**Correct** filenames for this rule:
 
 - `library.proto`
 - `library_service.proto`
