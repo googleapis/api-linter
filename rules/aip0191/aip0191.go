@@ -31,6 +31,7 @@ func AddRules(r lint.RuleRegistry) error {
 		javaMultipleFiles,
 		javaOuterClassname,
 		javaPackage,
+		rubyPackage,
 		syntax,
 	)
 }
