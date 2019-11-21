@@ -34,3 +34,12 @@ func FileSyntax(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 func FilePackage(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 2) // FileDescriptor.package == 2
 }
+
+// FileCsharpNamespace returns the location of the csharp_namespace file option
+// in a file descriptor.
+//
+// If the location can not be found (for example, because there is no
+// csharp_namespace option), it returns nil.
+func FileCsharpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 8, 37) // 8 == options, 37 == csharp_namespace
+}
