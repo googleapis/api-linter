@@ -28,6 +28,7 @@ func AddRules(r lint.RuleRegistry) error {
 		191,
 		csharpNamespace,
 		filename,
+		fileOptionConsistency,
 		javaMultipleFiles,
 		javaOuterClassname,
 		javaPackage,
