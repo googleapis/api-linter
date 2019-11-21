@@ -8,7 +8,7 @@ redirect_from:
   - /0191/php-namespace
 ---
 
-# C# namespace annotation
+# PHP namespace annotation
 
 This rule enforces that if a proto file for a public API surface sets
 `option php_namespace`, that it uses language idiomatic conventions, as
