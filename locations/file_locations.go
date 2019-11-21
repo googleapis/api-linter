@@ -48,7 +48,7 @@ func FileCsharpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // in a file descriptor.
 //
 // If the location can not be found (for example, because there is no
-// csharp_namespace option), it returns nil.
+// php_namespace option), it returns nil.
 func FilePhpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, 41) // 8 == options, 41 == php_namespace
 }
