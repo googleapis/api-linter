@@ -23,10 +23,6 @@ import (
 //
 // This works for any descriptor, regardless of type (message, field, etc.).
 func DescriptorName(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
-	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
-		// All descriptors seem to have `string name = 1`, so this conveniently works.
-		path := append(sourceInfo.Path, 1)
-		return pathLocation(d.GetFile(), path)
-	}
-	return nil
+	// All descriptors seem to have `string name = 1`, so this conveniently works.
+	return pathLocation(d, 1)
 }
