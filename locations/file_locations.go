@@ -48,7 +48,7 @@ func FileCsharpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // in a file descriptor.
 //
 // If the location can not be found (for example, because there is no
-// csharp_namespace option), it returns nil.
+// ruby_package option), it returns nil.
 func FileRubyPackage(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, 45) // 8 == options, 45 == ruby_package
 }
