@@ -20,7 +20,12 @@ This rule looks at each proto file, and complains if the `csharp_namespace`
 file annotation uses anything other than upper camel case, or includes
 characters other than letters, numbers, and `.`.
 
+It also ensures that versions with stability (e.g. `V1Beta1`) are capitalized
+appropriately.
+
 ## Examples
+
+### Case
 
 **Incorrect** code for this rule:
 
@@ -51,6 +56,30 @@ syntax = "proto3";
 package google.example.v1;
 
 option csharp_namespace = "Google.Example.V1";
+```
+
+### Versions with stability
+
+**Incorrect** code for this rule:
+
+```proto
+// Incorrect.
+syntax = "proto3";
+
+package google.example.v1beta1;
+
+option csharp_namespace = "Google.Example.V1beta1"; // Should be V1Beta1.
+```
+
+**Correct** code for this rule:
+
+```proto
+// Correct.
+syntax = "proto3";
+
+package google.example.v1beta1;
+
+option csharp_namespace = "Google.Example.V1Beta1";
 ```
 
 ## Disabling
