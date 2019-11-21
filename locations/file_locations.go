@@ -41,5 +41,5 @@ func FilePackage(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
 // If the location can not be found (for example, because there is no
 // csharp_namespace option), it returns nil.
 func FileCsharpNamespace(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, []int32{8, 37}) // 8 == options, 37 == csharp_namespace
+	return pathLocation(f, 8, 37) // 8 == options, 37 == csharp_namespace
 }
