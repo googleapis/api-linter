@@ -1,26 +1,26 @@
 ---
 rule:
   aip: 191
-  name: [core, '0191', csharp-namespace]
-  summary: The `option csharp_namespace` annotation should be idiomatic if set.
-permalink: /191/csharp-namespace
+  name: [core, '0191', php-namespace]
+  summary: The `option php_namespace` annotation should be idiomatic if set.
+permalink: /191/php-namespace
 redirect_from:
-  - /0191/csharp-namespace
+  - /0191/php-namespace
 ---
 
-# C# namespace annotation
+# PHP namespace annotation
 
 This rule enforces that if a proto file for a public API surface sets
-`option csharp_namespace`, that it uses language idiomatic conventions, as
+`option php_namespace`, that it uses language idiomatic conventions, as
 mandated in [AIP-191][].
 
 ## Details
 
-This rule looks at each proto file, and complains if the `csharp_namespace`
-file annotation uses anything other than upper camel case, or includes
-characters other than letters, numbers, and `.`.
+This rule looks at each proto file, and complains if the `php_namespace` file
+annotation uses anything other than upper camel case, or includes characters
+other than letters, numbers, and `.`.
 
-It also ensures that versions with stability (e.g. `V1Beta1`) are capitalized
+It also ensures that versions with stability (e.g. `V1beta1`) are capitalized
 appropriately.
 
 ## Examples
@@ -35,7 +35,7 @@ syntax = "proto3";
 
 package google.example.v1;
 
-option csharp_namespace = "google.example.v1";
+option php_namespace = "google\\example\\v1";  // Should be UpperCamelCase.
 ```
 
 ```proto
@@ -44,7 +44,7 @@ syntax = "proto3";
 
 package google.example.v1;
 
-option csharp_namespace = "Google::Example::V1";
+option php_namespace = "Google::Example::V1";  // Separator should be backslash.
 ```
 
 **Correct** code for this rule:
@@ -55,7 +55,7 @@ syntax = "proto3";
 
 package google.example.v1;
 
-option csharp_namespace = "Google.Example.V1";
+option php_namespace = "Google\\Example\\V1";
 ```
 
 ### Versions with stability
@@ -68,7 +68,7 @@ syntax = "proto3";
 
 package google.example.v1beta1;
 
-option csharp_namespace = "Google.Example.V1beta1"; // Should be V1Beta1.
+option php_namespace = "Google\\Example\\V1Beta1"; // Should be V1beta1.
 ```
 
 **Correct** code for this rule:
@@ -79,13 +79,13 @@ syntax = "proto3";
 
 package google.example.v1beta1;
 
-option csharp_namespace = "Google.Example.V1Beta1";
+option php_namespace = "Google\\Example\\V1beta1";
 ```
 
 ## Known issues
 
 This rule will improperly complain if it encounters an acronym. For example, it
-will complain about `Google.Cloud.AutoML.V1`, preferring `AutoMl`. This lint
+will complain about `Google\Cloud\AutoML\V1`, preferring `AutoMl`. This lint
 rule **should** be disabled in this case.
 
 ## Disabling
@@ -94,13 +94,13 @@ If you need to violate this rule, use a comment at the top of the file.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0191::csharp-namespace=disabled
+// (-- api-linter: core::0191::php-namespace=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 syntax = "proto3";
 
 package google.example.v1;
 
-option csharp_namespace = "google.example.v1";
+option php_namespace = "google\\example\\v1";
 ```
 
 [aip-191]: https://aip.dev/191
