@@ -27,8 +27,8 @@ func TestResponseUnknownFields(t *testing.T) {
 		problems  testutils.Problems
 	}{
 		{"total_size", testutils.Problems{}},
-		{"unavailable", testutils.Problems{}},
-		{"unavailable_locations", testutils.Problems{}},
+		{"unreachable", testutils.Problems{}},
+		{"unreachable_locations", testutils.Problems{}},
 		{"extra", testutils.Problems{{Message: "List responses"}}},
 	} {
 		t.Run(strcase.UpperCamelCase(test.FieldName), func(t *testing.T) {
@@ -40,8 +40,8 @@ func TestResponseUnknownFields(t *testing.T) {
 				}
 				message Book {}
 			`, test)
-			message := f.GetMessageTypes()[0]
-			if diff := test.problems.SetDescriptor(message).Diff(responseUnknownFields.Lint(f)); diff != "" {
+			field := f.GetMessageTypes()[0].GetFields()[2]
+			if diff := test.problems.SetDescriptor(field).Diff(responseUnknownFields.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
