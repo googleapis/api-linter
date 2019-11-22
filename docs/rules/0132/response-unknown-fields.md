@@ -8,7 +8,7 @@ redirect_from:
   - /0132/request-unknown-fields
 ---
 
-# List methods: Unknown fields (Request)
+# List methods: Unknown fields (Response)
 
 This rule enforces that all `List` standard methods do not have unexpected
 fields, as mandated in [AIP-132][].
@@ -18,18 +18,13 @@ fields, as mandated in [AIP-132][].
 This rule looks at any message matching `List*Request` and complains if it
 comes across any fields other than:
 
-- `string parent` ([AIP-132][])
-- `int32 page_size` ([AIP-158][])
-- `string page_token` ([AIP-158][])
-- `string filter` ([AIP-132][])
-- `string order_by` ([AIP-132][])
-- `bool show_deleted` ([AIP-135][])
-- `google.protobuf.FieldMask read_mask` ([AIP-157][])
-- `View view` ([AIP-157][])
+- The resource.
+- `int32/int64 total_size` ([AIP-132][])
+- `string next_page_token` ([AIP-158][])
+- `repeated string unavailable` ([AIP-217][])
 
-It only checks field names; it does not validate type correctness. This is
-handled by other rules, such as
-[request field types](./0132-request-field-types.md).
+It only checks field names; it does not validate type correctness or
+repeated-ness.
 
 ## Examples
 
@@ -37,11 +32,10 @@ handled by other rules, such as
 
 ```proto
 // Incorrect.
-message ListBooksRequest {
-  string parent = 1;
-  int32 page_size = 2;
-  string page_token = 3;
-  string library_id = 4;  // Non-standard field.
+message ListBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
+  string publisher_id = 3;  // Unrecognized field.
 }
 ```
 
@@ -49,10 +43,9 @@ message ListBooksRequest {
 
 ```proto
 // Correct.
-message ListBooksRequest {
-  string parent = 1;
-  int32 page_size = 2;
-  string page_token = 3;
+message ListBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
 }
 ```
 
@@ -62,14 +55,12 @@ If you need to violate this rule, use a leading comment above the field.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-message ListBooksRequest {
-  string parent = 1;
-  int32 page_size = 2;
-  string page_token = 3;
-
-  // (-- api-linter: core::0132::request-unknown-fields=disabled
+message ListBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
+  // (-- api-linter: core::0132::response-unknown-fields=disabled
   //     aip.dev/not-precedent: We really need this field because reasons. --)
-  string library_id = 4;
+  string publisher_id = 3;
 }
 ```
 
