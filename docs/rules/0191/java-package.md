@@ -31,8 +31,17 @@ package google.example.v1;
 // Needs `option java_package = "com.google.example.v1";`.
 option java_multiple_files = true;
 option java_outer_classname = "LibraryProto";
+```
 
-message Book {}
+```proto
+// Incorrect.
+syntax = "proto3";
+
+package google.example.v1;
+
+option java_package = "google.example";  // Should end with "google.example.v1".
+option java_multiple_files = true;
+option java_outer_classname = "LibraryProto";
 ```
 
 **Correct** code for this rule:
@@ -46,8 +55,6 @@ package google.example.v1;
 option java_package = "com.google.example.v1";
 option java_multiple_files = true;
 option java_outer_classname = "LibraryProto";
-
-message Book {}
 ```
 
 ## Disabling
@@ -64,8 +71,6 @@ package google.example.v1;
 
 option java_multiple_files = true;
 option java_outer_classname = "LibraryProto";
-
-message Book {}
 ```
 
 [aip-191]: https://aip.dev/191
