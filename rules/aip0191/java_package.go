@@ -15,6 +15,9 @@
 package aip0191
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -24,11 +27,20 @@ var javaPackage = &lint.FileRule{
 	Name:   lint.NewRuleName(191, "java-package"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if f.GetFileOptions().GetJavaPackage() == "" {
+		javaPkg := f.GetFileOptions().GetJavaPackage()
+		if javaPkg == "" {
 			return []lint.Problem{{
+				Message:    "Proto files must set `option java_package`.",
 				Descriptor: f,
 				Location:   locations.FilePackage(f),
-				Message:    "Proto files must set `option java_package`.",
+			}}
+		}
+		if !strings.HasSuffix(javaPkg, f.GetPackage()) {
+			return []lint.Problem{{
+				Message:    "The Java Package should mirror the proto package.",
+				Suggestion: fmt.Sprintf(`option java_package = "com.%s";`, f.GetPackage()),
+				Descriptor: f,
+				Location:   locations.FileJavaPackage(f),
 			}}
 		}
 		return nil

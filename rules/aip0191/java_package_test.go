@@ -28,7 +28,10 @@ func TestJavaPackage(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", []string{"package foo.v1;", `option java_package = "com.foo.v1";`}, testutils.Problems{}},
-		{"Invalid", []string{"package foo.v1;", ""}, testutils.Problems{{Message: "java_package"}}},
+		{"InvalidEmpty", []string{"package foo.v1;", ""}, testutils.Problems{{Message: "java_package"}}},
+		{"InvalidWrong", []string{"package foo.v1;", `option java_package = "something.else";`}, testutils.Problems{{
+			Suggestion: `option java_package = "com.foo.v1";`,
+		}}},
 		{"Ignored", []string{"", ""}, testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
