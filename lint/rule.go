@@ -128,14 +128,9 @@ func (r *FieldRule) GetName() RuleName {
 // field, and if it returns false, the `LintField` function is not called.
 func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
-
-	// Iterate over each message and process rules for each field in that
-	// message.
-	for _, message := range getAllMessages(fd) {
-		for _, field := range message.GetFields() {
-			if r.OnlyIf == nil || r.OnlyIf(field) {
-				problems = append(problems, r.LintField(field)...)
-			}
+	for _, field := range getAllFields(fd) {
+		if r.OnlyIf == nil || r.OnlyIf(field) {
+			problems = append(problems, r.LintField(field)...)
 		}
 	}
 	return problems
@@ -199,11 +194,9 @@ func (r *MethodRule) GetName() RuleName {
 // method, and if it returns false, the `LintMethod` function is not called.
 func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
-	for _, service := range fd.GetServices() {
-		for _, method := range service.GetMethods() {
-			if r.OnlyIf == nil || r.OnlyIf(method) {
-				problems = append(problems, r.LintMethod(method)...)
-			}
+	for _, method := range getAllMethods(fd) {
+		if r.OnlyIf == nil || r.OnlyIf(method) {
+			problems = append(problems, r.LintMethod(method)...)
 		}
 	}
 	return problems
@@ -273,40 +266,9 @@ func (r *DescriptorRule) GetName() RuleName {
 // This order is not guaranteed. It does NOT visit the file itself.
 func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
-
-	// Iterate over all services and methods.
-	for _, service := range fd.GetServices() {
-		if r.OnlyIf == nil || r.OnlyIf(service) {
-			problems = append(problems, r.LintDescriptor(service)...)
-		}
-		for _, method := range service.GetMethods() {
-			if r.OnlyIf == nil || r.OnlyIf(method) {
-				problems = append(problems, r.LintDescriptor(method)...)
-			}
-		}
-	}
-
-	// Iterate over all messages, and all fields within each message.
-	for _, message := range getAllMessages(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(message) {
-			problems = append(problems, r.LintDescriptor(message)...)
-		}
-		for _, field := range message.GetFields() {
-			if r.OnlyIf == nil || r.OnlyIf(field) {
-				problems = append(problems, r.LintDescriptor(field)...)
-			}
-		}
-	}
-
-	// Iterate over all enums and enum values.
-	for _, enum := range getAllEnums(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(enum) {
-			problems = append(problems, r.LintDescriptor(enum)...)
-		}
-		for _, value := range enum.GetValues() {
-			if r.OnlyIf == nil || r.OnlyIf(value) {
-				problems = append(problems, r.LintDescriptor(value)...)
-			}
+	for _, d := range getAllDescriptors(fd) {
+		if r.OnlyIf == nil || r.OnlyIf(d) {
+			problems = append(problems, r.LintDescriptor(d)...)
 		}
 	}
 
@@ -357,6 +319,39 @@ func getLeadingComments(d desc.Descriptor) string {
 	return ""
 }
 
+// getAllDescriptors returns a slice with every descriptor in the file.
+func getAllDescriptors(f *desc.FileDescriptor) []desc.Descriptor {
+	descriptors := []desc.Descriptor{}
+	for _, d := range getAllEnums(f) {
+		descriptors = append(descriptors, d)
+	}
+	for _, d := range getAllEnumValues(f) {
+		descriptors = append(descriptors, d)
+	}
+	for _, d := range getAllFields(f) {
+		descriptors = append(descriptors, d)
+	}
+	for _, d := range getAllMethods(f) {
+		descriptors = append(descriptors, d)
+	}
+	for _, d := range getAllMessages(f) {
+		descriptors = append(descriptors, d)
+	}
+	for _, d := range f.GetServices() {
+		descriptors = append(descriptors, d)
+	}
+	return descriptors
+}
+
+// getAllMethods returns a slice with every method in the file.
+func getAllMethods(f *desc.FileDescriptor) []*desc.MethodDescriptor {
+	methods := []*desc.MethodDescriptor{}
+	for _, service := range f.GetServices() {
+		methods = append(methods, service.GetMethods()...)
+	}
+	return methods
+}
+
 // getAllMessages returns a slice with every message (not just top-level
 // messages) in the file.
 func getAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor) {
@@ -391,6 +386,24 @@ func getAllEnums(f *desc.FileDescriptor) (enums []*desc.EnumDescriptor) {
 	}
 
 	return
+}
+
+// getAllEnumValues returns a slice with every enum value in the file.
+func getAllEnumValues(f *desc.FileDescriptor) []*desc.EnumValueDescriptor {
+	values := []*desc.EnumValueDescriptor{}
+	for _, e := range getAllEnums(f) {
+		values = append(values, e.GetValues()...)
+	}
+	return values
+}
+
+// getAllFields returns a slice with every field in the file.
+func getAllFields(f *desc.FileDescriptor) []*desc.FieldDescriptor {
+	fields := []*desc.FieldDescriptor{}
+	for _, m := range getAllMessages(f) {
+		fields = append(fields, m.GetFields()...)
+	}
+	return fields
 }
 
 // fileHeader attempts to get the comment at the top of the file, but it
