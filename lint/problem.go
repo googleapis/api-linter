@@ -40,6 +40,8 @@ type Problem struct {
 	// precise.
 	Suggestion string
 
+	// TODO: Remove this field.
+	//
 	// Descriptor provides the descriptor related to the problem.
 	//
 	// If present and `Location` is not specified, then the starting location of

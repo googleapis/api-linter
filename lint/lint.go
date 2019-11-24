@@ -67,9 +67,12 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	descriptors := getAllDescriptors(fd)
 	for _, d := range descriptors {
 		for _, rule := range l.rules {
-			if l.configs.IsRuleEnabled(string(rule.GetName()), fd.GetName()) {
+			// Check if the rule is neither disabled by comments or configs.
+			if ruleIsEnabled(rule, d, aliasMap) &&
+				l.configs.IsRuleEnabled(string(rule.GetName()), fd.GetName()) {
 				if problems, err := l.runAndRecoverFromPanics(rule, d); err == nil {
 					for _, p := range problems {
+						// TODO: Remove this check once Descriptor is removed from Problem.
 						if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
 							p.RuleID = rule.GetName()
 							resp.Problems = append(resp.Problems, p)
