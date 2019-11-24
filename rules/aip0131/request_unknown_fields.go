@@ -17,33 +17,30 @@ package aip0131
 import (
 	"fmt"
 
+	"bitbucket.org/creachadair/stringset"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Get methods should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-unknown-fields"),
-	OnlyIf: isGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// Rule check: Establish that there are no unexpected fields.
-		allowedFields := map[string]struct{}{
-			"name":      {}, // AIP-131
-			"read_mask": {}, // AIP-157
-			"view":      {}, // AIP-157
-		}
-		for _, field := range m.GetFields() {
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
-				problems = append(problems, lint.Problem{
-					Message: fmt.Sprintf(
-						"Unexpected field: Get RPCs must only contain fields explicitly described in AIPs, not %q.",
-						string(field.GetName()),
-					),
-					Descriptor: field,
-				})
-			}
+var unknownFields = &lint.FieldRule{
+	Name: lint.NewRuleName(131, "request-unknown-fields"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isGetRequestMessage(f.GetOwner())
+	},
+	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+		allowedFields := stringset.New("name", "read_mask", "view")
+		if !allowedFields.Contains(field.GetName()) {
+			return []lint.Problem{{
+				Message: fmt.Sprintf(
+					"Unexpected field: Get RPCs must only contain fields explicitly described in https://aip.dev/131, not %q.",
+					string(field.GetName()),
+				),
+				Descriptor: field,
+			}}
 		}
 
-		return
+		return nil
 	},
 }
