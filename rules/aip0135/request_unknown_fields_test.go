@@ -54,7 +54,7 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
-			gotProblems := unknownFields.Lint(message.GetFile())
+			gotProblems := unknownFields.Lint(message)
 			if diff := wantProblems.Diff(gotProblems); diff != "" {
 				t.Errorf(diff)
 			}

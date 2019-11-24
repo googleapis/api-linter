@@ -39,12 +39,11 @@ func TestUnspecified(t *testing.T) {
 					{{.ValueName}} = 0;
 					HARDBACK = 1;
 					PAPERBACK = 2;
-				}
-			`, test)
-
+				}`, test)
+			enum := f.GetEnumTypes()[0]
 			// Run the lint rule and establish we get the correct problems.
-			problems := unspecified.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
+			problems := unspecified.Lint(enum)
+			if diff := test.problems.SetDescriptor(enum.GetValues()[0]).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

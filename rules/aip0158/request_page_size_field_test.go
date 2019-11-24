@@ -79,7 +79,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageSize.Lint(message.GetFile())
+			problems := requestPaginationPageSize.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

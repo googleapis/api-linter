@@ -50,7 +50,8 @@ func TestCount(t *testing.T) {
 				Descriptor: field,
 			})
 		}
-		if diff := wantProblems.Diff(count.Lint(file)); diff != "" {
+		problems := count.Lint(field)
+		if diff := wantProblems.Diff(problems); diff != "" {
 			t.Errorf(diff)
 		}
 	}

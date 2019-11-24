@@ -69,7 +69,7 @@ func TestResourceField(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := resourceField.Lint(file)
+			problems := resourceField.Lint(file.GetMessageTypes()[0])
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

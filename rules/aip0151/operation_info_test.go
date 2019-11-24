@@ -33,7 +33,9 @@ func TestAnnotationExistsValid(t *testing.T) {
 		}
 		message WriteBookRequest {}
 	`)
-	if diff := (testutils.Problems{}).Diff(lroAnnotationExists.Lint(f)); diff != "" {
+	method := f.GetServices()[0].GetMethods()[0]
+	problems := lroAnnotationExists.Lint(method)
+	if diff := (testutils.Problems{}).Diff(problems); diff != "" {
 		t.Errorf(diff)
 	}
 }
@@ -46,11 +48,13 @@ func TestAnnotationExistsInvalid(t *testing.T) {
 		}
 		message WriteBookRequest {}
 	`)
-	want := testutils.Problems{{
-		Descriptor: f.GetServices()[0].GetMethods()[0],
+	method := f.GetServices()[0].GetMethods()[0]
+	wantProblems := testutils.Problems{{
+		Descriptor: method,
 		Message:    "operation_info annotation",
 	}}
-	if diff := want.Diff(lroAnnotationExists.Lint(f)); diff != "" {
+	problems := lroAnnotationExists.Lint(method)
+	if diff := wantProblems.Diff(problems); diff != "" {
 		t.Errorf(diff)
 	}
 }

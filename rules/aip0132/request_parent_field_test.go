@@ -66,7 +66,7 @@ func TestStandardFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			// number of problems.
-			problems := standardFields.Lint(message.GetFile())
+			problems := standardFields.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

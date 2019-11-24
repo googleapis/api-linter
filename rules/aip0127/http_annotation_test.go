@@ -54,7 +54,7 @@ func TestHasAnnotation(t *testing.T) {
 				message ReadBookResponse {}
 			`, "{{.Annotation}}", test.annotation), test)
 			m := f.GetServices()[0].GetMethods()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(hasAnnotation.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(hasAnnotation.Lint(m)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

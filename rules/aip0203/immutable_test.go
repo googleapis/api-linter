@@ -20,10 +20,9 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-var fieldPart = "string title = 1;"
-var fieldPartWithImmtutableBehavior = "string title = 1 [(google.api.field_behavior) = IMMUTABLE];"
-
 func TestImmutable(t *testing.T) {
+	var fieldPart = "string title = 1;"
+	var fieldPartWithImmutableBehavior = "string title = 1 [(google.api.field_behavior) = IMMUTABLE];"
 	testCases := []struct {
 		name     string
 		comment  string
@@ -33,13 +32,13 @@ func TestImmutable(t *testing.T) {
 		{
 			name:     "Valid",
 			comment:  "Immutable",
-			field:    fieldPartWithImmtutableBehavior,
+			field:    fieldPartWithImmutableBehavior,
 			problems: nil,
 		},
 		{
 			name:     "Valid",
 			comment:  "@immutable",
-			field:    fieldPartWithImmtutableBehavior,
+			field:    fieldPartWithImmutableBehavior,
 			problems: nil,
 		},
 		{
@@ -123,7 +122,7 @@ message Book {
 					Field   string
 				}{test.comment, test.field})
 			f := file.GetMessageTypes()[0].GetFields()[0]
-			problems := immutable.Lint(file)
+			problems := immutable.Lint(f)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

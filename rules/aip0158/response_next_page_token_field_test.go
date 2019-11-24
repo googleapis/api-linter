@@ -85,7 +85,7 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := responsePaginationNextPageToken.Lint(message.GetFile())
+			problems := responsePaginationNextPageToken.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

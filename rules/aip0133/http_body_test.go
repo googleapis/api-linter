@@ -71,7 +71,7 @@ func TestHttpBody(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpBody.Lint(service.GetFile())
+			problems := httpBody.Lint(service.GetMethods()[0])
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {

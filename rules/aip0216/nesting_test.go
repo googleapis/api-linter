@@ -20,6 +20,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
+// TODO: Separate it to two functions.
 func TestNesting(t *testing.T) {
 	t.Run("Nested", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, `
@@ -29,7 +30,9 @@ func TestNesting(t *testing.T) {
 				}
 			}
 		`)
-		if diff := (testutils.Problems{}).Diff(nesting.Lint(f)); diff != "" {
+		enum := f.GetMessageTypes()[0].GetNestedEnumTypes()[0]
+		problems := nesting.Lint(enum)
+		if diff := (testutils.Problems{}).Diff(problems); diff != "" {
 			t.Errorf(diff)
 		}
 	})
@@ -55,7 +58,7 @@ func TestNesting(t *testing.T) {
 					}
 				`, test)
 				e := f.GetEnumTypes()[0]
-				if diff := test.problems.SetDescriptor(e).Diff(nesting.Lint(f)); diff != "" {
+				if diff := test.problems.SetDescriptor(e).Diff(nesting.Lint(e)); diff != "" {
 					t.Errorf(diff)
 				}
 			})

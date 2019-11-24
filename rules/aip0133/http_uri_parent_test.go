@@ -61,7 +61,7 @@ func TestHttpUriField(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpURIField.Lint(service.GetFile())
+			problems := httpURIField.Lint(service.GetMethods()[0])
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && len(problems) == 0 {

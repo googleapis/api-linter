@@ -15,317 +15,382 @@
 package lint
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
+
+	"github.com/jhump/protoreflect/desc"
 )
 
-func TestFileRule(t *testing.T) {
-	// Create a file descriptor with nothing in it.
-	fd, err := builder.NewFile("test.proto").Build()
-	if err != nil {
-		t.Fatalf("Could not build file descriptor: %q", err)
+func TestFileRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"FileDescriptor_LintInvoked", &desc.FileDescriptor{}, true},
+		{"NotAFileDescriptor_LintNotInvoked", &desc.MessageDescriptor{}, false},
 	}
-
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd) {
-		t.Run(test.testName, func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			rule := &FileRule{
-				Name: RuleName("test"),
-				OnlyIf: func(fd *desc.FileDescriptor) bool {
-					return fd.GetName() == "test.proto"
-				},
-				LintFile: func(fd *desc.FileDescriptor) []Problem {
-					return test.problems
+				LintFile: func(f *desc.FileDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestMessageRule(t *testing.T) {
-	// Create a file descriptor with two messages in it.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book"),
-	).AddMessage(
-		builder.NewMessage("Author"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
+func TestFileRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.FileDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.FileDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.FileDescriptor) bool { return true }, true},
 	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &FileRule{
+				OnlyIf: test.onlyIf,
+				LintFile: func(f *desc.FileDescriptor) []Problem {
+					return []Problem{}
+				},
+			}
+			problems := rule.Lint(&desc.FileDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
+		})
+	}
+}
 
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[1]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the message rule.
+func TestFileRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &FileRule{
+		Name: want,
+	}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
+	}
+}
+
+func TestMessageRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"MessageDescriptor_LintInvoked", &desc.MessageDescriptor{}, true},
+		{"NotAMessageDescriptor_LintNotInvoked", &desc.FileDescriptor{}, false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			rule := &MessageRule{
-				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MessageDescriptor) bool {
-					return m.GetName() == "Author"
-				},
-				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					return test.problems
+				LintMessage: func(f *desc.MessageDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-// Establish that nested messages are tested.
-func TestMessageRuleNested(t *testing.T) {
-	// Create a file descriptor with a message and nested message in it.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddNestedMessage(builder.NewMessage("Author")),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
+func TestMessageRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.MessageDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.MessageDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.MessageDescriptor) bool { return true }, true},
 	}
-
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedMessageTypes()[0]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the message rule.
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			rule := &MessageRule{
-				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MessageDescriptor) bool {
-					return m.GetName() == "Author"
-				},
-				LintMessage: func(m *desc.MessageDescriptor) []Problem {
-					return test.problems
+				OnlyIf: test.onlyIf,
+				LintMessage: func(f *desc.MessageDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(&desc.MessageDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestFieldRule(t *testing.T) {
-	// Create a file descriptor with one message and two fields in that message.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddField(
-			builder.NewField("title", builder.FieldTypeString()),
-		).AddField(
-			builder.NewField("edition_count", builder.FieldTypeInt32()),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
+func TestMessageRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &MessageRule{
+		Name: want,
 	}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
+	}
+}
 
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetFields()[1]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the message rule.
+func TestFieldRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"FieldDescriptor_LintInvoked", &desc.FieldDescriptor{}, true},
+		{"NotAFieldDescriptor_LintNotInvoked", &desc.MessageDescriptor{}, false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			rule := &FieldRule{
-				Name: RuleName("test"),
-				OnlyIf: func(f *desc.FieldDescriptor) bool {
-					return f.GetName() == "edition_count"
-				},
 				LintField: func(f *desc.FieldDescriptor) []Problem {
-					return test.problems
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestServiceRule(t *testing.T) {
-	// Create a file descriptor with a service.
-	fd, err := builder.NewFile("test.proto").AddService(
-		builder.NewService("Library"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor: %q", err)
+func TestFieldRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.FieldDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.FieldDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.FieldDescriptor) bool { return true }, true},
 	}
-
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetServices()[0]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the service rule.
-			rule := &ServiceRule{
-				Name: RuleName("test"),
-				LintService: func(s *desc.ServiceDescriptor) []Problem {
-					return test.problems
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &FieldRule{
+				OnlyIf: test.onlyIf,
+				LintField: func(f *desc.FieldDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(&desc.FieldDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestMethodRule(t *testing.T) {
-	// Create a file descriptor with a service.
-	book := builder.RpcTypeMessage(builder.NewMessage("Book"), false)
-	fd, err := builder.NewFile("test.proto").AddService(
-		builder.NewService("Library").AddMethod(
-			builder.NewMethod(
-				"GetBook",
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-				book,
-			),
-		).AddMethod(
-			builder.NewMethod(
-				"CreateBook",
-				builder.RpcTypeMessage(builder.NewMessage("CreateBookRequest"), false),
-				book,
-			),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor: %q", err)
+func TestFieldRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &FieldRule{
+		Name: want,
 	}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
+	}
+}
 
-	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetServices()[0].GetMethods()[1]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the method rule.
+func TestEnumRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"EnumDescriptor_LintInvoked", &desc.EnumDescriptor{}, true},
+		{"NotAEnumDescriptor_LintNotInvoked", &desc.MessageDescriptor{}, false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &EnumRule{
+				LintEnum: func(f *desc.EnumDescriptor) []Problem {
+					return []Problem{}
+				},
+			}
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
+		})
+	}
+}
+
+func TestEnumRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.EnumDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.EnumDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.EnumDescriptor) bool { return true }, true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &EnumRule{
+				OnlyIf: test.onlyIf,
+				LintEnum: func(f *desc.EnumDescriptor) []Problem {
+					return []Problem{}
+				},
+			}
+			problems := rule.Lint(&desc.EnumDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
+		})
+	}
+}
+
+func TestEnumRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &EnumRule{
+		Name: want,
+	}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
+	}
+}
+
+func TestMethodRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"MethodDescriptor_LintInvoked", &desc.MethodDescriptor{}, true},
+		{"NotAMethodDescriptor_LintNotInvoked", &desc.MessageDescriptor{}, false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			rule := &MethodRule{
-				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MethodDescriptor) bool {
-					return m.GetName() == "CreateBook"
-				},
-				LintMethod: func(m *desc.MethodDescriptor) []Problem {
-					return test.problems
+				LintMethod: func(f *desc.MethodDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestEnumRule(t *testing.T) {
-	// Create a file descriptor with top-level enums.
-	fd, err := builder.NewFile("test.proto").AddEnum(
-		builder.NewEnum("Format"),
-	).AddEnum(
-		builder.NewEnum("Edition"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+func TestMethodRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.MethodDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.MethodDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.MethodDescriptor) bool { return true }, true},
 	}
-
-	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[1]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the enum rule.
-			rule := &EnumRule{
-				Name: RuleName("test"),
-				OnlyIf: func(e *desc.EnumDescriptor) bool {
-					return e.GetName() == "Edition"
-				},
-				LintEnum: func(e *desc.EnumDescriptor) []Problem {
-					return test.problems
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &MethodRule{
+				OnlyIf: test.onlyIf,
+				LintMethod: func(f *desc.MethodDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(&desc.MethodDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestEnumRuleNested(t *testing.T) {
-	// Create a file descriptor with top-level enums.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddNestedEnum(
-			builder.NewEnum("Format"),
-		).AddNestedEnum(
-			builder.NewEnum("Edition"),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+func TestMethodRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &MethodRule{
+		Name: want,
 	}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
+	}
+}
 
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedEnumTypes()[1]) {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create the enum rule.
-			rule := &EnumRule{
-				Name: RuleName("test"),
-				OnlyIf: func(e *desc.EnumDescriptor) bool {
-					return e.GetName() == "Edition"
-				},
-				LintEnum: func(e *desc.EnumDescriptor) []Problem {
-					return test.problems
+func TestServiceRule_Lint(t *testing.T) {
+	tests := []struct {
+		name        string
+		descriptor  desc.Descriptor
+		lintInvoked bool
+	}{
+		{"ServiceDescriptor_LintInvoked", &desc.ServiceDescriptor{}, true},
+		{"NotAServiceDescriptor_LintNotInvoked", &desc.MessageDescriptor{}, false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &ServiceRule{
+				LintService: func(f *desc.ServiceDescriptor) []Problem {
+					return []Problem{}
 				},
 			}
-
-			// Run the rule and assert that we got what we expect.
-			test.runRule(rule, fd, t)
+			problems := rule.Lint(test.descriptor)
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
 		})
 	}
 }
 
-func TestDescriptorRule(t *testing.T) {
-	// Create a file with one of everything in it.
-	book := builder.NewMessage("Book").AddNestedEnum(
-		builder.NewEnum("Format").AddValue(
-			builder.NewEnumValue("FORMAT_UNSPECIFIED"),
-		).AddValue(builder.NewEnumValue("PAPERBACK")),
-	).AddField(builder.NewField("name", builder.FieldTypeString())).AddNestedMessage(
-		builder.NewMessage("Author"),
-	)
-	fd, err := builder.NewFile("library.proto").AddMessage(book).AddService(
-		builder.NewService("Library").AddMethod(
-			builder.NewMethod(
-				"ConjureBook",
-				builder.RpcTypeMessage(book, false),
-				builder.RpcTypeMessage(book, false),
-			),
-		),
-	).AddEnum(builder.NewEnum("State")).Build()
-	if err != nil {
-		t.Fatalf("%v", err)
+func TestServiceRule_OnlyIf(t *testing.T) {
+	tests := []struct {
+		name        string
+		onlyIf      func(*desc.ServiceDescriptor) bool
+		lintInvoked bool
+	}{
+		{"NoOnlyIf_Invoked", nil, true},
+		{"OnlyIf_ReturnFalse_NotInvoked", func(*desc.ServiceDescriptor) bool { return false }, false},
+		{"OnlyIf_ReturnTrue_Invoked", func(*desc.ServiceDescriptor) bool { return true }, true},
 	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rule := &ServiceRule{
+				OnlyIf: test.onlyIf,
+				LintService: func(f *desc.ServiceDescriptor) []Problem {
+					return []Problem{}
+				},
+			}
+			problems := rule.Lint(&desc.ServiceDescriptor{})
+			lintInvoked := problems != nil
+			if test.lintInvoked != lintInvoked {
+				t.Errorf("Lint() invoked? got %v, but want %v", lintInvoked, test.lintInvoked)
+			}
+		})
+	}
+}
 
-	// Create a rule that lets us verify that each descriptor was visited.
-	visited := make(map[string]desc.Descriptor)
-	rule := &DescriptorRule{
-		Name: RuleName("test"),
-		OnlyIf: func(d desc.Descriptor) bool {
-			return d.GetName() != "FORMAT_UNSPECIFIED"
-		},
-		LintDescriptor: func(d desc.Descriptor) []Problem {
-			visited[d.GetName()] = d
-			return nil
-		},
+func TestServiceRule_GetName(t *testing.T) {
+	want := RuleName("test")
+	rule := &ServiceRule{
+		Name: want,
 	}
-
-	// Run the rule.
-	rule.Lint(fd)
-
-	// Verify that each descriptor was visited.
-	// We do not care what order they were visited in.
-	wantDescriptors := []string{
-		"Author", "Book", "ConjureBook", "Format", "PAPERBACK",
-		"name", "Library", "State",
-	}
-	if got, want := rule.GetName(), "test"; string(got) != want {
-		t.Errorf("Got name %q, wanted %q", got, want)
-	}
-	if got, want := len(visited), len(wantDescriptors); got != want {
-		t.Errorf("Got %d descriptors, wanted %d.", got, want)
-	}
-	for _, name := range wantDescriptors {
-		if _, ok := visited[name]; !ok {
-			t.Errorf("Missing descriptor %q.", name)
-		}
+	if rule.GetName() != want {
+		t.Errorf("GetName() got %s, but want %s", rule.GetName(), want)
 	}
 }
 
@@ -410,46 +475,5 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	}
 	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
-	}
-}
-
-type lintRuleTest struct {
-	testName string
-	problems []Problem
-}
-
-// runRule runs a rule within a test environment.
-func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *testing.T) {
-	// Establish that the metadata methods work.
-	if got, want := string(rule.GetName()), string(RuleName("test")); got != want {
-		t.Errorf("Got %q for GetName(), expected %q", got, want)
-	}
-
-	// Run the rule's lint function on the file descriptor
-	// and assert that we got what we expect.
-	if got, want := rule.Lint(fd), test.problems; !reflect.DeepEqual(got, want) {
-		t.Errorf("Got %v problems; expected %v.", got, want)
-	}
-}
-
-// makeLintRuleTests generates boilerplate tests that are consistent for
-// each type of rule.
-func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
-	return []lintRuleTest{
-		{"NoProblems", []Problem{}},
-		{"OneProblem", []Problem{{
-			Message:    "There was a problem.",
-			Descriptor: d,
-		}}},
-		{"TwoProblems", []Problem{
-			{
-				Message:    "This was the first problem.",
-				Descriptor: d,
-			},
-			{
-				Message:    "This was the second problem.",
-				Descriptor: d,
-			},
-		}},
 	}
 }

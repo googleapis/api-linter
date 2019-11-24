@@ -20,6 +20,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
+// TODO: add more tests for different descriptors.
 func TestHasComments(t *testing.T) {
 	file := testutils.ParseProto3String(t, `
 		// This is a book.
@@ -29,8 +30,9 @@ func TestHasComments(t *testing.T) {
 			string title = 2;
 		}
 	`)
-	wantProblems := testutils.Problems{{Descriptor: file.GetMessageTypes()[0].GetFields()[1]}}
-	if diff := wantProblems.Diff(hasComments.Lint(file)); diff != "" {
+	field := file.GetMessageTypes()[0].GetFields()[1]
+	wantProblems := testutils.Problems{{Descriptor: field}}
+	if diff := wantProblems.Diff(hasComments.Lint(field)); diff != "" {
 		t.Errorf(diff)
 	}
 }

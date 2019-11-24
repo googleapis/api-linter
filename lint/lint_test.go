@@ -96,7 +96,7 @@ func TestLinter_run(t *testing.T) {
 
 			// Assert that we got the problems we expected.
 			if !reflect.DeepEqual(resp.Problems, test.problems) {
-				t.Errorf("Expected %v, got %v.", resp.Problems, test.problems)
+				t.Errorf("Expected %v, got %v.", test.problems, resp.Problems)
 			}
 		})
 	}

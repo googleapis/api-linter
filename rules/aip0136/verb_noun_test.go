@@ -38,7 +38,7 @@ func TestVerbNoun(t *testing.T) {
 				message {{.MethodName}}Response {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			got := verbNoun.Lint(file)
+			got := verbNoun.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(got); diff != "" {
 				t.Errorf(diff)
 			}

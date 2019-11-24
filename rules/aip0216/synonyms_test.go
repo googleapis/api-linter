@@ -38,7 +38,7 @@ func TestSynonyms(t *testing.T) {
 			}
 		`, test)
 			e := f.GetEnumTypes()[0]
-			if diff := test.problems.SetDescriptor(e).Diff(synonyms.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(e).Diff(synonyms.Lint(e)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

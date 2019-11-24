@@ -24,6 +24,7 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
+// TODO: Use template for testing.
 func TestHttpUrl(t *testing.T) {
 	tests := []struct {
 		testName   string
@@ -60,8 +61,9 @@ func TestHttpUrl(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := uriSuffix.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			method := service.GetMethods()[0]
+			problems := uriSuffix.Lint(method)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

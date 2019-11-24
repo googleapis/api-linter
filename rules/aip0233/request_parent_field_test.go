@@ -81,7 +81,7 @@ func TestRequestParentField(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestParentField.Lint(file)
+			problems := requestParentField.Lint(m)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

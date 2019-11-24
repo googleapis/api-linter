@@ -47,7 +47,7 @@ func TestUpperSnake(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that we got the correct problems.
-			problems := enumValueUpperSnakeCase.Lint(enum.GetFile())
+			problems := enumValueUpperSnakeCase.Lint(enum)
 			if diff := test.problems.Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

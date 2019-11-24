@@ -50,7 +50,7 @@ func TestHttpUriField(t *testing.T) {
 				message FrobBookResponse {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			problems := httpURICase.Lint(file)
+			problems := httpURICase.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

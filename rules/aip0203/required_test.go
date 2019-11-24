@@ -111,19 +111,19 @@ func TestRequired(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			template := `
-import "google/api/field_behavior.proto";
-message Book {
-	// Title of the book
-	// {{.Comment}}
-	{{.Field}}
-}`
+				import "google/api/field_behavior.proto";
+				message Book {
+					// Title of the book
+					// {{.Comment}}
+					{{.Field}}
+				}`
 			file := testutils.ParseProto3Tmpl(t, template,
 				struct {
 					Comment string
 					Field   string
 				}{test.comment, test.field})
 			f := file.GetMessageTypes()[0].GetFields()[0]
-			problems := required.Lint(file)
+			problems := required.Lint(f)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

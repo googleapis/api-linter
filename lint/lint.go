@@ -64,19 +64,20 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	}
 	var errMessages []string
 
-	for name, rule := range l.rules {
-		// Run the linter rule against this file, and throw away any problems
-		// which should have been disabled.
-		if l.configs.IsRuleEnabled(string(name), fd.GetName()) {
-			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
-				for _, p := range problems {
-					if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
-						p.RuleID = rule.GetName()
-						resp.Problems = append(resp.Problems, p)
+	descriptors := getAllDescriptors(fd)
+	for _, d := range descriptors {
+		for _, rule := range l.rules {
+			if l.configs.IsRuleEnabled(string(rule.GetName()), fd.GetName()) {
+				if problems, err := l.runAndRecoverFromPanics(rule, d); err == nil {
+					for _, p := range problems {
+						if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
+							p.RuleID = rule.GetName()
+							resp.Problems = append(resp.Problems, p)
+						}
 					}
+				} else {
+					errMessages = append(errMessages, err.Error())
 				}
-			} else {
-				errMessages = append(errMessages, err.Error())
 			}
 		}
 	}
@@ -89,7 +90,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	return resp, err
 }
 
-func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
+func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, d desc.Descriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if rerr, ok := r.(error); ok {
@@ -100,5 +101,5 @@ func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor
 		}
 	}()
 
-	return rule.Lint(fd), nil
+	return rule.Lint(d), nil
 }

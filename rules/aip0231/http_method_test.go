@@ -24,6 +24,7 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
+// TODO: Use template for testing.
 func TestHttpVerb(t *testing.T) {
 	// Set up GET and POST HTTP annotations.
 	httpGet := &annotations.HttpRule{
@@ -69,8 +70,9 @@ func TestHttpVerb(t *testing.T) {
 			}
 
 			// Run the method, ensure we get what we expect.
-			problems := httpVerb.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			method := service.GetMethods()[0]
+			problems := httpVerb.Lint(method)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

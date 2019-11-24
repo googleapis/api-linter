@@ -23,6 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+// TODO: Separate it into small rules.
+//
 // The Batch Update response message should have resource field.
 var responseResourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(234, "response-resource-field"),

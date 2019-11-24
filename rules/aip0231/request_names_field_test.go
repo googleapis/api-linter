@@ -137,7 +137,7 @@ func TestNamesField(t *testing.T) {
 				problemDesc = test.problemDesc(m)
 			}
 
-			problems := namesField.Lint(file)
+			problems := namesField.Lint(m)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

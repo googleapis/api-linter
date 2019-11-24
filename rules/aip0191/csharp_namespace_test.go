@@ -46,7 +46,8 @@ func TestCsharpNamespace(t *testing.T) {
 
 				option csharp_namespace = "{{.CsharpNamespace}}";
 			`, test)
-			if diff := test.problems.SetDescriptor(f).Diff(csharpNamespace.Lint(f)); diff != "" {
+			problems := csharpNamespace.Lint(f)
+			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

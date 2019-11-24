@@ -47,9 +47,9 @@ func TestLROMetadata(t *testing.T) {
 				}
 				message {{.MethodName}}Request {}
 			`, test)
-			problems := lroMetadata.Lint(f)
-			d := f.GetServices()[0].GetMethods()[0]
-			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
+			method := f.GetServices()[0].GetMethods()[0]
+			problems := lroMetadata.Lint(method)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

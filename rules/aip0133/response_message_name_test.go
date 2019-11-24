@@ -59,8 +59,8 @@ func TestOutputMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			problems := outputName.Lint(file)
 			method := file.GetServices()[0].GetMethods()[0]
+			problems := outputName.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

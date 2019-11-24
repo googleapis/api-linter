@@ -50,8 +50,8 @@ func TestDefinedInFile(t *testing.T) {
 			message WriteBookResponse {}
 			message OperationMetadata {}
 		`, test)
-		problems := lroDefinedInFile.Lint(f)
 		m := f.GetServices()[0].GetMethods()[0]
+		problems := lroDefinedInFile.Lint(m)
 		if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 			t.Errorf(diff)
 		}

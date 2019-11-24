@@ -46,7 +46,7 @@ func TestStandardFields(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := standardFields.Lint(message.GetFile())
+			problems := standardFields.Lint(message)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
@@ -69,7 +69,7 @@ func TestStandardFieldsInvalidType(t *testing.T) {
 		Descriptor: message.GetFields()[0],
 		Suggestion: "string",
 	}}
-	gotProblems := standardFields.Lint(message.GetFile())
+	gotProblems := standardFields.Lint(message)
 	if diff := wantProblems.Diff(gotProblems); diff != "" {
 		t.Errorf(diff)
 	}

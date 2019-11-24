@@ -53,7 +53,7 @@ func TestInputName(t *testing.T) {
 
 			m := file.GetServices()[0].GetMethods()[0]
 
-			problems := inputName.Lint(file)
+			problems := inputName.Lint(m)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

@@ -80,7 +80,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageToken.Lint(message.GetFile())
+			problems := requestPaginationPageToken.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

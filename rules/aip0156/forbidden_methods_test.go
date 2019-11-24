@@ -48,7 +48,7 @@ func TestForbiddenMethods(t *testing.T) {
 			message Settings{}
 		`, test)
 		method := f.GetServices()[0].GetMethods()[0]
-		problems := forbiddenMethods.Lint(f)
+		problems := forbiddenMethods.Lint(method)
 		if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 			t.Errorf(diff)
 		}

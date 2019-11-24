@@ -72,7 +72,7 @@ func TestResponseMessageName(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the expected problems.
 			method := file.GetServices()[0].GetMethods()[0]
-			problems := responseMessageName.Lint(file)
+			problems := responseMessageName.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

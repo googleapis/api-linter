@@ -148,7 +148,7 @@ func TestOutput(t *testing.T) {
 					Field   string
 				}{test.comment, test.field})
 			f := file.GetMessageTypes()[0].GetFields()[0]
-			problems := outputOnly.Lint(file)
+			problems := outputOnly.Lint(f)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

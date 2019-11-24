@@ -98,7 +98,7 @@ func TestAbbreviations(t *testing.T) {
 					d := group.descFunc(file)
 
 					// Establish that we get the problems we expect.
-					problems := abbreviations.Lint(file)
+					problems := abbreviations.Lint(d)
 					if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 						t.Errorf(diff)
 					}

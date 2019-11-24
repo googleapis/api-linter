@@ -29,43 +29,43 @@ func TestOptionalBehaviorConsistency(t *testing.T) {
 		{
 			name: "Valid-NoneOptional",
 			field: `
-string name = 1 [
-	(google.api.field_behavior) = IMMUTABLE,
-	(google.api.field_behavior) = OUTPUT_ONLY];
+				string name = 1 [
+					(google.api.field_behavior) = IMMUTABLE,
+					(google.api.field_behavior) = OUTPUT_ONLY];
 
-string title = 2 [(google.api.field_behavior) = REQUIRED];
+				string title = 2 [(google.api.field_behavior) = REQUIRED];
 
-string summary = 3;
+				string summary = 3;
 
-string author = 4;`,
+				string author = 4;`,
 			problems: nil,
 		},
 		{
 			name: "Valid-AllOptional",
 			field: `
-string name = 1 [
-	(google.api.field_behavior) = IMMUTABLE,
-	(google.api.field_behavior) = OUTPUT_ONLY];
+				string name = 1 [
+					(google.api.field_behavior) = IMMUTABLE,
+					(google.api.field_behavior) = OUTPUT_ONLY];
 
-string title = 2 [(google.api.field_behavior) = REQUIRED];
+				string title = 2 [(google.api.field_behavior) = REQUIRED];
 
-string summary = 3 [(google.api.field_behavior) = OPTIONAL];
+				string summary = 3 [(google.api.field_behavior) = OPTIONAL];
 
-string author = 4 [(google.api.field_behavior) = OPTIONAL];`,
+				string author = 4 [(google.api.field_behavior) = OPTIONAL];`,
 			problems: nil,
 		},
 		{
 			name: "Invalid-PartialOptional",
 			field: `
-string name = 1 [
-	(google.api.field_behavior) = IMMUTABLE,
-	(google.api.field_behavior) = OUTPUT_ONLY];
+				string name = 1 [
+					(google.api.field_behavior) = IMMUTABLE,
+					(google.api.field_behavior) = OUTPUT_ONLY];
 
-string title = 2 [(google.api.field_behavior) = REQUIRED];
+				string title = 2 [(google.api.field_behavior) = REQUIRED];
 
-string summary = 3 [(google.api.field_behavior) = OPTIONAL];
+				string summary = 3 [(google.api.field_behavior) = OPTIONAL];
 
-string author = 4;`,
+				string author = 4;`,
 			problems: testutils.Problems{{
 				Message: "Within a single message, either all optional fields should be indicated, or none of them should be.",
 			}},
@@ -75,15 +75,15 @@ string author = 4;`,
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			template := `
-import "google/api/field_behavior.proto";
-message Book {
-	// Title of the book
-	{{.Field}}
-}`
+				import "google/api/field_behavior.proto";
+				message Book {
+					// Title of the book
+					{{.Field}}
+				}`
 			file := testutils.ParseProto3Tmpl(t, template, struct{ Field string }{test.field})
 			// author field in the test will get the warning
 			f := file.GetMessageTypes()[0].GetFields()[3]
-			problems := optionalBehaviorConsistency.Lint(file)
+			problems := optionalBehaviorConsistency.Lint(file.GetMessageTypes()[0])
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

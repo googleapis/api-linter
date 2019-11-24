@@ -68,17 +68,17 @@ func TestRequestParentField(t *testing.T) {
 				}
 				message UpdateBookRequest{}
 				`, test)
-
+			message := file.GetMessageTypes()[0]
 			// Determine the descriptor that a failing test will attach to.
 			var problemDesc desc.Descriptor
-			if parent := file.GetMessageTypes()[0].FindFieldByName("parent"); parent != nil {
+			if parent := message.FindFieldByName("parent"); parent != nil {
 				problemDesc = parent
 			} else {
-				problemDesc = file.GetMessageTypes()[0]
+				problemDesc = message
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestParentField.Lint(file)
+			problems := requestParentField.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

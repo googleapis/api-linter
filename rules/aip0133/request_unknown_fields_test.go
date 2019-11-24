@@ -115,7 +115,7 @@ func TestUnknownFields(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := unknownFields.Lint(message.GetFile())
+			problems := unknownFields.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

@@ -34,18 +34,18 @@ func TestOptionalBehaviorConflict(t *testing.T) {
 		{
 			name: "Valid",
 			field: `
-string title = 1 [
-	(google.api.field_behavior) = IMMUTABLE,
-	(google.api.field_behavior) = OUTPUT_ONLY];`,
+					string title = 1 [
+					(google.api.field_behavior) = IMMUTABLE,
+					(google.api.field_behavior) = OUTPUT_ONLY];`,
 			problems: nil,
 		},
 		{
 			name: "Invalid-optional-conflict",
 			field: `
-string title = 1 [
-	(google.api.field_behavior) = IMMUTABLE,
-	(google.api.field_behavior) = OUTPUT_ONLY,
-	(google.api.field_behavior) = OPTIONAL];`,
+					string title = 1 [
+						(google.api.field_behavior) = IMMUTABLE,
+						(google.api.field_behavior) = OUTPUT_ONLY,
+						(google.api.field_behavior) = OPTIONAL];`,
 			problems: testutils.Problems{{
 				Message: "Field behavior `(google.api.field_behavior) = OPTIONAL` shouldn't be used together with other field behaviors",
 			}},
@@ -55,14 +55,14 @@ string title = 1 [
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			template := `
-import "google/api/field_behavior.proto";
-message Book {
-	// Title of the book
-	{{.Field}}
-}`
+				import "google/api/field_behavior.proto";
+				message Book {
+					// Title of the book
+					{{.Field}}
+				}`
 			file := testutils.ParseProto3Tmpl(t, template, struct{ Field string }{test.field})
 			f := file.GetMessageTypes()[0].GetFields()[0]
-			problems := optionalBehaviorConflict.Lint(file)
+			problems := optionalBehaviorConflict.Lint(f)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

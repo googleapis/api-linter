@@ -52,7 +52,7 @@ func TestHttpBody(t *testing.T) {
 				message {{.MethodName}}Response {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			problems := httpBody.Lint(file)
+			problems := httpBody.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

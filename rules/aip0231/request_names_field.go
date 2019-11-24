@@ -24,6 +24,8 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
+// TODO: Separate it to small rules.
+//
 // The Batch Get standard method should have repeated name field or repeated
 // standard get request message field, but the latter one is not suggested.
 var namesField = &lint.MessageRule{

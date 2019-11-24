@@ -23,6 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
+// TODO: Separate it to small rules.
+//
 // The Batch Update request message should have parent field.
 var requestParentField = &lint.MessageRule{
 	Name:   lint.NewRuleName(234, "request-parent-field"),

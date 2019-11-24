@@ -64,7 +64,7 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			problems := unknownFields.Lint(message.GetFile())
+			problems := unknownFields.Lint(message)
 			if diff := test.problems.SetDescriptor(message.GetFields()[1]).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

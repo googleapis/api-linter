@@ -79,8 +79,9 @@ func TestOnlyLeadingComments(t *testing.T) {
 				message Book {}
 				{{.Trailing}}
 			`, test)
-			problems := onlyLeadingComments.Lint(file)
-			if diff := test.problems.SetDescriptor(file.GetMessageTypes()[0]).Diff(problems); diff != "" {
+			message := file.GetMessageTypes()[0]
+			problems := onlyLeadingComments.Lint(message)
+			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

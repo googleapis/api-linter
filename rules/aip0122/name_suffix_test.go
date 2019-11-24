@@ -21,24 +21,28 @@ import (
 )
 
 func TestNameSuffix(t *testing.T) {
-	for _, test := range []struct {
+	tests := []struct {
 		name      string
 		FieldName string
 		problems  testutils.Problems
 	}{
-		{"Valid", "publisher", testutils.Problems{}},
-		{"ValidStandard", "display_name", testutils.Problems{}},
+		{"Valid", "publisher", nil},
+		{"ValidStandard", "name", nil},
+		{"ValidStandard", "display_name", nil},
 		{"Invalid", "author_name", testutils.Problems{{Suggestion: "author"}}},
-	} {
-		f := testutils.ParseProto3Tmpl(t, `
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
 			message Book {
-				string name = 1;
-				string {{.FieldName}} = 2;
+				string {{.FieldName}} = 1;
+			}`, test)
+
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := nameSuffix.Lint(field)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Errorf(diff)
 			}
-		`, test)
-		field := f.GetMessageTypes()[0].GetFields()[1]
-		if diff := test.problems.SetDescriptor(field).Diff(nameSuffix.Lint(f)); diff != "" {
-			t.Errorf(diff)
-		}
+		})
 	}
 }

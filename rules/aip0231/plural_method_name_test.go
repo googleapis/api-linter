@@ -81,7 +81,7 @@ func TestPluralMethodResourceName(t *testing.T) {
 
 			m := file.GetServices()[0].GetMethods()[0]
 
-			problems := pluralMethodResourceName.Lint(file)
+			problems := pluralMethodResourceName.Lint(m)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

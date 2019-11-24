@@ -30,9 +30,9 @@ type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
 
-	// Lint accepts a FileDescriptor and lints it,
+	// Lint accepts a Descriptor and lints it,
 	// returning a slice of Problem objects it finds.
-	Lint(*desc.FileDescriptor) []Problem
+	Lint(desc.Descriptor) []Problem
 }
 
 // FileRule defines a lint rule that checks a file as a whole.
@@ -55,11 +55,13 @@ func (r *FileRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint forwards the FileDescriptor to the LintFile method defined on the
-// FileRule.
-func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
-	if r.OnlyIf == nil || r.OnlyIf(fd) {
-		return r.LintFile(fd)
+// Lint accepts a Descriptor and applies LintFile on it
+// only if the descriptor is a FileDescriptor.
+func (r *FileRule) Lint(d desc.Descriptor) []Problem {
+	if f, ok := d.(*desc.FileDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(f) {
+			return r.LintFile(f)
+		}
 	}
 	return nil
 }
@@ -86,20 +88,15 @@ func (r *MessageRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every message in the file, and runs `LintMessage`.
-//
-// If an `OnlyIf` function is provided on the rule, it is run against each
-// message, and if it returns false, the `LintMessage` function is not called.
-func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-
-	// Iterate over each message and process rules for each message.
-	for _, message := range getAllMessages(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(message) {
-			problems = append(problems, r.LintMessage(message)...)
+// Lint accepts a Descriptor and applies LintMessage on it
+// only if the descriptor is a MessageDescriptor.
+func (r *MessageRule) Lint(d desc.Descriptor) []Problem {
+	if m, ok := d.(*desc.MessageDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(m) {
+			return r.LintMessage(m)
 		}
 	}
-	return problems
+	return nil
 }
 
 // FieldRule defines a lint rule that is run on each field within a file.
@@ -122,18 +119,15 @@ func (r *FieldRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every field in the file and runs `LintField`.
-//
-// If an `OnlyIf` function is provided on the rule, it is run against each
-// field, and if it returns false, the `LintField` function is not called.
-func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-	for _, field := range getAllFields(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(field) {
-			problems = append(problems, r.LintField(field)...)
+// Lint accepts a Descriptor and applies LintField on it
+// only if the descriptor is a FieldDescriptor.
+func (r *FieldRule) Lint(d desc.Descriptor) []Problem {
+	if f, ok := d.(*desc.FieldDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(f) {
+			return r.LintField(f)
 		}
 	}
-	return problems
+	return nil
 }
 
 // ServiceRule defines a lint rule that is run on each service.
@@ -155,18 +149,15 @@ func (r *ServiceRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every service in the file and runs `LintService`.
-//
-// If an `OnlyIf` function is provided on the rule, it is run against each
-// service, and if it returns false, the `LintService` function is not called.
-func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-	for _, service := range fd.GetServices() {
-		if r.OnlyIf == nil || r.OnlyIf(service) {
-			problems = append(problems, r.LintService(service)...)
+// Lint accepts a Descriptor and applies LintSservice on it
+// only if the descriptor is a ServiceDescriptor.
+func (r *ServiceRule) Lint(d desc.Descriptor) []Problem {
+	if s, ok := d.(*desc.ServiceDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(s) {
+			return r.LintService(s)
 		}
 	}
-	return problems
+	return nil
 }
 
 // MethodRule defines a lint rule that is run on each method.
@@ -188,18 +179,15 @@ func (r *MethodRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every method in the file and runs `LintMethod`.
-//
-// If an `OnlyIf` function is provided on the rule, it is run against each
-// method, and if it returns false, the `LintMethod` function is not called.
-func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-	for _, method := range getAllMethods(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(method) {
-			problems = append(problems, r.LintMethod(method)...)
+// Lint accepts a Descriptor and applies LintMethod on it
+// only if the descriptor is a MethodDescriptor.
+func (r *MethodRule) Lint(d desc.Descriptor) []Problem {
+	if m, ok := d.(*desc.MethodDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(m) {
+			return r.LintMethod(m)
 		}
 	}
-	return problems
+	return nil
 }
 
 // EnumRule defines a lint rule that is run on each enum.
@@ -221,20 +209,15 @@ func (r *EnumRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every service in the file and runs `LintEnum`.
-//
-// If an `OnlyIf` function is provided on the rule, it is run against each
-// enum, and if it returns false, the `LintEnum` function is not called.
-func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-
-	// Lint all enums, either at the top of the file, or nested within messages.
-	for _, enum := range getAllEnums(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(enum) {
-			problems = append(problems, r.LintEnum(enum)...)
+// Lint accepts a Descriptor and applies LintEnum on it
+// only if the descriptor is a EnumDescriptor.
+func (r *EnumRule) Lint(d desc.Descriptor) []Problem {
+	if e, ok := d.(*desc.EnumDescriptor); ok {
+		if r.OnlyIf == nil || r.OnlyIf(e) {
+			return r.LintEnum(e)
 		}
 	}
-	return problems
+	return nil
 }
 
 // DescriptorRule defines a lint rule that is run on every descriptor
@@ -260,20 +243,12 @@ func (r *DescriptorRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every descriptor in the file and runs `LintDescriptor`.
-//
-// It visits every service, method, message, field, enum, and enum value.
-// This order is not guaranteed. It does NOT visit the file itself.
-func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
-	problems := []Problem{}
-	for _, d := range getAllDescriptors(fd) {
-		if r.OnlyIf == nil || r.OnlyIf(d) {
-			problems = append(problems, r.LintDescriptor(d)...)
-		}
+// Lint accepts a Descriptor and applies LintDescriptor on it.
+func (r *DescriptorRule) Lint(d desc.Descriptor) []Problem {
+	if r.OnlyIf == nil || r.OnlyIf(d) {
+		return r.LintDescriptor(d)
 	}
-
-	// Done; return the full set of problems.
-	return problems
+	return nil
 }
 
 var disableRuleNameRegex = regexp.MustCompile(`api-linter:\s*(.+)\s*=\s*disabled`)
@@ -321,7 +296,7 @@ func getLeadingComments(d desc.Descriptor) string {
 
 // getAllDescriptors returns a slice with every descriptor in the file.
 func getAllDescriptors(f *desc.FileDescriptor) []desc.Descriptor {
-	descriptors := []desc.Descriptor{}
+	descriptors := []desc.Descriptor{f}
 	for _, d := range getAllEnums(f) {
 		descriptors = append(descriptors, d)
 	}

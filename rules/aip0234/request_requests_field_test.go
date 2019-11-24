@@ -72,14 +72,15 @@ func TestRequestRequestsField(t *testing.T) {
 				`, test)
 
 			// Determine the descriptor that a failing test will attach to.
+			message := file.GetMessageTypes()[0]
 			var problemDesc desc.Descriptor
-			if requests := file.GetMessageTypes()[0].FindFieldByName("requests"); requests != nil {
+			if requests := message.FindFieldByName("requests"); requests != nil {
 				problemDesc = requests
 			} else {
-				problemDesc = file.GetMessageTypes()[0]
+				problemDesc = message
 			}
 
-			problems := requestRequestsField.Lint(file)
+			problems := requestRequestsField.Lint(message)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

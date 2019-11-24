@@ -54,7 +54,8 @@ func TestRequestMaskField(t *testing.T) {
 			if test.descriptor != nil {
 				d = test.descriptor(message)
 			}
-			if diff := test.problems.SetDescriptor(d).Diff(requestMaskField.Lint(file)); diff != "" {
+			problems := requestMaskField.Lint(message)
+			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

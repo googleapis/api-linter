@@ -49,7 +49,7 @@ func TestRequestMessageName(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the expected problems.
-			problems := requestMessageName.Lint(service.GetFile())
+			problems := requestMessageName.Lint(service.GetMethods()[0])
 			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

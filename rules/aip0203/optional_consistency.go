@@ -20,6 +20,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+// TODO: This should be a FieldRule.
+//
 // If a message has a field which is described as optional, ensure that every
 // optional field on the message has this indicator.
 var optionalBehaviorConsistency = &lint.MessageRule{

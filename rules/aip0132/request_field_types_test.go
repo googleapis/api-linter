@@ -51,8 +51,9 @@ func TestRequestFieldTypes(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
-			problems := requestFieldTypes.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(message.GetFields()[1]).Diff(problems); diff != "" {
+			field := message.GetFields()[1]
+			problems := requestFieldTypes.Lint(field)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

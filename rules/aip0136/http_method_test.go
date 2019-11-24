@@ -51,7 +51,7 @@ func TestHttpMethod(t *testing.T) {
 				message {{.MethodName}}Response {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			got := httpMethod.Lint(file)
+			got := httpMethod.Lint(method)
 			if diff := test.problems.SetDescriptor(method).Diff(got); diff != "" {
 				t.Errorf(diff)
 			}
