@@ -30,25 +30,25 @@ var respAllowedFields = stringset.New(
 	"unreachable_locations", // Wrong, but a separate AIP-217 rule catches it.
 )
 
-var responseUnknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(132, "response-unknown-fields"),
-	OnlyIf: isListResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		for _, field := range m.GetFields() {
-			// A repeated variant of the resource should be permitted.
-			resource := strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(m.GetName())[1])
-			if field.GetName() == resource {
-				continue
-			}
-
-			// It is not the resource field; check it against the whitelist.
-			if !respAllowedFields.Contains(field.GetName()) {
-				problems = append(problems, lint.Problem{
-					Message:    "List responses should only contain fields explicitly described in AIPs.",
-					Descriptor: field,
-				})
-			}
+var responseUnknownFields = &lint.FieldRule{
+	Name: lint.NewRuleName(132, "response-unknown-fields"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isListResponseMessage(f.GetOwner())
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		// A repeated variant of the resource should be permitted.
+		resource := strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(f.GetOwner().GetName())[1])
+		if f.GetName() == resource {
+			return nil
 		}
-		return
+
+		// It is not the resource field; check it against the whitelist.
+		if !respAllowedFields.Contains(f.GetName()) {
+			return []lint.Problem{{
+				Message:    "List responses should only contain fields explicitly described in AIPs.",
+				Descriptor: f,
+			}}
+		}
+		return nil
 	},
 }
