@@ -17,9 +17,9 @@ package utils
 import (
 	"testing"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
@@ -39,10 +39,10 @@ func TestGetFieldBehavior(t *testing.T) {
 	msg := fd.GetMessageTypes()[0]
 	tests := []struct {
 		fieldName      string
-		fieldBehaviors []apb.FieldBehavior
+		fieldBehaviors stringset.Set
 	}{
-		{"name", []apb.FieldBehavior{apb.FieldBehavior_IMMUTABLE, apb.FieldBehavior_OUTPUT_ONLY}},
-		{"title", []apb.FieldBehavior{apb.FieldBehavior_REQUIRED}},
+		{"name", stringset.New("IMMUTABLE", "OUTPUT_ONLY")},
+		{"title", stringset.New("REQUIRED")},
 		{"summary", nil},
 	}
 	for _, test := range tests {

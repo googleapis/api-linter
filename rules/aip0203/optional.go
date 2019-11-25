@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var optional = &lint.FieldRule{
@@ -34,20 +33,13 @@ var optional = &lint.FieldRule{
 var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
 
 func withoutOptionalFieldBehavior(f *desc.FieldDescriptor) bool {
-	for _, v := range utils.GetFieldBehavior(f) {
-		if v == annotations.FieldBehavior_OPTIONAL {
-			return false
-		}
-	}
-	return true
+	return !utils.GetFieldBehavior(f).Contains("OPTIONAL")
 }
 
 func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
 	for _, f := range m.GetFields() {
-		for _, v := range utils.GetFieldBehavior(f) {
-			if v == annotations.FieldBehavior_OPTIONAL {
-				return true
-			}
+		if utils.GetFieldBehavior(f).Contains("OPTIONAL") {
+			return true
 		}
 	}
 	return false

@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var outputOnly = &lint.FieldRule{
@@ -34,10 +33,5 @@ var outputOnly = &lint.FieldRule{
 var outputOnlyRegexp = regexp.MustCompile("(?i).*output.?only.*")
 
 func withoutOutputOnlyFieldBehavior(f *desc.FieldDescriptor) bool {
-	for _, v := range utils.GetFieldBehavior(f) {
-		if v == annotations.FieldBehavior_OUTPUT_ONLY {
-			return false
-		}
-	}
-	return true
+	return !utils.GetFieldBehavior(f).Contains("OUTPUT_ONLY")
 }

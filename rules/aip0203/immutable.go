@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var immutable = &lint.FieldRule{
@@ -34,10 +33,5 @@ var immutable = &lint.FieldRule{
 var immutableRegexp = regexp.MustCompile("(?i).*immutable.*")
 
 func withoutImmutableFieldBehavior(f *desc.FieldDescriptor) bool {
-	for _, v := range utils.GetFieldBehavior(f) {
-		if v == annotations.FieldBehavior_IMMUTABLE {
-			return false
-		}
-	}
-	return true
+	return !utils.GetFieldBehavior(f).Contains("IMMUTABLE")
 }
