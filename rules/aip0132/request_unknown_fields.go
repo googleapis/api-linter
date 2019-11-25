@@ -32,19 +32,19 @@ var allowedFields = stringset.New(
 )
 
 // List methods should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(132, "request-unknown-fields"),
-	OnlyIf: isListRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		for _, field := range m.GetFields() {
-			if !allowedFields.Contains(field.GetName()) {
-				problems = append(problems, lint.Problem{
-					Message:    "List RPCs should only contain fields explicitly described in AIPs.",
-					Descriptor: field,
-				})
-			}
+var unknownFields = &lint.FieldRule{
+	Name: lint.NewRuleName(132, "request-unknown-fields"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isListRequestMessage(f.GetOwner())
+	},
+	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+		if !allowedFields.Contains(field.GetName()) {
+			return []lint.Problem{{
+				Message:    "List RPCs should only contain fields explicitly described in AIPs.",
+				Descriptor: field,
+			}}
 		}
 
-		return
+		return nil
 	},
 }
