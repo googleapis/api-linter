@@ -12,39 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0132
+package aip0217
 
 import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var allowedFields = stringset.New(
-	"parent",       // AIP-132
-	"page_size",    // AIP-158
-	"page_token",   // AIP-158
-	"filter",       // AIP-132
-	"order_by",     // AIP-132
-	"show_deleted", // AIP-135
-	"read_mask",    // AIP-157
-	"view",         // AIP-157
+var synSet = stringset.New(
+	"unreachable_locations",
 )
 
-// List methods should not have unrecognized fields.
-var unknownFields = &lint.FieldRule{
-	Name: lint.NewRuleName(132, "request-unknown-fields"),
+var synonyms = &lint.FieldRule{
+	Name: lint.NewRuleName(217, "synonyms"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner())
+		return f.GetOwner().FindFieldByName("next_page_token") != nil
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
-		if !allowedFields.Contains(field.GetName()) {
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if synSet.Contains(f.GetName()) {
 			return []lint.Problem{{
-				Message:    "List RPCs should only contain fields explicitly described in AIPs.",
-				Descriptor: field,
+				Message:    "Use `unreachable` to express unreachable resources when listing.",
+				Suggestion: "unreachable",
+				Descriptor: f,
+				Location:   locations.DescriptorName(f),
 			}}
 		}
-
 		return nil
 	},
 }

@@ -12,37 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0126
+package aip0217
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
-var unspecified = &lint.EnumValueRule{
-	Name:   lint.NewRuleName(126, "unspecified"),
-	OnlyIf: isFirstEnumValue,
-	LintEnumValue: func(v *desc.EnumValueDescriptor) []lint.Problem {
-		want := strings.ToUpper(strcase.SnakeCase(v.GetEnum().GetName()) + "_UNSPECIFIED")
-		if v.GetName() != want {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("The first enum value should be %q", want),
-				Suggestion: want,
-				Descriptor: v,
-				Location:   locations.DescriptorName(v),
-			}}
-		}
-
-		return nil
+var unreachableFieldType = &lint.FieldRule{
+	Name: lint.NewRuleName(217, "unreachable-field-type"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return f.GetName() == "unreachable"
 	},
-}
-
-// Note: proto3 requires that first value in enum have numeric value of 0.
-func isFirstEnumValue(v *desc.EnumValueDescriptor) bool {
-	return v.GetNumber() == 0
+	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
+		if !f.IsRepeated() {
+			problems = append(problems, lint.Problem{
+				Message:    "unreachable field should be repeated.",
+				Descriptor: f,
+			})
+		}
+		if utils.GetScalarTypeName(f) != "string" {
+			problems = append(problems, lint.Problem{
+				Message:    "unreachable field should be a string.",
+				Suggestion: "string",
+				Descriptor: f,
+				Location:   locations.FieldType(f),
+			})
+		}
+		return
+	},
 }
