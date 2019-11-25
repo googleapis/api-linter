@@ -37,6 +37,11 @@ func TestSynonyms(t *testing.T) {
 					repeated string {{.FieldName}} = 3;
 				}
 				message Book {}
+
+				// Ignored because next_page_token is not present.
+				message Irrelevant {
+					repeated string unreachable_locations = 1;
+				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[2]
 			if diff := test.problems.SetDescriptor(field).Diff(synonyms.Lint(f)); diff != "" {

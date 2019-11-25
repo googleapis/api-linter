@@ -25,21 +25,19 @@ var synSet = stringset.New(
 	"unreachable_locations",
 )
 
-var synonyms = &lint.MessageRule{
+var synonyms = &lint.FieldRule{
 	Name: lint.NewRuleName(217, "synonyms"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return m.FindFieldByName("next_page_token") != nil
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return f.GetOwner().FindFieldByName("next_page_token") != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		for _, field := range m.GetFields() {
-			if synSet.Contains(field.GetName()) {
-				return []lint.Problem{{
-					Message:    "Use `unreachable` to express unreachable resources when listing.",
-					Suggestion: "unreachable",
-					Descriptor: field,
-					Location:   locations.DescriptorName(field),
-				}}
-			}
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if synSet.Contains(f.GetName()) {
+			return []lint.Problem{{
+				Message:    "Use `unreachable` to express unreachable resources when listing.",
+				Suggestion: "unreachable",
+				Descriptor: f,
+				Location:   locations.DescriptorName(f),
+			}}
 		}
 		return nil
 	},

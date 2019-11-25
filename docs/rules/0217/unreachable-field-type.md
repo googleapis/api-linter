@@ -27,7 +27,7 @@ anything other than a `repeated string`.
 message ListBooksResponse {
   repeated Book books = 1;
   string next_page_token = 2;
-  string unreachable_locations = 3;  // Should be repeated.
+  string unreachable = 3;  // Should be repeated.
 }
 ```
 
