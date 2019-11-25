@@ -15,18 +15,23 @@
 package utils
 
 import (
+	"bitbucket.org/creachadair/stringset"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	lrpb "google.golang.org/genproto/googleapis/longrunning"
 )
 
-// GetFieldBehavior returns a slice of FieldBehavior annotations for
+// GetFieldBehavior returns a stringset.Set of FieldBehavior annotations for
 // the given field.
-func GetFieldBehavior(f *desc.FieldDescriptor) []apb.FieldBehavior {
+func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 	opts := f.GetFieldOptions()
 	if x, err := proto.GetExtension(opts, apb.E_FieldBehavior); err == nil {
-		return x.([]apb.FieldBehavior)
+		answer := stringset.New()
+		for _, fb := range x.([]apb.FieldBehavior) {
+			answer.Add(fb.String())
+		}
+		return answer
 	}
 	return nil
 }
