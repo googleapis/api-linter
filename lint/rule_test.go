@@ -240,6 +240,34 @@ func TestEnumRule(t *testing.T) {
 	}
 }
 
+func TestEnumValueRule(t *testing.T) {
+	// Create a file descriptor with a top-level enum with values.
+	fd, err := builder.NewFile("test.proto").AddEnum(
+		builder.NewEnum("Format").AddValue(builder.NewEnumValue("YAML")).AddValue(builder.NewEnumValue("JSON")),
+	).Build()
+	if err != nil {
+		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+	}
+
+	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[0].GetValues()[1]) {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the enum value rule.
+			rule := &EnumValueRule{
+				Name: RuleName("test"),
+				OnlyIf: func(e *desc.EnumValueDescriptor) bool {
+					return e.GetName() == "JSON"
+				},
+				LintEnumValue: func(e *desc.EnumValueDescriptor) []Problem {
+					return test.problems
+				},
+			}
+
+			// Run the rule and assert that we got what we expect.
+			test.runRule(rule, fd, t)
+		})
+	}
+}
+
 func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := builder.NewFile("test.proto").AddMessage(
