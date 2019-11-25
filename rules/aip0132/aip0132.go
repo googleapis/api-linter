@@ -29,6 +29,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestFieldTypes,
 		requestMessageName,
 		responseMessageName,
+		responseUnknownFields,
 		standardFields,
 		unknownFields,
 	)
@@ -36,6 +37,7 @@ func AddRules(r lint.RuleRegistry) error {
 
 var listMethodRegexp = regexp.MustCompile("^List(?:[A-Z]|$)")
 var listReqMessageRegexp = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
+var listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
 
 // Return true if this is an AIP-132 List method, false otherwise.
 func isListMethod(m *desc.MethodDescriptor) bool {
@@ -45,4 +47,9 @@ func isListMethod(m *desc.MethodDescriptor) bool {
 // Return true if this is an AIP-132 List request message, false otherwise.
 func isListRequestMessage(m *desc.MessageDescriptor) bool {
 	return listReqMessageRegexp.MatchString(m.GetName())
+}
+
+// Return true if this is an AIP-132 List response message, false otherwise.
+func isListResponseMessage(m *desc.MessageDescriptor) bool {
+	return listRespMessageRegexp.MatchString(m.GetName())
 }
