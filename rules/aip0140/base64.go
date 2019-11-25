@@ -21,8 +21,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var base64 = &lint.FieldRule{
-	Name:   lint.NewRuleName(140, "base64"),
+var base64 = &descrule.FieldRule{
+	RuleName:   lint.NewRuleName(140, "base64"),
 	OnlyIf: isStringField,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())

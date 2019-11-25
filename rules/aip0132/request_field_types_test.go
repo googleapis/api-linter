@@ -17,6 +17,7 @@ package aip0132
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -52,7 +53,7 @@ func TestRequestFieldTypes(t *testing.T) {
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
 			field := message.GetFields()[1]
-			problems := requestFieldTypes.Lint(field)
+			problems := requestFieldTypes.Lint(descrule.NewField(field))
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

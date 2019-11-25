@@ -31,19 +31,19 @@ func TestOptional(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "Optional",
 			field:    titleWithOptionalBehavior,
 			problems: nil,
 		},
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "@optional",
 			field:    titleWithOptionalBehavior,
 			problems: nil,
 		},
 		{
-			name:    "Invalid-optional",
+			RuleName:    "Invalid-optional",
 			comment: "optional",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -51,7 +51,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-Optional",
+			RuleName:    "Invalid-Optional",
 			comment: "Optional",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -59,7 +59,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@optional",
+			RuleName:    "Invalid-@optional",
 			comment: "@optional",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -67,7 +67,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@Optional",
+			RuleName:    "Invalid-@Optional",
 			comment: "@Optional",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -75,7 +75,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-OPTIONAL",
+			RuleName:    "Invalid-OPTIONAL",
 			comment: "OPTIONAL",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -83,7 +83,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@OPTIONAL",
+			RuleName:    "Invalid-@OPTIONAL",
 			comment: "@OPTIONAL",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -91,7 +91,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-optional_free_text",
+			RuleName:    "Invalid-optional_free_text",
 			comment: "This field is optional",
 			field:   titleField,
 			problems: testutils.Problems{{
@@ -99,7 +99,7 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-!optional",
+			RuleName:    "Invalid-!optional",
 			comment: "!optional",
 			field:   titleField,
 			problems: testutils.Problems{{

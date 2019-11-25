@@ -24,8 +24,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var uriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-uri-suffix"),
+var uriSuffix = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(136, "http-uri-suffix"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

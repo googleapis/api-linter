@@ -15,15 +15,16 @@
 package aip0134
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Update methods should use the HTTP PATCH verb.
-var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "http-method"),
-	OnlyIf: isUpdateMethod,
+var httpMethod = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(134, "http-method"),
+	OnlyIf:   isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP PATCH.
 		for _, httpRule := range utils.GetHTTPRules(m) {

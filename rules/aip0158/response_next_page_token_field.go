@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var responsePaginationNextPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "response-next-page-token-field"),
+var responsePaginationNextPageToken = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(158, "response-next-page-token-field"),
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a next_page_token field is present.

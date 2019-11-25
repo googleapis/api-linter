@@ -17,11 +17,9 @@
 package lint
 
 import (
-	"errors"
-	"fmt"
+	"regexp"
+	"sort"
 	"strings"
-
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Linter checks API files and returns a list of detected problems.
@@ -39,70 +37,72 @@ func New(rules RuleRegistry, configs Configs) *Linter {
 	return l
 }
 
-// LintProtos checks protobuf files and returns a list of problems or an error.
-func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
-	var responses []Response
-	for _, proto := range files {
-		resp, err := l.lintFileDescriptor(proto)
-		if err != nil {
-			return nil, err
-		}
-		responses = append(responses, resp)
-	}
-	return responses, nil
-}
-
-// run executes rules on the request.
-//
-// It uses the proto file path to determine which rules will
-// be applied to the request, according to the list of Linter
-// configs.
-func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
-	resp := Response{
-		FilePath: fd.GetName(),
-		Problems: []Problem{},
-	}
-	var errMessages []string
-
-	descriptors := getAllDescriptors(fd)
+// Lint checks a list of descriptors and returns a slice of responses
+// with any findings in those descriptors.
+func (l *Linter) Lint(descriptors ...Descriptor) []Response {
+	results := make(map[string][]Problem)
 	for _, d := range descriptors {
+		filePath := d.SourceInfo().File().Path()
 		for _, rule := range l.rules {
-			// Check if the rule is neither disabled by comments or configs.
-			if ruleIsEnabled(rule, d, aliasMap) &&
-				l.configs.IsRuleEnabled(string(rule.GetName()), fd.GetName()) {
-				if problems, err := l.runAndRecoverFromPanics(rule, d); err == nil {
-					for _, p := range problems {
-						// TODO: Remove this check once Descriptor is removed from Problem.
-						if ruleIsEnabled(rule, p.Descriptor, aliasMap) {
-							p.RuleID = rule.GetName()
-							resp.Problems = append(resp.Problems, p)
-						}
-					}
-				} else {
-					errMessages = append(errMessages, err.Error())
+			// Check if the rule is not disabled by comments or configs.
+			if ruleIsEnabled(rule, d, aliasMap) && l.configs.IsRuleEnabled(string(rule.Name()), filePath) {
+				for _, p := range rule.Lint(d) {
+					p.RuleID = rule.Name()
+					results[filePath] = append(results[filePath], p)
 				}
 			}
 		}
 	}
 
-	var err error
-	if len(errMessages) != 0 {
-		err = errors.New(strings.Join(errMessages, "; "))
+	filePaths := []string{}
+	for path := range results {
+		filePaths = append(filePaths, path)
 	}
+	sort.Strings(filePaths)
 
-	return resp, err
+	responses := []Response{}
+	for _, filePath := range filePaths {
+		problems := results[filePath]
+		responses = append(responses, Response{
+			FilePath: filePath,
+			Problems: problems,
+		})
+	}
+	return responses
 }
 
-func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, d desc.Descriptor) (probs []Problem, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if rerr, ok := r.(error); ok {
-				err = rerr
-			} else {
-				err = fmt.Errorf("panic occurred during rule execution: %v", r)
-			}
-		}
-	}()
+// ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
+// for the given descriptor or its file), false otherwise.
+func ruleIsEnabled(rule Rule, d Descriptor, aliasMap map[string]string) bool {
+	// Some rules have a legacy name. We add it to the check list.
+	ruleName := string(rule.Name())
+	names := []string{ruleName, aliasMap[ruleName]}
 
-	return rule.Lint(d), nil
+	commentLines := strings.Split(d.SourceInfo().File().Comments(), "\n")
+	commentLines = append(commentLines, strings.Split(d.SourceInfo().LeadingComments(), "\n")...)
+	disabledRules := []string{}
+	for _, commentLine := range commentLines {
+		r := extractDisabledRuleName(commentLine)
+		if r != "" {
+			disabledRules = append(disabledRules, r)
+		}
+	}
+
+	for _, name := range names {
+		if matchRule(name, disabledRules...) {
+			return false
+		}
+	}
+
+	return true
+}
+
+var disableRuleNameRegex = regexp.MustCompile(`api-linter:\s*(.+)\s*=\s*disabled`)
+
+func extractDisabledRuleName(commentLine string) string {
+	match := disableRuleNameRegex.FindStringSubmatch(commentLine)
+	if len(match) > 0 {
+		return match[1]
+	}
+	return ""
 }

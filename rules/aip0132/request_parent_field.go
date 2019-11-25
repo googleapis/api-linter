@@ -17,6 +17,7 @@ package aip0132
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // The List standard method should contain a parent field.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(132, "request-parent-field"),
-	OnlyIf: isListRequestMessage,
+var standardFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(132, "request-parent-field"),
+	OnlyIf:   isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.
 		parentField := m.FindFieldByName("parent")

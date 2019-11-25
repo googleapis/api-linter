@@ -32,19 +32,19 @@ func TestOutput(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "Output Only",
 			field:    generatedURIWithOutputOnlyBehavior,
 			problems: nil,
 		},
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "@OutputOnly",
 			field:    generatedURIWithOutputOnlyBehavior,
 			problems: nil,
 		},
 		{
-			name:    "Invalid-Output Only",
+			RuleName:    "Invalid-Output Only",
 			comment: "Output Only",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -52,7 +52,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-OutputOnly",
+			RuleName:    "Invalid-OutputOnly",
 			comment: "OutputOnly",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -60,7 +60,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@OutputOnly",
+			RuleName:    "Invalid-@OutputOnly",
 			comment: "@OutputOnly",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -68,7 +68,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-output_only",
+			RuleName:    "Invalid-output_only",
 			comment: "output_only",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -76,7 +76,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@output_only",
+			RuleName:    "Invalid-@output_only",
 			comment: "@output_only",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -84,7 +84,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-OUTPUT_ONLY",
+			RuleName:    "Invalid-OUTPUT_ONLY",
 			comment: "OUTPUT_ONLY",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -92,7 +92,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-outputOnly",
+			RuleName:    "Invalid-outputOnly",
 			comment: "outputOnly",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -100,7 +100,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@outputOnly",
+			RuleName:    "Invalid-@outputOnly",
 			comment: "@outputonly",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -108,7 +108,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@OUTPUT_ONLY",
+			RuleName:    "Invalid-@OUTPUT_ONLY",
 			comment: "@OUTPUT_ONLY",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -116,7 +116,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-output_only_free_text",
+			RuleName:    "Invalid-output_only_free_text",
 			comment: "This field is output only",
 			field:   generatedURI,
 			problems: testutils.Problems{{
@@ -124,7 +124,7 @@ func TestOutput(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-!outputOnly",
+			RuleName:    "Invalid-!outputOnly",
 			comment: "!outputOnly",
 			field:   generatedURI,
 			problems: testutils.Problems{{

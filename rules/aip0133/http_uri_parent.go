@@ -15,15 +15,16 @@
 package aip0133
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Create methods should have a proper HTTP pattern.
-var httpURIField = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "http-uri-parent"),
-	OnlyIf: isCreateMethod,
+var httpURIField = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(133, "http-uri-parent"),
+	OnlyIf:   isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri should include the `parent` field.
 		for _, httpRule := range utils.GetHTTPRules(m) {

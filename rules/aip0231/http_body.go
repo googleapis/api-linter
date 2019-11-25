@@ -21,8 +21,8 @@ import (
 )
 
 // Get methods should not have an HTTP body.
-var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "http-body"),
+var httpBody = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(231, "http-body"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

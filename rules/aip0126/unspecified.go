@@ -18,14 +18,15 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
 
-var unspecified = &lint.EnumRule{
-	Name: lint.NewRuleName(126, "unspecified"),
+var unspecified = &descrule.EnumRule{
+	RuleName: lint.NewRuleName(126, "unspecified"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		firstValue := e.GetValues()[0]
 		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")

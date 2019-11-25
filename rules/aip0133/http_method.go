@@ -15,15 +15,16 @@
 package aip0133
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Create methods should use the HTTP POST verb.
-var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "http-method"),
-	OnlyIf: isCreateMethod,
+var httpMethod = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(133, "http-method"),
+	OnlyIf:   isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP POST.
 		for _, httpRule := range utils.GetHTTPRules(m) {

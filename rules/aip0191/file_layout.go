@@ -20,7 +20,7 @@ import (
 )
 
 var fileLayout = &lint.FileRule{
-	Name: lint.NewRuleName(191, "file-layout"),
+	RuleName: lint.NewRuleName(191, "file-layout"),
 	LintFile: func(f *desc.FileDescriptor) (problems []lint.Problem) {
 		// Verify that services precede messages.
 		if len(f.GetMessageTypes()) > 0 {

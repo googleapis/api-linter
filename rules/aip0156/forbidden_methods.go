@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var forbiddenMethods = &lint.MethodRule{
-	Name: lint.NewRuleName(156, "forbidden-methods"),
+var forbiddenMethods = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(156, "forbidden-methods"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		// If the `name` variable in the URI ends in something other than
 		// "*", that indicates that this is a singleton.

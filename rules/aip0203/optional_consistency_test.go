@@ -27,7 +27,7 @@ func TestOptionalBehaviorConsistency(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name: "Valid-NoneOptional",
+			RuleName: "Valid-NoneOptional",
 			field: `
 				string name = 1 [
 					(google.api.field_behavior) = IMMUTABLE,
@@ -41,7 +41,7 @@ func TestOptionalBehaviorConsistency(t *testing.T) {
 			problems: nil,
 		},
 		{
-			name: "Valid-AllOptional",
+			RuleName: "Valid-AllOptional",
 			field: `
 				string name = 1 [
 					(google.api.field_behavior) = IMMUTABLE,
@@ -55,7 +55,7 @@ func TestOptionalBehaviorConsistency(t *testing.T) {
 			problems: nil,
 		},
 		{
-			name: "Invalid-PartialOptional",
+			RuleName: "Invalid-PartialOptional",
 			field: `
 				string name = 1 [
 					(google.api.field_behavior) = IMMUTABLE,

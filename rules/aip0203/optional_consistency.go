@@ -24,8 +24,8 @@ import (
 //
 // If a message has a field which is described as optional, ensure that every
 // optional field on the message has this indicator.
-var optionalBehaviorConsistency = &lint.MessageRule{
-	Name:   lint.NewRuleName(203, "optional-consistency"),
+var optionalBehaviorConsistency = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(203, "optional-consistency"),
 	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		for _, f := range m.GetFields() {

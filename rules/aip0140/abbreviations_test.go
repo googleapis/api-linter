@@ -31,7 +31,7 @@ func TestAbbreviations(t *testing.T) {
 		descFunc func(*desc.FileDescriptor) desc.Descriptor
 	}{
 		{
-			name:     "Field",
+			RuleName:     "Field",
 			tmpl:     `message Book { string {{.Name}} = 1; }`,
 			caseFunc: strcase.SnakeCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -39,7 +39,7 @@ func TestAbbreviations(t *testing.T) {
 			},
 		},
 		{
-			name:     "Message",
+			RuleName:     "Message",
 			tmpl:     `message {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -47,7 +47,7 @@ func TestAbbreviations(t *testing.T) {
 			},
 		},
 		{
-			name:     "Service",
+			RuleName:     "Service",
 			tmpl:     `service {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -55,7 +55,7 @@ func TestAbbreviations(t *testing.T) {
 			},
 		},
 		{
-			name: "Method",
+			RuleName: "Method",
 			tmpl: `
 				service Library {
 					rpc {{.Name}}(Request) returns (Response);
@@ -70,7 +70,7 @@ func TestAbbreviations(t *testing.T) {
 			},
 		},
 		{
-			name:     "Enum",
+			RuleName:     "Enum",
 			tmpl:     `enum {{.Name}} { UNSPECIFIED = 0; }`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
@@ -78,7 +78,7 @@ func TestAbbreviations(t *testing.T) {
 			},
 		},
 		{
-			name: "EnumValue",
+			RuleName: "EnumValue",
 			tmpl: `enum Thing { {{.Name}} = 0; }`,
 			caseFunc: func(s string) string {
 				return strings.ToUpper(strcase.SnakeCase(s))

@@ -28,8 +28,8 @@ import (
 // Delete messages should use google.protobuf.Empty,
 // google.longrunning.Operation, or the resource itself as the response
 // message.
-var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(135, "response-message-name"),
+var responseMessageName = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(135, "response-message-name"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response

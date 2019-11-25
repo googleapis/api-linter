@@ -24,8 +24,8 @@ import (
 )
 
 // The Batch Get request message should have parent field.
-var parentField = &lint.MessageRule{
-	Name:   lint.NewRuleName(231, "request-parent-field"),
+var parentField = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(231, "request-parent-field"),
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.

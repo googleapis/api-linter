@@ -20,8 +20,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var lroMetadata = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-metadata-type"),
+var lroMetadata = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(151, "lro-metadata-type"),
 	OnlyIf: isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		lro := utils.GetOperationInfo(m)

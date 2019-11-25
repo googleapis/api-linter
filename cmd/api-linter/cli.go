@@ -25,6 +25,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -147,9 +148,14 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return err
 	}
 
+	descriptors := []lint.Descriptor{}
+	for _, file := range fd {
+		descriptors = append(descriptors, descrule.AllDescriptors(file))
+	}
+
 	// Create a linter to lint the file descriptors.
 	l := lint.New(rules, configs)
-	results, err := l.LintProtos(fd...)
+	results, err := l.LintProtos(descriptors...)
 	if err != nil {
 		return err
 	}

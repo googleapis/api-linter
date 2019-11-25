@@ -16,6 +16,7 @@ package aip0132
 
 import (
 	"bitbucket.org/creachadair/stringset"
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -32,9 +33,9 @@ var allowedFields = stringset.New(
 )
 
 // List methods should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(132, "request-unknown-fields"),
-	OnlyIf: isListRequestMessage,
+var unknownFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(132, "request-unknown-fields"),
+	OnlyIf:   isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		for _, field := range m.GetFields() {
 			if !allowedFields.Contains(field.GetName()) {

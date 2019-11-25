@@ -39,7 +39,7 @@ var consistentOptions = map[string]func(*dpb.FileOptions) string{
 }
 
 var fileOptionConsistency = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "file-option-consistency"),
+	RuleName:   lint.NewRuleName(191, "file-option-consistency"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) (problems []lint.Problem) {
 		opts := f.GetFileOptions()

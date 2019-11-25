@@ -21,8 +21,8 @@ import (
 )
 
 // Batch Update methods should use "*" as the HTTP body.
-var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(234, "http-body"),
+var httpBody = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(234, "http-body"),
 	OnlyIf: isBatchUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has correct HTTP body.

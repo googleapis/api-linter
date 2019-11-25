@@ -20,8 +20,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-method"),
+var httpMethod = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(136, "http-method"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

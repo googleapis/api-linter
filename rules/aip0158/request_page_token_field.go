@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var requestPaginationPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "request-page-token-field"),
+var requestPaginationPageToken = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(158, "request-page-token-field"),
 	OnlyIf: isPaginatedRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a page_size field is present.

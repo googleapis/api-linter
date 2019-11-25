@@ -17,14 +17,15 @@ package aip0131
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Get methods should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-unknown-fields"),
-	OnlyIf: isGetRequestMessage,
+var unknownFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(131, "request-unknown-fields"),
+	OnlyIf:   isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{

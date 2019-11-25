@@ -22,7 +22,7 @@ import (
 )
 
 var noHTML = &lint.DescriptorRule{
-	Name: lint.NewRuleName(192, "no-html"),
+	RuleName: lint.NewRuleName(192, "no-html"),
 	OnlyIf: func(d desc.Descriptor) bool {
 		return d.GetSourceInfo() != nil
 	},

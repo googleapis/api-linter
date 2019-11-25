@@ -28,13 +28,13 @@ func TestInputOnly(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "valid case with INPUT_ONLY field behavior annotation",
+			RuleName:     "valid case with INPUT_ONLY field behavior annotation",
 			comment:  "input_only",
 			field:    "string secret = 1 [(google.api.field_behavior) = INPUT_ONLY];",
 			problems: nil,
 		},
 		{
-			name:    "input_only",
+			RuleName:    "input_only",
 			comment: "input_only",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -42,7 +42,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "inputonly",
+			RuleName:    "inputonly",
 			comment: "inputonly",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -50,7 +50,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "@inputonly",
+			RuleName:    "@inputonly",
 			comment: "@inputonly",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -58,7 +58,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "@input_only",
+			RuleName:    "@input_only",
 			comment: "@input_only",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -66,7 +66,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "INPUT_ONLY",
+			RuleName:    "INPUT_ONLY",
 			comment: "INPUT_ONLY",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -74,7 +74,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "inputOnly",
+			RuleName:    "inputOnly",
 			comment: "inputOnly",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -82,7 +82,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "@inputOnly",
+			RuleName:    "@inputOnly",
 			comment: "@inputonly",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -90,7 +90,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "@INPUT_ONLY",
+			RuleName:    "@INPUT_ONLY",
 			comment: "@INPUT_ONLY",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -98,7 +98,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "input_only_free_text",
+			RuleName:    "input_only_free_text",
 			comment: "This field is input only",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{
@@ -106,7 +106,7 @@ func TestInputOnly(t *testing.T) {
 			}},
 		},
 		{
-			name:    "!inputOnly",
+			RuleName:    "!inputOnly",
 			comment: "!inputOnly",
 			field:   "string secret = 1;",
 			problems: testutils.Problems{{

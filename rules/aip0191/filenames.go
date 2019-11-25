@@ -24,7 +24,7 @@ import (
 )
 
 var filename = &lint.FileRule{
-	Name: lint.NewRuleName(191, "filenames"),
+	RuleName: lint.NewRuleName(191, "filenames"),
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
 		if versionRegexp.MatchString(fn) {

@@ -27,12 +27,12 @@ func TestOptionalBehaviorConflict(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			field:    "string title = 1 [(google.api.field_behavior) = OPTIONAL];",
 			problems: nil,
 		},
 		{
-			name: "Valid",
+			RuleName: "Valid",
 			field: `
 					string title = 1 [
 					(google.api.field_behavior) = IMMUTABLE,
@@ -40,7 +40,7 @@ func TestOptionalBehaviorConflict(t *testing.T) {
 			problems: nil,
 		},
 		{
-			name: "Invalid-optional-conflict",
+			RuleName: "Invalid-optional-conflict",
 			field: `
 					string title = 1 [
 						(google.api.field_behavior) = IMMUTABLE,

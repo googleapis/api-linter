@@ -30,19 +30,19 @@ func TestImmutable(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "Immutable",
 			field:    fieldPartWithImmutableBehavior,
 			problems: nil,
 		},
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "@immutable",
 			field:    fieldPartWithImmutableBehavior,
 			problems: nil,
 		},
 		{
-			name:    "Invalid-immutable",
+			RuleName:    "Invalid-immutable",
 			comment: "immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -50,7 +50,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-Immutable",
+			RuleName:    "Invalid-Immutable",
 			comment: "Immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -58,7 +58,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@immutable",
+			RuleName:    "Invalid-@immutable",
 			comment: "@immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -66,7 +66,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@immutable",
+			RuleName:    "Invalid-@immutable",
 			comment: "@Immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -74,7 +74,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-IMMUTABLE",
+			RuleName:    "Invalid-IMMUTABLE",
 			comment: "IMMUTABLE",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -82,7 +82,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@IMMUTABLE",
+			RuleName:    "Invalid-@IMMUTABLE",
 			comment: "@IMMUTABLE",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -90,7 +90,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-immutable_free_text",
+			RuleName:    "Invalid-immutable_free_text",
 			comment: "This field is immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{
@@ -98,7 +98,7 @@ func TestImmutable(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-!immutable",
+			RuleName:    "Invalid-!immutable",
 			comment: "!immutable",
 			field:   fieldPart,
 			problems: testutils.Problems{{

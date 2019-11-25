@@ -14,9 +14,7 @@
 
 package lint
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestRuleRegistryRegister(t *testing.T) {
 	tests := []struct {
@@ -52,9 +50,9 @@ func TestRuleRegistryRegister(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			rules := []ProtoRule{}
+			rules := []Rule{}
 			for _, name := range test.ruleNames {
-				rules = append(rules, &FileRule{Name: name})
+				rules = append(rules, &mockRule{name: name})
 			}
 
 			registry := NewRuleRegistry()

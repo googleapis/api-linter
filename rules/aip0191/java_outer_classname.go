@@ -25,7 +25,7 @@ import (
 )
 
 var javaOuterClassname = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "java-outer-classname"),
+	RuleName:   lint.NewRuleName(191, "java-outer-classname"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if f.GetFileOptions().GetJavaOuterClassname() == "" {

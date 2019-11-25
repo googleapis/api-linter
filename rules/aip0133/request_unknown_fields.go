@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
@@ -25,9 +26,9 @@ import (
 )
 
 // The create request message should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-unknown-fields"),
-	OnlyIf: isCreateRequestMessage,
+var unknownFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(133, "request-unknown-fields"),
+	OnlyIf:   isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 

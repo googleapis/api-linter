@@ -32,7 +32,7 @@ var expectedAbbreviations = map[string]string{
 }
 
 var abbreviations = &lint.DescriptorRule{
-	Name: lint.NewRuleName(140, "abbreviations"),
+	RuleName: lint.NewRuleName(140, "abbreviations"),
 	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
 		// Determine the correct case function to use.
 		// Most things in protobuf are PascalCase; the two exceptions are

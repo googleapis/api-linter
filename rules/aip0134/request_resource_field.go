@@ -17,6 +17,7 @@ package aip0134
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // The create request message should have resource field.
-var resourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-resource-field"),
-	OnlyIf: isUpdateRequestMessage,
+var resourceField = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(134, "request-resource-field"),
+	OnlyIf:   isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resourceMsgName := extractResource(m.GetName())
 

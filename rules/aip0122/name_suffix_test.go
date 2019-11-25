@@ -17,6 +17,7 @@ package aip0122
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -39,7 +40,7 @@ func TestNameSuffix(t *testing.T) {
 			}`, test)
 
 			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := nameSuffix.Lint(field)
+			problems := nameSuffix.Lint(descrule.NewField(field))
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

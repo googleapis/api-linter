@@ -17,6 +17,7 @@ package aip0133
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
@@ -79,7 +80,7 @@ func TestParentField(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := parentField.Lint(message)
+			problems := parentField.Lint(descrule.NewMessage(message))
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

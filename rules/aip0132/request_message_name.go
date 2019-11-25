@@ -17,15 +17,16 @@ package aip0132
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // List messages should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(132, "request-message-name"),
-	OnlyIf: isListMethod,
+var requestMessageName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(132, "request-message-name"),
+	OnlyIf:   isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `ListFoos`, the request
 		// message is named `ListFoosRequest`.

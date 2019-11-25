@@ -25,8 +25,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var noPrepositions = &lint.MethodRule{
-	Name: lint.NewRuleName(136, "prepositions"),
+var noPrepositions = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(136, "prepositions"),
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		for _, word := range strings.Split(strcase.SnakeCase(m.GetName()), "_") {
 			if data.Prepositions.Contains(word) {

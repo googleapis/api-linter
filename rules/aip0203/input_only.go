@@ -23,8 +23,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-var inputOnly = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "input-only"),
+var inputOnly = &descrule.FieldRule{
+	RuleName:   lint.NewRuleName(203, "input-only"),
 	OnlyIf: withoutInputOnlyFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, inputOnlyRegexp, "INPUT_ONLY")

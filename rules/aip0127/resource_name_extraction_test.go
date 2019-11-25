@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -44,7 +45,7 @@ func TestResourceNameExtraction(t *testing.T) {
 				message Book {}
 			`, "{{.URI}}", test.uri))
 			method := f.GetServices()[0].GetMethods()[0]
-			problems := resourceNameExtraction.Lint(method)
+			problems := resourceNameExtraction.Lint(descrule.NewMethod(method))
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

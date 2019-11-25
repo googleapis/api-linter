@@ -30,7 +30,7 @@ func TestResourceField(t *testing.T) {
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
-			testName: "Valid",
+			testRuleName: "Valid",
 			src: `
 				message BatchGetBooksResponse {
 				// Books requested.
@@ -39,7 +39,7 @@ func TestResourceField(t *testing.T) {
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "FieldIsNotRepeated",
+			testRuleName: "FieldIsNotRepeated",
 			src: `
 				message BatchGetBooksResponse {
 				// Book requested.
@@ -48,7 +48,7 @@ func TestResourceField(t *testing.T) {
 			problems: testutils.Problems{{Message: "The \"Book\" type field on Batch Get Response message should be repeated"}},
 		},
 		{
-			testName: "MissingField",
+			testRuleName: "MissingField",
 			src: `
 				message BatchGetBooksResponse {
 				string response = 1;

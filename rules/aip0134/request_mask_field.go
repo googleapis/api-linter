@@ -15,14 +15,15 @@
 package aip0134
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestMaskField = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-mask-field"),
-	OnlyIf: isUpdateRequestMessage,
+var requestMaskField = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(134, "request-mask-field"),
+	OnlyIf:   isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")
 		if updateMask == nil {

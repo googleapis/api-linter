@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName(142, "time-field-names"),
+var fieldNames = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(142, "time-field-names"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{

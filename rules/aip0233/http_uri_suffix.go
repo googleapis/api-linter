@@ -21,8 +21,8 @@ import (
 )
 
 // Batch Create methods should have a proper HTTP pattern.
-var httpUriSuffix = &lint.MethodRule{
-	Name:   lint.NewRuleName(233, "http-uri-suffix"),
+var httpUriSuffix = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(233, "http-uri-suffix"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.

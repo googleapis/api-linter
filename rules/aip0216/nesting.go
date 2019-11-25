@@ -22,8 +22,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var nesting = &lint.EnumRule{
-	Name: lint.NewRuleName(216, "nesting"),
+var nesting = &descrule.EnumRule{
+	RuleName: lint.NewRuleName(216, "nesting"),
 	OnlyIf: func(e *desc.EnumDescriptor) bool {
 		return strings.HasSuffix(e.GetName(), "State") && e.GetName() != "State"
 	},

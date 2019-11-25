@@ -30,17 +30,17 @@ func TestResponseResourceField(t *testing.T) {
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
-			testName: "Valid",
+			testRuleName: "Valid",
 			Field:    "repeated Book books",
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "FieldIsNotRepeated",
+			testRuleName: "FieldIsNotRepeated",
 			Field:    "Book book",
 			problems: testutils.Problems{{Message: "repeated"}},
 		},
 		{
-			testName: "MissingField",
+			testRuleName: "MissingField",
 			Field:    "string response",
 			problems: testutils.Problems{{Message: "no \"Book\" type field"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {

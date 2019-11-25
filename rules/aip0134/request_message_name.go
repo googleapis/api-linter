@@ -17,15 +17,16 @@ package aip0134
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Update methods should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "request-message-name"),
-	OnlyIf: isUpdateMethod,
+var requestMessageName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(134, "request-message-name"),
+	OnlyIf:   isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the request
 		// message is named `UpdateFooRequest`.

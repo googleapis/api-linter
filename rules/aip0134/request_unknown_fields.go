@@ -18,14 +18,15 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Update methods should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-unknown-fields"),
-	OnlyIf: isUpdateRequestMessage,
+var unknownFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(134, "request-unknown-fields"),
+	OnlyIf:   isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resource := extractResource(m.GetName())
 		// Rule check: Establish that there are no unexpected fields.

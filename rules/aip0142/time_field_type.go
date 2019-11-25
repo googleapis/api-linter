@@ -24,8 +24,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fieldType = &lint.FieldRule{
-	Name: lint.NewRuleName(142, "time-field-type"),
+var fieldType = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(142, "time-field-type"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		suffixes := stringset.New(
 			"date", "datetime", "ms", "msec", "msecs", "millis", "nanos", "ns",

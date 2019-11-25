@@ -17,6 +17,7 @@ package aip0133
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -60,7 +61,7 @@ func TestOutputMessageName(t *testing.T) {
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
 			method := file.GetServices()[0].GetMethods()[0]
-			problems := outputName.Lint(method)
+			problems := outputName.Lint(descrule.NewMethod(method))
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

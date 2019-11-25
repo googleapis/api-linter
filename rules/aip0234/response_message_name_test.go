@@ -29,22 +29,22 @@ func TestResponseMessageName(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{
-			testName:   "Valid-BatchUpdateBooksResponse",
-			MethodName: "BatchUpdateBooks",
+			testRuleName:   "Valid-BatchUpdateBooksResponse",
+			MethodRuleName: "BatchUpdateBooks",
 			Response:   "BatchUpdateBooksResponse",
 			problems:   testutils.Problems{},
 		},
 		{
-			testName:   "Invalid-MissMatchingMethodName",
-			MethodName: "BatchUpdateBooks",
+			testRuleName:   "Invalid-MissMatchingMethodName",
+			MethodRuleName: "BatchUpdateBooks",
 			Response:   "BatchUpdateBookResponse",
 			problems: testutils.Problems{{
 				Suggestion: "BatchUpdateBooksResponse",
 			}},
 		},
 		{
-			testName:   "Irrelevant",
-			MethodName: "UpdateBook",
+			testRuleName:   "Irrelevant",
+			MethodRuleName: "UpdateBook",
 			Response:   "Book",
 			problems:   testutils.Problems{},
 		},
@@ -87,12 +87,12 @@ func TestLongRunningResponse(t *testing.T) {
 		problems     testutils.Problems
 	}{
 		{
-			testName:     "Valid-LongRunning",
+			testRuleName:     "Valid-LongRunning",
 			ResponseType: "BatchUpdateBooksResponse",
 			problems:     testutils.Problems{},
 		},
 		{
-			testName: "Valid-LongRunningEmptyResponseType",
+			testRuleName: "Valid-LongRunningEmptyResponseType",
 			problems: testutils.Problems{},
 		},
 	}

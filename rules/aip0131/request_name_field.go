@@ -17,6 +17,7 @@ package aip0131
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // The Get standard method should only have expected fields.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-name-field"),
-	OnlyIf: isGetRequestMessage,
+var standardFields = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(131, "request-name-field"),
+	OnlyIf:   isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a name field is present.
 		name := m.FindFieldByName("name")

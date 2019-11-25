@@ -15,14 +15,15 @@
 package aip0127
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var resourceNameExtraction = &lint.MethodRule{
-	Name: lint.NewRuleName(127, "resource-name-extraction"),
+var resourceNameExtraction = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(127, "resource-name-extraction"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, rule := range utils.GetHTTPRules(m) {
 			for _, v := range rule.GetVariables() {

@@ -17,6 +17,7 @@ package aip0131
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -49,8 +50,9 @@ func TestRequestMessageName(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the expected problems.
-			problems := requestMessageName.Lint(service.GetMethods()[0])
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			method := service.GetMethods()[0]
+			problems := requestMessageName.Lint(descrule.NewMethod(method))
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

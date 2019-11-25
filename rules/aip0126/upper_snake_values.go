@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -11,8 +12,8 @@ import (
 )
 
 // All enum values must use UPPER_SNAKE_CASE.
-var enumValueUpperSnakeCase = &lint.EnumRule{
-	Name: lint.NewRuleName(126, "upper-snake-values"),
+var enumValueUpperSnakeCase = &descrule.EnumRule{
+	RuleName: lint.NewRuleName(126, "upper-snake-values"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		for _, v := range e.GetValues() {

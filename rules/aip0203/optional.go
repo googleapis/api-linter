@@ -23,8 +23,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-var optional = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "optional"),
+var optional = &descrule.FieldRule{
+	RuleName:   lint.NewRuleName(203, "optional"),
 	OnlyIf: withoutOptionalFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, optionalRegexp, "OPTIONAL")

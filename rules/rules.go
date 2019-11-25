@@ -23,15 +23,15 @@
 // A rule is technically anything with a `GetName()`, `GetURI()``, and
 // `Lint(*desc.FileDescriptorProto) []lint.Problem` method, but most rule
 // authors will want to use the rule structs provided in the lint package
-// (`&lint.MessageRule`, `&lint.FieldRule`, and so on). These run against
+// (`&descrule.MessageRule`, `&descrule.FieldRule`, and so on). These run against
 // each applicable descriptor in the file (`MessageRule` against every message,
 // for example). They also have an `OnlyIf` property that can be used to run
 // against a subset of descriptors.
 //
 // A simple rule therefore looks like this:
 //
-//   var myRule = &lint.MessageRule{
-//     Name: lint.NewRuleName(1234, "my-rule"),
+//   var myRule = &descrule.MessageRule{
+//     RuleName: lint.NewRuleName(1234, "my-rule"),
 //     LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 //       if isBad(m) {
 //         return []lint.Problem{{

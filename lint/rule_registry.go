@@ -20,7 +20,7 @@ import (
 )
 
 // RuleRegistry is a registry for registering and looking up rules.
-type RuleRegistry map[RuleName]ProtoRule
+type RuleRegistry map[RuleName]Rule
 
 // Copy returns a new copy of the rules.
 func (r RuleRegistry) Copy() RuleRegistry {
@@ -37,22 +37,22 @@ var errDuplicatedRuleName = errors.New("duplicate rule name")
 
 // Register registers the list of rules of the same AIP.
 // Return an error if any of the rules is found duplicate in the registry.
-func (r RuleRegistry) Register(aip int, rules ...ProtoRule) error {
+func (r RuleRegistry) Register(aip int, rules ...Rule) error {
 	rulePrefix := getRuleGroup(aip) + nameSeparator + fmt.Sprintf("%04d", aip)
 	for _, rl := range rules {
-		if !rl.GetName().IsValid() {
+		if !rl.Name().IsValid() {
 			return errInvalidRuleName
 		}
 
-		if !rl.GetName().HasPrefix(rulePrefix) {
+		if !rl.Name().HasPrefix(rulePrefix) {
 			return errInvalidRuleGroup
 		}
 
-		if _, found := r[rl.GetName()]; found {
+		if _, found := r[rl.Name()]; found {
 			return errDuplicatedRuleName
 		}
 
-		r[rl.GetName()] = rl
+		r[rl.Name()] = rl
 	}
 	return nil
 }

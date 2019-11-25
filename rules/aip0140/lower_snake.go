@@ -22,8 +22,8 @@ import (
 )
 
 // Field names must be snake case.
-var lowerSnake = &lint.FieldRule{
-	Name: lint.NewRuleName(140, "lower-snake"),
+var lowerSnake = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(140, "lower-snake"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if got, want := f.GetName(), toLowerSnakeCase(f.GetName()); got != want {
 			return []lint.Problem{{

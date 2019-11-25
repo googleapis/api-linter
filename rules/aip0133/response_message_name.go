@@ -17,6 +17,7 @@ package aip0133
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -24,9 +25,9 @@ import (
 )
 
 // Create method should use the resource as the output message
-var outputName = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "response-message-name"),
-	OnlyIf: isCreateMethod,
+var outputName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(133, "response-message-name"),
+	OnlyIf:   isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		want := getResourceMsgName(m)
 

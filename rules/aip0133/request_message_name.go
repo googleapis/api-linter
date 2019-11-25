@@ -17,15 +17,16 @@ package aip0133
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Create method should have a properly named input message.
-var inputName = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "request-message-name"),
-	OnlyIf: isCreateMethod,
+var inputName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(133, "request-message-name"),
+	OnlyIf:   isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgName(m)
 

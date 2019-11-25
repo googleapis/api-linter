@@ -30,7 +30,7 @@ func TestNamesField(t *testing.T) {
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
-			testName: "Valid-Names",
+			testRuleName: "Valid-Names",
 			src: `
 				message BatchGetBooksRequest {
 					repeated string names = 1;
@@ -39,7 +39,7 @@ func TestNamesField(t *testing.T) {
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-StandardGetReq",
+			testRuleName: "Valid-StandardGetReq",
 			src: `
 				message BatchGetBooksRequest {
 				repeated GetBookRequest requests = 1;
@@ -50,7 +50,7 @@ func TestNamesField(t *testing.T) {
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Invalid-MissingNamesField",
+			testRuleName: "Invalid-MissingNamesField",
 			src: `
 				message BatchGetBooksRequest {
 				string parent = 1;
@@ -59,7 +59,7 @@ func TestNamesField(t *testing.T) {
 			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" has no "names" field`}},
 		},
 		{
-			testName: "Invalid-KeepingNamesFieldOnly",
+			testRuleName: "Invalid-KeepingNamesFieldOnly",
 			src: `
 				message BatchGetBooksRequest {
 				repeated string names = 1;
@@ -74,7 +74,7 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-NamesFieldIsNotRepeated",
+			testRuleName: "Invalid-NamesFieldIsNotRepeated",
 			src: `
 				message BatchGetBooksRequest {
 					string names = 1;
@@ -85,7 +85,7 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-NamesFieldWrongType",
+			testRuleName: "Invalid-NamesFieldWrongType",
 			src: `
 				message BatchGetBooksRequest {
 					repeated int32 names = 1;
@@ -97,7 +97,7 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-GetReqFieldIsNotRepeated",
+			testRuleName: "Invalid-GetReqFieldIsNotRepeated",
 			src: `
 				message BatchGetBooksRequest {
 				GetBookRequest requests = 1;
@@ -111,7 +111,7 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-NamesFieldWrongType",
+			testRuleName: "Invalid-NamesFieldWrongType",
 			src: `
 				message BatchGetBooksRequest {
 					repeated string requests = 1;

@@ -17,14 +17,15 @@ package aip0122
 import (
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // HTTP URL pattern shouldn't include underscore("_")
-var httpURICase = &lint.MethodRule{
-	Name: lint.NewRuleName(122, "camel-case-uris"),
+var httpURICase = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(122, "camel-case-uris"),
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		// Establish that the URI does not include a `_` character.
 		for _, httpRule := range utils.GetHTTPRules(m) {

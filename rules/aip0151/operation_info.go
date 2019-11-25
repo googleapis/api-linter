@@ -20,8 +20,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var lroAnnotationExists = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "operation-info"),
+var lroAnnotationExists = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(151, "operation-info"),
 	OnlyIf: isLRO,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if utils.GetOperationInfo(m) == nil {

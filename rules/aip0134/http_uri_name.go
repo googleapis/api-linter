@@ -17,6 +17,7 @@ package aip0134
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // Update methods should have a proper HTTP pattern.
-var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "http-uri-name"),
-	OnlyIf: isUpdateMethod,
+var httpNameField = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(134, "http-uri-name"),
+	OnlyIf:   isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has expected HTTP pattern.

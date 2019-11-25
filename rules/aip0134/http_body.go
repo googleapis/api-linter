@@ -17,6 +17,7 @@ package aip0134
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // Update methods should have an HTTP body.
-var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "http-body"),
-	OnlyIf: isUpdateMethod,
+var httpBody = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(134, "http-body"),
+	OnlyIf:   isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has HTTP body equal to fieldName.

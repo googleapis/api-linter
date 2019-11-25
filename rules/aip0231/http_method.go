@@ -21,8 +21,8 @@ import (
 )
 
 // Batch Get methods should use the HTTP GET verb.
-var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "http-method"),
+var httpVerb = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(231, "http-method"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP GET.

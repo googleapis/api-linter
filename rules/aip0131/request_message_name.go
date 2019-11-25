@@ -17,15 +17,16 @@ package aip0131
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Get messages should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(131, "request-message-name"),
-	OnlyIf: isGetMethod,
+var requestMessageName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(131, "request-message-name"),
+	OnlyIf:   isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `GetFoo`, the request
 		// message is named `GetFooRequest`.

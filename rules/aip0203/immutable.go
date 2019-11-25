@@ -23,8 +23,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-var immutable = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "immutable"),
+var immutable = &descrule.FieldRule{
+	RuleName:   lint.NewRuleName(203, "immutable"),
 	OnlyIf: withoutImmutableFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, immutableRegexp, "IMMUTABLE")

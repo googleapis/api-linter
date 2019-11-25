@@ -26,7 +26,7 @@ import (
 )
 
 var csharpNamespace = &lint.FileRule{
-	Name: lint.NewRuleName(191, "csharp-namespace"),
+	RuleName: lint.NewRuleName(191, "csharp-namespace"),
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if ns := f.GetFileOptions().GetCsharpNamespace(); ns != "" {
 			// Check for invalid characters.

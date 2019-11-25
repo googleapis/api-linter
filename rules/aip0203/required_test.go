@@ -31,19 +31,19 @@ func TestRequired(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "Required",
 			field:    titleWithRequiredBehavior,
 			problems: nil,
 		},
 		{
-			name:     "Valid",
+			RuleName:     "Valid",
 			comment:  "@required",
 			field:    titleWithRequiredBehavior,
 			problems: nil,
 		},
 		{
-			name:    "Invalid-required",
+			RuleName:    "Invalid-required",
 			comment: "required",
 			field:   title,
 			problems: testutils.Problems{{
@@ -51,7 +51,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-Required",
+			RuleName:    "Invalid-Required",
 			comment: "Required",
 			field:   title,
 			problems: testutils.Problems{{
@@ -59,7 +59,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@required",
+			RuleName:    "Invalid-@required",
 			comment: "@required",
 			field:   title,
 			problems: testutils.Problems{{
@@ -67,7 +67,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@Required",
+			RuleName:    "Invalid-@Required",
 			comment: "@Required",
 			field:   title,
 			problems: testutils.Problems{{
@@ -75,7 +75,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-REQUIRED",
+			RuleName:    "Invalid-REQUIRED",
 			comment: "REQUIRED",
 			field:   title,
 			problems: testutils.Problems{{
@@ -83,7 +83,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-@REQUIRED",
+			RuleName:    "Invalid-@REQUIRED",
 			comment: "@REQUIRED",
 			field:   title,
 			problems: testutils.Problems{{
@@ -91,7 +91,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-required_free_text",
+			RuleName:    "Invalid-required_free_text",
 			comment: "This field is required",
 			field:   title,
 			problems: testutils.Problems{{
@@ -99,7 +99,7 @@ func TestRequired(t *testing.T) {
 			}},
 		},
 		{
-			name:    "Invalid-!required",
+			RuleName:    "Invalid-!required",
 			comment: "!required",
 			field:   title,
 			problems: testutils.Problems{{

@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -51,7 +52,7 @@ func TestInputName(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the expected problems.
-			problems := inputName.Lint(service.GetMethods()[0])
+			problems := inputName.Lint(descrule.NewMethod(service.GetMethods()[0]))
 			if test.msg == "" && len(problems) > 0 {
 				t.Errorf("Got %v, expected no problems.", problems)
 			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {

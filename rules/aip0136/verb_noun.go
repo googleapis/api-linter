@@ -23,8 +23,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var verbNoun = &lint.MethodRule{
-	Name: lint.NewRuleName(136, "verb-noun"),
+var verbNoun = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(136, "verb-noun"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// We can not detect this precisely without a full dictionary (probably
 		// not worth it), but we can catch some common mistakes.

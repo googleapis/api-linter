@@ -24,7 +24,7 @@ import (
 )
 
 var javaPackage = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "java-package"),
+	RuleName:   lint.NewRuleName(191, "java-package"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		javaPkg := f.GetFileOptions().GetJavaPackage()

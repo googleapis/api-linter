@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var count = &lint.FieldRule{
-	Name: lint.NewRuleName(141, "count-suffix"),
+var count = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(141, "count-suffix"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if n := f.GetName(); strings.HasPrefix(n, "num_") {
 			want := pluralize.NewClient().Singular(n[4:]) + "_count"

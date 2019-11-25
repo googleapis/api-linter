@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -26,8 +27,8 @@ import (
 var knownFields = stringset.New("filter", "order_by")
 
 // List methods should not have unrecognized fields.
-var requestFieldTypes = &lint.FieldRule{
-	Name: lint.NewRuleName(132, "request-field-types"),
+var requestFieldTypes = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isListRequestMessage(f.GetOwner()) && knownFields.Contains(f.GetName())
 	},

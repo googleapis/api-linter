@@ -29,29 +29,29 @@ func TestRequestRequestsField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
-			testName: "Valid",
+			testRuleName: "Valid",
 			Field:    "repeated UpdateBookRequest requests",
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Invalid-MissingRequestsField",
+			testRuleName: "Invalid-MissingRequestsField",
 			Field:    "string parent",
 			problems: testutils.Problems{{Message: `no "requests" field`}},
 		},
 		{
-			testName: "Invalid-RequestsFieldIsNotRepeated",
+			testRuleName: "Invalid-RequestsFieldIsNotRepeated",
 			Field:    "UpdateBookRequest requests",
 			problems: testutils.Problems{{Message: "repeated"}},
 		},
 		{
-			testName: "Invalid-RequestsFieldWrongType",
+			testRuleName: "Invalid-RequestsFieldWrongType",
 			Field:    "repeated int32 requests",
 			problems: testutils.Problems{{
 				Suggestion: "UpdateBookRequest",
 			}},
 		},
 		{
-			testName: "Invalid-RequestsNotRepeatedWrongType",
+			testRuleName: "Invalid-RequestsNotRepeatedWrongType",
 			Field:    "int32 requests",
 			problems: testutils.Problems{
 				{Message: `The "requests" field should be repeated`},

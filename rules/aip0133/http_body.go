@@ -18,15 +18,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Create methods should have an HTTP body, and the body value should be resource.
-var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "http-body"),
-	OnlyIf: isCreateMethod,
+var httpBody = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(133, "http-body"),
+	OnlyIf:   isCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgName(m)
 		resourceFieldName := strings.ToLower(resourceMsgName)

@@ -29,33 +29,33 @@ func TestPluralMethodResourceName(t *testing.T) {
 		problems       testutils.Problems
 	}{
 		{
-			testName:       "ValidBatchGetBooks",
-			MethodName:     "BatchGetBooks",
-			CollectionName: "books",
+			testRuleName:       "ValidBatchGetBooks",
+			MethodRuleName:     "BatchGetBooks",
+			CollectionRuleName: "books",
 			problems:       testutils.Problems{},
 		},
 		{
-			testName:       "ValidBatchGetMen",
-			MethodName:     "BatchGetMen",
-			CollectionName: "men",
+			testRuleName:       "ValidBatchGetMen",
+			MethodRuleName:     "BatchGetMen",
+			CollectionRuleName: "men",
 			problems:       testutils.Problems{},
 		},
 		{
-			testName:       "InvalidSingularBus",
-			MethodName:     "BatchGetBus",
-			CollectionName: "buses",
+			testRuleName:       "InvalidSingularBus",
+			MethodRuleName:     "BatchGetBus",
+			CollectionRuleName: "buses",
 			problems:       testutils.Problems{{Message: "Buses"}},
 		},
 		{
-			testName:       "Invalid-SingularCorpPerson",
-			MethodName:     "BatchGetCorpPerson",
-			CollectionName: "corpPerson",
+			testRuleName:       "Invalid-SingularCorpPerson",
+			MethodRuleName:     "BatchGetCorpPerson",
+			CollectionRuleName: "corpPerson",
 			problems:       testutils.Problems{{Message: "CorpPeople"}},
 		},
 		{
-			testName:       "Invalid-Irrelevant",
-			MethodName:     "GetBook",
-			CollectionName: "books",
+			testRuleName:       "Invalid-Irrelevant",
+			MethodRuleName:     "GetBook",
+			CollectionRuleName: "books",
 			problems:       testutils.Problems{},
 		},
 	}

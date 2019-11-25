@@ -23,8 +23,8 @@ import (
 )
 
 // Batch Update method should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(234, "request-message-name"),
+var requestMessageName = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(234, "request-message-name"),
 	OnlyIf: isBatchUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `BatchUpdateFoos`, the request

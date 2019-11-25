@@ -17,6 +17,7 @@ package aip0134
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -54,7 +55,7 @@ func TestRequestMaskField(t *testing.T) {
 			if test.descriptor != nil {
 				d = test.descriptor(message)
 			}
-			problems := requestMaskField.Lint(message)
+			problems := requestMaskField.Lint(descrule.NewMessage(message))
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

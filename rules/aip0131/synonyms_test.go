@@ -17,6 +17,7 @@ package aip0131
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -41,7 +42,7 @@ func TestSynonyms(t *testing.T) {
 			message Book {}
 		`, test)
 		m := file.GetServices()[0].GetMethods()[0]
-		if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(m)); diff != "" {
+		if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(descrule.NewMethod(m))); diff != "" {
 			t.Errorf(diff)
 		}
 	}

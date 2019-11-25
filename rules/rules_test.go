@@ -15,19 +15,19 @@ func TestAddAIPRules(t *testing.T) {
 		err           error
 	}{
 		{
-			name:          "EmptyRules_NoError",
+			RuleName:          "EmptyRules_NoError",
 			addRulesFuncs: nil,
 			err:           nil,
 		},
 		{
-			name: "AddingRules_NoError",
+			RuleName: "AddingRules_NoError",
 			addRulesFuncs: []addRulesFuncType{
 				func(lint.RuleRegistry) error { return nil },
 			},
 			err: nil,
 		},
 		{
-			name: "ReturnError",
+			RuleName: "ReturnError",
 			addRulesFuncs: []addRulesFuncType{
 				func(lint.RuleRegistry) error { return wantError },
 			},

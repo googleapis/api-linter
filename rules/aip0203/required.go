@@ -23,8 +23,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
-var required = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "required"),
+var required = &descrule.FieldRule{
+	RuleName:   lint.NewRuleName(203, "required"),
 	OnlyIf: withoutRequiredFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, requiredRegexp, "REQUIRED")

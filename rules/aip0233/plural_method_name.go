@@ -24,8 +24,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var pluralMethodName = &lint.MethodRule{
-	Name:   lint.NewRuleName(233, "plural-method-name"),
+var pluralMethodName = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(233, "plural-method-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Note: Retrieve the resource name from the method name. For example,

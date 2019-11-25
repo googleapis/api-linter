@@ -18,13 +18,14 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var nameSuffix = &lint.FieldRule{
-	Name: lint.NewRuleName(122, "name-suffix"),
+var nameSuffix = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(122, "name-suffix"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return !stringset.New("name", "display_name").Contains(f.GetName())
 	},

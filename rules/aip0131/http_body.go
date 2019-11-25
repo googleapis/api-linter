@@ -15,15 +15,16 @@
 package aip0131
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Get methods should not have an HTTP body.
-var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(131, "http-body"),
-	OnlyIf: isGetMethod,
+var httpBody = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(131, "http-body"),
+	OnlyIf:   isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {

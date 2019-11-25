@@ -24,8 +24,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fieldTypes = &lint.FieldRule{
-	Name: lint.NewRuleName(143, "string-type"),
+var fieldTypes = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(143, "string-type"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return stringset.New(
 			"country_code",

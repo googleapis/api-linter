@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -54,7 +55,7 @@ func TestHasAnnotation(t *testing.T) {
 				message ReadBookResponse {}
 			`, "{{.Annotation}}", test.annotation), test)
 			m := f.GetServices()[0].GetMethods()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(hasAnnotation.Lint(m)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(hasAnnotation.Lint(descrule.NewMethod(m))); diff != "" {
 				t.Errorf(diff)
 			}
 		})

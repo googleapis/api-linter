@@ -26,8 +26,8 @@ import (
 // TODO: Separate it into small rules.
 //
 // The Batch Update response message should have resource field.
-var responseResourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName(234, "response-resource-field"),
+var responseResourceField = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(234, "response-resource-field"),
 	OnlyIf: isBatchUpdateResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// the singular form the resource name, the first letter is Capitalized.

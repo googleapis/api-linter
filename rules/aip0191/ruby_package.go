@@ -26,7 +26,7 @@ import (
 )
 
 var rubyPackage = &lint.FileRule{
-	Name: lint.NewRuleName(191, "ruby-package"),
+	RuleName: lint.NewRuleName(191, "ruby-package"),
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if ns := f.GetFileOptions().GetRubyPackage(); ns != "" {
 			// Check for invalid characters.

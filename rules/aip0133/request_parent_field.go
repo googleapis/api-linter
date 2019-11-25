@@ -17,6 +17,7 @@ package aip0133
 import (
 	"fmt"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -24,9 +25,9 @@ import (
 )
 
 // The create request message should have parent field.
-var parentField = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-parent-field"),
-	OnlyIf: isCreateRequestMessage,
+var parentField = &descrule.MessageRule{
+	RuleName: lint.NewRuleName(133, "request-parent-field"),
+	OnlyIf:   isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.
 		parentField := m.FindFieldByName("parent")

@@ -24,8 +24,8 @@ import (
 )
 
 // Batch Update method should have a properly named Response message.
-var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(234, "response-message-name"),
+var responseMessageName = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(234, "response-message-name"),
 	OnlyIf: isBatchUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Proper response name should be the concatenation of the method name and

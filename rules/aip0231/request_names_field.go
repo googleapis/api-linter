@@ -28,8 +28,8 @@ import (
 //
 // The Batch Get standard method should have repeated name field or repeated
 // standard get request message field, but the latter one is not suggested.
-var namesField = &lint.MessageRule{
-	Name:   lint.NewRuleName(231, "request-names-field"),
+var namesField = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(231, "request-names-field"),
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.

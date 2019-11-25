@@ -26,8 +26,8 @@ import (
 
 // The Batch Update standard method should have repeated standard Update request
 // message field.
-var requestRequestsField = &lint.MessageRule{
-	Name:   lint.NewRuleName(234, "request-requests-field"),
+var requestRequestsField = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(234, "request-requests-field"),
 	OnlyIf: isBatchUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a "requests" field is present.

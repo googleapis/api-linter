@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -25,9 +26,9 @@ import (
 )
 
 // Update methods should use the resource as the response message
-var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(134, "response-message-name"),
-	OnlyIf: isUpdateMethod,
+var responseMessageName = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(134, "response-message-name"),
+	OnlyIf:   isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.

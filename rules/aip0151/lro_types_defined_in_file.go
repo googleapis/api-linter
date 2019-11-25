@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var lroDefinedInFile = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-types-defined-in-file"),
+var lroDefinedInFile = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(151, "lro-types-defined-in-file"),
 	OnlyIf: isAnnotatedLRO,
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		lro := utils.GetOperationInfo(m)

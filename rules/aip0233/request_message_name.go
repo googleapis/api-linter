@@ -23,8 +23,8 @@ import (
 )
 
 // Batch Create method should have a properly named Request message.
-var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(233, "request-message-name"),
+var requestMessageName = &descrule.MethodRule{
+	RuleName:   lint.NewRuleName(233, "request-message-name"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `BatchCreateFoos`, the request

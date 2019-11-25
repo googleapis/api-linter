@@ -15,15 +15,16 @@
 package aip0131
 
 import (
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Get methods should use the HTTP GET verb.
-var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(131, "http-method"),
-	OnlyIf: isGetMethod,
+var httpMethod = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(131, "http-method"),
+	OnlyIf:   isGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that the RPC uses HTTP GET.
 		for _, httpRule := range utils.GetHTTPRules(m) {

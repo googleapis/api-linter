@@ -20,8 +20,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var optionalBehaviorConflict = &lint.FieldRule{
-	Name: lint.NewRuleName(203, "optional-conflict"),
+var optionalBehaviorConflict = &descrule.FieldRule{
+	RuleName: lint.NewRuleName(203, "optional-conflict"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return !withoutOptionalFieldBehavior(f)
 	},

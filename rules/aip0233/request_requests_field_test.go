@@ -30,17 +30,17 @@ func TestRequestRequestsField(t *testing.T) {
 		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
 		{
-			testName: "Valid",
+			testRuleName: "Valid",
 			Field:    "repeated CreateBookRequest requests = 1;",
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Invalid-MissingRequestsField",
+			testRuleName: "Invalid-MissingRequestsField",
 			Field:    "string parent = 1;",
 			problems: testutils.Problems{{Message: `no "requests" field`}},
 		},
 		{
-			testName: "Invalid-RequestsFieldIsNotRepeated",
+			testRuleName: "Invalid-RequestsFieldIsNotRepeated",
 			Field:    "CreateBookRequest requests = 1;",
 			problems: testutils.Problems{{Message: "repeated"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
@@ -48,7 +48,7 @@ func TestRequestRequestsField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-RequestsFieldWrongType",
+			testRuleName: "Invalid-RequestsFieldWrongType",
 			Field:    "repeated int32 requests = 1;",
 			problems: testutils.Problems{{
 				Suggestion: "CreateBookRequest",
@@ -58,7 +58,7 @@ func TestRequestRequestsField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-RequestsNotRepeatedWrongType",
+			testRuleName: "Invalid-RequestsNotRepeatedWrongType",
 			Field:    "int32 requests = 1;",
 			problems: testutils.Problems{
 				{Message: "repeated"},

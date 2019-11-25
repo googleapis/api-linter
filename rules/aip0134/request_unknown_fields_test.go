@@ -16,6 +16,7 @@ package aip0134
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
@@ -63,7 +64,7 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
-			gotProblems := unknownFields.Lint(message)
+			gotProblems := unknownFields.Lint(descrule.NewMessage(message))
 			if diff := wantProblems.Diff(gotProblems); diff != "" {
 				t.Errorf(diff)
 			}

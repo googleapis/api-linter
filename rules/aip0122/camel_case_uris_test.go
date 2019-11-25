@@ -17,6 +17,7 @@ package aip0122
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/descrule"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
@@ -50,7 +51,7 @@ func TestHttpUriField(t *testing.T) {
 				message FrobBookResponse {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			problems := httpURICase.Lint(method)
+			problems := httpURICase.Lint(descrule.NewMethod(method))
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

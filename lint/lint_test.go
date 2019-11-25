@@ -17,138 +17,223 @@ package lint
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"testing"
-
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestLinter_run(t *testing.T) {
-	fd, err := builder.NewFile("protofile.proto").Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor.")
-	}
-	defaultConfigs := Configs{}
-
-	testRuleName := NewRuleName(111, "test-rule")
-	ruleProblems := []Problem{{
-		Message:    "rule1_problem",
-		Descriptor: fd,
-		category:   "",
-		RuleID:     testRuleName,
-	}}
-
+func TestLint(t *testing.T) {
+	ruleName1 := NewRuleName(111, "a")
+	ruleName2 := NewRuleName(111, "b")
 	tests := []struct {
-		testName string
-		configs  Configs
-		problems []Problem
+		name        string
+		descriptors []Descriptor
+		rules       []Rule
+		responses   []Response
 	}{
-		{"Empty", Configs{}, []Problem{}},
 		{
-			"NonMatchingFile",
-			append(
-				defaultConfigs,
-				Config{
-					IncludedPaths: []string{"nofile"},
-				},
-			),
-			ruleProblems,
+			"NoRule",
+			[]Descriptor{&mockDescriptor{}},
+			[]Rule{},
+			[]Response{},
 		},
 		{
-			"NonMatchingRule",
-			append(
-				defaultConfigs,
-				Config{
-					DisabledRules: []string{"foo::bar"},
-				},
-			),
-			ruleProblems,
+			"OneRule",
+			[]Descriptor{&mockDescriptor{}},
+			[]Rule{&mockRule{ruleName1}},
+			[]Response{{
+				FilePath: "",
+				Problems: []Problem{{RuleID: ruleName1, Message: string(ruleName1)}},
+			}},
 		},
 		{
-			"DisabledRule",
-			append(
-				defaultConfigs,
-				Config{
-					DisabledRules: []string{string(testRuleName)},
+			"TwoRule",
+			[]Descriptor{&mockDescriptor{}},
+			[]Rule{&mockRule{ruleName1}, &mockRule{ruleName2}},
+			[]Response{
+				{
+					FilePath: "",
+					Problems: []Problem{
+						{RuleID: ruleName1, Message: string(ruleName1)},
+						{RuleID: ruleName2, Message: string(ruleName2)},
+					},
 				},
-			),
-			[]Problem{},
+			},
+		},
+		{
+			"OneRule_TwoFiles",
+			[]Descriptor{
+				&mockDescriptor{sourceInfo: mockSourceInfo{file: mockFileInfo{path: "test-file1"}}},
+				&mockDescriptor{sourceInfo: mockSourceInfo{file: mockFileInfo{path: "test-file2"}}},
+			},
+			[]Rule{&mockRule{ruleName1}},
+			[]Response{
+				{
+					FilePath: "test-file1",
+					Problems: []Problem{{RuleID: ruleName1, Message: string(ruleName1)}},
+				},
+				{
+					FilePath: "test-file2",
+					Problems: []Problem{{RuleID: ruleName1, Message: string(ruleName1)}},
+				},
+			},
 		},
 	}
-
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			rules := NewRuleRegistry()
-			err := rules.Register(111, &FileRule{
-				Name: NewRuleName(111, "test-rule"),
-				LintFile: func(f *desc.FileDescriptor) []Problem {
-					return test.problems
-				},
-			})
+			err := rules.Register(111, test.rules...)
 			if err != nil {
 				t.Fatal(err)
 			}
-			l := New(rules, test.configs)
-
-			// Actually run the linter.
-			resp, _ := l.lintFileDescriptor(fd)
-
-			// Assert that we got the problems we expected.
-			if !reflect.DeepEqual(resp.Problems, test.problems) {
-				t.Errorf("Expected %v, got %v.", test.problems, resp.Problems)
+			linter := New(rules, Configs{})
+			responses := linter.Lint(test.descriptors...)
+			if !reflect.DeepEqual(responses, test.responses) {
+				t.Errorf("Lint got %v, but want %v", responses, test.responses)
 			}
 		})
 	}
 }
 
-func TestLinter_LintProtos_RulePanics(t *testing.T) {
-	fd, err := builder.NewFile("test.proto").Build()
+func TestLint_Configs(t *testing.T) {
+	ruleName := NewRuleName(111, "test")
+	rules := NewRuleRegistry()
+	err := rules.Register(111, &mockRule{name: ruleName})
 	if err != nil {
-		t.Fatalf("Failed to build the file descriptor.")
+		t.Fatal(err)
 	}
-
-	testAIP := 111
+	descriptor := mockDescriptor{
+		sourceInfo: mockSourceInfo{
+			file: mockFileInfo{
+				path: "test-file",
+			},
+		},
+	}
 
 	tests := []struct {
-		testName string
-		rule     ProtoRule
+		name        string
+		configs     Configs
+		wantProblem bool
 	}{
+		{"EmptyConfigs_Run", Configs{}, true},
+		{"PathNotMatched_Run", Configs{{IncludedPaths: []string{"nofile"}}}, true},
 		{
-			testName: "Panic",
-			rule: &FileRule{
-				Name: NewRuleName(testAIP, "panic"),
-				LintFile: func(_ *desc.FileDescriptor) []Problem {
-					panic("panic")
-				},
-			},
+			"PathIncluded_RuleDisabled_NotRun",
+			Configs{{
+				IncludedPaths: []string{"test-file"},
+				DisabledRules: []string{string(ruleName)},
+			}},
+			false,
 		},
 		{
-			testName: "PanicError",
-			rule: &FileRule{
-				Name: NewRuleName(testAIP, "panic-error"),
-				LintFile: func(_ *desc.FileDescriptor) []Problem {
-					panic(fmt.Errorf("panic"))
-				},
-			},
+			"PathIncluded_RuleEnabled_Run",
+			Configs{{
+				IncludedPaths: []string{"test-file"},
+				EnabledRules:  []string{string(ruleName)},
+			}},
+			true,
+		},
+		{
+			"PathExcluded_RuleDisabled_Run",
+			Configs{{
+				ExcludedPaths: []string{"test-file"},
+				DisabledRules: []string{string(ruleName)},
+			}},
+			true,
 		},
 	}
-
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			rules := NewRuleRegistry()
-			err := rules.Register(testAIP, test.rule)
-			if err != nil {
-				t.Fatalf("Failed to create Rules: %q", err)
-			}
-
-			// Instantiate a linter with the given rule.
-			l := New(rules, nil)
-
-			_, err = l.LintProtos(fd)
-			if err == nil || !strings.Contains(err.Error(), "panic") {
-				t.Fatalf("Expected error with panic, got %q", err)
+		t.Run(test.name, func(t *testing.T) {
+			linter := New(rules, test.configs)
+			problems := linter.Lint(descriptor)
+			gotProblem := len(problems) > 0
+			if test.wantProblem != gotProblem {
+				t.Errorf("Running lint? Got %v, but want %v", gotProblem, test.wantProblem)
 			}
 		})
 	}
+}
+
+func TestLint_CommentDisabling(t *testing.T) {
+	ruleName := NewRuleName(111, "test")
+	rules := NewRuleRegistry()
+	err := rules.Register(111, &mockRule{name: ruleName})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name        string
+		descriptor  Descriptor
+		wantProblem bool
+	}{
+		{"NoComments", mockDescriptor{}, true},
+		{
+			"Disabled_LeadingComments",
+			mockDescriptor{
+				sourceInfo: mockSourceInfo{leadingComments: fmt.Sprintf("api-linter: %s=disabled", ruleName)},
+			},
+			false,
+		},
+		{
+			"Disabled_FileComments",
+			mockDescriptor{
+				sourceInfo: mockSourceInfo{file: mockFileInfo{comments: fmt.Sprintf("api-linter: %s=disabled", ruleName)}},
+			},
+			false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			linter := New(rules, Configs{})
+			problems := linter.Lint(test.descriptor)
+			gotProblem := len(problems) > 0
+			if test.wantProblem != gotProblem {
+				t.Errorf("Running lint? Got %v, but want %v", gotProblem, test.wantProblem)
+			}
+		})
+	}
+}
+
+type mockRule struct {
+	name RuleName
+}
+
+func (r mockRule) Name() RuleName {
+	return r.name
+}
+
+func (r mockRule) Lint(d Descriptor) []Problem {
+	return []Problem{Problem{Message: string(r.name)}}
+}
+
+type mockFileInfo struct {
+	path, comments string
+}
+
+func (f mockFileInfo) Path() string {
+	return f.path
+}
+
+func (f mockFileInfo) Comments() string {
+	return f.comments
+}
+
+type mockSourceInfo struct {
+	leadingComments string
+	file            mockFileInfo
+}
+
+func (s mockSourceInfo) LeadingComments() string {
+	return s.leadingComments
+}
+
+func (s mockSourceInfo) File() FileInfo {
+	return s.file
+}
+
+type mockDescriptor struct {
+	sourceInfo mockSourceInfo
+}
+
+func (d mockDescriptor) SourceInfo() SourceInfo {
+	return d.sourceInfo
 }

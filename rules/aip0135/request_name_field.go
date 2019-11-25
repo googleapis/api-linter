@@ -24,8 +24,8 @@ import (
 )
 
 // The Delete standard method should only have expected fields.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(135, "request-name-field"),
+var standardFields = &descrule.MessageRule{
+	RuleName:   lint.NewRuleName(135, "request-name-field"),
 	OnlyIf: isDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a name field is present.

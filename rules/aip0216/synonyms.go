@@ -22,8 +22,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var synonyms = &lint.EnumRule{
-	Name: lint.NewRuleName(216, "synonyms"),
+var synonyms = &descrule.EnumRule{
+	RuleName: lint.NewRuleName(216, "synonyms"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		if strings.HasSuffix(e.GetName(), "Status") {
 			return []lint.Problem{{

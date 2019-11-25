@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var hardcodedHyphen = &lint.MethodRule{
-	Name: lint.NewRuleName(159, "hardcoded-hyphen"),
+var hardcodedHyphen = &descrule.MethodRule{
+	RuleName: lint.NewRuleName(159, "hardcoded-hyphen"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, http := range utils.GetHTTPRules(m) {
 			if strings.Contains(http.GetPlainURI(), "/-/") {

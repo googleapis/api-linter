@@ -29,22 +29,22 @@ func TestRequestMessageName(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{
-			testName:   "Valid-BatchCreateBooksRequest",
-			MethodName: "BatchCreateBooks",
+			testRuleName:   "Valid-BatchCreateBooksRequest",
+			MethodRuleName: "BatchCreateBooks",
 			Request:    "BatchCreateBooksRequest",
 			problems:   testutils.Problems{},
 		},
 		{
-			testName:   "Invalid-MissMatchingMethodName",
-			MethodName: "BatchCreateBooks",
+			testRuleName:   "Invalid-MissMatchingMethodName",
+			MethodRuleName: "BatchCreateBooks",
 			Request:    "BatchCreateBookRequest",
 			problems: testutils.Problems{{
 				Suggestion: "BatchCreateBooksRequest",
 			}},
 		},
 		{
-			testName:   "Irrelevant",
-			MethodName: "AcquireBook",
+			testRuleName:   "Irrelevant",
+			MethodRuleName: "AcquireBook",
 			Request:    "AcquireBookRequest",
 			problems:   testutils.Problems{},
 		},

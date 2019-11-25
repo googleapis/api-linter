@@ -29,36 +29,36 @@ func TestMethodPluralResourceName(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{
-			testName:   "Valid-BatchUpdateBooks",
-			MethodName: "BatchUpdateBooks",
+			testRuleName:   "Valid-BatchUpdateBooks",
+			MethodRuleName: "BatchUpdateBooks",
 			UriSuffix:  "books:batchUpdate",
 			problems:   testutils.Problems{},
 		},
 		{
-			testName:   "Valid-BatchUpdateMen",
-			MethodName: "BatchUpdateMen",
+			testRuleName:   "Valid-BatchUpdateMen",
+			MethodRuleName: "BatchUpdateMen",
 			UriSuffix:  "men:batchUpdate",
 			problems:   testutils.Problems{},
 		},
 		{
-			testName:   "Invalid-SingularBus",
-			MethodName: "BatchUpdateBus",
+			testRuleName:   "Invalid-SingularBus",
+			MethodRuleName: "BatchUpdateBus",
 			UriSuffix:  "bus:batchUpdate",
 			problems: testutils.Problems{{
 				Suggestion: "BatchUpdateBuses",
 			}},
 		},
 		{
-			testName:   "Invalid-SingularCorpPerson",
-			MethodName: "BatchUpdateCorpPerson",
+			testRuleName:   "Invalid-SingularCorpPerson",
+			MethodRuleName: "BatchUpdateCorpPerson",
 			UriSuffix:  "corpPerson:batchUpdate",
 			problems: testutils.Problems{{
 				Suggestion: "BatchUpdateCorpPeople",
 			}},
 		},
 		{
-			testName:   "Invalid-Irrelevant",
-			MethodName: "AcquireBook",
+			testRuleName:   "Invalid-Irrelevant",
+			MethodRuleName: "AcquireBook",
 			UriSuffix:  "book",
 			problems:   testutils.Problems{},
 		},
