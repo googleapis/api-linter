@@ -19,8 +19,11 @@ import (
 	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/internal/pragma"
 	"github.com/jhump/protoreflect/desc"
 )
+
+type doNotImplement pragma.DoNotImplement
 
 // ProtoRule defines a lint rule that checks Google Protobuf APIs.
 //
@@ -33,6 +36,8 @@ type ProtoRule interface {
 	// Lint accepts a FileDescriptor and lints it,
 	// returning a slice of Problem objects it finds.
 	Lint(*desc.FileDescriptor) []Problem
+
+	doNotImplement
 }
 
 // FileRule defines a lint rule that checks a file as a whole.
@@ -49,6 +54,9 @@ type FileRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *FileRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *FileRule) GetName() RuleName {
@@ -80,6 +88,9 @@ type MessageRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *MessageRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *MessageRule) GetName() RuleName {
@@ -116,6 +127,9 @@ type FieldRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *FieldRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *FieldRule) GetName() RuleName {
@@ -155,6 +169,9 @@ type ServiceRule struct {
 	noPositional struct{}
 }
 
+// LinterInternal implements DoNotImplement.
+func (r *ServiceRule) LinterInternal(pragma.DoNotImplement) {}
+
 // GetName returns the name of the rule.
 func (r *ServiceRule) GetName() RuleName {
 	return r.Name
@@ -187,6 +204,9 @@ type MethodRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *MethodRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *MethodRule) GetName() RuleName {
@@ -222,6 +242,9 @@ type EnumRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *EnumRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *EnumRule) GetName() RuleName {
@@ -261,6 +284,9 @@ type DescriptorRule struct {
 
 	noPositional struct{}
 }
+
+// LinterInternal implements DoNotImplement.
+func (r *DescriptorRule) LinterInternal(pragma.DoNotImplement) {}
 
 // GetName returns the name of the rule.
 func (r *DescriptorRule) GetName() RuleName {
