@@ -15,7 +15,7 @@ fields, as mandated in [AIP-132][].
 
 ## Details
 
-This rule looks at any message matching `List*Request` and complains if it
+This rule looks at any message matching `List*Response` and complains if it
 comes across any fields other than:
 
 - The resource.
