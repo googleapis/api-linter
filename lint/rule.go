@@ -228,7 +228,7 @@ func (r *EnumRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every service in the file and runs `LintEnum`.
+// Lint visits every enum in the file and runs `LintEnum`.
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // enum, and if it returns false, the `LintEnum` function is not called.
@@ -239,6 +239,43 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 	for _, enum := range getAllEnums(fd) {
 		if r.OnlyIf == nil || r.OnlyIf(enum) {
 			problems = append(problems, r.LintEnum(enum)...)
+		}
+	}
+	return problems
+}
+
+// EnumValueRule defines a lint rule that is run on each enum value.
+type EnumValueRule struct {
+	Name RuleName
+
+	// LintEnumValue accepts a EnumValueDescriptor and lints it.
+	LintEnumValue func(*desc.EnumValueDescriptor) []Problem
+
+	// OnlyIf accepts an EnumValueDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.EnumValueDescriptor) bool
+
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *EnumValueRule) GetName() RuleName {
+	return r.Name
+}
+
+// Lint visits every enum value in the file and runs `LintEnum`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// enum value, and if it returns false, the `LintEnum` function is not called.
+func (r *EnumValueRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
+
+	// Lint all enums, either at the top of the file, or nested within messages.
+	for _, enum := range getAllEnums(fd) {
+		for _, value := range enum.GetValues() {
+			if r.OnlyIf == nil || r.OnlyIf(value) {
+				problems = append(problems, r.LintEnumValue(value)...)
+			}
 		}
 	}
 	return problems
