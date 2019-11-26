@@ -17,9 +17,9 @@ package testutils
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"strings"
 	"testing"
+	"text/template"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
