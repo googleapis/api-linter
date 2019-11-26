@@ -24,5 +24,6 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		214,
 		resourceExpiry,
+		ttlType,
 	)
 }
