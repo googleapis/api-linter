@@ -8,7 +8,7 @@ redirect_from:
   - /0140/reserved-words
 ---
 
-# Field names: Prepositions
+# Field names: Reserved words
 
 This rule enforces that field names are not reserved words, as mandated in
 [AIP-140][].
