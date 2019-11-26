@@ -36,7 +36,7 @@ var fieldTypes = &lint.FieldRule{
 		).Contains(f.GetName())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if typeName := utils.GetScalarTypeName(f); typeName != "string" {
+		if typeName := utils.GetTypeName(f); typeName != "string" {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field %q should be a string, not %s.", f.GetName(), typeName),
 				Suggestion: "string",

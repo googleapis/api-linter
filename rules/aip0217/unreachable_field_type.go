@@ -33,7 +33,7 @@ var unreachableFieldType = &lint.FieldRule{
 				Descriptor: f,
 			})
 		}
-		if utils.GetScalarTypeName(f) != "string" {
+		if utils.GetTypeName(f) != "string" {
 			problems = append(problems, lint.Problem{
 				Message:    "unreachable field should be a string.",
 				Suggestion: "string",

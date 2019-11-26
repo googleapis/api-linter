@@ -20,42 +20,21 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestGetScalarTypeName(t *testing.T) {
-	for _, ty := range []string{"int32", "int64", "string", "bytes", "float", "double"} {
+func TestGetTypeName(t *testing.T) {
+	for _, ty := range []string{"int32", "int64", "string", "bytes", "google.protobuf.Timestamp", "Format"} {
 		t.Run(ty, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
-				message Book {
-					{{.Type}} field = 1;
-				}
-			`, struct{ Type string }{ty})
-			field := file.GetMessageTypes()[0].GetFields()[0]
-			if got, want := GetScalarTypeName(field), ty; got != want {
-				t.Errorf("Got %q, expected %q.", got, want)
-			}
-		})
-	}
-}
-
-func TestGetMessageTypeName(t *testing.T) {
-	tests := []struct {
-		testName string
-		Type     string
-		want     string
-	}{
-		{"Message", "google.protobuf.Timestamp", "google.protobuf.Timestamp"},
-		{"Scalar", "int32", ""},
-	}
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/timestamp.proto";
 				message Book {
 					{{.Type}} field = 1;
 				}
-			`, test)
+				enum Format {
+					FORMAT_UNSPECIFIED = 0;
+				}
+			`, struct{ Type string }{ty})
 			field := file.GetMessageTypes()[0].GetFields()[0]
-			if got := GetMessageTypeName(field); got != test.want {
-				t.Errorf("Got %q, expected %q.", got, test.want)
+			if got, want := GetTypeName(field), ty; got != want {
+				t.Errorf("Got %q, expected %q.", got, want)
 			}
 		})
 	}

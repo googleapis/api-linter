@@ -17,23 +17,17 @@ package utils
 import (
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 )
 
-type hasGetType interface {
-	GetType() dpb.FieldDescriptorProto_Type
-}
-
-// GetScalarTypeName returns the name of the type of the field, as a string.
-func GetScalarTypeName(t hasGetType) string {
-	return strings.ToLower(t.GetType().String()[len("TYPE_"):])
-}
-
-// GetMessageTypeName returns the name of the type of the field, as a string.
-func GetMessageTypeName(f *desc.FieldDescriptor) string {
-	if messageType := f.GetMessageType(); messageType != nil {
-		return messageType.GetFullyQualifiedName()
+// GetTypeName returns the name of the type of the field, as a string,
+// regardless
+func GetTypeName(f *desc.FieldDescriptor) string {
+	if m := f.GetMessageType(); m != nil {
+		return m.GetFullyQualifiedName()
 	}
-	return ""
+	if e := f.GetEnumType(); e != nil {
+		return e.GetFullyQualifiedName()
+	}
+	return strings.ToLower(f.GetType().String()[len("TYPE_"):])
 }

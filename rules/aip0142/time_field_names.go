@@ -45,7 +45,7 @@ var fieldNames = &lint.FieldRule{
 		}
 
 		// Look for timestamps that do not end in `_time`.
-		if utils.GetMessageTypeName(f) == "google.protobuf.Timestamp" && !strings.HasSuffix(f.GetName(), "_time") {
+		if utils.GetTypeName(f) == "google.protobuf.Timestamp" && !strings.HasSuffix(f.GetName(), "_time") {
 			return []lint.Problem{{
 				Message:    "Timestamp fields should end in `_time`.",
 				Descriptor: f,
