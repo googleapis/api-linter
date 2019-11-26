@@ -71,6 +71,7 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0191"
 	"github.com/googleapis/api-linter/rules/aip0192"
 	"github.com/googleapis/api-linter/rules/aip0203"
+	"github.com/googleapis/api-linter/rules/aip0214"
 	"github.com/googleapis/api-linter/rules/aip0216"
 	"github.com/googleapis/api-linter/rules/aip0217"
 	"github.com/googleapis/api-linter/rules/aip0231"
@@ -101,6 +102,7 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0191.AddRules,
 	aip0192.AddRules,
 	aip0203.AddRules,
+	aip0214.AddRules,
 	aip0216.AddRules,
 	aip0217.AddRules,
 	aip0231.AddRules,

@@ -17,9 +17,9 @@ package testutils
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"strings"
 	"testing"
+	"text/template"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -75,7 +75,7 @@ func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
 // ParseProto3Tmpl parses a template string representing a proto file, and
 // returns a FileDescriptor.
 //
-// It parses the template using Go's template Parse function, and then
+// It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3String.
 func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescriptor {
 	// Create a new template object.
