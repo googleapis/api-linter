@@ -31,7 +31,7 @@ var ttlType = &lint.FieldRule{
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if fieldType := utils.GetTypeName(f); fieldType != "google.protobuf.Duration" {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("ttl fields should be google.protobuf.Duration type, not %s.", fieldType),
+				Message:    fmt.Sprintf("ttl fields should be `google.protobuf.Duration` type, not `%s`.", fieldType),
 				Suggestion: "google.protobuf.Duration",
 				Descriptor: f,
 				Location:   locations.FieldType(f),
