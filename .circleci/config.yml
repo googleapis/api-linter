@@ -17,7 +17,7 @@ jobs:
           command: go test -mod=readonly -v ./...
   lint:
     docker:
-      - image: circleci/golang:1.13
+      - image: golang:1.13
     steps:
       - checkout
       - run:
@@ -26,6 +26,17 @@ jobs:
       - run:
           name: Run golangci-lint
           command: "! $(go env GOPATH)/bin/golangci-lint run ./... 2>&1 | read"
+      - run:
+          name: Check Format
+          command: "! go fmt ./... 2>&1 | read"
+      - run:
+          name: go vet
+          command: go vet ./...
+  format:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
       - run:
           name: Check Format
           command: "! go fmt ./... 2>&1 | read"
