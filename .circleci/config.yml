@@ -5,6 +5,7 @@ workflows:
     jobs:
       - unit-tests
       - lint
+      - format
       - meta-lint
 jobs:
   unit-tests:
