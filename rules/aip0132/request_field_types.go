@@ -33,7 +33,7 @@ var requestFieldTypes = &lint.FieldRule{
 	},
 	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
 		// Establish that the field being checked is a string.
-		if utils.GetScalarTypeName(f) != "string" {
+		if utils.GetTypeName(f) != "string" {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field %q should be a string.", f.GetName()),
 				Descriptor: f,

@@ -17,29 +17,18 @@ package aip0141
 import (
 	"fmt"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var forbiddenTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "forbidden-types"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		// Make a map of the forbidden types.
-		nope := make(map[dpb.FieldDescriptorProto_Type]string)
-		for _, t := range []*builder.FieldType{
-			builder.FieldTypeFixed32(),
-			builder.FieldTypeFixed64(),
-			builder.FieldTypeUInt32(),
-			builder.FieldTypeUInt64(),
-		} {
-			// Change "TYPE_TYPENAME" to "typename".
-			nope[t.GetType()] = utils.GetScalarTypeName(t)
-		}
-		if typeName, ok := nope[f.GetType()]; ok {
+		nope := stringset.New("fixed32", "fixed64", "uint32", "uint64")
+		if typeName := utils.GetTypeName(f); nope.Contains(typeName) {
 			// Preserve original intent w/r/t 32-bit vs. 64-bit.
 			want := "int" + typeName[len(typeName)-2:]
 			return []lint.Problem{{

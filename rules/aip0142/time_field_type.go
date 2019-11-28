@@ -33,7 +33,7 @@ var fieldType = &lint.FieldRule{
 			"usec", "usecs",
 		)
 		tokens := strings.Split(f.GetName(), "_")
-		if suffixes.Contains(tokens[len(tokens)-1]) && utils.GetMessageTypeName(f) != "google.protobuf.Timestamp" {
+		if suffixes.Contains(tokens[len(tokens)-1]) && utils.GetTypeName(f) != "google.protobuf.Timestamp" {
 			return []lint.Problem{{
 				Message:    "Fields representing timestamps should use `google.protobuf.Timestamp`.",
 				Suggestion: "google.protobuf.Timestamp",
