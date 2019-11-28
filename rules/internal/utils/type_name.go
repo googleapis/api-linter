@@ -22,6 +22,8 @@ import (
 
 // GetTypeName returns the name of the type of the field, as a string,
 // regardless
+//
+// TODO: Add support for map types.
 func GetTypeName(f *desc.FieldDescriptor) string {
 	if m := f.GetMessageType(); m != nil {
 		return m.GetFullyQualifiedName()
