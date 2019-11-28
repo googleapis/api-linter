@@ -3,8 +3,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - unit-test
-      - format
+      - unit-tests
       - lint
       - meta-lint
 jobs:
