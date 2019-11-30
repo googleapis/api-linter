@@ -64,7 +64,10 @@ func newCli(args []string) *cli {
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 
 	// Parse flags.
-	fs.Parse(args)
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
 
 	return &cli{
 		ConfigPath:       cfgFlag,

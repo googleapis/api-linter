@@ -24,7 +24,7 @@ var javaMultipleFiles = &lint.FileRule{
 	Name:   lint.NewRuleName(191, "java-multiple-files"),
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if f.GetFileOptions().GetJavaMultipleFiles() == false {
+		if !f.GetFileOptions().GetJavaMultipleFiles() {
 			return []lint.Problem{{
 				Descriptor: f,
 				Location:   locations.FilePackage(f),
