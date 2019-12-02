@@ -88,7 +88,7 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 					DisabledRules: []string{"somerule", "testrule"},
 				},
 			},
-			"a/with/long/sub/dir/ect/ory/e.proto",
+			"a/with/long/sub/dir/etc/ory/e.proto",
 			"testrule",
 			disabled,
 		},

@@ -28,7 +28,7 @@ var noHTML = &lint.DescriptorRule{
 	},
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
 		for _, comment := range separateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
-			if htmlTag.MatchString(comment) == true {
+			if htmlTag.MatchString(comment) {
 				return []lint.Problem{{
 					Message:    "Comments must not include raw HTML.",
 					Descriptor: d,

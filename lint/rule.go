@@ -47,6 +47,7 @@ type FileRule struct {
 	// is applicable.
 	OnlyIf func(*desc.FileDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -78,6 +79,7 @@ type MessageRule struct {
 	// is applicable.
 	OnlyIf func(*desc.MessageDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -114,6 +116,7 @@ type FieldRule struct {
 	// is applicable.
 	OnlyIf func(*desc.FieldDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -152,6 +155,7 @@ type ServiceRule struct {
 	// is applicable.
 	OnlyIf func(*desc.ServiceDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -185,6 +189,7 @@ type MethodRule struct {
 	// is applicable.
 	OnlyIf func(*desc.MethodDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -220,6 +225,7 @@ type EnumRule struct {
 	// is applicable.
 	OnlyIf func(*desc.EnumDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -255,6 +261,7 @@ type EnumValueRule struct {
 	// is applicable.
 	OnlyIf func(*desc.EnumValueDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -296,6 +303,7 @@ type DescriptorRule struct {
 	// is applicable.
 	OnlyIf func(desc.Descriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 

@@ -14,9 +14,11 @@
 
 package aip0140
 
-import "testing"
+import (
+	"testing"
 
-import "github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
+)
 
 func TestReservedWords(t *testing.T) {
 	reservedWordsSet.Each(func(s string) {
