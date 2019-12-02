@@ -3,6 +3,3 @@ linters:
   enable:
     - goimports
     - misspell
-  disable:
-    - structcheck
-    - unused
