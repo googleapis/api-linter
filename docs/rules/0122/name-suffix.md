@@ -8,7 +8,7 @@ redirect_from:
   - /0122/name-suffix
 ---
 
-# HTTP URI case
+# Name field suffix
 
 This rule enforces that fields do not use the suffix `_name`, as mandated in
 [AIP-122][].
