@@ -40,6 +40,8 @@ func TestUnknownFields(t *testing.T) {
 		// Use BigBook instead of Book to test correct casing logic
 		{"UpdateMask", "UpdateBigBookRequest", "update_mask",
 			builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
+		{"ValidateOnly", "UpdateBigBookRequest", "validate_only",
+			builder.FieldTypeBool(), testutils.Problems{}},
 		{"Invalid", "UpdateBigBookRequest", "application_id",
 			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
 		{"InvalidCasing", "UpdateBigBookRequest", "bigbook",
