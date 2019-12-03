@@ -36,7 +36,7 @@ func TestParseProtoString(t *testing.T) {
 			string eggs = 2;
 			google.protobuf.Timestamp create_time = 3;
 		}
-	`)
+	`, "test.proto")
 	if !fd.IsProto3() {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
@@ -73,7 +73,7 @@ func TestParseProtoStringError(t *testing.T) {
 			syntax = "proto3";
 			message Foo {}
 			The quick brown fox jumped over the lazy dogs.
-		`)
+		`, "test.proto")
 	}()
 	wg.Wait()
 
