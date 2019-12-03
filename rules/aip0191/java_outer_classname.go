@@ -29,7 +29,11 @@ var javaOuterClassname = &lint.FileRule{
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if f.GetFileOptions().GetJavaOuterClassname() == "" {
-			want := strcase.UpperCamelCase(strings.ReplaceAll(f.GetName(), ".", "_"))
+			filename := f.GetName()
+			if ix := strings.LastIndex(filename, "/"); ix != -1 {
+				filename = filename[ix+1:]
+			}
+			want := strcase.UpperCamelCase(strings.ReplaceAll(filename, ".", "_"))
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Proto files should set `option java_outer_classname = %q`.",

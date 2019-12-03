@@ -24,12 +24,15 @@ import (
 func TestJavaOuterClassname(t *testing.T) {
 	for _, test := range []struct {
 		name       string
+		filename   string
 		statements []string
 		problems   testutils.Problems
 	}{
-		{"Valid", []string{"package foo.v1;", `option java_outer_classname = "TestProto";`}, testutils.Problems{}},
-		{"Invalid", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
-		{"Ignored", []string{"", ""}, testutils.Problems{}},
+		{"Valid", "test.proto", []string{"package foo.v1;", `option java_outer_classname = "TestProto";`}, testutils.Problems{}},
+		{"ValidWithPath", "foo/bar/test.proto", []string{"package foo.v1;", `option java_outer_classname = "TestProto";`}, testutils.Problems{}},
+		{"Invalid", "test.proto", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"InvalidWithPath", "foo/bar/test.proto", []string{"package foo.v1;"}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"Ignored", "test.proto", []string{"", ""}, testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))
