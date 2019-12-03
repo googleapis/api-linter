@@ -39,6 +39,9 @@ It will install `api-linter` into your local Go binary directory
 `$HOME/go/bin`. Ensure that your operating system's `PATH` contains the Go
 binary directory.
 
+**Note:** For working in Google-internal source control, you should
+use the released binary `/google/bin/releases/api-linter/api-linter`.
+
 ## Usage
 
 ```sh
