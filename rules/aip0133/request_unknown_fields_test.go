@@ -44,6 +44,13 @@ func TestUnknownFields(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidateOnly",
+			"CreateBookRequest",
+			[]field{{"parent", builder.FieldTypeString()}, {"validate_only", builder.FieldTypeBool()}},
+			testutils.Problems{},
+			nil,
+		},
+		{
 			"ResourceRelatedField",
 			"CreateBookRequest",
 			[]field{
