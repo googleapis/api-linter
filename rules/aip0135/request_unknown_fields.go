@@ -28,10 +28,11 @@ var unknownFields = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"name":       {}, // AIP-135
-			"force":      {}, // AIP-135
-			"etag":       {}, // AIP-154
-			"request_id": {}, // AIP-155
+			"name":          {}, // AIP-135
+			"force":         {}, // AIP-135
+			"etag":          {}, // AIP-154
+			"request_id":    {}, // AIP-155
+			"validate_only": {}, // AIP needed
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
