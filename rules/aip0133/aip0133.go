@@ -42,7 +42,6 @@ func AddRules(r lint.RuleRegistry) error {
 
 var createMethodRegexp = regexp.MustCompile("^Create(?:[A-Z]|$)")
 var createReqMessageRegexp = regexp.MustCompile("^Create[A-Za-z0-9]*Request$")
-var createURINameRegexp = regexp.MustCompile(`{parent=[a-zA-Z/*]+}$`)
 
 // Returns true if this is a AIP-133 Create method, false otherwise.
 func isCreateMethod(m *desc.MethodDescriptor) bool {
