@@ -16,6 +16,7 @@ package aip0191
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -29,10 +30,7 @@ var javaOuterClassname = &lint.FileRule{
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if f.GetFileOptions().GetJavaOuterClassname() == "" {
-			filename := f.GetName()
-			if ix := strings.LastIndex(filename, "/"); ix != -1 {
-				filename = filename[ix+1:]
-			}
+			filename := filepath.Base(f.GetName())
 			want := strcase.UpperCamelCase(strings.ReplaceAll(filename, ".", "_"))
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
