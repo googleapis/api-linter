@@ -376,7 +376,12 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
 
-	commentLines := strings.Split(getLeadingComments(d), "\n")
+	commentLines := []string{}
+	if f, ok := d.(*desc.FileDescriptor); ok {
+		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
+	} else {
+		commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	}
 	disabledRules := []string{}
 	for _, commentLine := range commentLines {
 		r := extractDisabledRuleName(commentLine)
