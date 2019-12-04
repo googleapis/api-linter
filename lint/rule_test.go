@@ -422,7 +422,7 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 		},
 	}
 
-	// Run the specific tests individually.
+	// Build a proto and check that ruleIsEnabled does the right thing.
 	f, err := builder.NewFile("test.proto").AddMessage(
 		builder.NewMessage("FirstMessage").SetComments(builder.Comments{
 			LeadingComment: "api-linter: test=disabled",
@@ -438,6 +438,34 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	}
 	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
+	}
+}
+
+func TestRuleIsEnabledParent(t *testing.T) {
+	// Create a rule that we can check enabled status on.
+	rule := &FieldRule{
+		Name: RuleName("test"),
+		LintField: func(f *desc.FieldDescriptor) []Problem {
+			return nil
+		},
+	}
+
+	// Build a proto with two messages, one of which disables the rule.
+	f, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("Foo").SetComments(builder.Comments{
+			LeadingComment: "api-linter: test=disabled",
+		}).AddField(builder.NewField("foo", builder.FieldTypeBool())),
+	).AddMessage(
+		builder.NewMessage("Bar").AddField(builder.NewField("bar", builder.FieldTypeBool())),
+	).Build()
+	if err != nil {
+		t.Fatalf("Error building test file: %q", err)
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil), false; got != want {
+		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil), true; got != want {
+		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
 }
 
