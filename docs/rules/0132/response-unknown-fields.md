@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 132
-  name: [core, '0132', request-unknown-fields]
-  summary: List RPCs should not have unexpected fields in the request.
-permalink: /132/request-unknown-fields
+  name: [core, '0132', response-unknown-fields]
+  summary: List RPCs should not have unexpected fields in the response.
+permalink: /132/response-unknown-fields
 redirect_from:
-  - /0132/request-unknown-fields
+  - /0132/response-unknown-fields
 ---
 
 # List methods: Unknown fields (Response)
