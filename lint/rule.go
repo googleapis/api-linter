@@ -376,8 +376,12 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
 
-	commentLines := strings.Split(fileHeader(d.GetFile()), "\n")
-	commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	commentLines := []string{}
+	if f, ok := d.(*desc.FileDescriptor); ok {
+		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
+	} else {
+		commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	}
 	disabledRules := []string{}
 	for _, commentLine := range commentLines {
 		r := extractDisabledRuleName(commentLine)
@@ -390,6 +394,12 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 		if matchRule(name, disabledRules...) {
 			return false
 		}
+	}
+
+	// The rule may have been disabled on a parent. (For example, a field rule
+	// may be disabled at the message level to cover all fields in the message).
+	if parent := d.GetParent(); parent != nil {
+		return ruleIsEnabled(rule, parent, aliasMap)
 	}
 
 	return true
