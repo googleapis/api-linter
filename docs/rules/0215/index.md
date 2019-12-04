@@ -5,6 +5,6 @@ redirect_from:
   - /0215/
 ---
 
-# States
+# Common component versions
 
 {% include linter-aip-listing.md aip=215 %}
