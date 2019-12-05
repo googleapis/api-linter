@@ -46,3 +46,18 @@ func TestFieldLocations(t *testing.T) {
 		})
 	}
 }
+
+func TestFieldResourceReference(t *testing.T) {
+	f := parse(t, `
+		import "google/api/resource.proto";
+		message GetBookRequest {
+		  string name = 1 [(google.api.resource_reference) = {
+		    type: "library.googleapis.com/Book"
+		  }];
+		}
+	`)
+	loc := FieldResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
+		t.Errorf(diff)
+	}
+}

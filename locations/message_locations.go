@@ -20,16 +20,8 @@ import (
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
-// FieldResourceReference returns the precise location for a field's
-// resource reference annotation.
-func FieldResourceReference(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, 8, int(apb.E_ResourceReference.Field)) // FieldDescriptor.options == 8
-}
-
-// FieldType returns the precise location for a field's type.
-func FieldType(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
-	if f.GetMessageType() != nil || f.GetEnumType() != nil {
-		return pathLocation(f, 6) // FieldDescriptor.type_name == 6
-	}
-	return pathLocation(f, 5) // FieldDescriptor.type == 5
+// MessageResource returns the precise location of the `google.api.resource`
+// annotation.
+func MessageResource(m *desc.MessageDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(m, 7, int(apb.E_Resource.Field)) // MessageDescriptor.options == 7
 }
