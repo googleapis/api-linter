@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 123
-  name: [core, '0123', name-suffix]
-  summary: Fields should not use the suffix `_name`.
-permalink: /123/name-suffix
+  name: [core, '0123', resource-annotation]
+  summary: Resource messages should be annotated with `google.api.resource`.
+permalink: /123/resource-annotation
 redirect_from:
-  - /0123/name-suffix
+  - /0123/resource-annotation
 ---
 
 # Resource annotation presence
