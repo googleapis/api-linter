@@ -36,11 +36,29 @@ func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 	return nil
 }
 
-// GetOperationInfo returns the LRO annotation.
+// GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	opts := m.GetMethodOptions()
 	if x, err := proto.GetExtension(opts, lrpb.E_OperationInfo); err == nil {
 		return x.(*lrpb.OperationInfo)
+	}
+	return nil
+}
+
+// GetResource returns the google.api.resource annotation.
+func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
+	opts := m.GetMessageOptions()
+	if x, err := proto.GetExtension(opts, apb.E_Resource); err == nil {
+		return x.(*apb.ResourceDescriptor)
+	}
+	return nil
+}
+
+// GetResourceReference returns the google.api.resource_reference annotation.
+func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+	opts := f.GetFieldOptions()
+	if x, err := proto.GetExtension(opts, apb.E_ResourceReference); err == nil {
+		return x.(*apb.ResourceReference)
 	}
 	return nil
 }

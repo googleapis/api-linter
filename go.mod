@@ -10,9 +10,9 @@ require (
 	github.com/google/go-cmp v0.3.1
 	github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58
 	github.com/lithammer/dedent v1.1.0
-	github.com/olekukonko/tablewriter v0.0.3
+	github.com/olekukonko/tablewriter v0.0.4
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.1.0
-	google.golang.org/genproto v0.0.0-20191203220235-3fa9dbf08042
+	google.golang.org/genproto v0.0.0-20191205163323-51378566eb59
 	gopkg.in/yaml.v2 v2.2.7
 )
