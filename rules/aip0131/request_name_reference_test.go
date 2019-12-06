@@ -35,16 +35,26 @@ func TestRequestNameReference(t *testing.T) {
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
-		f := testutils.ParseProto3String(t, `
-			import "google/api/resource.proto";
-			message GetBookRequest {
-				string name = 1;
-			}
-		`)
-		field := f.GetMessageTypes()[0].GetFields()[0]
-		problems := testutils.Problems{{Message: "google.api.resource_reference", Descriptor: field}}
-		if diff := problems.Diff(requestNameReference.Lint(f)); diff != "" {
-			t.Errorf(diff)
+		for _, test := range []struct {
+			name      string
+			FieldName string
+			problems  testutils.Problems
+		}{
+			{"Error", "name", testutils.Problems{{Message: "google.api.resource_reference"}}},
+			{"Irrelevant", "something_else", testutils.Problems{}},
+		} {
+			t.Run(test.name, func(t *testing.T) {
+				f := testutils.ParseProto3Tmpl(t, `
+					import "google/api/resource.proto";
+					message GetBookRequest {
+						string {{.FieldName}} = 1;
+					}
+				`, test)
+				field := f.GetMessageTypes()[0].GetFields()[0]
+				if diff := test.problems.SetDescriptor(field).Diff(requestNameReference.Lint(f)); diff != "" {
+					t.Errorf(diff)
+				}
+			})
 		}
 	})
 }
