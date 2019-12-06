@@ -18,8 +18,8 @@ as mandated in [AIP-136][].
 This rule looks at any method that is not a standard method, and tries to find
 the appropriate suffix at the end of the URI. More specifically:
 
-- If the URI contains a `name` variable, then it expects `:verb` at the end of
-  the URI.
+- If the URI contains a `name` or `parent` variable, then it expects `:verb` at
+  the end of the URI.
 - Otherwise, it expects `:verbNoun` at the end of the URI.
 
 ## Examples
