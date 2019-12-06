@@ -25,14 +25,20 @@ the `name` field is missing, or if it has any type other than `string`.
 ```proto
 // Incorrect.
 message GetBookRequest {
-  string book = 1;  // Field name should be `name`.
+  string book = 1 [  // Field name should be `name`.
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
 ```proto
 // Incorrect.
 message GetBookRequest {
-  bytes name = 1;  // Field type should be `string`.
+  bytes name = 1 [  // Field type should be `string`.
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -41,7 +47,10 @@ message GetBookRequest {
 ```proto
 // Correct.
 message GetBookRequest {
-  string name = 1;
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
