@@ -16,10 +16,14 @@
 package aip0123
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 // AddRules accepts a register function and registers each of
@@ -28,9 +32,52 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		123,
 		resourceAnnotation,
+		resourcePattern,
+		resourceVariables,
 	)
 }
 
 func isResourceMessage(m *desc.MessageDescriptor) bool {
 	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request")
 }
+
+func hasResourceAnnotation(m *desc.MessageDescriptor) bool {
+	return utils.GetResource(m) != nil
+}
+
+// getVariables returns a slice of variables declared in the pattern.
+//
+// For example, a pattern of "publishers/{publisher}/books/{book}" would
+// return []string{"publisher", "book"}.
+func getVariables(pattern string) []string {
+	answer := []string{}
+	for _, match := range varRegexp.FindAllStringSubmatch(pattern, -1) {
+		answer = append(answer, match[1])
+	}
+	return answer
+}
+
+// getPlainPattern returns the pattern with all variables replaced with "*".
+//
+// For example, a pattern of "publishers/{publisher}/books/{book}" would
+// return "publishers/*/books/*".
+func getPlainPattern(pattern string) string {
+	return varRegexp.ReplaceAllLiteralString(pattern, "*")
+}
+
+// getDesiredPattern returns the expected desired pattern, with errors we
+// lint for corrected.
+func getDesiredPattern(pattern string) string {
+	want := []string{}
+	for _, token := range strings.Split(pattern, "/") {
+		if strings.HasPrefix(token, "{") && strings.HasSuffix(token, "}") {
+			varname := token[1 : len(token)-1]
+			want = append(want, fmt.Sprintf("{%s}", strings.TrimSuffix(strcase.SnakeCase(varname), "_id")))
+		} else {
+			want = append(want, strcase.LowerCamelCase(token))
+		}
+	}
+	return strings.Join(want, "/")
+}
+
+var varRegexp = regexp.MustCompile(`\{([^}=]+)}`)
