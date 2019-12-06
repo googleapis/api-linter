@@ -23,17 +23,19 @@ import (
 func TestRequestNameBehavior(t *testing.T) {
 	for _, test := range []struct {
 		name          string
+		FieldName     string
 		FieldBehavior string
 		problems      testutils.Problems
 	}{
-		{"Valid", " [(google.api.field_behavior) = REQUIRED]", testutils.Problems{}},
-		{"Missing", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"Valid", "name", " [(google.api.field_behavior) = REQUIRED]", testutils.Problems{}},
+		{"Missing", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"Irrelevant", "something_else", "", testutils.Problems{}}.
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/field_behavior.proto";
 				message GetBookRequest {
-					string name = 1{{.FieldBehavior}};
+					string {{.FieldName}} = 1{{.FieldBehavior}};
 				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
