@@ -27,8 +27,12 @@ func TestResourceVariables(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "publishers/{publisher}/electronicBooks/{electronic_book}", testutils.Problems{}},
-		{"CamelCase", "publishers/{publisher}/electronicBooks/{electronicBook}", testutils.Problems{{Message: "snake case"}}},
-		{"ID", "publishers/{publisher}/electronicBooks/{electronic_book_id}", testutils.Problems{{Message: "_id"}}},
+		{"CamelCase", "publishers/{publisher}/electronicBooks/{electronicBook}", testutils.Problems{{
+			Message: "publishers/{publisher}/electronicBooks/{electronic_book}",
+		}}},
+		{"ID", "publishers/{publisher}/electronicBooks/{electronic_book_id}", testutils.Problems{{
+			Message: "publishers/{publisher}/electronicBooks/{electronic_book}",
+		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
