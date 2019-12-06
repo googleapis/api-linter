@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/googleapis/api-linter/locations"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -35,7 +37,7 @@ var uriSuffix = &lint.MethodRule{
 			//
 			// This is somewhat tricky to test for perfectly, and may need to evolve
 			// over time, but the following rules should be mostly correct:
-			//   1. If the URI contains `{name=`, expect `:verb`.
+			//   1. If the URI contains `{name=` or `{parent=`, expect `:verb`.
 			//   2. Otherwise, expect `:verbNoun`.
 			//
 			// We blindly assume that the verb is always one word (the "noun" may be
@@ -44,7 +46,7 @@ var uriSuffix = &lint.MethodRule{
 			// N.B. The LowerCamel(Snake(name)) is because strcase does not translate
 			//      from upper camel to lower camel correctly.
 			want := ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
-			if strings.Contains(httpRule.URI, "{name=") {
+			if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
 				want = ":" + strings.Split(strcase.SnakeCase(m.GetName()), "_")[0]
 			}
 
@@ -59,6 +61,7 @@ var uriSuffix = &lint.MethodRule{
 						want,
 					),
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}
