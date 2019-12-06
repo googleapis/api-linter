@@ -2,8 +2,8 @@ bitbucket.org/creachadair/stringset v0.0.8 h1:gQqe4vs8XWgMyijfyKE6K8o4TcyGGrRXe0
 bitbucket.org/creachadair/stringset v0.0.8/go.mod h1:AgthVMyMxC/6FK1KBJ2ALdqkZObGN8hOetgpwXyMn34=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/bmatcuk/doublestar v1.1.5 h1:2bNwBOmhyFEFcoB3tGvTD5xanq+4kyOZlB8wFYbMjkk=
-github.com/bmatcuk/doublestar v1.1.5/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
+github.com/bmatcuk/doublestar v1.2.1 h1:eetYiv8DDYOZcBADY+pRvRytf3Dlz1FhnpvL2FsClBc=
+github.com/bmatcuk/doublestar v1.2.1/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/creachadair/staticfile v0.1.2/go.mod h1:a3qySzCIXEprDGxk6tSxSI+dBBdLzqeBOMhZ+o2d3pM=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
@@ -24,10 +24,10 @@ github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58 h1:RHSRszt3DI
 github.com/jhump/protoreflect v1.5.1-0.20191024142022-1d0024204e58/go.mod h1:eaTn3RZAmMBcV0fifFvlm6VHNz3wSkYyXYWUh7ymB74=
 github.com/lithammer/dedent v1.1.0 h1:VNzHMVCBNG1j0fh3OrsFRkVUwStdDArbgBWoPAffktY=
 github.com/lithammer/dedent v1.1.0/go.mod h1:jrXYCQtgg0nJiN+StA2KgR7w6CiQNv9Fd/Z9BP0jIOc=
-github.com/mattn/go-runewidth v0.0.6 h1:V2iyH+aX9C5fsYCpK60U8BYIvmhqxuOL3JZcqc1NB7k=
-github.com/mattn/go-runewidth v0.0.6/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
-github.com/olekukonko/tablewriter v0.0.3 h1:i0LBnzgiChAWHJYTQAZJDOgf8MNxAVYZJ2m63SIDimI=
-github.com/olekukonko/tablewriter v0.0.3/go.mod h1:YZeBtGzYYEsCHp2LST/u/0NDwGkRoBtmn1cIWCJiS6M=
+github.com/mattn/go-runewidth v0.0.7 h1:Ei8KR0497xHyKJPAv59M1dkC+rOZCMBJ+t3fZ+twI54=
+github.com/mattn/go-runewidth v0.0.7/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
+github.com/olekukonko/tablewriter v0.0.4 h1:vHD/YYe1Wolo78koG299f7V/VAS08c6IpCLn+Ejf/w8=
+github.com/olekukonko/tablewriter v0.0.4/go.mod h1:zq6QwlOf5SlnkVbMSr5EoBv3636FWnp+qbPhuoO21uA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
@@ -59,8 +59,8 @@ google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7
 google.golang.org/genproto v0.0.0-20170818010345-ee236bd376b0 h1:ZvI3lsq5AIkr7axxmT3tfwFlJVRFLqe6Fp0W03+MJ38=
 google.golang.org/genproto v0.0.0-20170818010345-ee236bd376b0/go.mod h1:JiN7NxoALGmiZfu7CAH4rXhgtRTLTxftemlI0sWmxmc=
 google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoALGmiZfu7CAH4rXhgtRTLTxftemlI0sWmxmc=
-google.golang.org/genproto v0.0.0-20191115221424-83cc0476cb11 h1:51D++eCgOHufw5VfDE9Uzqyyc+OyQIjb9hkYy9LN5Fk=
-google.golang.org/genproto v0.0.0-20191115221424-83cc0476cb11/go.mod h1:n3cpQtvxv34hfy77yVDNjmbRyujviMdxYliBSkLhpCc=
+google.golang.org/genproto v0.0.0-20191205163323-51378566eb59 h1:A2If0NMGFAltEHPrnAZY86sBw/gA9ESWJdgG7kVWt64=
+google.golang.org/genproto v0.0.0-20191205163323-51378566eb59/go.mod h1:n3cpQtvxv34hfy77yVDNjmbRyujviMdxYliBSkLhpCc=
 google.golang.org/grpc v1.8.0 h1:HN69LlNA/SpyBIRxTfuU0QOntYfdeEeBWlVhRHRCOyw=
 google.golang.org/grpc v1.8.0/go.mod h1:yo6s7OP7yaDglbqo1J04qKzAhqBH6lvTonzMVmEdcZw=
 google.golang.org/grpc v1.19.0 h1:cfg4PD8YEdSFnm7qLV4++93WcmhH2nIUhMjhdCvl3j8=

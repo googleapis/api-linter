@@ -42,8 +42,7 @@ func AddRules(r lint.RuleRegistry) error {
 var batchUpdateMethodRegexp = regexp.MustCompile("^BatchUpdate(?:[A-Za-z0-9]|$)")
 var batchUpdateReqMessageRegexp = regexp.MustCompile("^BatchUpdate[A-Za-z0-9]*Request$")
 var batchUpdateResMessageRegexp = regexp.MustCompile("^BatchUpdate[A-Za-z0-9]*Response$")
-var batchUpdateURINameRegexp = regexp.MustCompile("\\{[a-zA-Z=/*]+\\}\\/[A-Za-z0-9-=/*]+:batchUpdate$")
-var updateReqMessageRegexp = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
+var batchUpdateURINameRegexp = regexp.MustCompile(`\{[a-zA-Z=/*]+\}\/[A-Za-z0-9-=/*]+:batchUpdate$`)
 
 // Returns true if this is a AIP-234 Batch Update method, false otherwise.
 func isBatchUpdateMethod(m *desc.MethodDescriptor) bool {

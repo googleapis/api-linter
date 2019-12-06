@@ -17,9 +17,9 @@ package testutils
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"strings"
 	"testing"
+	"text/template"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -37,14 +37,14 @@ import (
 //
 // It dedents the string before parsing.
 // It is unable to handle imports, and calls t.Fatalf if there is any error.
-func ParseProtoString(t *testing.T, src string) *desc.FileDescriptor {
+func ParseProtoString(t *testing.T, src string, filename string) *desc.FileDescriptor {
 	// Make a map of filenames and file contents.
 	// We hard-code "test.proto"; we do not care what the filename is.
 	//
 	// Include the common protos here too, so our proto may safely import them
 	// if needed.
 	fileContents := map[string]string{
-		"test.proto": strings.TrimSpace(dedent.Dedent(src)),
+		filename: strings.TrimSpace(dedent.Dedent(src)),
 	}
 
 	// Parse the file.
@@ -69,13 +69,13 @@ func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
 	return ParseProtoString(t, fmt.Sprintf(
 		"syntax = \"proto3\";\n\n%s",
 		strings.TrimSpace(dedent.Dedent(src)),
-	))
+	), "test.proto")
 }
 
 // ParseProto3Tmpl parses a template string representing a proto file, and
 // returns a FileDescriptor.
 //
-// It parses the template using Go's template Parse function, and then
+// It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3String.
 func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescriptor {
 	// Create a new template object.

@@ -23,7 +23,7 @@ import (
 func TestJavaMultipleFiles(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		Package string
+		Package  string
 		Opt      string
 		problems testutils.Problems
 	}{

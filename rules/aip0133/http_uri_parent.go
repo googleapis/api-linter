@@ -27,7 +27,7 @@ var httpURIField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC uri should include the `parent` field.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if !createURINameRegexp.MatchString(httpRule.URI) {
+			if _, ok := httpRule.GetVariables()["parent"]; !ok {
 				return []lint.Problem{{
 					Message:    "Create methods should include the `parent` field in the URI.",
 					Descriptor: m,

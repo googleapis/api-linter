@@ -16,6 +16,7 @@ package aip0191
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -29,7 +30,8 @@ var javaOuterClassname = &lint.FileRule{
 	OnlyIf: hasPackage,
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if f.GetFileOptions().GetJavaOuterClassname() == "" {
-			want := strcase.UpperCamelCase(strings.ReplaceAll(f.GetName(), ".", "_"))
+			filename := filepath.Base(f.GetName())
+			want := strcase.UpperCamelCase(strings.ReplaceAll(filename, ".", "_"))
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Proto files should set `option java_outer_classname = %q`.",

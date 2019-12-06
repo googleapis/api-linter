@@ -15,27 +15,50 @@
 package utils
 
 import (
+	"bitbucket.org/creachadair/stringset"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	lrpb "google.golang.org/genproto/googleapis/longrunning"
 )
 
-// GetFieldBehavior returns a slice of FieldBehavior annotations for
+// GetFieldBehavior returns a stringset.Set of FieldBehavior annotations for
 // the given field.
-func GetFieldBehavior(f *desc.FieldDescriptor) []apb.FieldBehavior {
+func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 	opts := f.GetFieldOptions()
 	if x, err := proto.GetExtension(opts, apb.E_FieldBehavior); err == nil {
-		return x.([]apb.FieldBehavior)
+		answer := stringset.New()
+		for _, fb := range x.([]apb.FieldBehavior) {
+			answer.Add(fb.String())
+		}
+		return answer
 	}
 	return nil
 }
 
-// GetOperationInfo returns the LRO annotation.
+// GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	opts := m.GetMethodOptions()
 	if x, err := proto.GetExtension(opts, lrpb.E_OperationInfo); err == nil {
 		return x.(*lrpb.OperationInfo)
+	}
+	return nil
+}
+
+// GetResource returns the google.api.resource annotation.
+func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
+	opts := m.GetMessageOptions()
+	if x, err := proto.GetExtension(opts, apb.E_Resource); err == nil {
+		return x.(*apb.ResourceDescriptor)
+	}
+	return nil
+}
+
+// GetResourceReference returns the google.api.resource_reference annotation.
+func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+	opts := f.GetFieldOptions()
+	if x, err := proto.GetExtension(opts, apb.E_ResourceReference); err == nil {
+		return x.(*apb.ResourceReference)
 	}
 	return nil
 }

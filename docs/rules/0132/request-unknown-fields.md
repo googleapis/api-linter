@@ -8,7 +8,7 @@ redirect_from:
   - /0132/request-unknown-fields
 ---
 
-# Get methods: Unknown fields
+# List methods: Unknown fields (Request)
 
 This rule enforces that all `List` standard methods do not have unexpected
 fields, as mandated in [AIP-132][].

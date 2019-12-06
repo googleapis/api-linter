@@ -17,9 +17,9 @@ package utils
 import (
 	"testing"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
@@ -39,10 +39,10 @@ func TestGetFieldBehavior(t *testing.T) {
 	msg := fd.GetMessageTypes()[0]
 	tests := []struct {
 		fieldName      string
-		fieldBehaviors []apb.FieldBehavior
+		fieldBehaviors stringset.Set
 	}{
-		{"name", []apb.FieldBehavior{apb.FieldBehavior_IMMUTABLE, apb.FieldBehavior_OUTPUT_ONLY}},
-		{"title", []apb.FieldBehavior{apb.FieldBehavior_REQUIRED}},
+		{"name", stringset.New("IMMUTABLE", "OUTPUT_ONLY")},
+		{"title", stringset.New("REQUIRED")},
 		{"summary", nil},
 	}
 	for _, test := range tests {
@@ -89,4 +89,54 @@ func TestGetOperationInfoNone(t *testing.T) {
 	if lro != nil {
 		t.Errorf("Got %v, expected nil LRO annotation.", lro)
 	}
+}
+
+func TestGetResource(t *testing.T) {
+	t.Run("Present", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+			}
+		`)
+		resource := GetResource(f.GetMessageTypes()[0])
+		if got, want := resource.GetType(), "library.googleapis.com/Book"; got != want {
+			t.Errorf("Got %q, expected %q.", got, want)
+		}
+		if got, want := resource.GetPattern()[0], "publishers/{publisher}/books/{book}"; got != want {
+			t.Errorf("Got %q, expected %q.", got, want)
+		}
+	})
+	t.Run("Absent", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, "message Book {}")
+		if got := GetResource(f.GetMessageTypes()[0]); got != nil {
+			t.Errorf(`Got "%v", expected nil`, got)
+		}
+	})
+}
+
+func TestGetResourceReference(t *testing.T) {
+	t.Run("Present", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			message GetBookRequest {
+				string name = 1 [(google.api.resource_reference) = {
+					type: "library.googleapis.com/Book"
+				}];
+			}
+		`)
+		ref := GetResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+		if got, want := ref.GetType(), "library.googleapis.com/Book"; got != want {
+			t.Errorf("Got %q, expected %q.", got, want)
+		}
+	})
+	t.Run("Absent", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, "message GetBookRequest { string name = 1; }")
+		if got := GetResourceReference(f.GetMessageTypes()[0].GetFields()[0]); got != nil {
+			t.Errorf(`Got "%v", expected nil`, got)
+		}
+	})
 }

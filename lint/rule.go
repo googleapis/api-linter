@@ -47,6 +47,7 @@ type FileRule struct {
 	// is applicable.
 	OnlyIf func(*desc.FileDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -78,6 +79,7 @@ type MessageRule struct {
 	// is applicable.
 	OnlyIf func(*desc.MessageDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -114,6 +116,7 @@ type FieldRule struct {
 	// is applicable.
 	OnlyIf func(*desc.FieldDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -152,6 +155,7 @@ type ServiceRule struct {
 	// is applicable.
 	OnlyIf func(*desc.ServiceDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -185,6 +189,7 @@ type MethodRule struct {
 	// is applicable.
 	OnlyIf func(*desc.MethodDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -220,6 +225,7 @@ type EnumRule struct {
 	// is applicable.
 	OnlyIf func(*desc.EnumDescriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -228,7 +234,7 @@ func (r *EnumRule) GetName() RuleName {
 	return r.Name
 }
 
-// Lint visits every service in the file and runs `LintEnum`.
+// Lint visits every enum in the file and runs `LintEnum`.
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // enum, and if it returns false, the `LintEnum` function is not called.
@@ -239,6 +245,44 @@ func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
 	for _, enum := range getAllEnums(fd) {
 		if r.OnlyIf == nil || r.OnlyIf(enum) {
 			problems = append(problems, r.LintEnum(enum)...)
+		}
+	}
+	return problems
+}
+
+// EnumValueRule defines a lint rule that is run on each enum value.
+type EnumValueRule struct {
+	Name RuleName
+
+	// LintEnumValue accepts a EnumValueDescriptor and lints it.
+	LintEnumValue func(*desc.EnumValueDescriptor) []Problem
+
+	// OnlyIf accepts an EnumValueDescriptor and determines whether this rule
+	// is applicable.
+	OnlyIf func(*desc.EnumValueDescriptor) bool
+
+	// nolint:structcheck,unused
+	noPositional struct{}
+}
+
+// GetName returns the name of the rule.
+func (r *EnumValueRule) GetName() RuleName {
+	return r.Name
+}
+
+// Lint visits every enum value in the file and runs `LintEnum`.
+//
+// If an `OnlyIf` function is provided on the rule, it is run against each
+// enum value, and if it returns false, the `LintEnum` function is not called.
+func (r *EnumValueRule) Lint(fd *desc.FileDescriptor) []Problem {
+	problems := []Problem{}
+
+	// Lint all enums, either at the top of the file, or nested within messages.
+	for _, enum := range getAllEnums(fd) {
+		for _, value := range enum.GetValues() {
+			if r.OnlyIf == nil || r.OnlyIf(value) {
+				problems = append(problems, r.LintEnumValue(value)...)
+			}
 		}
 	}
 	return problems
@@ -259,6 +303,7 @@ type DescriptorRule struct {
 	// is applicable.
 	OnlyIf func(desc.Descriptor) bool
 
+	// nolint:structcheck,unused
 	noPositional struct{}
 }
 
@@ -331,8 +376,12 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
 
-	commentLines := strings.Split(fileHeader(d.GetFile()), "\n")
-	commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	commentLines := []string{}
+	if f, ok := d.(*desc.FileDescriptor); ok {
+		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
+	} else {
+		commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)
+	}
 	disabledRules := []string{}
 	for _, commentLine := range commentLines {
 		r := extractDisabledRuleName(commentLine)
@@ -345,6 +394,12 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 		if matchRule(name, disabledRules...) {
 			return false
 		}
+	}
+
+	// The rule may have been disabled on a parent. (For example, a field rule
+	// may be disabled at the message level to cover all fields in the message).
+	if parent := d.GetParent(); parent != nil {
+		return ruleIsEnabled(rule, parent, aliasMap)
 	}
 
 	return true

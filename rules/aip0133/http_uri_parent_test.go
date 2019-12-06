@@ -15,59 +15,41 @@
 package aip0133
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestHttpUriField(t *testing.T) {
 	tests := []struct {
 		testName   string
-		uri        string
-		methodName string
-		msg        string
+		URI        string
+		MethodName string
+		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", ""},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "`parent` field"},
-		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", "`parent` field"},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", ""},
+		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", testutils.Problems{}},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", testutils.Problems{{Message: "`parent` field"}}},
+		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", testutils.Problems{{Message: "`parent` field"}}},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", testutils.Problems{}},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Post{
-					Post: test.uri,
-				},
-			}
-			if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
-				t.Fatalf("Failed to set google.api.http annotation.")
-			}
-
-			// Create a minimal service with a AIP-133 Create method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("CreateBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := httpURIField.Lint(service.GetFile())
-			if test.msg == "" && len(problems) > 0 {
-				t.Errorf("Got %v, expected no problems.", problems)
-			} else if test.msg != "" && len(problems) == 0 {
-				t.Errorf("Got no problems, expected 1.")
-			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
-				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+			  service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							get: "{{.URI}}"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.MethodName}}Response {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(httpURIField.Lint(f)); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

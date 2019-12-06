@@ -240,6 +240,34 @@ func TestEnumRule(t *testing.T) {
 	}
 }
 
+func TestEnumValueRule(t *testing.T) {
+	// Create a file descriptor with a top-level enum with values.
+	fd, err := builder.NewFile("test.proto").AddEnum(
+		builder.NewEnum("Format").AddValue(builder.NewEnumValue("YAML")).AddValue(builder.NewEnumValue("JSON")),
+	).Build()
+	if err != nil {
+		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+	}
+
+	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[0].GetValues()[1]) {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the enum value rule.
+			rule := &EnumValueRule{
+				Name: RuleName("test"),
+				OnlyIf: func(e *desc.EnumValueDescriptor) bool {
+					return e.GetName() == "JSON"
+				},
+				LintEnumValue: func(e *desc.EnumValueDescriptor) []Problem {
+					return test.problems
+				},
+			}
+
+			// Run the rule and assert that we got what we expect.
+			test.runRule(rule, fd, t)
+		})
+	}
+}
+
 func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := builder.NewFile("test.proto").AddMessage(
@@ -394,7 +422,7 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 		},
 	}
 
-	// Run the specific tests individually.
+	// Build a proto and check that ruleIsEnabled does the right thing.
 	f, err := builder.NewFile("test.proto").AddMessage(
 		builder.NewMessage("FirstMessage").SetComments(builder.Comments{
 			LeadingComment: "api-linter: test=disabled",
@@ -410,6 +438,34 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	}
 	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
+	}
+}
+
+func TestRuleIsEnabledParent(t *testing.T) {
+	// Create a rule that we can check enabled status on.
+	rule := &FieldRule{
+		Name: RuleName("test"),
+		LintField: func(f *desc.FieldDescriptor) []Problem {
+			return nil
+		},
+	}
+
+	// Build a proto with two messages, one of which disables the rule.
+	f, err := builder.NewFile("test.proto").AddMessage(
+		builder.NewMessage("Foo").SetComments(builder.Comments{
+			LeadingComment: "api-linter: test=disabled",
+		}).AddField(builder.NewField("foo", builder.FieldTypeBool())),
+	).AddMessage(
+		builder.NewMessage("Bar").AddField(builder.NewField("bar", builder.FieldTypeBool())),
+	).Build()
+	if err != nil {
+		t.Fatalf("Error building test file: %q", err)
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil), false; got != want {
+		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+	}
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil), true; got != want {
+		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
 }
 
