@@ -3,7 +3,7 @@ rule:
   aip: 132
   name: [core, '0132', request-parent-behavior]
   summary: |
-    Get RPCs should annotate the `parent` field with `google.api.field_behavior`.
+    List RPCs should annotate the `parent` field with `google.api.field_behavior`.
 permalink: /132/request-parent-behavior
 redirect_from:
   - /0132/request-parent-behavior
@@ -11,7 +11,7 @@ redirect_from:
 
 # List methods: Field behavior
 
-This rule enforces that all `Get` standard methods have
+This rule enforces that all `List` standard methods have
 `google.api.field_behavior` set to `REQUIRED` on their `string parent` field,
 as mandated in [AIP-132][].
 
