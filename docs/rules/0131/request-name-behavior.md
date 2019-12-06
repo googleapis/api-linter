@@ -17,8 +17,8 @@ mandated in [AIP-131][].
 
 ## Details
 
-This rule looks at any message matching `Get*Request` and complains if either
-the `name` field does not have a `google.api.field_behavior` annotation with a
+This rule looks at any message matching `Get*Request` and complains if the
+`name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -29,7 +29,7 @@ value of `REQUIRED`.
 // Incorrect.
 message GetBookRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string book = 1 [(google.api.resource_reference) = {
+  string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
 }
@@ -54,9 +54,9 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0131::request-name-behavior=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message GetBookRequest {
-  string book = 1 [(google.api.resource_reference) = {
+  string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
 }

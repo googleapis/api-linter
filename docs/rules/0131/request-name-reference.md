@@ -28,7 +28,7 @@ complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message GetBookRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string book = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -51,9 +51,9 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 // (-- api-linter: core::0131::request-name-reference=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message GetBookRequest {
-  string book = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
