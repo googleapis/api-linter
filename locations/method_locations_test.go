@@ -69,3 +69,23 @@ func TestMethodHTTPRule(t *testing.T) {
 		t.Errorf(diff)
 	}
 }
+
+func TestMethodOperationInfo(t *testing.T) {
+	f := parse(t, `
+		import "google/longrunning/operations.proto";
+		service Library {
+		  rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+		    option (google.longrunning.operation_info) = {
+					response_type: "WriteBookResponse"
+		      metadata_type: "WriteBookMetadata"
+		    };
+		  }
+		}
+		message WriteBookRequest {}
+	`)
+	loc := MethodOperationInfo(f.GetServices()[0].GetMethods()[0])
+	// Four character span: start line, start column, end line, end column.
+	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 8, 6}); diff != "" {
+		t.Errorf(diff)
+	}
+}

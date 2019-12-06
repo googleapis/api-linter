@@ -17,6 +17,8 @@ package aip0151
 import (
 	"strings"
 
+	"github.com/googleapis/api-linter/locations"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -33,6 +35,7 @@ var lroResponse = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Methods returning an LRO must set the response type.",
 				Descriptor: m,
+				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 
@@ -44,6 +47,7 @@ var lroResponse = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Methods returning an LRO should create a blank message rather than using Empty.",
 				Descriptor: m,
+				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 
