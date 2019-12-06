@@ -9,7 +9,7 @@ redirect_from:
   - /0131/method-signature
 ---
 
-# Get methods: Field behavior
+# Get methods: Method signature
 
 This rule enforces that all `Get` standard methods have a
 `google.api.method_signature` annotation with a value of `"name"`, as mandated
