@@ -9,7 +9,7 @@ workflows:
 jobs:
   unit-tests:
     docker:
-      - image: golang:1.13-alpine
+      - image: golang:1.13
     steps:
       - checkout
       - run:
