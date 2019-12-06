@@ -9,12 +9,12 @@ workflows:
 jobs:
   unit-tests:
     docker:
-      - image: golang:1.13
+      - image: golang:1.13-alpine
     steps:
       - checkout
       - run:
           name: Run unit tests.
-          command: go test -mod=readonly -v ./...
+          command: go test ./...
   lint:
     docker:
       - image: golang:1.13
