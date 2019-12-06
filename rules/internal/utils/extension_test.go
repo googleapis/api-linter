@@ -55,6 +55,39 @@ func TestGetFieldBehavior(t *testing.T) {
 	}
 }
 
+func TestGetMethodSignatures(t *testing.T) {
+	for _, test := range []struct {
+		name       string
+		want       [][]string
+		Signatures string
+	}{
+		{"Zero", [][]string{}, ""},
+		{"One", [][]string{{"name"}}, `option (google.api.method_signature) = "name";`},
+		{"Two",
+			[][]string{{"name"}, {"name", "read_mask"}},
+			`option (google.api.method_signature) = "name";
+			 option (google.api.method_signature) = "name,read_mask";`,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/client.proto";
+				service Library {
+					rpc GetBook(GetBookRequest) returns (Book) {
+						{{.Signatures}}
+					}
+				}
+				message Book {}
+				message GetBookRequest {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			if diff := cmp.Diff(GetMethodSignatures(method), test.want); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
 func TestGetOperationInfo(t *testing.T) {
 	fd := testutils.ParseProto3String(t, `
 		import "google/longrunning/operations.proto";
