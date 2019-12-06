@@ -17,8 +17,8 @@ mandated in [AIP-131][].
 
 ## Details
 
-This rule looks at any message matching `Get*Request` and complains if either
-the `name` field does not have a `google.api.field_behavior` annotation with a
+This rule looks at any message matching `Get*Request` and complains if the
+`name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples

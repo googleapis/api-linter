@@ -17,9 +17,9 @@ as mandated in [AIP-132][].
 
 ## Details
 
-This rule looks at any message matching `List*Request` and complains if either
-the `parent` field does not have a `google.api.field_behavior` annotation with
-a value of `REQUIRED`.
+This rule looks at any message matching `List*Request` and complains if the
+`parent` field does not have a `google.api.field_behavior` annotation with a
+value of `REQUIRED`.
 
 ## Examples
 
