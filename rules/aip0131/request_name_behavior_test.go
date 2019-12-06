@@ -29,7 +29,7 @@ func TestRequestNameBehavior(t *testing.T) {
 	}{
 		{"Valid", "name", " [(google.api.field_behavior) = REQUIRED]", testutils.Problems{}},
 		{"Missing", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"Irrelevant", "something_else", "", testutils.Problems{}}.
+		{"Irrelevant", "something_else", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
