@@ -18,11 +18,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/stoewer/go-strcase"
-
-	"github.com/googleapis/api-linter/locations"
-
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -45,18 +42,10 @@ var resourcePattern = &lint.MessageRule{
 		// not snake case.
 		for _, pattern := range resource.GetPattern() {
 			if strings.Contains(getPlainPattern(pattern), "_") {
-				want := []string{}
-				for _, token := range strings.Split(pattern, "/") {
-					if strings.HasPrefix(token, "{") && strings.HasSuffix(token, "}") {
-						want = append(want, token)
-					} else {
-						want = append(want, strcase.LowerCamelCase(token))
-					}
-				}
 				return []lint.Problem{{
 					Message: fmt.Sprintf(
 						"Resource patterns should use camel case (apart from the variable names), such as %q.",
-						strings.Join(want, "/"),
+						getDesiredPattern(pattern),
 					),
 					Descriptor: m,
 					Location:   locations.MessageResource(m),

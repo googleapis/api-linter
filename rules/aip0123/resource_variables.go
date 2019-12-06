@@ -15,6 +15,7 @@
 package aip0123
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -32,14 +33,20 @@ var resourceVariables = &lint.MessageRule{
 			for _, variable := range getVariables(pattern) {
 				if strings.ToLower(variable) != variable {
 					return []lint.Problem{{
-						Message:    "Variable names in patterns should use snake case.",
+						Message: fmt.Sprintf(
+							"Variable names in patterns should use snake case, such as %q.",
+							getDesiredPattern(pattern),
+						),
 						Descriptor: m,
 						Location:   locations.MessageResource(m),
 					}}
 				}
 				if strings.HasSuffix(variable, "_id") {
 					return []lint.Problem{{
-						Message:    "Variable names should omit the `_id` suffix.",
+						Message: fmt.Sprintf(
+							"Variable names should omit the `_id` suffix, such as %q.",
+							getDesiredPattern(pattern),
+						),
 						Descriptor: m,
 						Location:   locations.MessageResource(m),
 					}}
