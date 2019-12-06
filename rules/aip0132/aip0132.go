@@ -29,6 +29,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestFieldTypes,
 		requestMessageName,
 		requestParentBehavior,
+		requestParentReference,
 		responseMessageName,
 		responseUnknownFields,
 		standardFields,
