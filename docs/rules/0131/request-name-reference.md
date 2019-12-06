@@ -17,8 +17,8 @@ This rule enforces that all `Get` standard methods have
 
 ## Details
 
-This rule looks at any message matching `Get*Request` and complains if the
-`name` field does not have a `google.api.resource_reference` annotation.
+This rule looks at the `name` field of any message matching `Get*Request` and
+complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
 
