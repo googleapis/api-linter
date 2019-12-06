@@ -16,9 +16,11 @@
 package aip0123
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -28,9 +30,37 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		123,
 		resourceAnnotation,
+		resourcePattern,
+		resourceVariables,
 	)
 }
 
 func isResourceMessage(m *desc.MessageDescriptor) bool {
 	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request")
 }
+
+func hasResourceAnnotation(m *desc.MessageDescriptor) bool {
+	return utils.GetResource(m) != nil
+}
+
+// getVariables returns a slice of variables declared in the pattern.
+//
+// For example, a pattern of "publishers/{publisher}/books/{book}" would
+// return []string{"publisher", "book"}.
+func getVariables(pattern string) []string {
+	answer := []string{}
+	for _, match := range varRegexp.FindAllStringSubmatch(pattern, -1) {
+		answer = append(answer, match[1])
+	}
+	return answer
+}
+
+// getPlainPattern returns the pattern with all variables replaced with "*".
+//
+// For example, a pattern of "publishers/{publisher}/books/{book}" would
+// return "publishers/*/books/*".
+func getPlainPattern(pattern string) string {
+	return varRegexp.ReplaceAllLiteralString(pattern, "*")
+}
+
+var varRegexp = regexp.MustCompile(`\{([^}=]+)}`)
