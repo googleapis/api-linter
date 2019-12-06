@@ -27,6 +27,7 @@ func TestResourcePattern(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", `pattern: "publishers/{publisher}/books/{book}"`, testutils.Problems{}},
+		{"ValidCamel", `pattern: "publishers/{publisher}/electronicBooks/{electronic_book}"`, testutils.Problems{}},
 		{"Missing", "", testutils.Problems{{Message: "declare resource name pattern"}}},
 		{"SnakeCase", `pattern: "book_publishers/{publisher}/books/{book}"`, testutils.Problems{{Message: "camel case"}}},
 	} {
