@@ -23,7 +23,7 @@ import (
 var requestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(131, "request-name-reference"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isGetRequestMessage(f.GetOwner())
+		return isGetRequestMessage(f.GetOwner()) && f.GetName() == "name"
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if ref := utils.GetResourceReference(f); ref == nil {
