@@ -16,8 +16,8 @@ package aip0132
 
 import (
 	"fmt"
+	"reflect"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -42,7 +42,7 @@ var methodSignature = &lint.MethodRule{
 		}
 
 		// Check if the signature is wrong.
-		if diff := cmp.Diff(signatures[0], []string{"parent"}); diff != "" {
+		if !reflect.DeepEqual(signatures[0], []string{"parent"}) {
 			return []lint.Problem{{
 				Message:    `The method signature for List methods should be "parent".`,
 				Suggestion: `option (google.api.method_signature) = "parent";`,
