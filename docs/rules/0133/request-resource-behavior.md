@@ -1,24 +1,24 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', request-parent-behavior]
+  name: [core, '0133', request-resource-behavior]
   summary: |
-    Create RPCs should annotate the `parent` field with `google.api.field_behavior`.
-permalink: /133/request-parent-behavior
+    Create RPCs should annotate the resource field with `google.api.field_behavior`.
+permalink: /133/request-resource-behavior
 redirect_from:
-  - /0133/request-parent-behavior
+  - /0133/request-resource-behavior
 ---
 
 # Create methods: Field behavior
 
 This rule enforces that all `Create` standard methods have
-`google.api.field_behavior` set to `REQUIRED` on their `string parent` field,
-as mandated in [AIP-133][].
+`google.api.field_behavior` set to `REQUIRED` on the field representing the
+resource, as mandated in [AIP-133][].
 
 ## Details
 
 This rule looks at any message matching `Create*Request` and complains if the
-`parent` field does not have a `google.api.field_behavior` annotation with a
+resource field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -28,11 +28,11 @@ value of `REQUIRED`.
 ```proto
 // Incorrect.
 message CreateBooksRequest {
-  // The `google.api.field_behavior` annotation should also be included.
-  string parent = 1 [(google.api.resource_reference) = {
-    type: "library.googleapis.com/Publisher"
-  }];
-  Book book = 2 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Publisher"
+  ];
+  Book book = 2;  // Should also have (google.api.field_behavior) = REQUIRED.
 }
 ```
 
@@ -56,12 +56,14 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message CreateBooksRequest {
-  // (-- api-linter: core::0133::request-parent-behavior=disabled
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Publisher"
+  ];
+
+  // (-- api-linter: core::0133::request-resource-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string parent = 1 [(google.api.resource_reference) = {
-    type: "library.googleapis.com/Publisher"
-  }];
-  Book book = 2 [(google.api.field_behavior) = REQUIRED];
+  Book book = 2;
 }
 ```
 

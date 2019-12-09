@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -46,6 +47,7 @@ var lroDefinedInFile = &lint.MethodRule{
 						k,
 					),
 					Descriptor: m,
+					Location:   locations.MethodOperationInfo(m),
 				})
 			}
 		}
