@@ -17,7 +17,6 @@ package aip0131
 import (
 	"fmt"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -42,7 +41,7 @@ var methodSignature = &lint.MethodRule{
 		}
 
 		// Check if the signature is wrong.
-		if diff := cmp.Diff(signatures[0], []string{"name"}); diff != "" {
+		if len(signatures[0]) != 1 || signatures[0][0] != "name" {
 			return []lint.Problem{{
 				Message:    `The method signature for Get methods should be "name".`,
 				Suggestion: `option (google.api.method_signature) = "name";`,
