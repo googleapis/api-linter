@@ -16,9 +16,9 @@ package aip0134
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -48,7 +48,7 @@ var methodSignature = &lint.MethodRule{
 		}
 
 		// Check if the signature is wrong.
-		if diff := cmp.Diff(signatures[0], want); diff != "" {
+		if !reflect.DeepEqual(signatures[0], want) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"The method signature for Update methods should be %q.",
