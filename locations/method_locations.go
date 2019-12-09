@@ -42,3 +42,9 @@ func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 func MethodOperationInfo(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 4, int(lrpb.E_OperationInfo.Field)) // MethodDescriptor.options == 4
 }
+
+// MethodSignature returns the precise location of the method's
+// `google.api.method_signature` annotation, if any.
+func MethodSignature(m *desc.MethodDescriptor, index int) *dpb.SourceCodeInfo_Location {
+	return pathLocation(m, 4, int(apb.E_MethodSignature.Field), index) // MethodDescriptor.options == 4
+}
