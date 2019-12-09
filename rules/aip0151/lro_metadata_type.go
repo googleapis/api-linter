@@ -16,6 +16,7 @@ package aip0151
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -31,6 +32,7 @@ var lroMetadata = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Methods returning an LRO must set the metadata type.",
 				Descriptor: m,
+				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 
@@ -39,6 +41,7 @@ var lroMetadata = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Methods returning an LRO should create a blank message rather than using Empty.",
 				Descriptor: m,
+				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 

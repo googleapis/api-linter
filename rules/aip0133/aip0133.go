@@ -34,10 +34,11 @@ func AddRules(r lint.RuleRegistry) error {
 		inputName,
 		methodSignature,
 		outputName,
-		requestParentReference,
-		resourceField,
 		parentField,
 		requestParentBehavior,
+		requestParentReference,
+		requestResourceBehavior,
+		resourceField,
 		synonyms,
 		unknownFields,
 	)
