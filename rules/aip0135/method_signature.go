@@ -16,8 +16,8 @@ package aip0135
 
 import (
 	"fmt"
+	"reflect"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -42,7 +42,7 @@ var methodSignature = &lint.MethodRule{
 		}
 
 		// Check if the signature is wrong.
-		if diff := cmp.Diff(signatures[0], []string{"name"}); diff != "" {
+		if !reflect.DeepEqual(signatures[0], []string{"name"}) {
 			return []lint.Problem{{
 				Message:    `The method signature for Delete methods should be "name".`,
 				Suggestion: `option (google.api.method_signature) = "name";`,
