@@ -30,22 +30,9 @@ func TestRequestParentField(t *testing.T) {
 		problems    testutils.Problems
 	}{
 		{"Valid", "CreateBookRequest", "parent", "string", nil},
-		// {
-		// 	"MissingField",
-		// 	"CreateBookRequest",
-		// 	nil,
-		// 	testutils.Problems{{Message: "parent"}},
-		// 	nil,
-		// },
-		// {
-		// 	"InvalidType",
-		// 	"CreateBookRequest",
-		// 	&field{"parent", builder.FieldTypeDouble()},
-		// 	testutils.Problems{{Suggestion: "string"}},
-		// 	func(m *desc.MessageDescriptor) desc.Descriptor {
-		// 		return m.FindFieldByName("parent")
-		// 	},
-		// },
+		{"InvalidType", "CreateBookRequest", "parent", "bytes", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantMessage", "AddBookRequest", "parent", "bytes", nil},
+		{"IrrelevantField", "CreateBookRequest", "id", "bytes", nil},
 	}
 
 	// Run each test individually.
