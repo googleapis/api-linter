@@ -8,7 +8,7 @@ redirect_from:
   - /0131/request-name-field
 ---
 
-# Get methods: Name field type
+# Get methods: Name field
 
 This rule enforces that all `Get` standard methods have a `string name` field
 in the request message, as mandated in [AIP-131][].
