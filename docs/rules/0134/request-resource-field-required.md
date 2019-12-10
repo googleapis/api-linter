@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 134
-  name: [core, '0134', request-resource-field]
+  name: [core, '0134', request-resource-field-required]
   summary: Update RPCs must have a field for the resource in the request.
-permalink: /134/request-resource-field
+permalink: /134/request-resource-field-required
 redirect_from:
-  - /0134/request-resource-field
+  - /0134/request-resource-field-required
 ---
 
 # Update methods: Resource field
@@ -15,8 +15,8 @@ request message for the resource itself, as mandated in [AIP-134][].
 
 ## Details
 
-This rule looks at any message matching `Update*Request` and complains if 
-the field of the resource's type is not named properly.
+This rule looks at any message matching `Update*Request` and complains if there
+is no field of the resource's type with the expected field name.
 
 ## Examples
 
@@ -24,9 +24,8 @@ the field of the resource's type is not named properly.
 
 ```proto
 // Incorrect.
+// `Book book` is missing.
 message UpdateBookRequest {
-  // Field name should be `book`.
-  Book payload = 1;
   google.protobuf.FieldMask update_mask = 2;
 }
 ```
@@ -43,14 +42,13 @@ message UpdateBookRequest {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the field.
+If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
+// (-- api-linter: core::0134::request-resource-field-required=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message UpdateBookRequest {
-  // (-- api-linter: core::0134::request-resource-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
-  Book payload = 1;
   google.protobuf.FieldMask update_mask = 2;
 }
 ```

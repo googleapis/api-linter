@@ -20,31 +20,28 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestMaskField(t *testing.T) {
+func TestRequestMaskFieldRequired(t *testing.T) {
 	tests := []struct {
-		name        string
-		MessageName string
-		FieldType   string
-		FieldName   string
-		problems    testutils.Problems
+		name     string
+		Field    string
+		problems testutils.Problems
 	}{
-		{"Valid", "UpdateBookRequest", "google.protobuf.FieldMask", "update_mask", nil},
-		{"InvalidType", "UpdateBookRequest", "string", "update_mask", testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}}},
-		{"IrrelevantMessage", "ModifyBookRequest", "string", "update_mask", nil},
-		{"IrrelevantField", "UpdateBookRequest", "string", "modify_mask", nil},
+		{"Valid", "google.protobuf.FieldMask update_mask = 2;", nil},
+		{"InvalidMissing", "", testutils.Problems{{Message: "`update_mask` field"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/field_mask.proto";
-				message {{.MessageName}} {
-					{{.FieldType}} {{.FieldName}} = 1;
+				message UpdateBookRequest {
+					Book book = 1;
+					{{.Field}}
 				}
 				message Book {}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
-			problems := requestMaskField.Lint(file)
-			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+			message := file.GetMessageTypes()[0]
+			problems := requestMaskFieldRequired.Lint(file)
+			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
