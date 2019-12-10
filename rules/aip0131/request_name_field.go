@@ -7,8 +7,9 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var requestNameFieldType = &lint.FieldRule{
-	Name: lint.NewRuleName(131, "request-name-field-type"),
+// Get request should have a string name field.
+var requestNameField = &lint.FieldRule{
+	Name: lint.NewRuleName(131, "request-name-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isGetRequestMessage(f.GetOwner()) && f.GetName() == "name"
 	},

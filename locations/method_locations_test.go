@@ -69,3 +69,51 @@ func TestMethodHTTPRule(t *testing.T) {
 		t.Errorf(diff)
 	}
 }
+
+func TestMethodOperationInfo(t *testing.T) {
+	f := parse(t, `
+		import "google/longrunning/operations.proto";
+		service Library {
+		  rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+		    option (google.longrunning.operation_info) = {
+					response_type: "WriteBookResponse"
+		      metadata_type: "WriteBookMetadata"
+		    };
+		  }
+		}
+		message WriteBookRequest {}
+	`)
+	loc := MethodOperationInfo(f.GetServices()[0].GetMethods()[0])
+	// Four character span: start line, start column, end line, end column.
+	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 8, 6}); diff != "" {
+		t.Errorf(diff)
+	}
+}
+
+func TestMethodSignature(t *testing.T) {
+	f := parse(t, `
+		import "google/api/client.proto";
+		service Library {
+		  rpc GetBook(GetBookRequest) returns (Book) {
+		    option (google.api.method_signature) = "name";
+		    option (google.api.method_signature) = "name,read_mask";
+		  }
+		}
+		message GetBookRequest{}
+		message Book {}
+	`)
+	for _, test := range []struct {
+		name  string
+		index int
+		want  []int32
+	}{
+		{"First", 0, []int32{5, 4, 50}},
+		{"Second", 1, []int32{6, 4, 60}},
+	} {
+		loc := MethodSignature(f.GetServices()[0].GetMethods()[0], test.index)
+		// Four character span: start line, start column, end line, end column.
+		if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}

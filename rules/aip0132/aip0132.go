@@ -26,8 +26,11 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		132,
+		methodSignature,
 		requestFieldTypes,
 		requestMessageName,
+		requestParentBehavior,
+		requestParentReference,
 		responseMessageName,
 		responseUnknownFields,
 		standardFields,

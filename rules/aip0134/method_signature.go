@@ -12,39 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0151
+package aip0134
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
-var lroMetadata = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-metadata-type"),
-	OnlyIf: isAnnotatedLRO,
+var methodSignature = &lint.MethodRule{
+	Name:   lint.NewRuleName(134, "method-signature"),
+	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		lro := utils.GetOperationInfo(m)
+		signatures := utils.GetMethodSignatures(m)
+		want := []string{
+			strcase.SnakeCase(strings.TrimPrefix(m.GetName(), "Update")),
+			"update_mask",
+		}
 
-		// Ensure the response type is set.
-		if lro.GetMetadataType() == "" {
+		// Check if the signature is missing.
+		if len(signatures) == 0 {
 			return []lint.Problem{{
-				Message:    "Methods returning an LRO must set the metadata type.",
+				Message: fmt.Sprintf(
+					"Update methods should include `(google.api.method_signature) = %q`",
+					strings.Join(want, ","),
+				),
 				Descriptor: m,
-				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 
-		// The netadata type should not be Empty.
-		if t := lro.GetMetadataType(); t == "Empty" || t == "google.protobuf.Empty" {
+		// Check if the signature is wrong.
+		if !reflect.DeepEqual(signatures[0], want) {
 			return []lint.Problem{{
-				Message:    "Methods returning an LRO should create a blank message rather than using Empty.",
+				Message: fmt.Sprintf(
+					"The method signature for Update methods should be %q.",
+					strings.Join(want, ","),
+				),
+				Suggestion: fmt.Sprintf(
+					"option (google.api.method_signature) = %q;",
+					strings.Join(want, ","),
+				),
 				Descriptor: m,
-				Location:   locations.MethodOperationInfo(m),
+				Location:   locations.MethodSignature(m, 0),
 			}}
 		}
-
 		return nil
 	},
 }

@@ -15,24 +15,23 @@
 package aip0131
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// The Get standard method should only have expected fields.
-var requestHasNameField = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-has-name-field"),
-	OnlyIf: isGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		if m.FindFieldByName("name") == nil {
+var requestNameReference = &lint.FieldRule{
+	Name: lint.NewRuleName(131, "request-name-reference"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isGetRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if ref := utils.GetResourceReference(f); ref == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
-				Descriptor: m,
+				Message:    "Get methods: The `name` field should include a `google.api.resource_reference` annotation.",
+				Descriptor: f,
 			}}
 		}
-
 		return nil
 	},
 }

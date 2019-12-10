@@ -18,6 +18,7 @@ import (
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	lrpb "google.golang.org/genproto/googleapis/longrunning"
 )
 
 // MethodRequestType returns the precise location of the method's input type.
@@ -34,4 +35,16 @@ func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 // rule, if any.
 func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 4, int(apb.E_Http.Field)) // MethodDescriptor.options == 4
+}
+
+// MethodOperationInfo returns the precise location of the method's
+// `google.longrunning.operation_info` annotation, if any.
+func MethodOperationInfo(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(m, 4, int(lrpb.E_OperationInfo.Field)) // MethodDescriptor.options == 4
+}
+
+// MethodSignature returns the precise location of the method's
+// `google.api.method_signature` annotation, if any.
+func MethodSignature(m *desc.MethodDescriptor, index int) *dpb.SourceCodeInfo_Location {
+	return pathLocation(m, 4, int(apb.E_MethodSignature.Field), index) // MethodDescriptor.options == 4
 }

@@ -1,14 +1,14 @@
 ---
 rule:
   aip: 131
-  name: [core, '0131', request-has-name-field]
-  summary: Get RPCs must have a `name` field in the request.
-permalink: /131/request-has-name-field
+  name: [core, '0131', request-name-field]
+  summary: Get RPCs must have a `string name` field in the request.
+permalink: /131/request-name-field
 redirect_from:
-  - /0131/request-has-name-field
+  - /0131/request-name-field
 ---
 
-# Get methods: Name field
+# Get methods: Name field type
 
 This rule enforces that all `Get` standard methods have a `string name` field
 in the request message, as mandated in [AIP-131][].
@@ -16,7 +16,7 @@ in the request message, as mandated in [AIP-131][].
 ## Details
 
 This rule looks at any message matching `Get*Request` and complains if
-the `name` field is missing.
+the `name` field type is not `string`.
 
 ## Examples
 
@@ -25,7 +25,7 @@ the `name` field is missing.
 ```proto
 // Incorrect.
 message GetBookRequest {
-  string book = 1;  // Field name should be `name`.
+  bytes name = 1;  // Field type should be `string`.
 }
 ```
 
@@ -40,14 +40,15 @@ message GetBookRequest {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the message.
+If you need to violate this rule, use a leading comment above the field.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-has-name-field=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
+
 message GetBookRequest {
-  string book = 1;
+  // (-- api-linter: core::0131::request-name-field=disabled
+  //     aip.dev/not-precedent: This uses `bytes` for historical reasons. --)
+  bytes name = 1;
 }
 ```
 

@@ -25,7 +25,7 @@ func TestRequestNameFieldType(t *testing.T) {
 				{{.NameFieldType}} name = 1;
 			}`, test)
 
-			problems := requestNameFieldType.Lint(f)
+			problems := requestNameField.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0].GetFields()[0]).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}

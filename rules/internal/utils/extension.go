@@ -15,6 +15,8 @@
 package utils
 
 import (
+	"strings"
+
 	"bitbucket.org/creachadair/stringset"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
@@ -43,6 +45,18 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 		return x.(*lrpb.OperationInfo)
 	}
 	return nil
+}
+
+// GetMethodSignatures returns the `google.api.method_signature` annotations.
+func GetMethodSignatures(m *desc.MethodDescriptor) [][]string {
+	answer := [][]string{}
+	opts := m.GetMethodOptions()
+	if x, err := proto.GetExtension(opts, apb.E_MethodSignature); err == nil {
+		for _, sig := range x.([]string) {
+			answer = append(answer, strings.Split(sig, ","))
+		}
+	}
+	return answer
 }
 
 // GetResource returns the google.api.resource annotation.

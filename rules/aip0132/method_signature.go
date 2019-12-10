@@ -12,39 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0151
+package aip0132
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var lroMetadata = &lint.MethodRule{
-	Name:   lint.NewRuleName(151, "lro-metadata-type"),
-	OnlyIf: isAnnotatedLRO,
+var methodSignature = &lint.MethodRule{
+	Name:   lint.NewRuleName(132, "method-signature"),
+	OnlyIf: isListMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		lro := utils.GetOperationInfo(m)
+		signatures := utils.GetMethodSignatures(m)
 
-		// Ensure the response type is set.
-		if lro.GetMetadataType() == "" {
+		// Check if the signature is missing.
+		if len(signatures) == 0 {
 			return []lint.Problem{{
-				Message:    "Methods returning an LRO must set the metadata type.",
+				Message: fmt.Sprintf(
+					"List methods should include `(google.api.method_signature) = %q`",
+					"parent",
+				),
 				Descriptor: m,
-				Location:   locations.MethodOperationInfo(m),
 			}}
 		}
 
-		// The netadata type should not be Empty.
-		if t := lro.GetMetadataType(); t == "Empty" || t == "google.protobuf.Empty" {
+		// Check if the signature is wrong.
+		if !reflect.DeepEqual(signatures[0], []string{"parent"}) {
 			return []lint.Problem{{
-				Message:    "Methods returning an LRO should create a blank message rather than using Empty.",
+				Message:    `The method signature for List methods should be "parent".`,
+				Suggestion: `option (google.api.method_signature) = "parent";`,
 				Descriptor: m,
-				Location:   locations.MethodOperationInfo(m),
+				Location:   locations.MethodSignature(m, 0),
 			}}
 		}
-
 		return nil
 	},
 }
