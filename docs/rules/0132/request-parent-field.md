@@ -15,8 +15,8 @@ field in the request message, as mandated in [AIP-132](http://aip.dev/132).
 
 ## Details
 
-This rule looks at any message matching `List*Request` and complains if the 
-`parent` field has any type other than `string`.
+This rule looks at any message matching `List*Request` and complains if either
+the `parent` field is missing, or if it has any type other than `string`.
 
 ## Examples
 
@@ -25,8 +25,16 @@ This rule looks at any message matching `List*Request` and complains if the
 ```proto
 // Incorrect.
 message ListBooksRequest {
-  // Field type should be `string`.
-  bytes parent = 1;
+  string publisher = 1;  // Field name should be `parent`.
+  int32 page_size = 2;
+  string page_token = 3;
+}
+```
+
+```proto
+// Incorrect.
+message ListBooksRequest {
+  bytes parent = 1;  // Field type should be `string`.
   int32 page_size = 2;
   string page_token = 3;
 }
@@ -45,14 +53,15 @@ message ListBooksRequest {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the field.
+If you need to violate this rule, use a leading comment above the message (if
+the `parent` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
+// (-- api-linter: core::0132::request-parent-field=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
-  // (-- api-linter: core::0132::request-parent-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
-  bytes parent = 1;
+  string publisher = 1;
   int32 page_size = 2;
   string page_token = 3;
 }
