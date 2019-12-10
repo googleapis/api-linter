@@ -37,7 +37,7 @@ rpc UpdateBook(UpdateBookRequest) returns (Book) {
 // Incorrect.
 rpc UpdateBook(UpdateBookRequest) returns (Book) {
   // Should be "book,update_mask".
-  option (google.api.method_signature) = "book,update_mask";
+  option (google.api.method_signature) = "book";
 }
 ```
 
