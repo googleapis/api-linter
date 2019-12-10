@@ -32,6 +32,7 @@ func AddRules(r lint.RuleRegistry) error {
 		httpURIField,
 		httpMethod,
 		inputName,
+		methodSignature,
 		outputName,
 		parentField,
 		requestParentBehavior,
