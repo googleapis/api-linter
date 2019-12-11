@@ -7,8 +7,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestRequiredFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-required-fields"),
+var requestParentFieldRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(133, "request-parent-field-required"),
 	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("parent") == nil {

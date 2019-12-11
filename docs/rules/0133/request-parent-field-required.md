@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', request-required-fields]
+  name: [core, '0133', request-parent-field-required]
   summary: Create RPCs must have a `parent` field in the request.
-permalink: /133/request-required-fields
+permalink: /133/request-parent-field-required
 redirect_from:
-  - /0133/request-required-fields
+  - /0133/request-parent-field-required
 ---
 
 # Create methods: Parent field
@@ -49,7 +49,7 @@ If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0133::request-required-fields=disabled
+// (-- api-linter: core::0133::request-parent-field-required=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message CreateBookRequest {
   string publisher = 1;
