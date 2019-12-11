@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0151 contains rules defined in https://aip.dev/151.
 package aip0151
 
 import (
@@ -21,22 +20,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-151 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		151,
-		lroAnnotationExists,
-		lroMetadata,
-		lroMetadataReachable,
-		lroResponse,
-		lroResponseReachable,
-	)
-}
-
-func isLRO(m *desc.MethodDescriptor) bool {
-	return m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation"
-}
-
-func isAnnotatedLRO(m *desc.MethodDescriptor) bool {
-	return isLRO(m) && utils.GetOperationInfo(m) != nil
+var lroMetadataReachable = &lint.MethodRule{
+	Name:   lint.NewRuleName(151, "lro-metadata-reachable"),
+	OnlyIf: isAnnotatedLRO,
+	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+		// See lro_response_reachable.go for `checkReachable` method.
+		return checkReachable(m, utils.GetOperationInfo(m).GetMetadataType())
+	},
 }
