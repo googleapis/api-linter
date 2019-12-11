@@ -18,56 +18,39 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestStandardFields(t *testing.T) {
+func TestRequestParentField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName      string
-		messageName   string
-		nameFieldName string
-		nameFieldType *builder.FieldType
-		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
+		name        string
+		MessageName string
+		FieldName   string
+		FieldType   string
+		problems    testutils.Problems
 	}{
-		{"Valid", "ListBooksRequest", "parent", builder.FieldTypeString(), testutils.Problems{}, nil},
-		{"InvalidName", "ListBooksRequest", "publisher", builder.FieldTypeString(), testutils.Problems{{Message: "no `parent` field"}}, nil},
+		{"Valid", "ListBooksRequest", "parent", "string", nil},
+		{"IrrelevantMessageName", "EnumerateBooksRequest", "id", "bytes", nil},
+		{"IrrelevantFieldName", "ListBooksRequest", "id", "bytes", nil},
 		{
 			"InvalidType",
 			"ListBooksRequest",
 			"parent",
-			builder.FieldTypeBytes(),
+			"bytes",
 			testutils.Problems{{Suggestion: "string"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.GetFields()[0]
-			},
 		},
-		{"Irrelevant", "EnumerateBooksRequest", "id", builder.FieldTypeString(), testutils.Problems{}, nil},
 	}
 
-	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField(test.nameFieldName, test.nameFieldType),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
-			// What descriptor is the problem expected to be attached to?
-			var problemDesc desc.Descriptor = message
-			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(message)
-			}
-
-			// Run the lint rule, and establish that it returns the correct problems.
-			// number of problems.
-			problems := standardFields.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					{{.FieldType}} {{.FieldName}} = 1;
+				}
+			`, test)
+			problems := requestParentField.Lint(f)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

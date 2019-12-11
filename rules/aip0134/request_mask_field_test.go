@@ -18,43 +18,33 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 func TestRequestMaskField(t *testing.T) {
 	tests := []struct {
-		testName   string
-		Field      string
-		descriptor func(*desc.MessageDescriptor) desc.Descriptor
-		problems   testutils.Problems
+		name        string
+		MessageName string
+		FieldType   string
+		FieldName   string
+		problems    testutils.Problems
 	}{
-		{"Valid", "google.protobuf.FieldMask update_mask = 2;", nil, testutils.Problems{}},
-		{"InvalidMissing", "", nil, testutils.Problems{{Message: "`update_mask` field"}}},
-		{
-			"InvalidType",
-			"string update_mask = 2;",
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.GetFields()[1]
-			},
-			testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}},
-		},
+		{"Valid", "UpdateBookRequest", "google.protobuf.FieldMask", "update_mask", nil},
+		{"InvalidType", "UpdateBookRequest", "string", "update_mask", testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}}},
+		{"IrrelevantMessage", "ModifyBookRequest", "string", "update_mask", nil},
+		{"IrrelevantField", "UpdateBookRequest", "string", "modify_mask", nil},
 	}
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/field_mask.proto";
-				message UpdateBookRequest {
-					Book book = 1;
-					{{.Field}}
+				message {{.MessageName}} {
+					{{.FieldType}} {{.FieldName}} = 1;
 				}
 				message Book {}
 			`, test)
-			message := file.GetMessageTypes()[0]
-			var d desc.Descriptor = message
-			if test.descriptor != nil {
-				d = test.descriptor(message)
-			}
-			if diff := test.problems.SetDescriptor(d).Diff(requestMaskField.Lint(file)); diff != "" {
+			field := file.GetMessageTypes()[0].GetFields()[0]
+			problems := requestMaskField.Lint(file)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

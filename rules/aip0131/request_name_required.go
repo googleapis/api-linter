@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0134
+package aip0131
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestMaskField = &lint.FieldRule{
-	Name: lint.NewRuleName(134, "request-mask-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != "google.protobuf.FieldMask" {
+// The Get standard method should have some required fields.
+var requestNameRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(131, "request-name-required"),
+	OnlyIf: isGetRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{
-				Message:    "The `update_mask` field should be a google.protobuf.FieldMask.",
-				Suggestion: "google.protobuf.FieldMask",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Descriptor: m,
 			}}
 		}
+
 		return nil
 	},
 }
