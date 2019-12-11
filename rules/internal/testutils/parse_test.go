@@ -21,8 +21,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-func TestParseProtoString(t *testing.T) {
-	fd := ParseProtoString(t, `
+func TestParseProtoStrings(t *testing.T) {
+	fd := ParseProtoStrings(t, map[string]string{"test.proto": `
 		syntax = "proto3";
 
 		import "google/protobuf/timestamp.proto";
@@ -36,7 +36,7 @@ func TestParseProtoString(t *testing.T) {
 			string eggs = 2;
 			google.protobuf.Timestamp create_time = 3;
 		}
-	`, "test.proto")
+	`})["test.proto"]
 	if !fd.IsProto3() {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
@@ -69,11 +69,11 @@ func TestParseProtoStringError(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		ParseProtoString(canary, `
+		ParseProtoStrings(canary, map[string]string{"test.proto": `
 			syntax = "proto3";
 			message Foo {}
 			The quick brown fox jumped over the lazy dogs.
-		`, "test.proto")
+		`})
 	}()
 	wg.Wait()
 
