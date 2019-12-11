@@ -15,6 +15,7 @@
 package aip0215
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -29,7 +30,13 @@ var versionedPackages = &lint.FileRule{
 		return f.GetPackage() != ""
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if p := f.GetPackage(); !version.MatchString(p) && !strings.HasSuffix(p, ".type") {
+		p := f.GetPackage()
+		for _, exception := range []string{"master", "type"} {
+			if strings.HasSuffix(p, fmt.Sprintf(".%s", exception)) {
+				return nil
+			}
+		}
+		if !version.MatchString(p) {
 			return []lint.Problem{{
 				Message:    "API components should be in versioned packages.",
 				Descriptor: f,
