@@ -29,6 +29,9 @@ func TestRequestNameField(t *testing.T) {
 		problems    testutils.Problems
 	}{
 		{"Valid", "DeleteBookRequest", "string", "name", nil},
+		{"Invalid", "DeleteBookRequest", "bytes", "name", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantMessage", "RemoveBookRequest", "bytes", "name", nil},
+		{"IrrelevantField", "DeleteBookRequest", "bytes", "title", nil},
 	}
 
 	for _, test := range tests {
