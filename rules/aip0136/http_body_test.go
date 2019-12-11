@@ -29,7 +29,8 @@ func TestHttpBody(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"ValidPostBody", "ArchiveBook", "post", "*", testutils.Problems{}},
-		{"InvalidPostBody", "ArchiveBook", "post", "book", testutils.Problems{{Message: `body: "*"`}}},
+		{"ValidPostBodyBook", "ArchiveBook", "post", "book", testutils.Problems{}},
+		{"InvalidPostBody", "ArchiveBook", "post", "random", testutils.Problems{{Message: `body: "*"`}}},
 		{"InvalidPostNoBody", "ArchiveBook", "post", "", testutils.Problems{{Message: `body: "*"`}}},
 		{"ValidGetNoBody", "ReadBook", "get", "", testutils.Problems{}},
 		{"InvalidGetBody", "ReadBook", "get", "*", testutils.Problems{{Message: "should not set"}}},

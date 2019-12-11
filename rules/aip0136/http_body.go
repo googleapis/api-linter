@@ -15,10 +15,13 @@
 package aip0136
 
 import (
+	"strings"
+
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 var httpBody = &lint.MethodRule{
@@ -27,14 +30,20 @@ var httpBody = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			noBody := stringset.New("GET", "DELETE")
-			if !noBody.Contains(httpRule.Method) && httpRule.Body != "*" {
-				// FIXME: We intentionally only return one Problem here.
-				// When we can attach problems to the particular annotation, update this
-				// to return multiples.
-				return []lint.Problem{{
-					Message:    "Custom POST methods should set `body: \"*\"`.",
-					Descriptor: m,
-				}}
+			if !noBody.Contains(httpRule.Method) {
+				// Determine the name of the resource.
+				// This entails some guessing; we assume that the verb is a single
+				// word and that the resource is everything else.
+				resource := strings.Join(strings.Split(strcase.SnakeCase(m.GetName()), "_")[1:], "_")
+				if !stringset.New(resource, "*").Contains(httpRule.Body) {
+					// FIXME: We intentionally only return one Problem here.
+					// When we can attach problems to the particular annotation, update this
+					// to return multiples.
+					return []lint.Problem{{
+						Message:    "Custom POST methods should set `body: \"*\"`.",
+						Descriptor: m,
+					}}
+				}
 			} else if noBody.Contains(httpRule.Method) && httpRule.Body != "" {
 				// FIXME: We intentionally only return one Problem here.
 				// When we can attach problems to the particular annotation, update this
