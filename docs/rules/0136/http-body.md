@@ -11,12 +11,13 @@ redirect_from:
 # Custom methods: HTTP body
 
 This rule enforces that all custom methods set the HTTP `body` to `*`, as
-mandated in [AIP-136][].
+advised in [AIP-136][].
 
 ## Details
 
-This rule looks at any method that is not a standard method, and complains 
-if the HTTP `body` field is not set to the resource being created.
+This rule looks at any method that is not a standard method, and complains if
+the HTTP `body` field is not set to `"*"`. It also permits the name of the
+resource.
 
 ## Examples
 
@@ -27,7 +28,7 @@ if the HTTP `body` field is not set to the resource being created.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books}:checkout"
-    body: "book"  // This should be "*".
+    // `body: "*"` should be included.
   };
 }
 ```
@@ -55,7 +56,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books}:checkout"
-    body: "book"
   };
 }
 ```
