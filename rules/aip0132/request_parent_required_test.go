@@ -6,7 +6,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestRequiredFields(t *testing.T) {
+func TestRequestParentRequired(t *testing.T) {
 	tests := []struct {
 		name        string
 		MessageName string
@@ -25,7 +25,7 @@ func TestRequestRequiredFields(t *testing.T) {
 					string {{.FieldName}} = 1;
 				}
 			`, test)
-			problems := requestRequiredFields.Lint(f)
+			problems := requestParentRequired.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

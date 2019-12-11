@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 132
-  name: [core, '0132', request-required-fields]
+  name: [core, '0132', request-parent-required]
   summary: List RPCs must have a `parent` field in the request.
-permalink: /132/request-required-fields
+permalink: /132/request-parent-required
 redirect_from:
-  - /0132/request-required-fields
+  - /0132/request-parent-required
 ---
 
 # List methods: Parent field
@@ -49,7 +49,7 @@ If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0132::request-required-fields=disabled
+// (-- api-linter: core::0132::request-parent-required=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
   string publisher = 1;
