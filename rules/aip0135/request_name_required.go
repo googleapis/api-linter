@@ -15,27 +15,22 @@
 package aip0135
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var requestNameField = &lint.FieldRule{
-	Name: lint.NewRuleName(135, "request-name-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.GetType() != builder.FieldTypeString().GetType() {
+var requestNameRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(135, "request-name-required"),
+	OnlyIf: isDeleteRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{
-				Message:    "`name` field on Get RPCs should be a string",
-				Suggestion: "string",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Descriptor: m,
 			}}
 		}
-
 		return nil
 	},
 }
