@@ -20,30 +20,32 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestNameField(t *testing.T) {
+func TestRequestNameRequired(t *testing.T) {
+	// Set up the testing permutations.
 	tests := []struct {
 		name        string
 		MessageName string
-		FieldType   string
 		FieldName   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "DeleteBookRequest", "string", "name", nil},
-		{"Invalid", "DeleteBookRequest", "bytes", "name", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantMessage", "RemoveBookRequest", "bytes", "name", nil},
-		{"IrrelevantField", "DeleteBookRequest", "bytes", "title", nil},
+		{"Valid", "DeleteBookRequest", "name", nil},
+		{"InvalidName", "DeleteBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Irrelevant", "RemoveBookRequest", "id", nil},
 	}
 
+	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				message {{.MessageName}} {
-					{{.FieldType}} {{.FieldName}} = 1;
+					string {{.FieldName}} = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := requestNameField.Lint(f)
-			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+
+			// Run the lint rule, and establish that it returns the correct problems.
+			problems := requestNameRequired.Lint(f)
+			message := f.GetMessageTypes()[0]
+			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
 		})
