@@ -15,35 +15,26 @@
 package aip0132
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The List standard method should contain a parent field.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(132, "request-parent-field"),
-	OnlyIf: isListRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `parent` field is present.
-		parentField := m.FindFieldByName("parent")
-		if parentField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the parent field is a string.
-		if parentField.GetType() != builder.FieldTypeString().GetType() {
+// The type of the parent field in the List request message should
+// be string.
+var requestParentField = &lint.FieldRule{
+	Name: lint.NewRuleName(132, "request-parent-field"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if f.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
 				Message:    "`parent` field on List RPCs must be a string",
 				Suggestion: "string",
-				Descriptor: parentField,
-				Location:   locations.FieldType(parentField),
+				Descriptor: f,
+				Location:   locations.FieldType(f),
 			}}
 		}
 

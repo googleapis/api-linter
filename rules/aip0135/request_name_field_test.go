@@ -18,59 +18,34 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestStandardFields(t *testing.T) {
-	// Set up the testing permutations.
+func TestRequestNameField(t *testing.T) {
 	tests := []struct {
-		testName      string
-		messageName   string
-		nameFieldName string
-		problems      testutils.Problems
+		name        string
+		MessageName string
+		FieldType   string
+		FieldName   string
+		problems    testutils.Problems
 	}{
-		{"Valid", "DeleteBookRequest", "name", testutils.Problems{}},
-		{"InvalidName", "DeleteBookRequest", "id", testutils.Problems{{Message: "name"}}},
-		{"Irrelevant", "RemoveBookRequest", "id", testutils.Problems{}},
+		{"Valid", "DeleteBookRequest", "string", "name", nil},
+		{"Invalid", "DeleteBookRequest", "bytes", "name", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantMessage", "RemoveBookRequest", "bytes", "name", nil},
+		{"IrrelevantField", "DeleteBookRequest", "bytes", "title", nil},
 	}
 
-	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField(test.nameFieldName, builder.FieldTypeString()),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
-			// Run the lint rule, and establish that it returns the correct problems.
-			problems := standardFields.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					{{.FieldType}} {{.FieldName}} = 1;
+				}
+			`, test)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := requestNameField.Lint(f)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
 		})
-	}
-}
-
-func TestStandardFieldsInvalidType(t *testing.T) {
-	// Create an appropriate message descriptor.
-	message, err := builder.NewMessage("DeleteBookRequest").AddField(
-		builder.NewField("name", builder.FieldTypeBytes()),
-	).Build()
-	if err != nil {
-		t.Fatalf("Could not build descriptor.")
-	}
-
-	// Run the lint rule, and establish that it returns the correct
-	// number of problems.
-	wantProblems := testutils.Problems{{
-		Descriptor: message.GetFields()[0],
-		Suggestion: "string",
-	}}
-	gotProblems := standardFields.Lint(message.GetFile())
-	if diff := wantProblems.Diff(gotProblems); diff != "" {
-		t.Errorf(diff)
 	}
 }
