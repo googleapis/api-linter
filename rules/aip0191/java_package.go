@@ -24,8 +24,10 @@ import (
 )
 
 var javaPackage = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "java-package"),
-	OnlyIf: hasPackage,
+	Name: lint.NewRuleName(191, "java-package"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		javaPkg := f.GetFileOptions().GetJavaPackage()
 		if javaPkg == "" {
