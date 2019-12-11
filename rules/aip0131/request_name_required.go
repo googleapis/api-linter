@@ -12,29 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0132
+package aip0131
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The type of the parent field in the List request message should
-// be string.
-var requestParentField = &lint.FieldRule{
-	Name: lint.NewRuleName(132, "request-parent-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.GetType() != builder.FieldTypeString().GetType() {
+// The Get standard method should have some required fields.
+var requestNameRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(131, "request-name-required"),
+	OnlyIf: isGetRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{
-				Message:    "`parent` field on List RPCs must be a string",
-				Suggestion: "string",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Descriptor: m,
 			}}
 		}
 

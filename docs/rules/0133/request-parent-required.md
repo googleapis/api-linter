@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', request-parent-field]
+  name: [core, '0133', request-parent-required]
   summary: Create RPCs must have a `parent` field in the request.
-permalink: /133/request-parent-field
+permalink: /133/request-parent-required
 redirect_from:
-  - /0133/request-parent-field
+  - /0133/request-parent-required
 ---
 
 # Create methods: Parent field
@@ -15,8 +15,8 @@ field in the request message, as mandated in [AIP-133](http://aip.dev/133).
 
 ## Details
 
-This rule looks at any message matching `Create*Request` and complains if
-the `parent` field has any type other than `string`.
+This rule looks at any message matching `Create*Request` and complains if 
+the `parent` field is missing.
 
 ## Examples
 
@@ -24,9 +24,9 @@ the `parent` field has any type other than `string`.
 
 ```proto
 // Incorrect.
-message GetBookRequest {
-  // Field type should be `string`.
-  bytes parent = 1;
+message CreateBookRequest {
+  // Field name should be `parent`.
+  string publisher = 1;
   Book book = 2;
   string book_id = 3;
 }
@@ -45,14 +45,14 @@ message CreateBookRequest {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the field.
+If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
+// (-- api-linter: core::0133::request-parent-required=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message CreateBookRequest {
-  // (-- api-linter: core::0133::request-parent-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
-  bytes parent = 1;
+  string publisher = 1;
   Book book = 2;
   string book_id = 3;
 }

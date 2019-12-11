@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0131
 
 import (
 	"testing"
@@ -20,34 +20,31 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestParentField(t *testing.T) {
+func TestRequestHasNameField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		name        string
+		testName    string
 		MessageName string
 		FieldName   string
-		FieldType   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "CreateBookRequest", "parent", "string", nil},
-		{"InvalidType", "CreateBookRequest", "parent", "bytes", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantMessage", "AddBookRequest", "parent", "bytes", nil},
-		{"IrrelevantField", "CreateBookRequest", "id", "bytes", nil},
+		{"Valid", "GetBookRequest", "name", testutils.Problems{}},
+		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				message {{.MessageName}} {
-					{{.FieldType}} {{.FieldName}} = 1;
-				}
-			`, test)
+			message {{.MessageName}} {
+				string {{.FieldName}} = 1;
+			}`, test)
 
-			problems := requestParentField.Lint(f)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
-				t.Errorf(diff)
+			// Run the lint rule, and establish that it returns the correct problems.
+			problems := requestNameRequired.Lint(f)
+			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
+				t.Errorf("Problems did not match: %v", diff)
 			}
 		})
 	}
