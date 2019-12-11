@@ -18,69 +18,35 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestParentField(t *testing.T) {
+func TestRequestParentField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName     string
-		messageName  string
-		messageField *field
-		problems     testutils.Problems
-		problemDesc  func(m *desc.MessageDescriptor) desc.Descriptor
+		name        string
+		MessageName string
+		FieldName   string
+		FieldType   string
+		problems    testutils.Problems
 	}{
-		{
-			"Valid",
-			"CreateBookRequest",
-			&field{"parent", builder.FieldTypeString()},
-			testutils.Problems{},
-			nil},
-		{
-			"MissingField",
-			"CreateBookRequest",
-			nil,
-			testutils.Problems{{Message: "parent"}},
-			nil,
-		},
-		{
-			"InvalidType",
-			"CreateBookRequest",
-			&field{"parent", builder.FieldTypeDouble()},
-			testutils.Problems{{Suggestion: "string"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("parent")
-			},
-		},
+		{"Valid", "CreateBookRequest", "parent", "string", nil},
+		{"InvalidType", "CreateBookRequest", "parent", "bytes", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantMessage", "AddBookRequest", "parent", "bytes", nil},
+		{"IrrelevantField", "CreateBookRequest", "id", "bytes", nil},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			messageBuilder := builder.NewMessage(test.messageName)
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					{{.FieldType}} {{.FieldName}} = 1;
+				}
+			`, test)
 
-			if test.messageField != nil {
-				messageBuilder.AddField(
-					builder.NewField(test.messageField.fieldName, test.messageField.fieldType),
-				)
-			}
-
-			message, err := messageBuilder.Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
-			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = message
-			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(message)
-			}
-
-			// Run the lint rule, and establish that it returns the correct problems.
-			problems := parentField.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+			problems := requestParentField.Lint(f)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
