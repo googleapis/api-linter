@@ -2,7 +2,7 @@
 rule:
   aip: 131
   name: [core, '0131', request-name-field]
-  summary: Get RPCs must have a `name` field in the request.
+  summary: Get RPCs must have a `string name` field in the request.
 permalink: /131/request-name-field
 redirect_from:
   - /0131/request-name-field
@@ -15,8 +15,8 @@ in the request message, as mandated in [AIP-131][].
 
 ## Details
 
-This rule looks at any message matching `Get*Request` and complains if either
-the `name` field is missing, or if it has any type other than `string`.
+This rule looks at any message matching `Get*Request` and complains if
+the `name` field type is not `string`.
 
 ## Examples
 
@@ -25,20 +25,7 @@ the `name` field is missing, or if it has any type other than `string`.
 ```proto
 // Incorrect.
 message GetBookRequest {
-  string book = 1 [  // Field name should be `name`.
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
-  ];
-}
-```
-
-```proto
-// Incorrect.
-message GetBookRequest {
-  bytes name = 1 [  // Field type should be `string`.
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
-  ];
+  bytes name = 1;  // Field type should be `string`.
 }
 ```
 
@@ -47,24 +34,21 @@ message GetBookRequest {
 ```proto
 // Correct.
 message GetBookRequest {
-  string name = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
-  ];
+  string name = 1;
 }
 ```
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+If you need to violate this rule, use a leading comment above the field.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-name-field=disabled
-//     aip.dev/not-precedent: This is named "book" for historical reasons. --)
+
 message GetBookRequest {
-  string book = 1;
+  // (-- api-linter: core::0131::request-name-field=disabled
+  //     aip.dev/not-precedent: This uses `bytes` for historical reasons. --)
+  bytes name = 1;
 }
 ```
 

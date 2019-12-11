@@ -15,25 +15,21 @@
 package aip0131
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// Get request should have a string name field.
-var requestNameField = &lint.FieldRule{
-	Name: lint.NewRuleName(131, "request-name-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isGetRequestMessage(f.GetOwner()) && f.GetName() == "name"
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.GetType() != builder.FieldTypeString().GetType() {
+// The Get standard method should have some required fields.
+var requestNameRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(131, "request-name-required"),
+	OnlyIf: isGetRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{
-				Message:    "`name` field on Get RPCs should be a string",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
-				Suggestion: "string",
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Descriptor: m,
 			}}
 		}
 
