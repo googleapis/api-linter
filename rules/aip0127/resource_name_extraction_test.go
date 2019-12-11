@@ -28,6 +28,7 @@ func TestResourceNameExtraction(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
+		{"VersioningTool", "/{$api_version}/{name=publishers/*/books/*}", testutils.Problems{}},
 		{"Invalid", "/v1/publishers/{publisher_id}/books/{book_id}", testutils.Problems{{Message: "full resource name"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {

@@ -25,8 +25,8 @@ var resourceNameExtraction = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "resource-name-extraction"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, rule := range utils.GetHTTPRules(m) {
-			for _, v := range rule.GetVariables() {
-				if v == "*" {
+			for k, v := range rule.GetVariables() {
+				if v == "*" && k != "$api_version" {
 					return []lint.Problem{{
 						Message:    "Extract a full resource name into a variable, not just IDs.",
 						Descriptor: m,
