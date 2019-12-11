@@ -23,34 +23,26 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-// The create request message should have resource field.
-var resourceField = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-resource-field"),
-	OnlyIf: isUpdateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resourceMsgName := extractResource(m.GetName())
-
-		// The rule (resource field name must map to the POST body) is
-		// checked by AIP-0134 ("core::0134::http-body")
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				// Rule check: Is the field named properly?
-				if want := strcase.SnakeCase(resourceMsgName); fieldDesc.GetName() != want {
-					return []lint.Problem{{
-						Message:    fmt.Sprintf("Resource field should be named %q.", want),
-						Descriptor: fieldDesc,
-						Suggestion: want,
-						Location:   locations.DescriptorName(fieldDesc),
-					}}
-				}
-				return nil
-			}
+// The resource field in a update method should named properly.
+var requestResourceField = &lint.FieldRule{
+	Name: lint.NewRuleName(134, "request-resource-field"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		message := f.GetOwner()
+		return isUpdateRequestMessage(message) &&
+			f.GetMessageType() != nil &&
+			f.GetMessageType().GetName() == extractResource(message.GetName())
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		resourceName := extractResource(f.GetOwner().GetName())
+		wantFieldName := strcase.SnakeCase(resourceName)
+		if f.GetName() != wantFieldName {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("Resource field should be named %q.", wantFieldName),
+				Descriptor: f,
+				Suggestion: wantFieldName,
+				Location:   locations.DescriptorName(f),
+			}}
 		}
-
-		// Rule check: Establish that a resource field must be included.
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
-			Descriptor: m,
-		}}
+		return nil
 	},
 }

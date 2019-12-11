@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 134
-  name: [core, '0134', request-mask-field]
+  name: [core, '0134', request-mask-required]
   summary: Update RPCs must have a field mask in the request.
-permalink: /134/request-mask-field
+permalink: /134/request-mask-required
 redirect_from:
-  - /0134/request-mask-field
+  - /0134/request-mask-required
 ---
 
 # Update methods: Mask field
@@ -15,8 +15,8 @@ request message for the field mask, as mandated in [AIP-134][].
 
 ## Details
 
-This rule looks at any message matching `Update*Request` and complains if
-the `update_mask` field has any type other than `google.protobuf.FieldMask`.
+This rule looks at any message matching `Update*Request` and complains if it
+can not find a field named `update_mask`.
 
 ## Examples
 
@@ -24,12 +24,12 @@ the `update_mask` field has any type other than `google.protobuf.FieldMask`.
 
 ```proto
 // Incorrect.
+// `google.protobuf.FieldMask update_mask` is missing.
 message UpdateBookRequest {
   Book book = 1;
-  // Field type should be `google.protobuf.FieldMask`.
-  string update_mask = 2;
 }
 ```
+
 
 **Correct** code for this rule:
 
@@ -43,16 +43,14 @@ message UpdateBookRequest {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the message (if
-the resource field is missing) or above the field (if it is improperly named).
+If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
+// (-- api-linter: core::0134::request-mask-required=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
 message UpdateBookRequest {
   Book book = 1;
-  // (-- api-linter: core::0134::request-mask-field=disabled
-  //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string update_mask = 2;
 }
 ```
 
