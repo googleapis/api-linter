@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 131
-  name: [core, '0131', request-required-fields]
+  name: [core, '0131', request-name-required]
   summary: Get RPCs must have a `name` field in the request.
-permalink: /131/request-required-fields
+permalink: /131/request-name-required
 redirect_from:
-  - /0131/request-required-fields
+  - /0131/request-name-required
 ---
 
 # Get methods: Name field
@@ -50,7 +50,7 @@ If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0131::request-required-fields=disabled
+// (-- api-linter: core::0131::request-name-required=disabled
 //     aip.dev/not-precedent: This is named "book" for historical reasons. --)
 message GetBookRequest {
   string book = 1 [

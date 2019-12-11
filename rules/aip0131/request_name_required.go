@@ -22,8 +22,8 @@ import (
 )
 
 // The Get standard method should have some required fields.
-var requestRequiredFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(131, "request-required-fields"),
+var requestNameRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(131, "request-name-required"),
 	OnlyIf: isGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("name") == nil {
