@@ -33,6 +33,7 @@ func TestJavaPackage(t *testing.T) {
 			Suggestion: `option java_package = "com.foo.v1";`,
 		}}},
 		{"Ignored", []string{"", ""}, testutils.Problems{}},
+		{"IgnoredMaster", []string{"package foo.master;", ""}, testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))
