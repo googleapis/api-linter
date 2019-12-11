@@ -40,7 +40,7 @@ func TestRequestMaskFieldRequired(t *testing.T) {
 				message Book {}
 			`, test)
 			message := file.GetMessageTypes()[0]
-			problems := requestMaskFieldRequired.Lint(file)
+			problems := requestMaskRequired.Lint(file)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

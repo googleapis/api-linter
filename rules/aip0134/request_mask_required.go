@@ -19,8 +19,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestMaskFieldRequired = &lint.MessageRule{
-	Name:   lint.NewRuleName(134, "request-mask-field-required"),
+var requestMaskRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(134, "request-mask-required"),
 	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")
