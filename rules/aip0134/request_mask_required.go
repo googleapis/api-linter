@@ -16,22 +16,18 @@ package aip0134
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requestMaskField = &lint.FieldRule{
-	Name: lint.NewRuleName(134, "request-mask-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != "google.protobuf.FieldMask" {
+var requestMaskRequired = &lint.MessageRule{
+	Name:   lint.NewRuleName(134, "request-mask-required"),
+	OnlyIf: isUpdateRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		updateMask := m.FindFieldByName("update_mask")
+		if updateMask == nil {
 			return []lint.Problem{{
-				Message:    "The `update_mask` field should be a google.protobuf.FieldMask.",
-				Suggestion: "google.protobuf.FieldMask",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
+				Message:    "Update methods should have an `update_mask` field.",
+				Descriptor: m,
 			}}
 		}
 		return nil

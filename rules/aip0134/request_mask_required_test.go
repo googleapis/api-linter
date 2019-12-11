@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0134
 
 import (
 	"testing"
@@ -20,33 +20,28 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestParentField(t *testing.T) {
-	// Set up the testing permutations.
+func TestRequestMaskFieldRequired(t *testing.T) {
 	tests := []struct {
-		name        string
-		MessageName string
-		FieldName   string
-		FieldType   string
-		problems    testutils.Problems
+		name     string
+		Field    string
+		problems testutils.Problems
 	}{
-		{"Valid", "CreateBookRequest", "parent", "string", nil},
-		{"InvalidType", "CreateBookRequest", "parent", "bytes", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantMessage", "AddBookRequest", "parent", "bytes", nil},
-		{"IrrelevantField", "CreateBookRequest", "id", "bytes", nil},
+		{"Valid", "google.protobuf.FieldMask update_mask = 2;", nil},
+		{"InvalidMissing", "", testutils.Problems{{Message: "`update_mask` field"}}},
 	}
-
-	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
-				message {{.MessageName}} {
-					{{.FieldType}} {{.FieldName}} = 1;
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/protobuf/field_mask.proto";
+				message UpdateBookRequest {
+					Book book = 1;
+					{{.Field}}
 				}
+				message Book {}
 			`, test)
-
-			problems := requestParentField.Lint(f)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+			message := file.GetMessageTypes()[0]
+			problems := requestMaskRequired.Lint(file)
+			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})

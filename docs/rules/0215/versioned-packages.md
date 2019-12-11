@@ -17,7 +17,7 @@ in [AIP-215][].
 
 This rule examines the proto package and complains if it does not end something
 that appears to be a version component, such as `v1` or `v1beta`. It also
-permits proto packages ending in `type`.
+permits proto packages ending in `type` or `master`.
 
 ## Examples
 

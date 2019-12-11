@@ -15,35 +15,24 @@
 package aip0135
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The Delete standard method should only have expected fields.
-var standardFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(135, "request-name-field"),
-	OnlyIf: isDeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a name field is present.
-		name := m.FindFieldByName("name")
-		if name == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name field is the correct type.
-		if name.GetType() != builder.FieldTypeString().GetType() {
+var requestNameField = &lint.FieldRule{
+	Name: lint.NewRuleName(135, "request-name-field"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if f.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
 				Message:    "`name` field on Get RPCs should be a string",
 				Suggestion: "string",
-				Descriptor: name,
-				Location:   locations.FieldType(name),
+				Descriptor: f,
+				Location:   locations.FieldType(f),
 			}}
 		}
 
