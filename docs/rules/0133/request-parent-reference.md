@@ -40,7 +40,7 @@ message CreateBookRequest {
 message CreateBookRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
+    (google.api.resource_reference).type = "library.googleapis.com/Publisher"
   ];
   Book book = 2;
 }
