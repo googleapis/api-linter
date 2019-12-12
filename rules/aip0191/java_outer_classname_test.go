@@ -33,6 +33,7 @@ func TestJavaOuterClassname(t *testing.T) {
 		{"Invalid", "test.proto", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"InvalidWithPath", "foo/bar/test.proto", []string{"package foo.v1;"}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"Ignored", "test.proto", []string{"", ""}, testutils.Problems{}},
+		{"IgnoredMaster", "test.proto", []string{"package foo.master;", ""}, testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))

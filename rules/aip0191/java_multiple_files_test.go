@@ -30,6 +30,7 @@ func TestJavaMultipleFiles(t *testing.T) {
 		{"Valid", "package foo.v1;", "option java_multiple_files = true;", testutils.Problems{}},
 		{"Invalid", "package foo.v1;", "", testutils.Problems{{Message: "java_multiple_files"}}},
 		{"Ignored", "", "", testutils.Problems{}},
+		{"IgnoredMaster", "package foo.master;", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
