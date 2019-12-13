@@ -26,8 +26,10 @@ import (
 )
 
 var javaOuterClassname = &lint.FileRule{
-	Name:   lint.NewRuleName(191, "java-outer-classname"),
-	OnlyIf: hasPackage,
+	Name: lint.NewRuleName(191, "java-outer-classname"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		if f.GetFileOptions().GetJavaOuterClassname() == "" {
 			filename := filepath.Base(f.GetName())
