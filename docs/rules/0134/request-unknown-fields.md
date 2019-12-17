@@ -55,7 +55,7 @@ message UpdateBookRequest {
   Book book = 1;
   google.protobuf.FieldMask update_mask = 2;
   // (-- api-linter: core::0134::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reaosns. --)
+  //     aip.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 3;  // Non-standard field.
 }
 ```
