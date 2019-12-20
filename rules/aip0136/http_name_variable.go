@@ -15,18 +15,21 @@
 package aip0136
 
 import (
+	"strings"
+
 	pluralize "github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
-var httpVariables = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-variables"),
+var httpNameVariable = &lint.MethodRule{
+	Name:   lint.NewRuleName(136, "http-name-variable"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		p := pluralize.NewClient()
-		for _, http := utils.GetHTTPRules(m) {
+		for _, http := range utils.GetHTTPRules(m) {
 			vars := http.GetVariables()
 
 			// If there is a "name" variable, the noun should be present
@@ -35,22 +38,16 @@ var httpVariables = &lint.MethodRule{
 				// Determine the resource.
 				name = strings.TrimSuffix(name, "/*")
 				segs := strings.Split(name, "/")
-				resource := p.Singular(segs[len(segs) - 1])
+				resource := p.Singular(segs[len(segs)-1])
 
 				// Does the RPC name end in the singular name of the resource?
 				// If not, complain.
-
-			}
-
-			if parent, ok := vars["parent"]; ok {
-				// Determine the resource.
-				// Because this is `parent`, we expect the plural version this time.
-				// Furthermore, it is **outside** the actual parent variable.
-				segs := strings.Split(strings.Split(http.GetPlainURI(), ":")[0], "/")
-				resource := segs[len(segs) - 1]
-
-				// Does the RPC name end in the plural name of the resource?
-				// If not, complain.
+				if !strings.HasSuffix(strcase.SnakeCase(m.GetName()), resource) {
+					return []lint.Problem{{
+						Message:    "The name variable should only be used if the RPC noun matches the URI.",
+						Descriptor: m,
+					}}
+				}
 			}
 		}
 		return nil
