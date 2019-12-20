@@ -30,20 +30,11 @@ const nameSeparator string = "::"
 
 var ruleNameValidator = regexp.MustCompile("^([a-z0-9][a-z0-9-]*(::[a-z0-9][a-z0-9-]*)?)+$")
 
-// getRuleGroup takes an AIP number and returns the appropriate group.
-// It panics if no group is found.
-func getRuleGroup(aip int) string {
-	if aip > 0 && aip < 1000 {
-		return "core"
-	}
-	panic(fmt.Sprintf("Invalid AIP number %d: no available group.", aip))
-}
-
 // NewRuleName creates a RuleName from an AIP number and a unique name within
 // that AIP.
 func NewRuleName(aip int, name string) RuleName {
 	return RuleName(strings.Join([]string{
-		getRuleGroup(aip),
+		getRuleGroup(aip, aipGroups),
 		fmt.Sprintf("%04d", aip),
 		name,
 	}, nameSeparator))
