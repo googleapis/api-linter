@@ -16,7 +16,6 @@ package lint
 
 import (
 	"encoding/json"
-	"strings"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
@@ -96,7 +95,7 @@ func (p Problem) marshal() interface{} {
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
 		p.RuleID,
-		ruleDocURI(p.RuleID),
+		getRuleURL(string(p.RuleID), ruleURLMappings),
 		p.category,
 	}
 }
@@ -159,12 +158,4 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 			Column: int(span[2]),
 		},
 	}
-}
-
-// ruleDocURI returns the link to the rule doc in https://linter.aip.dev/.
-func ruleDocURI(name RuleName) string {
-	base := "https://linter.aip.dev/"
-	nameParts := strings.Split(string(name), "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
-	path := strings.TrimPrefix(strings.Join(nameParts[1:], "/"), "0")
-	return base + path
 }

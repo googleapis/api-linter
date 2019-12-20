@@ -117,23 +117,3 @@ func TestProblemDescriptor(t *testing.T) {
 	}
 
 }
-
-func TestRuleDocURI(t *testing.T) {
-	cases := []struct {
-		name     string
-		ruleName RuleName
-		wantURI  string
-	}{{
-		name:     "CoreRule",
-		ruleName: NewRuleName(122, "camel-case-uris"),
-		wantURI:  "https://linter.aip.dev/122/camel-case-uris",
-	}}
-
-	for _, test := range cases {
-		t.Run(test.name, func(t *testing.T) {
-			if got, want := ruleDocURI(test.ruleName), test.wantURI; got != want {
-				t.Errorf("ruleDocURI(%q): got %q, but want %q", string(test.ruleName), got, want)
-			}
-		})
-	}
-}
