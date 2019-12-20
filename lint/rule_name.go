@@ -20,6 +20,34 @@ import (
 	"strings"
 )
 
+// A list of functions, each of which returns the group name for the given AIP
+// number and if no group is found, returns an empty string.
+// NOTE: the list will be evaluated in the FILO order.
+//
+// At Google, we inject additional group naming functions into this list.
+// Example: google_aip_groups.go
+// package lint
+// func init() {
+//   aipGroups = append(aipGroups, aipInternalGroup)
+// }
+//
+// func aipInternalGroup(aip int) string {
+//   if aip > 9000 {
+//	   return "internal"
+//   }
+//   return ""
+// }
+var aipGroups = []func(int) string{
+	aipCoreGroup,
+}
+
+func aipCoreGroup(aip int) string {
+	if aip > 0 && aip < 1000 {
+		return "core"
+	}
+	return ""
+}
+
 // RuleName is an identifier for a rule. Allowed characters include a-z, 0-9, -.
 //
 // The namespace separator :: is allowed between RuleName segments
@@ -33,8 +61,10 @@ var ruleNameValidator = regexp.MustCompile("^([a-z0-9][a-z0-9-]*(::[a-z0-9][a-z0
 // getRuleGroup takes an AIP number and returns the appropriate group.
 // It panics if no group is found.
 func getRuleGroup(aip int) string {
-	if aip > 0 && aip < 1000 {
-		return "core"
+	for i := len(aipGroups) - 1; i >= 0; i-- {
+		if group := aipGroups[i](aip); group != "" {
+			return group
+		}
 	}
 	panic(fmt.Sprintf("Invalid AIP number %d: no available group.", aip))
 }
