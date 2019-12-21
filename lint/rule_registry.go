@@ -22,15 +22,6 @@ import (
 // RuleRegistry is a registry for registering and looking up rules.
 type RuleRegistry map[RuleName]ProtoRule
 
-// Copy returns a new copy of the rules.
-func (r RuleRegistry) Copy() RuleRegistry {
-	n := make(RuleRegistry, len(r))
-	for k, v := range r {
-		n[k] = v
-	}
-	return n
-}
-
 var errInvalidRuleName = errors.New("not a valid rule name")
 var errInvalidRuleGroup = errors.New("invalid rule group")
 var errDuplicatedRuleName = errors.New("duplicate rule name")
