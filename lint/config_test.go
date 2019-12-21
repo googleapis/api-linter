@@ -15,6 +15,10 @@
 package lint
 
 import (
+	"errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -220,6 +224,34 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 	}
 }
 
+type errReader int
+
+func (errReader) Read(p []byte) (int, error) {
+	return 0, errors.New("test error")
+}
+
+func TestReadConfigsJSONReaderError(t *testing.T) {
+	if _, err := ReadConfigsJSON(errReader(0)); err == nil {
+		t.Error("ReadConfigsJSON expects an error")
+	}
+}
+
+func TestReadConfigsJSONFormatError(t *testing.T) {
+	invalidJSON := `
+	[
+		{
+			"included_paths": ["path_a"],
+			"excluded_paths": ["path_b"],
+			"disabled_rules": ["rule_a", "rule_b"],
+			"enabled_rules": ["rule_c", "rule_d"]
+		}
+	`
+
+	if _, err := ReadConfigsJSON(strings.NewReader(invalidJSON)); err == nil {
+		t.Error("ReadConfigsJSON expects an error")
+	}
+}
+
 func TestReadConfigsJSON(t *testing.T) {
 	content := `
 	[
@@ -248,4 +280,156 @@ func TestReadConfigsJSON(t *testing.T) {
 	if !reflect.DeepEqual(configs, expected) {
 		t.Errorf("ReadConfigsJSON returns %v, but want %v", configs, expected)
 	}
+}
+
+func TestReadConfigsYAMLReaderError(t *testing.T) {
+	if _, err := ReadConfigsYAML(errReader(0)); err == nil {
+		t.Error("ReadConfigsYAML expects an error")
+	}
+}
+
+func TestReadConfigsYAMLFormatError(t *testing.T) {
+	invalidYAML := `
+	[
+		{
+			"included_paths": ["path_a"],
+			"excluded_paths": ["path_b"],
+			"disabled_rules": ["rule_a", "rule_b"],
+			"enabled_rules": ["rule_c", "rule_d"]
+		}
+	`
+
+	if _, err := ReadConfigsYAML(strings.NewReader(invalidYAML)); err == nil {
+		t.Error("ReadConfigsYAML expects an error")
+	}
+}
+
+func TestReadConfigsYAML(t *testing.T) {
+	content := `
+---
+- included_paths:
+    - 'path_a'
+  excluded_paths:
+    - 'path_b'
+  disabled_rules:
+    - 'rule_a'
+    - 'rule_b'
+  enabled_rules:
+    - 'rule_c'
+    - 'rule_d'
+`
+
+	configs, err := ReadConfigsYAML(strings.NewReader(content))
+	if err != nil {
+		t.Errorf("ReadConfigsYAML returns error: %v", err)
+	}
+
+	expected := Configs{
+		{
+			IncludedPaths: []string{"path_a"},
+			ExcludedPaths: []string{"path_b"},
+			DisabledRules: []string{"rule_a", "rule_b"},
+			EnabledRules:  []string{"rule_c", "rule_d"},
+		},
+	}
+	if !reflect.DeepEqual(configs, expected) {
+		t.Errorf("ReadConfigsYAML returns %v, but want %v", configs, expected)
+	}
+}
+
+func TestReadConfigsFromFile(t *testing.T) {
+	expectedConfigs := Configs{
+		{
+			IncludedPaths: []string{"path_a"},
+			ExcludedPaths: []string{"path_b"},
+			DisabledRules: []string{"rule_a", "rule_b"},
+			EnabledRules:  []string{"rule_c", "rule_d"},
+		},
+	}
+
+	jsonConfigsText := `
+	[
+		{
+			"included_paths": ["path_a"],
+			"excluded_paths": ["path_b"],
+			"disabled_rules": ["rule_a", "rule_b"],
+			"enabled_rules": ["rule_c", "rule_d"]
+		}
+	]
+	`
+	jsonConfigsFile := createTempFile(t, "test.json", jsonConfigsText)
+	defer os.Remove(jsonConfigsFile)
+
+	yamlConfigsText := `
+---
+- included_paths:
+    - 'path_a'
+  excluded_paths:
+    - 'path_b'
+  disabled_rules:
+    - 'rule_a'
+    - 'rule_b'
+  enabled_rules:
+    - 'rule_c'
+    - 'rule_d'
+`
+	yamlConfigsFile := createTempFile(t, "test.yaml", yamlConfigsText)
+	defer os.Remove(yamlConfigsFile)
+
+	tests := []struct {
+		name     string
+		filePath string
+		configs  Configs
+		hasErr   bool
+	}{
+		{
+			"JSON file",
+			jsonConfigsFile,
+			expectedConfigs,
+			false,
+		},
+		{
+			"YAML file",
+			yamlConfigsFile,
+			expectedConfigs,
+			false,
+		},
+		{
+			"Invalid file extension",
+			"test.abc",
+			nil,
+			true,
+		},
+		{
+			"File not existed",
+			"not-existed-file.json",
+			nil,
+			true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			configs, err := ReadConfigsFromFile(test.filePath)
+			if (err != nil) != test.hasErr {
+				t.Errorf("ReadConfigsFromFile got error %v, but want %v", err, test.hasErr)
+			}
+			if err != nil {
+				if !reflect.DeepEqual(configs, test.configs) {
+					t.Errorf("ReadConfigsFromFile got configs %v, but want %v", configs, test.configs)
+				}
+			}
+		})
+	}
+}
+
+func createTempFile(t *testing.T, name, content string) string {
+	dir, err := ioutil.TempDir("", "config_tests")
+	if err != nil {
+		t.Fatal(err)
+	}
+	filePath := filepath.Join(dir, name)
+	if err := ioutil.WriteFile(filePath, []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	return filePath
 }
