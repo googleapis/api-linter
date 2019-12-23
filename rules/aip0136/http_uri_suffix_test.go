@@ -35,6 +35,7 @@ func TestURISuffix(t *testing.T) {
 		{"InvalidVerbNoun", "TranslateText", "/v3:translate", testutils.Problems{{Message: ":translateText"}}},
 		{"ValidOneWord", "Translate", "/v3:translate", testutils.Problems{}},
 		{"ValidStdMethod", "GetBook", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
+		{"IgnoredFailsVariables", "AddPages", "/v1/{name=publishers/*/books/*}:addPages", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
