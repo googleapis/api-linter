@@ -57,7 +57,7 @@ message Book {
   BookState book_state = 1;
 }
 
-// (-- api-linter: core::0216::synonyms=disabled
+// (-- api-linter: core::0216::nesting=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 enum BookState {
   BOOK_STATE_UNSPECIFIED = 0;
