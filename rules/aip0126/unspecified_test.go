@@ -49,4 +49,23 @@ func TestUnspecified(t *testing.T) {
 			}
 		})
 	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the proto with the enum.
+			f := testutils.ParseProto3Tmpl(t, `
+				enum BookFormat {
+					option allow_alias = true; 
+					HARDBACK = 0;
+					{{.ValueName}} = 0;
+					PAPERBACK = 2;
+				}
+			`, test)
+
+			// Run the lint rule and establish we get the correct problems.
+			problems := unspecified.Lint(f)
+			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
 }
