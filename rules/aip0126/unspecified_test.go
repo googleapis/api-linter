@@ -57,7 +57,7 @@ func TestUnspecified(t *testing.T) {
 					option allow_alias = true; 
 					HARDBACK = 0;
 					{{.ValueName}} = 0;
-					PAPERBACK = 2;
+					PAPERBACK = 1;
 				}
 			`, test)
 
