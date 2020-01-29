@@ -30,8 +30,8 @@ var unspecified = &lint.EnumRule{
 		firstValue := e.GetValues()[0]
 		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")
 		for _, element := range e.GetValues() {
-			if element.GetName() == want && element.GetNumber() == 0  {
-				return nil;
+			if element.GetName() == want && element.GetNumber() == 0 {
+				return nil
 			}
 		}
 		return []lint.Problem{{
