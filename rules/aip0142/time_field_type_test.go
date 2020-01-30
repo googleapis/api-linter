@@ -28,12 +28,18 @@ func TestFieldType(t *testing.T) {
 		problems  testutils.Problems
 	}{
 		{"Valid", "google.protobuf.Timestamp", "create_time", testutils.Problems{}},
+		{"Valid Date", "google.type.Date", "birth_date", testutils.Problems{}},
+		{"Valid Civil Time", "google.type.TimeOfDay", "civil_time", testutils.Problems{}},
+		{"Valid DateTime", "google.type.DateTime", "local_time", testutils.Problems{}},
 		{"Invalid", "int32", "created_ms", testutils.Problems{{Suggestion: "google.protobuf.Timestamp"}}},
 		{"Irrelevant", "int32", "foo", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
+				import "google/type/date.proto";
+				import "google/type/datetime.proto";
+				import "google/type/timeofday.proto";
 				import "google/protobuf/timestamp.proto";
 				message Book {
 					{{.FieldType}} {{.FieldName}} = 1;
