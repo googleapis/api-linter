@@ -24,25 +24,21 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var unspecified = &lint.EnumValueRule{
-	Name:   lint.NewRuleName(126, "unspecified"),
-	OnlyIf: isFirstEnumValue,
-	LintEnumValue: func(v *desc.EnumValueDescriptor) []lint.Problem {
-		want := strings.ToUpper(strcase.SnakeCase(v.GetEnum().GetName()) + "_UNSPECIFIED")
-		if v.GetName() != want {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("The first enum value should be %q", want),
-				Suggestion: want,
-				Descriptor: v,
-				Location:   locations.DescriptorName(v),
-			}}
+var unspecified = &lint.EnumRule{
+	Name: lint.NewRuleName(126, "unspecified"),
+	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
+		firstValue := e.GetValues()[0]
+		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")
+		for _, element := range e.GetValues() {
+			if element.GetName() == want && element.GetNumber() == 0 {
+				return nil
+			}
 		}
-
-		return nil
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("The first enum value should be %q", want),
+			Suggestion: want,
+			Descriptor: firstValue,
+			Location:   locations.DescriptorName(firstValue),
+		}}
 	},
-}
-
-// Note: proto3 requires that first value in enum have numeric value of 0.
-func isFirstEnumValue(v *desc.EnumValueDescriptor) bool {
-	return v.GetNumber() == 0
 }
