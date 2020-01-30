@@ -22,6 +22,10 @@ the appropriate suffix at the end of the URI. More specifically:
   the end of the URI.
 - Otherwise, it expects `:verbNoun` at the end of the URI.
 
+**Note:** This rule will not run if the [http-name-variable][] or
+[http-parent-variable][] rules raise an issue, as a significant number of
+issues raised by this rule are _actually_ violations of one of those.
+
 ## Examples
 
 ### Verb only
@@ -99,3 +103,5 @@ top of the file.
 
 [aip-136]: https://aip.dev/136
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
+[http-name-variable]: ./http-name-variable.md
+[http-parent-variable]: ./http-parent-variable.md

@@ -1,22 +1,23 @@
 ---
 rule:
   aip: 136
-  name: [core, '0136', http-name-variable]
-  summary:
-    Custom methods should only use `name` if the RPC noun matches the resource.
-permalink: /136/http-name-variable
+  name: [core, '0136', http-parent-variable]
+  summary: |
+    Custom methods should only use `parent` if the RPC noun matches the
+    resource.
+permalink: /136/http-parent-variable
 redirect_from:
-  - /0136/http-name-variable
+  - /0136/http-parent-variable
 ---
 
-# Custom methods: HTTP name variable
+# Custom methods: HTTP parent variable
 
-This rule enforces that custom methods only use the `name` variable if the RPC
-noun matches the resource, as mandated in [AIP-136][].
+This rule enforces that custom methods only use the `parent` variable if the
+RPC noun matches the resource, as mandated in [AIP-136][].
 
 ## Details
 
-This rule looks at custom methods and, if the URI contains a `name` variable,
+This rule looks at custom methods and, if the URI contains a `parent` variable,
 it ensures that the RPC name ends with the same text as the final component in
 the URI (after adjusting for case).
 
@@ -29,7 +30,7 @@ the URI (after adjusting for case).
 // The variable should be "book", or the RPC name should change.
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:writePage"
+    post: "/v1/{parent=publishers/*/books/*}:writePage"
     body: "*"
   };
 }
@@ -51,18 +52,18 @@ rpc WritePage(WritePageRequest) return (WritePageResponse) {
 
 ```proto
 // Correct.
-// If Page is a first-class, already-created resource, use `name` as the
+// If Page is a first-class, not-yet-created resource, use `parent` as the
 // variable name and a verb-only suffix.
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*/pages/*}:write"
+    post: "/v1/{parent=publishers/*/books/*}/pages:write"
     body: "*"
   };
 }
 ```
 
-See also the [http-parent-variable][] rule (for first-class resources that are
-created by the custom RPC).
+See also the [http-name-variable][] rule (for first-class resources that are
+already created).
 
 ## Disabling
 
@@ -70,11 +71,11 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0136::http-name-variable=disabled
+// (-- api-linter: core::0136::http-parent-variable=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:writePage"
+    post: "/v1/{parent=publishers/*/books/*}:writePage"
     body: "*"
   };
 }
@@ -85,4 +86,4 @@ top of the file.
 
 [aip-136]: https://aip.dev/136
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
-[http-parent-variable]: ./http-parent-variable.md
+[http-name-variable]: ./http-name-variable.md
