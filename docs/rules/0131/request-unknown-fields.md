@@ -53,7 +53,7 @@ message GetBookRequest {
   string name = 1;
 
   // (-- api-linter: core::0131::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reaosns. --)
+  //     aip.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 2;
 }
 ```
