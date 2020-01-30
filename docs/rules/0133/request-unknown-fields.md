@@ -60,7 +60,7 @@ message CreateBookRequest {
   string book_id = 3;
 
   // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because reaosns. --)
+  //     aip.dev/not-precedent: We really need this field because reasons. --)
   string library_id = 4;  // Non-standard field.
 }
 ```
