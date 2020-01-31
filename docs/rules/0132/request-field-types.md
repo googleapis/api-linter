@@ -60,7 +60,7 @@ message ListBooksRequest {
   string page_token = 3;
 
   // (-- api-linter: core::0134::request-field-types=disabled
-  //     aip.dev/not-precedent: We really need this field because reaosns. --)
+  //     aip.dev/not-precedent: We really need this field because reasons. --)
   BookFilter filter = 4;
 }
 ```

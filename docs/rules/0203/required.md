@@ -65,7 +65,7 @@ message Book {
   string name = 1;
 
   // Required. The title of the book.
-  // (-- api-linter: core::0203::required
+  // (-- api-linter: core::0203::required=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string title = 2;
 }

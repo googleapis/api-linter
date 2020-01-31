@@ -30,6 +30,9 @@ import (
 	// `proto.FileDescriptor` work for the imported files.
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	_ "google.golang.org/genproto/googleapis/longrunning"
+	_ "google.golang.org/genproto/googleapis/type/date"
+	_ "google.golang.org/genproto/googleapis/type/datetime"
+	_ "google.golang.org/genproto/googleapis/type/timeofday"
 )
 
 // ParseProtoStrings parses a map representing a proto files, and returns

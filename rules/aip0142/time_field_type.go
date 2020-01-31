@@ -27,13 +27,21 @@ import (
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-field-type"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		tokens := strings.Split(f.GetName(), "_")
+		suffix := tokens[len(tokens)-1]
+		typeName := utils.GetTypeName(f)
 		suffixes := stringset.New(
 			"date", "datetime", "ms", "msec", "msecs", "millis", "nanos", "ns",
 			"nsec", "nsecs", "sec", "secs", "seconds", "time", "timestamp", "us",
 			"usec", "usecs",
 		)
-		tokens := strings.Split(f.GetName(), "_")
-		if suffixes.Contains(tokens[len(tokens)-1]) && utils.GetTypeName(f) != "google.protobuf.Timestamp" {
+		allowed := stringset.New(
+			"google.protobuf.Timestamp",
+			"google.type.Date",
+			"google.type.DateTime",
+			"google.type.TimeOfDay",
+		)
+		if suffixes.Contains(suffix) && !allowed.Contains(typeName) {
 			return []lint.Problem{{
 				Message:    "Fields representing timestamps should use `google.protobuf.Timestamp`.",
 				Suggestion: "google.protobuf.Timestamp",
