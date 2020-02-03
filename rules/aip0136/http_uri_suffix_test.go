@@ -29,6 +29,7 @@ func TestURISuffix(t *testing.T) {
 	}{
 		{"ValidVerb", "ArchiveBook", "/v1/{name=publishers/*/books}:archive", testutils.Problems{}},
 		{"ValidVerbParent", "ImportBooks", "/v1/{parent=publishers/*}/books:import", testutils.Problems{}},
+		{"ValidVerbParentBatchGet", "BatchGetBooks", "/v1/{parent=publishers/*}/books:batchGet", testutils.Problems{}},
 		{"InvalidVerb", "ArchiveBook", "/v1/{name=publishers/*/books}:archiveBook", testutils.Problems{{Message: ":archive"}}},
 		{"ValidVerbNounNoVars", "TranslateText", "/v3:translateText", testutils.Problems{}},
 		{"ValidVerbNounNoName", "TranslateText", "/v3/{location=projects/*/locations/*}:translateText", testutils.Problems{}},
