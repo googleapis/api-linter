@@ -30,6 +30,7 @@ func TestHTTPVariables(t *testing.T) {
 		{"Valid", "WriteBook", "/v1/{name=publishers/*/books/*}:write", testutils.Problems{}},
 		{"Invalid", "WritePage", "/v1/{name=publishers/*/books/*}:writePage", testutils.Problems{{Message: "name variable"}}},
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
