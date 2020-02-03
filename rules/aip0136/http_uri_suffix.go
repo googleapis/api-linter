@@ -49,7 +49,12 @@ var uriSuffix = &lint.MethodRule{
 			//      from upper camel to lower camel correctly.
 			want := ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
 			if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
-				want = ":" + strings.Split(strcase.SnakeCase(m.GetName()), "_")[0]
+				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+				if rpcSlice[0] == "batch" {
+					want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
+				} else {
+					want = ":" + rpcSlice[0]
+				}
 			}
 
 			// Do we have the suffix we expect?
