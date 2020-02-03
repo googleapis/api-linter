@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -38,6 +39,11 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 func isCustomMethod(m *desc.MethodDescriptor) bool {
+	for _, httpRule := range utils.GetHTTPRules(m) {
+		if strings.Contains(httpRule.GetPlainURI(), ":") {
+			return true
+		}
+	}
 	for _, prefix := range []string{"Get", "List", "Create", "Update", "Delete", "Replace"} {
 		if strings.HasPrefix(m.GetName(), prefix) {
 			return false
