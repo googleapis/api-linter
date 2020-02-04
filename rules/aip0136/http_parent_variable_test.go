@@ -29,6 +29,7 @@ func TestHTTPParentVariable(t *testing.T) {
 	}{
 		{"Valid", "WriteBook", "/v1/{parent=publishers/*}/books:write", testutils.Problems{}},
 		{"ValidPlural", "WriteBook", "/v1/{parent=publishers/*}/books:write", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{parent=publishers/*}/audioBooks:write", testutils.Problems{}},
 		{"Invalid", "WritePage", "/v1/{parent=publishers/*/books/*}:writePage", testutils.Problems{{Message: "parent variable"}}},
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
 	} {

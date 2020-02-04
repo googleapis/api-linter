@@ -32,13 +32,19 @@ var httpNameVariable = &lint.MethodRule{
 		for _, http := range utils.GetHTTPRules(m) {
 			vars := http.GetVariables()
 
+			// Special case: AIP-162 describes "revision" methods; the `name`
+			// variable is appropriate (and mandated) for those.
+			if strings.HasSuffix(m.GetName(), "Revision") || strings.HasSuffix(m.GetName(), "Revisions") {
+				return nil
+			}
+
 			// If there is a "name" variable, the noun should be present
 			// in the RPC name.
 			if name, ok := vars["name"]; ok {
 				// Determine the resource.
 				name = strings.TrimSuffix(name, "/*")
 				segs := strings.Split(name, "/")
-				resource := p.Singular(segs[len(segs)-1])
+				resource := strcase.SnakeCase(p.Singular(segs[len(segs)-1]))
 
 				// Does the RPC name end in the singular name of the resource?
 				// If not, complain.
