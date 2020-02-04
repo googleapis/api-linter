@@ -36,6 +36,7 @@ func TestURISuffix(t *testing.T) {
 		{"InvalidVerbNoun", "TranslateText", "/v3:translate", testutils.Problems{{Message: ":translateText"}}},
 		{"ValidOneWord", "Translate", "/v3:translate", testutils.Problems{}},
 		{"ValidStdMethod", "GetBook", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
 		{"ValidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
 		{"ValidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
 		{"ValidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", testutils.Problems{}},

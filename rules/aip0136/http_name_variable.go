@@ -44,7 +44,7 @@ var httpNameVariable = &lint.MethodRule{
 				// Determine the resource.
 				name = strings.TrimSuffix(name, "/*")
 				segs := strings.Split(name, "/")
-				resource := p.Singular(segs[len(segs)-1])
+				resource := strcase.SnakeCase(p.Singular(segs[len(segs)-1]))
 
 				// Does the RPC name end in the singular name of the resource?
 				// If not, complain.

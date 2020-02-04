@@ -38,7 +38,7 @@ var httpParentVariable = &lint.MethodRule{
 				// Determine the resource.
 				segs := strings.Split(strings.Split(http.GetPlainURI(), ":")[0], "/")
 				plural := segs[len(segs)-1]
-				singular := p.Singular(plural)
+				singular := strcase.SnakeCase(p.Singular(plural))
 
 				// Does the RPC name end in the singular or plural name of the resource?
 				// If not, complain.
