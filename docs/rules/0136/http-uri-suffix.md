@@ -82,6 +82,16 @@ rpc SignContract(SignContractRequest) returns (SignContractResponse) {
 }
 ```
 
+## Known limitations
+
+This rule naïvely assumes that the verb is always one word (the "noun" may be
+any number of words; they often include adjectives). This may cause some false
+positives, and the rule **may** be disabled in these situations.
+
+**Note:** Before disabling the rule, consider whether the verb is properly
+represented as a single word. A common occurrence here is for words like
+"Signup", "Rollout", etc., which **should** prefer their single-word form.
+
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
