@@ -37,6 +37,12 @@ func TestURISuffix(t *testing.T) {
 		{"ValidOneWord", "Translate", "/v3:translate", testutils.Problems{}},
 		{"ValidStdMethod", "GetBook", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
 		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
+		{"ValidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
+		{"ValidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
+		{"ValidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", testutils.Problems{}},
+		{"InvalidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:list", testutils.Problems{{Message: ":listRevisions"}}},
+		{"InvalidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tag", testutils.Problems{{Message: ":tagRevision"}}},
+		{"InvalidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:delete", testutils.Problems{{Message: ":deleteRevision"}}},
 		{"IgnoredFailsVariables", "AddPages", "/v1/{name=publishers/*/books/*}:addPages", testutils.Problems{}},
 	}
 	for _, test := range tests {

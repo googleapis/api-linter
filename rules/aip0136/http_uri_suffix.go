@@ -57,6 +57,22 @@ var uriSuffix = &lint.MethodRule{
 				}
 			}
 
+			// AIP-162 introduces some special cases around revisions, where
+			// `ListFooRevisions` gets a suffix of `:listRevisions` (and the same for
+			// `Delete` and `Tag`).
+			n := m.GetName()
+			if strings.HasPrefix(n, "List") && strings.HasSuffix(m.GetName(), "Revisions") {
+				want = ":listRevisions"
+			}
+			if strings.HasSuffix(m.GetName(), "Revision") {
+				if strings.HasPrefix(m.GetName(), "Tag") {
+					want = ":tagRevision"
+				}
+				if strings.HasPrefix(m.GetName(), "Delete") {
+					want = ":deleteRevision"
+				}
+			}
+
 			// Do we have the suffix we expect?
 			if !strings.HasSuffix(httpRule.URI, want) {
 				// FIXME: We intentionally only return one Problem here.
