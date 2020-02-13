@@ -60,7 +60,7 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0143::standard-codes=disabled
+// (-- api-linter: core::0143::standardized-codes=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
