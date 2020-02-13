@@ -68,7 +68,7 @@ message Book {
   string name = 1;
 
   // Immutable. The title of the book.
-  // (-- api-linter: core::0203::output-only
+  // (-- api-linter: core::0203::output-only=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   // Output only. When the book was published.
   google.protobuf.Timestamp publish_time = 2;

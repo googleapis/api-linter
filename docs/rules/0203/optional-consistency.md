@@ -74,7 +74,7 @@ If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0203::optional-consistency
+// (-- api-linter: core::0203::optional-consistency=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;

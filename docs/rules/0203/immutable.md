@@ -66,7 +66,7 @@ message Book {
   string name = 1;
 
   // Immutable. The title of the book.
-  // (-- api-linter: core::0203::immutable
+  // (-- api-linter: core::0203::immutable=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string title = 2;
 }
