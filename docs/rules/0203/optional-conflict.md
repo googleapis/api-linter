@@ -56,7 +56,7 @@ message Book {
   string name = 1;
 
   // Optional. The foreword for the book.
-  // (-- api-linter: core::0203::optional-conflict
+  // (-- api-linter: core::0203::optional-conflict=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string foreword = 2 [
     (google.api.field_behavior) = OPTIONAL,

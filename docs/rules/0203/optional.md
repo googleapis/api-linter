@@ -67,7 +67,7 @@ message Book {
   string name = 1;
 
   // Optional. The foreword for the book.
-  // (-- api-linter: core::0203::optional
+  // (-- api-linter: core::0203::optional=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string foreword = 2;
 }
