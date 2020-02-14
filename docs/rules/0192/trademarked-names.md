@@ -30,10 +30,12 @@ It currently catches common mistaken variants for:
 - Dataflow
 - Dataprep
 - Dialogflow
+- Directory Sync
 - GitHub
 - GitLab
 - G Suite
 - Pub/Sub
+- Service Mesh
 - Stack Overflow
 
 ## Examples
