@@ -49,7 +49,7 @@ This rule **should** be disabled in this situation.
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the enum.
+If you need to violate this rule, place the comment above the package statement.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
@@ -57,9 +57,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 package foo.bar;
 ```
-
-If you need to violate this rule for an entire file, place the comment at the
-top of the file.
 
 [aip-215]: https://aip.dev/215
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

@@ -22,6 +22,10 @@ the appropriate suffix at the end of the URI. More specifically:
   the end of the URI.
 - Otherwise, it expects `:verbNoun` at the end of the URI.
 
+**Note:** This rule will not run if the [http-name-variable][] or
+[http-parent-variable][] rules raise an issue, as a significant number of
+issues raised by this rule are _actually_ violations of one of those.
+
 ## Examples
 
 ### Verb only
@@ -78,6 +82,16 @@ rpc SignContract(SignContractRequest) returns (SignContractResponse) {
 }
 ```
 
+## Known limitations
+
+This rule naïvely assumes that the verb is always one word (the "noun" may be
+any number of words; they often include adjectives). This may cause some false
+positives, and the rule **may** be disabled in these situations.
+
+**Note:** Before disabling the rule, consider whether the verb is properly
+represented as a single word. A common occurrence here is for words like
+"Signup", "Rollout", etc., which **should** prefer their single-word form.
+
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the method.
@@ -99,3 +113,5 @@ top of the file.
 
 [aip-136]: https://aip.dev/136
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
+[http-name-variable]: ./http-name-variable.md
+[http-parent-variable]: ./http-parent-variable.md

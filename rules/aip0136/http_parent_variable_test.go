@@ -20,19 +20,18 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestHTTPVariables(t *testing.T) {
+func TestHTTPParentVariable(t *testing.T) {
 	for _, test := range []struct {
 		name       string
 		MethodName string
 		URI        string
 		problems   testutils.Problems
 	}{
-		{"Valid", "WriteBook", "/v1/{name=publishers/*/books/*}:write", testutils.Problems{}},
-		{"ValidRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
-		{"ValidRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
-		{"Invalid", "WritePage", "/v1/{name=publishers/*/books/*}:writePage", testutils.Problems{{Message: "name variable"}}},
+		{"Valid", "WriteBook", "/v1/{parent=publishers/*}/books:write", testutils.Problems{}},
+		{"ValidPlural", "WriteBook", "/v1/{parent=publishers/*}/books:write", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{parent=publishers/*}/audioBooks:write", testutils.Problems{}},
+		{"Invalid", "WritePage", "/v1/{parent=publishers/*/books/*}:writePage", testutils.Problems{{Message: "parent variable"}}},
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
-		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -50,7 +49,7 @@ func TestHTTPVariables(t *testing.T) {
 				message {{.MethodName}}Response {}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(httpNameVariable.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(httpParentVariable.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

@@ -24,33 +24,28 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var httpNameVariable = &lint.MethodRule{
-	Name:   lint.NewRuleName(136, "http-name-variable"),
+var httpParentVariable = &lint.MethodRule{
+	Name:   lint.NewRuleName(136, "http-parent-variable"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		p := pluralize.NewClient()
 		for _, http := range utils.GetHTTPRules(m) {
 			vars := http.GetVariables()
 
-			// Special case: AIP-162 describes "revision" methods; the `name`
-			// variable is appropriate (and mandated) for those.
-			if strings.HasSuffix(m.GetName(), "Revision") || strings.HasSuffix(m.GetName(), "Revisions") {
-				return nil
-			}
-
-			// If there is a "name" variable, the noun should be present
+			// If there is a "parent" variable, the noun should be present
 			// in the RPC name.
-			if name, ok := vars["name"]; ok {
+			if _, ok := vars["parent"]; ok {
 				// Determine the resource.
-				name = strings.TrimSuffix(name, "/*")
-				segs := strings.Split(name, "/")
-				resource := strcase.SnakeCase(p.Singular(segs[len(segs)-1]))
+				segs := strings.Split(strings.Split(http.GetPlainURI(), ":")[0], "/")
+				plural := segs[len(segs)-1]
+				singular := strcase.SnakeCase(p.Singular(plural))
 
-				// Does the RPC name end in the singular name of the resource?
+				// Does the RPC name end in the singular or plural name of the resource?
 				// If not, complain.
-				if !strings.HasSuffix(strcase.SnakeCase(m.GetName()), resource) {
+				snakeName := strcase.SnakeCase(m.GetName())
+				if !strings.HasSuffix(snakeName, plural) && !strings.HasSuffix(snakeName, singular) {
 					return []lint.Problem{{
-						Message:    "The name variable should only be used if the RPC noun matches the URI.",
+						Message:    "The parent variable should only be used if the RPC noun matches the URI.",
 						Descriptor: m,
 					}}
 				}

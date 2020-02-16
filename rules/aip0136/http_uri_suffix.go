@@ -29,7 +29,7 @@ import (
 var uriSuffix = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "http-uri-suffix"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCustomMethod(m) && httpNameVariable.LintMethod(m) == nil
+		return isCustomMethod(m) && httpNameVariable.LintMethod(m) == nil && httpParentVariable.LintMethod(m) == nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
@@ -49,7 +49,28 @@ var uriSuffix = &lint.MethodRule{
 			//      from upper camel to lower camel correctly.
 			want := ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
 			if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
-				want = ":" + strings.Split(strcase.SnakeCase(m.GetName()), "_")[0]
+				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+				if rpcSlice[0] == "batch" {
+					want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
+				} else {
+					want = ":" + rpcSlice[0]
+				}
+			}
+
+			// AIP-162 introduces some special cases around revisions, where
+			// `ListFooRevisions` gets a suffix of `:listRevisions` (and the same for
+			// `Delete` and `Tag`).
+			n := m.GetName()
+			if strings.HasPrefix(n, "List") && strings.HasSuffix(m.GetName(), "Revisions") {
+				want = ":listRevisions"
+			}
+			if strings.HasSuffix(m.GetName(), "Revision") {
+				if strings.HasPrefix(m.GetName(), "Tag") {
+					want = ":tagRevision"
+				}
+				if strings.HasPrefix(m.GetName(), "Delete") {
+					want = ":deleteRevision"
+				}
 			}
 
 			// Do we have the suffix we expect?

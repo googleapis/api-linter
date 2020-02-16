@@ -29,12 +29,20 @@ func TestURISuffix(t *testing.T) {
 	}{
 		{"ValidVerb", "ArchiveBook", "/v1/{name=publishers/*/books}:archive", testutils.Problems{}},
 		{"ValidVerbParent", "ImportBooks", "/v1/{parent=publishers/*}/books:import", testutils.Problems{}},
+		{"ValidVerbParentBatchGet", "BatchGetBooks", "/v1/{parent=publishers/*}/books:batchGet", testutils.Problems{}},
 		{"InvalidVerb", "ArchiveBook", "/v1/{name=publishers/*/books}:archiveBook", testutils.Problems{{Message: ":archive"}}},
 		{"ValidVerbNounNoVars", "TranslateText", "/v3:translateText", testutils.Problems{}},
 		{"ValidVerbNounNoName", "TranslateText", "/v3/{location=projects/*/locations/*}:translateText", testutils.Problems{}},
 		{"InvalidVerbNoun", "TranslateText", "/v3:translate", testutils.Problems{{Message: ":translateText"}}},
 		{"ValidOneWord", "Translate", "/v3:translate", testutils.Problems{}},
 		{"ValidStdMethod", "GetBook", "/v1/{name=publishers/*/books/*}", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
+		{"ValidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
+		{"ValidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
+		{"ValidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", testutils.Problems{}},
+		{"InvalidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:list", testutils.Problems{{Message: ":listRevisions"}}},
+		{"InvalidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tag", testutils.Problems{{Message: ":tagRevision"}}},
+		{"InvalidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:delete", testutils.Problems{{Message: ":deleteRevision"}}},
 		{"IgnoredFailsVariables", "AddPages", "/v1/{name=publishers/*/books/*}:addPages", testutils.Problems{}},
 	}
 	for _, test := range tests {

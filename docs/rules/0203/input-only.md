@@ -66,7 +66,7 @@ message Book {
   string name = 1;
 
   // Input only. The password used to check out this book.
-  // (-- api-linter: core::0203::input-only
+  // (-- api-linter: core::0203::input-only=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string access_password = 2;
 }
