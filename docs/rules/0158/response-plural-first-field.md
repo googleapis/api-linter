@@ -9,11 +9,16 @@ redirect_from:
 ---
 
 # Paginated methods: Page token field
-This rule enforces that all `List` and `Search` methods have a plural name repeatable field as a first field in the response message, as mandated in [AIP-158][].
+
+This rule enforces that all `List` and `Search` methods have a plural name
+repeatable field as a first field in the response message, as mandated in
+[AIP-158][].
 
 ## Details
 
-This rule looks at any message matching `List*Response` or `Search*Response` that has `next_page_token` field and complains if the first field's name is not plural.
+This rule looks at any message matching `List*Response` or `Search*Response`
+that has `next_page_token` field and complains if the first field's name is not
+plural.
 
 ## Examples
 
@@ -38,8 +43,10 @@ message ListStudentProfilesResponse {
 ```
 
 ## Disabling
-If you need to violate this rule, use a leading comment above the message or above the field. 
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+
+If you need to violate this rule, use a leading comment above the message or
+above the field. Remember to also include an [aip.dev/not-precedent][] comment
+explaining why.
 
 ```proto
 // (-- api-linter: core::0158::response-plural-first-field=disabled
