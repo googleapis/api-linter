@@ -29,6 +29,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestPaginationPageSize,
 		requestPaginationPageToken,
 		responsePaginationNextPageToken,
+		responseFirstFieldMustBePlural,
 	)
 }
 
