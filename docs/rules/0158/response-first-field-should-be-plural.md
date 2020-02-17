@@ -2,7 +2,7 @@
 rule:
   aip: 158
   name: [core, '0158', response-first-field-should-be-plural]
-  summary: First field of Paginated RPCs should be plural.
+  summary: First field of Paginated RPCs' response should be plural.
 permalink: /158/response-first-field-should-be-plural
 redirect_from:
   - /0158/response-first-field-should-be-plural
