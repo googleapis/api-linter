@@ -31,7 +31,7 @@ func TestResponseFirstFieldMustBePlural(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create the proto with the enum.
+			// Create the proto message.
 			f := testutils.ParseProto3Tmpl(t, `
 				message Profile {
 					string name = 1;

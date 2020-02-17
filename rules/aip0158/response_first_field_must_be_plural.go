@@ -39,24 +39,7 @@ var responseFirstFieldMustBePlural = &lint.MessageRule{
 				Location:   locations.DescriptorName(m),
 			}}
 		}
-
-		// splited_string := strings.Split(strcase.SnakeCase(field_name), "-")
-		// last_word := splited_string[len(splited_string)-1]
-
-		// pluralize:= pluralize.NewClient()
-		// if !pluralize.IsPlural(last_word) {
-		// 	pluralized_last_word := pluralize.Plural(last_word)
-		// 	fmt.Println("last_word =" + last_word)
-		// 	fmt.Println("pluralized_last_word = " + pluralized_last_word)
-		// 	want := strings.Replace(field_name, last_word, pluralized_last_word, strings.Count(field_name, last_word))
-
-		// 	return []lint.Problem{{
-		// 		Message:    fmt.Sprintf("The first field should be plural."),
-		// 		Suggestion: want,
-		// 		Descriptor: m,
-		// 		Location:   locations.DescriptorName(m),
-		// 	}}
-		// }
+		
 		return nil
 	},
 }
