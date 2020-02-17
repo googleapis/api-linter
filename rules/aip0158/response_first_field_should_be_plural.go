@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var responseFirstFieldMustBePlural = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "response-first-field-must-be-plural"),
+var responseFirstFieldShouldBePlural = &lint.MessageRule{
+	Name:   lint.NewRuleName(158, "response-first-field-should-be-plural"),
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: for all messages that end in Response and contain a next_page_token field.
