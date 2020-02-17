@@ -20,7 +20,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestResponseFirstFieldShouldBePlural(t *testing.T) {
+func TestResponsePluralFirstField(t *testing.T) {
 	tests := []struct {
 		testName    string
 		MessageName string
@@ -44,7 +44,7 @@ func TestResponseFirstFieldShouldBePlural(t *testing.T) {
 			`, test)
 
 			// Run the lint rule and establish we get the correct problems.
-			problems := responseFirstFieldShouldBePlural.Lint(f)
+			problems := responsePluralFirstField.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByNumber(1)).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

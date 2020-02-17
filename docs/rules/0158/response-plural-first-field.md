@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 158
-  name: [core, '0158', response-first-field-should-be-plural]
+  name: [core, '0158', response-plural-first-field]
   summary: First field of Paginated RPCs' response should be plural.
-permalink: /158/response-first-field-should-be-plural
+permalink: /158/response-plural-first-field
 redirect_from:
-  - /0158/response-first-field-should-be-plural
+  - /0158/response-plural-first-field
 ---
 
 # Paginated methods: Page token field
@@ -42,7 +42,7 @@ If you need to violate this rule, use a leading comment above the message or abo
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0158::response-first-field-should-be-plural=disabled
+// (-- api-linter: core::0158::response-plural-first-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListStudentProfilesResponse {
     repeated Profile studentProfile = 1; // Field name should be `studentProfiles`.
