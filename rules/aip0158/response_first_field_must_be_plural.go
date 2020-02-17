@@ -27,6 +27,13 @@ var responseFirstFieldMustBePlural = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "response-first-field-must-be-plural"),
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		// Rule check: for all messages that end in Response and contain a next_page_token field.
+		// Throw a linter warning if, the first field in the message is not named according to plural(message_name.to_snake().split('_')[1:-1]).
+		nextPageToken := m.FindFieldByName("next_page_token")
+		if nextPageToken == nil {
+			return nil
+		}
+
 		firstField := m.FindFieldByNumber(1)
 		pluralize := pluralize.NewClient()
 		if !pluralize.IsPlural(firstField.GetName()) {
@@ -39,7 +46,7 @@ var responseFirstFieldMustBePlural = &lint.MessageRule{
 				Location:   locations.DescriptorName(m),
 			}}
 		}
-		
+
 		return nil
 	},
 }
