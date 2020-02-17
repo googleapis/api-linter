@@ -24,22 +24,22 @@ import (
 )
 
 var trademarks = map[string][]string{
-	"App Engine":     []string{"GAE", "AppEngine", "App engine"},
+	"App Engine":     []string{"GAE", "gae", "AppEngine", "App engine"},
 	"BigQuery":       []string{"Bigquery", "Big Query", "BQ"},
-	"BigQuery ML":    []string{"BQML"},
+	"BigQuery ML":    []string{"BQML", "bqml"},
 	"Bigtable":       []string{"BigTable", "Big Table", "Big table"},
 	"Bitbucket":      []string{"BitBucket", "Bit Bucket"},
-	"Cloud Storage":  []string{"GCS"},
-	"Compute Engine": []string{"GCE"},
+	"Cloud Storage":  []string{"GCS", "gcs"},
+	"Compute Engine": []string{"GCE", "gce"},
 	"Dataflow":       []string{"Data Flow", "Data flow", "DataFlow"},
 	"Dataprep":       []string{"Data Prep", "Data prep", "DataPrep"},
 	"Dialogflow":     []string{"DialogFlow", "Dialog Flow", "Dialog flow"},
-	"Directory Sync": []string{"GCDS", "CDS", "DirectorySync"},
+	"Directory Sync": []string{"GCDS", "CDS", "gcds", "cds", "DirectorySync"},
 	"GitHub":         []string{"Github", "Git Hub"},
 	"GitLab":         []string{"Gitlab", "Git Lab"},
 	"G Suite":        []string{"GSuite", "G-Suite", "gSuite"},
 	"Pub/Sub":        []string{"PubSub", "Pubsub", "Cloud Pub/Sub"},
-	"Service Mesh":   []string{"ASM", "CSM", "GCSM"},
+	"Service Mesh":   []string{"ASM", "CSM", "GCSM", "csm", "gcsm"},
 	"Stack Overflow": []string{"StackOverflow"},
 }
 
