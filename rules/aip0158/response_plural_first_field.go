@@ -29,8 +29,7 @@ var responsePluralFirstField = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: for all messages that end in Response and contain a next_page_token field.
 		// Throw a linter warning if, the first field in the message is not named according to plural(message_name.to_snake().split('_')[1:-1]).
-		nextPageToken := m.FindFieldByName("next_page_token")
-		if nextPageToken == nil {
+		if m.FindFieldByName("next_page_token") == nil {
 			return nil
 		}
 
