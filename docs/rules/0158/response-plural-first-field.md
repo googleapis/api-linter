@@ -27,7 +27,7 @@ plural.
 ```proto
 // Incorrect
 message ListStudentProfilesResponse {
-    repeated Profile studentProfile = 1; // Field name should be `studentProfiles`.
+    repeated Profile student_profile = 1; // Field name should be `student_profiles`.
     string next_page_token = 2;
 }
 ```
@@ -37,7 +37,7 @@ message ListStudentProfilesResponse {
 ```proto
 // Correct.
 message ListStudentProfilesResponse {
-  repeated Profile studentProfiles = 1;
+  repeated Profile student_profiles = 1;
   string next_page_token = 2;
 }
 ```
@@ -52,7 +52,7 @@ explaining why.
 // (-- api-linter: core::0158::response-plural-first-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListStudentProfilesResponse {
-    repeated Profile studentProfile = 1; // Field name should be `studentProfiles`.
+    repeated Profile student_profile = 1; // Field name should be `student_profiles`.
     string next_page_token = 2;
 }
 ```
