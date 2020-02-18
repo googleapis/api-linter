@@ -32,12 +32,13 @@ var responsePluralFirstField = &lint.MessageRule{
 		if m.FindFieldByName("next_page_token") == nil {
 			return nil
 		}
-
 		firstField := m.GetFields()[0]
 		pluralize := pluralize.NewClient()
-		if !pluralize.IsPlural(firstField.GetName()) {
-			want := pluralize.Plural(firstField.GetName())
 
+		// Need to convert name to singular first to support none standard case such as persons, cactuses.
+		// persons -> person -> people
+		want := pluralize.Plural(pluralize.Singular(firstField.GetName()))
+		if want != firstField.GetName() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("First field of Paginated RPCs' response should be plural."),
 				Suggestion: want,

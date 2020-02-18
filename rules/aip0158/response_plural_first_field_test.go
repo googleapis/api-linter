@@ -28,6 +28,10 @@ func TestResponsePluralFirstField(t *testing.T) {
 	}{
 		{"Valid", "student_profiles", testutils.Problems{}},
 		{"InvalidWrongSuffix", "student_profile", testutils.Problems{{Suggestion: "student_profiles"}}},
+		{"ValidLatin", "cacti", testutils.Problems{}},
+		{"InvalidLatin", "cactuses", testutils.Problems{{Suggestion: "cacti"}}},
+		{"ValidNonstandard", "people", testutils.Problems{}},
+		{"InvalidNonstandard", "persons", testutils.Problems{{Suggestion: "people"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
