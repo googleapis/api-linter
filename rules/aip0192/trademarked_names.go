@@ -23,7 +23,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var trademarks = map[string][]string{
+var trademarkAliases = map[string][]string{
 	"App Engine":     []string{"GAE", "gae", "AppEngine", "App engine"},
 	"BigQuery":       []string{"Bigquery", "Big Query", "BQ"},
 	"BigQuery ML":    []string{"BQML", "bqml"},
@@ -49,7 +49,7 @@ var trademarks = map[string][]string{
 var tmRegexes = map[string][]*regexp.Regexp{}
 
 func init() {
-	for k, tms := range trademarks {
+	for k, tms := range trademarkAliases {
 		tmReg := []*regexp.Regexp{}
 		for _, tm := range tms {
 			tmReg = append(tmReg, regexp.MustCompile(`\b`+strings.ReplaceAll(tm, " ", `\s+`)+`\b`))
