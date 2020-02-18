@@ -26,9 +26,8 @@ var responseRepeatedFirstField = &lint.MessageRule{
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: for all messages that end in Response and contain a next_page_token field.
-		// Throw a linter warning if, the first field in the message (by both position and field number) is not repeated
-		nextPageToken := m.FindFieldByName("next_page_token")
-		if nextPageToken == nil {
+		// Throw a linter warning if the first field in the message (by both position and field number) is not repeated
+		if m.FindFieldByName("next_page_token") == nil {
 			return nil
 		}
 
