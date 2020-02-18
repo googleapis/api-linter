@@ -12,9 +12,8 @@ redirect_from:
 
 # Paginated methods: Page token field
 
-This rule enforces that all `List` and `Search` methods have a plural name
-repeatable field as a first field in the response message, as mandated in
-[AIP-158][].
+This rule enforces that all `List` and `Search` methods have a repeatable field
+as a first field in the response message, as mandated in [AIP-158][].
 
 ## Details
 
