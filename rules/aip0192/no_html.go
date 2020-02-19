@@ -44,8 +44,10 @@ var noHTML = &lint.DescriptorRule{
 //
 // That said, we really only want to pick up "basic HTML smell", and are
 // disinterested in actually doing any manipulation, and we can be at least
-// a little tolerant of false positives/negatives.
+// a little tolerant of false positives/negatives. To do this, we'll look for
+// closing tags (e.g., <foo /> or </foo>) since opening tags are likely to be
+// used for variable placeholders (e.g., http://<server>/<path>).
 //
-// Therefore, in this case, a regex seems better than taking a dependency
-// just for this.
-var htmlTag = regexp.MustCompile(`</?[a-zA-Z]+( /)?>`)
+// TL;DR: In this case, a regex seems better than taking a dependency just for
+// checking if HTML exists in comments.
+var htmlTag = regexp.MustCompile(`(</ *[a-zA-Z-]+>|<[a-zA-Z-]+ */>)`)
