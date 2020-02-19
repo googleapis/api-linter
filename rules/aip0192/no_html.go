@@ -42,10 +42,10 @@ var noHTML = &lint.DescriptorRule{
 // Yes, yes, I know: https://stackoverflow.com/questions/1732348/
 // Even Jon Skeet cannot parse HTML using regular expressions.
 //
-// That said, we really only want to pick up "basic HTML smell", and are
+// That said, we really only want to pick up "basic HTML smell" and are
 // disinterested in actually doing any manipulation, and we can be at least
 // a little tolerant of false positives/negatives.
 //
 // Therefore, in this case, a regex seems better than taking a dependency
 // just for this.
-var htmlTag = regexp.MustCompile(`</?[a-zA-Z]+( /)?>`)
+var htmlTag = regexp.MustCompile(`(</[a-zA-Z-]+>|<[a-zA-Z-]+ */>)`)
