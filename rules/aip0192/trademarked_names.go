@@ -48,7 +48,7 @@ var trademarkAliases = map[string][]string{
 // to change to BigQuery.)
 var tmRegexes = map[string][]*regexp.Regexp{}
 
-func init() {
+func defaultTrademarkTypos() {
 	for k, tms := range trademarkAliases {
 		tmReg := []*regexp.Regexp{}
 		for _, tm := range tms {
@@ -56,6 +56,10 @@ func init() {
 		}
 		tmRegexes[k] = tmReg
 	}
+}
+
+func init() {
+	defaultTrademarkTypos()
 }
 
 var trademarkedNames = &lint.DescriptorRule{
