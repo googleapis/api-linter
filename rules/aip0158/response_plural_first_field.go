@@ -17,7 +17,6 @@ package aip0158
 import (
 	"fmt"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -27,17 +26,9 @@ var responsePluralFirstField = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "response-plural-first-field"),
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: for all messages that end in Response and contain a next_page_token field.
 		// Throw a linter warning if, the first field in the message is not named according to plural(message_name.to_snake().split('_')[1:-1]).
-		if m.FindFieldByName("next_page_token") == nil {
-			return nil
-		}
 		firstField := m.GetFields()[0]
-		pluralize := pluralize.NewClient()
-
-		// Need to convert name to singular first to support none standard case such as persons, cactuses.
-		// persons -> person -> people
-		want := pluralize.Plural(pluralize.Singular(firstField.GetName()))
+		want := lint.ToPlural(firstField.GetName())
 		if want != firstField.GetName() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("First field of Paginated RPCs' response should be plural."),
