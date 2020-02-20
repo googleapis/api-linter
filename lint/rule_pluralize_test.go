@@ -24,11 +24,12 @@ func TestPluralize(t *testing.T) {
 		word           string
 		pluralizedWord string
 	}{
-		{"PluralizePluralLatinWord", "cacti", "cacti"},
-		{"PluralizeNonstandardPluralLatinWord", "cactuses", "cacti"},
 		{"PluralizeSingularWord", "person", "people"},
 		{"PluralizePluralWord", "people", "people"},
 		{"PluralizeNonstandardPluralWord", "persons", "people"},
+		{"PluralizeNoPluralFormWord", "moose", "moose"},
+		{"PluralizePluralLatinWord", "cacti", "cacti"},
+		{"PluralizeNonstandardPluralLatinWord", "cactuses", "cacti"},
 		{"PluralizePluralCamelCaseWord", "student_profiles", "student_profiles"},
 		{"PluralizeSingularCamelCaseWord", "student_profile", "student_profiles"},
 	}
