@@ -46,9 +46,7 @@ var trademarkAliases = map[string][]string{
 // We actually want regexes so we do not accidentally false-positive acronyms
 // that *contain* our matches. (For example, "BQD" should not match and tell us
 // to change to BigQuery.)
-var tmRegexes = map[string][]*regexp.Regexp{}
-
-func defaultTrademarkTypos() {
+func defaultTrademarkTypos() (tmRegexes map[string][]*regexp.Regexp) {
 	for k, tms := range trademarkAliases {
 		tmReg := []*regexp.Regexp{}
 		for _, tm := range tms {
@@ -56,11 +54,10 @@ func defaultTrademarkTypos() {
 		}
 		tmRegexes[k] = tmReg
 	}
+	return
 }
 
-func init() {
-	defaultTrademarkTypos()
-}
+var tmRegexes = defaultTrademarkTypos()
 
 var trademarkedNames = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "trademarked-names"),
