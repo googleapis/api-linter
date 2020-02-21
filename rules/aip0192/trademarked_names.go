@@ -46,7 +46,8 @@ var trademarkAliases = map[string][]string{
 // We actually want regexes so we do not accidentally false-positive acronyms
 // that *contain* our matches. (For example, "BQD" should not match and tell us
 // to change to BigQuery.)
-func defaultTrademarkTypos() (tmRegexes map[string][]*regexp.Regexp) {
+func defaultTrademarkTypos() map[string][]*regexp.Regexp {
+	tmRegexes := map[string][]*regexp.Regexp{}
 	for k, tms := range trademarkAliases {
 		tmReg := []*regexp.Regexp{}
 		for _, tm := range tms {
@@ -54,7 +55,7 @@ func defaultTrademarkTypos() (tmRegexes map[string][]*regexp.Regexp) {
 		}
 		tmRegexes[k] = tmReg
 	}
-	return
+	return tmRegexes
 }
 
 var tmRegexes = defaultTrademarkTypos()
