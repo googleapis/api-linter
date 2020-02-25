@@ -372,6 +372,28 @@ func extractDisabledRuleName(commentLine string) string {
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
 func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+	// Sanity check: All rules are disabled on a deprecated descriptor.
+	deprecated := false
+	switch v := d.(type) {
+	case *desc.EnumDescriptor:
+		deprecated = v.GetEnumOptions().GetDeprecated()
+	case *desc.EnumValueDescriptor:
+		deprecated = v.GetEnumValueOptions().GetDeprecated()
+	case *desc.FieldDescriptor:
+		deprecated = v.GetFieldOptions().GetDeprecated()
+	case *desc.FileDescriptor:
+		deprecated = v.GetFileOptions().GetDeprecated()
+	case *desc.MessageDescriptor:
+		deprecated = v.GetMessageOptions().GetDeprecated()
+	case *desc.MethodDescriptor:
+		deprecated = v.GetMethodOptions().GetDeprecated()
+	case *desc.ServiceDescriptor:
+		deprecated = v.GetServiceOptions().GetDeprecated()
+	}
+	if deprecated {
+		return false
+	}
+
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
