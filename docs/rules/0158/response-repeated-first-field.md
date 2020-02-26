@@ -27,8 +27,8 @@ position and field number) is not repeated.
 
 ```proto
 // Incorrect
-message ListStudentProfilesResponse {
-    Profile student_profiles = 1; // Field should be repeated.
+message ListBooksResponse {
+    Book books = 1; // Field should be repeated.
     string next_page_token = 2;
 }
 ```
@@ -37,8 +37,8 @@ message ListStudentProfilesResponse {
 
 ```proto
 // Correct.
-message ListStudentProfilesResponse {
-  repeated Profile student_profiles = 1;
+message ListBooksResponse {
+  repeated Book books = 1;
   string next_page_token = 2;
 }
 ```
@@ -52,8 +52,8 @@ explaining why.
 ```proto
 // (-- api-linter: core::0158::response-repeated-first-field
 //     aip.dev/not-precedent: We need to do this because reasons. --)
-message ListStudentProfilesResponse {
-    Profile student_profiles = 1; // Field should be repeated.
+message ListBooksResponse {
+    Book books = 1;
     string next_page_token = 2;
 }
 ```
