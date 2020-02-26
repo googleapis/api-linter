@@ -29,7 +29,7 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 	}{
 		{
 			"Valid",
-			"repeated Profile student_profiles = 1;",
+			"repeated Book books = 1;",
 			"string next_page_token = 2;",
 			testutils.Problems{}},
 		{
@@ -42,12 +42,12 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			// first field by number should be repeated.
 			"InvalidType",
 			"repeated string next_page_token = 2;",
-			"Profile student_profiles = 1;",
+			"Book books = 1;",
 			testutils.Problems{{}}},
 		{
 			// first field by position should be repeated.
 			"InvalidType",
-			"Profile student_profiles = 2;",
+			"Book books = 2;",
 			"repeated string next_page_token = 1;",
 			testutils.Problems{{}}},
 	}
@@ -55,18 +55,18 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the proto message.
 			f := testutils.ParseProto3Tmpl(t, `
-				message Profile {
+				message Book {
 					string name = 1;
 				}
-				message ListStudentProfilesResponse {
+				message ListBooksResponse {
 					{{.FirstField}}
 					{{.SecondField}}
 				}
 			`, test)
 
 			// Determine the descriptor that a failing test will attach to.
-			if f.GetMessageTypes()[1].FindFieldByName("student_profiles") != nil {
-				test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByName("student_profiles"))
+			if f.GetMessageTypes()[1].FindFieldByName("books") != nil {
+				test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByName("books"))
 			}
 
 			// Run the lint rule and establish we get the correct problems.
