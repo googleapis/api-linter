@@ -33,6 +33,12 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			"string next_page_token = 2;",
 			testutils.Problems{}},
 		{
+			// should have at least 1 field
+			"InvalidType",
+			"",
+			"",
+			testutils.Problems{{}}},
+		{
 			// first field by number should be repeated.
 			"InvalidType",
 			"repeated string next_page_token = 2;",
@@ -58,9 +64,14 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 				}
 			`, test)
 
+			// Determine the descriptor that a failing test will attach to.
+			if f.GetMessageTypes()[1].FindFieldByName("student_profiles") != nil {
+				test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByName("student_profiles"))
+			}
+
 			// Run the lint rule and establish we get the correct problems.
 			problems := responseRepeatedFirstField.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByName("student_profiles")).Diff(problems); diff != "" {
+			if diff := test.problems.Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
 		})
