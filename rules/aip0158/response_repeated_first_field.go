@@ -27,7 +27,7 @@ var responseRepeatedFirstField = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if len(m.GetFields()) == 0 {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Paginated RPCs' response should have at least 1 field."),
+				Message: fmt.Sprintf("Paginated RPCs' response should have at least 1 field."),
 			}}
 		}
 
