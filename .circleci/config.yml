@@ -9,7 +9,7 @@ workflows:
 jobs:
   unit-tests:
     docker:
-      - image: golang:1.13
+      - image: golang:1.14
     steps:
       - checkout
       - run:
@@ -17,7 +17,7 @@ jobs:
           command: go test -p 1 ./...
   lint:
     docker:
-      - image: golang:1.13
+      - image: golang:1.14
     steps:
       - checkout
       - run:
@@ -28,7 +28,7 @@ jobs:
           command: golangci-lint run ./...
   meta-lint:
     docker:
-      - image: golang:1.13-alpine
+      - image: golang:1.14-alpine
     steps:
       - checkout
       - run:
