@@ -371,7 +371,10 @@ func extractDisabledRuleName(commentLine string) string {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+//
+// Note, if the given source code location is not nil, it will be used to
+// augment the set of commentLines.
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
 	// Sanity check: All rules are disabled on a deprecated descriptor.
 	deprecated := false
 	switch v := d.(type) {
@@ -399,6 +402,9 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 	names := []string{ruleName, aliasMap[ruleName]}
 
 	commentLines := []string{}
+	if l != nil {
+		commentLines = append(commentLines, strings.Split(l.GetLeadingComments(), "\n")...)
+	}
 	if f, ok := d.(*desc.FileDescriptor); ok {
 		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
 	} else {
@@ -420,8 +426,11 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 
 	// The rule may have been disabled on a parent. (For example, a field rule
 	// may be disabled at the message level to cover all fields in the message).
+	//
+	// Do not pass the source code location here, the source location in relation
+	// to the parent is not helpful.
 	if parent := d.GetParent(); parent != nil {
-		return ruleIsEnabled(rule, parent, aliasMap)
+		return ruleIsEnabled(rule, parent, nil, aliasMap)
 	}
 
 	return true
