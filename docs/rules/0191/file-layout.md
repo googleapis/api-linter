@@ -19,7 +19,7 @@ This rule checks for common file layout mistakes, but does not currently check
 the exhaustive file layout in AIP-191. This rule currently complains if:
 
 - Services appear below messages.
-- Top-level enums appear below messages.
+- Top-level enums appear above messages.
 
 ## Examples
 
