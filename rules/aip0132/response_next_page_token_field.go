@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0158
+package aip0132
 
 import (
 	"fmt"
@@ -23,9 +23,9 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var responsePaginationNextPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "response-next-page-token-field"),
-	OnlyIf: isPaginatedResponseMessage,
+var responseNextPageToken = &lint.MessageRule{
+	Name:   lint.NewRuleName(132, "response-next-page-token-field"),
+	OnlyIf: isListResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a next_page_token field is present.
 		nextPageToken := m.FindFieldByName("next_page_token")

@@ -29,11 +29,13 @@ func AddRules(r lint.RuleRegistry) error {
 		methodSignature,
 		requestFieldTypes,
 		requestMessageName,
+		requestPageSize,
 		requestParentBehavior,
 		requestParentField,
 		requestParentReference,
 		requestParentRequired,
 		responseMessageName,
+		responseNextPageToken,
 		responseUnknownFields,
 		unknownFields,
 	)

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0158
+package aip0132
 
 import (
 	"fmt"
@@ -23,9 +23,9 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-var requestPaginationPageSize = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "request-page-size-field"),
-	OnlyIf: isPaginatedRequestMessage,
+var requestPageSize = &lint.MessageRule{
+	Name:   lint.NewRuleName(132, "request-page-size-field"),
+	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a page_size field is present.
 		pageSize := m.FindFieldByName("page_size")

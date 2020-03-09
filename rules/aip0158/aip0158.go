@@ -16,8 +16,6 @@
 package aip0158
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -26,22 +24,17 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		158,
-		requestPaginationPageSize,
 		requestPaginationPageToken,
-		responsePaginationNextPageToken,
 		responsePluralFirstField,
 	)
 }
 
-var paginatedReq = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Request$")
-var paginatedRes = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Response$")
-
 // Return true if this is an AIP-158 List request message, false otherwise.
 func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
-	return paginatedReq.MatchString(m.GetName()) || m.FindFieldByName("page_size") != nil || m.FindFieldByName("page_token") != nil
+	return m.FindFieldByName("page_size") != nil
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
 func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
-	return paginatedRes.MatchString(m.GetName()) || m.FindFieldByName("next_page_token") != nil
+	return m.FindFieldByName("next_page_token") != nil
 }

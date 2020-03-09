@@ -10,14 +10,14 @@ redirect_from:
 
 # Paginated methods: Page token field
 
-This rule enforces that all `List` and `Search` methods have a
-`string page_token` field in the request message, as mandated in [AIP-158][].
+This rule enforces that Pagination requests have a `string page_token` field in
+the request message, as mandated in [AIP-158][].
 
 ## Details
 
-This rule looks at any message matching `List*Request` or `Search*Request` and
-complains if either the `page_token` field is missing, or if it has any type
-other than `string`.
+This rule looks at any message mthat has `page_size` field and complains if
+either the `page_token` field is missing, or if it has any type other than
+`string`.
 
 ## Examples
 
@@ -55,8 +55,9 @@ message ListBooksRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `page_token` field is missing) or above the field (if it is the wrong type).
-Remember to also include an [aip.dev/not-precedent][] comment explaining why.
+the `page_token` field is missing) or above the field (if it is the wrong
+type). Remember to also include an [aip.dev/not-precedent][] comment explaining
+why.
 
 ```proto
 // (-- api-linter: core::0158::request-page-token-field=disabled

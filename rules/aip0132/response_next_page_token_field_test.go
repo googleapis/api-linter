@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		https://www.apache.org/licenses/LICENSE-2.0
+//     https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0158
+package aip0132
 
 import (
 	"testing"
@@ -22,7 +22,12 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-func TestRequestPaginationPageSize(t *testing.T) {
+type field struct {
+	fieldName string
+	fieldType *builder.FieldType
+}
+
+func TestResponseNextPageToken(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName      string
@@ -33,24 +38,25 @@ func TestRequestPaginationPageSize(t *testing.T) {
 	}{
 		{
 			"Valid",
-			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
+			"ListBooksResponse",
+			[]field{{"books", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeString()}},
 			testutils.Problems{},
-			nil},
+			nil,
+		},
 		{
 			"MissingField",
-			"ListFooRequest",
-			[]field{{"page_token", builder.FieldTypeString()}},
-			testutils.Problems{{Message: "page_size"}},
+			"ListBooksResponse",
+			[]field{{"books", builder.FieldTypeString()}},
+			testutils.Problems{{Message: "next_page_token"}},
 			nil,
 		},
 		{
 			"InvalidType",
-			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeDouble()}},
-			testutils.Problems{{Suggestion: "int32"}},
+			"ListFooResponse",
+			[]field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}},
+			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("page_size")
+				return m.FindFieldByName("next_page_token")
 			},
 		},
 	}
@@ -79,7 +85,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageSize.Lint(message.GetFile())
+			problems := responseNextPageToken.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}

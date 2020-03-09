@@ -22,6 +22,11 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
+type field struct {
+	fieldName string
+	fieldType *builder.FieldType
+}
+
 func TestRequestPaginationPageToken(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
@@ -33,22 +38,22 @@ func TestRequestPaginationPageToken(t *testing.T) {
 	}{
 		{
 			"Valid",
-			"ListFooRequest",
-			[]field{{"page_token", builder.FieldTypeString()}},
+			"FooRequest",
+			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
 			testutils.Problems{},
 			nil,
 		},
 		{
 			"MissingField",
-			"ListFooRequest",
-			[]field{{"name", builder.FieldTypeString()}},
+			"FooRequest",
+			[]field{{"name", builder.FieldTypeString()}, {"page_size", builder.FieldTypeInt32()}},
 			testutils.Problems{{Message: "page_token"}},
 			nil,
 		},
 		{
 			"InvalidType",
-			"ListFooRequest",
-			[]field{{"page_token", builder.FieldTypeDouble()}},
+			"FooRequest",
+			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeDouble()}},
 			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("page_token")

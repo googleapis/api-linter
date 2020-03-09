@@ -1,23 +1,22 @@
 ---
 rule:
-  aip: 158
-  name: [core, '0158', request-page-size-field]
-  summary: Paginated RPCs must have a `page_size` field in the request.
-permalink: /158/request-page-size-field
+  aip: 132
+  name: [core, '0132', request-page-size-field]
+  summary: List RPCs must have a `page_size` field in the request.
+permalink: /132/request-page-size-field
 redirect_from:
-  - /0158/request-page-size-field
+  - /0132/request-page-size-field
 ---
 
 # Paginated methods: Page size field
 
-This rule enforces that all `List` and `Search` methods have a
-`int32 page_size` field in the request message, as mandated in [AIP-158][].
+This rule enforces that all `List` methods have a `int32 page_size` field in
+the request message, as mandated in [AIP-132][].
 
 ## Details
 
-This rule looks at any message matching `List*Request` or `Search*Request` and
-complains if either the `page_size` field is missing, or if it has any type
-other than `int32`.
+This rule looks at any message matching `List*Request` and complains if either
+the `page_size` field is missing, or if it has any type other than `int32`.
 
 ## Examples
 
@@ -59,7 +58,7 @@ the `page_size` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0158::request-page-size-field=disabled
+// (-- api-linter: core::0132::request-page-size-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksRequest {
   string name = 1;
@@ -71,5 +70,5 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-158]: https://aip.dev/158
+[aip-132]: https://aip.dev/132
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
