@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"testing"
 
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -125,7 +126,7 @@ func TestFieldRule(t *testing.T) {
 	// Iterate over the tests and run them.
 	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetFields()[1]) {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create the message rule.
+			// Create the field rule.
 			rule := &FieldRule{
 				Name: RuleName("test"),
 				OnlyIf: func(f *desc.FieldDescriptor) bool {
@@ -406,7 +407,7 @@ func TestRuleIsEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test message")
 			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], aliases), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 		})
@@ -433,10 +434,10 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, nil), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil, nil), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
 	}
 }
@@ -461,11 +462,50 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil), false; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil, nil), true; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+	}
+}
+
+func TestRuleIsEnabledDeprecated(t *testing.T) {
+	// Create a rule that we can check enabled status on.
+	rule := &FieldRule{
+		Name: RuleName("test"),
+		LintField: func(f *desc.FieldDescriptor) []Problem {
+			return nil
+		},
+	}
+
+	for _, test := range []struct {
+		name            string
+		msgDeprecated   bool
+		fieldDeprecated bool
+		enabled         bool
+	}{
+		{"Both", true, true, false},
+		{"Message", true, false, false},
+		{"Field", false, true, false},
+		{"Neither", false, false, true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			// Build a proto with a message and field, possibly deprecated.
+			f, err := builder.NewFile("test.proto").AddMessage(
+				builder.NewMessage("Foo").SetOptions(&dpb.MessageOptions{
+					Deprecated: &test.msgDeprecated,
+				}).AddField(builder.NewField("bar", builder.FieldTypeBool()).SetOptions(
+					&dpb.FieldOptions{Deprecated: &test.fieldDeprecated},
+				)),
+			).Build()
+			if err != nil {
+				t.Fatalf("Error building test file: %q", err)
+			}
+			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil), test.enabled; got != want {
+				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+			}
+		})
 	}
 }
 

@@ -22,19 +22,23 @@ import (
 )
 
 func TestNoHTML(t *testing.T) {
+	rawHtmlProblem := testutils.Problems{{Message: "must not include raw HTML"}}
+	noProblems := testutils.Problems{}
+
 	for _, test := range []struct {
 		name     string
 		comment  string
 		problems testutils.Problems
 	}{
-		{"Valid", "It is **great!**", testutils.Problems{}},
-		{"ValidMath", "x < 10", testutils.Problems{}},
-		{"ValidMoreMath", "x < 10 > y", testutils.Problems{}},
-		{"InvalidBold", "It is <b>great!</b>", testutils.Problems{{Message: "raw HTML"}}},
-		{"InvalidCode", "This is <code>code font</code>.", testutils.Problems{{Message: "raw HTML"}}},
-		{"InvalidBreak", "This spans<br />two lines.", testutils.Problems{{Message: "raw HTML"}}},
-		{"InternionalFalseNegativeComplexTag", `<img src="https://foo.bar/mickey" />`, testutils.Problems{}},
-		{"IntentionalFalseNegativeInnerSpace", "Something < b > bold < /b >", testutils.Problems{}},
+		{"Valid", "It is **great!**", noProblems},
+		{"ValidMath", "x < 10", noProblems},
+		{"ValidMoreMath", "x < 10 > y", noProblems},
+		{"ValidAngleBracketPlaceholders", "Format: http://<server>/<path>", noProblems},
+		{"ValidComplexTag", `<img src="https://foo.bar/mickey" />`, noProblems},
+		{"InvalidBold", "It is <b>great!</b>", rawHtmlProblem},
+		{"InvalidCode", "This is <code>code font</code>.", rawHtmlProblem},
+		{"InvalidBreak", "This spans<br />two lines.", rawHtmlProblem},
+		{"IntentionalFalseNegativeInnerSpace", "Something < b > bold < /b >", noProblems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.ReplaceAll(`

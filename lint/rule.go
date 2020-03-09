@@ -371,12 +371,40 @@ func extractDisabledRuleName(commentLine string) string {
 
 // ruleIsEnabled returns true if the rule is enabled (not disabled by the comments
 // for the given descriptor or its file), false otherwise.
-func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string) bool {
+//
+// Note, if the given source code location is not nil, it will be used to
+// augment the set of commentLines.
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
+	// Sanity check: All rules are disabled on a deprecated descriptor.
+	deprecated := false
+	switch v := d.(type) {
+	case *desc.EnumDescriptor:
+		deprecated = v.GetEnumOptions().GetDeprecated()
+	case *desc.EnumValueDescriptor:
+		deprecated = v.GetEnumValueOptions().GetDeprecated()
+	case *desc.FieldDescriptor:
+		deprecated = v.GetFieldOptions().GetDeprecated()
+	case *desc.FileDescriptor:
+		deprecated = v.GetFileOptions().GetDeprecated()
+	case *desc.MessageDescriptor:
+		deprecated = v.GetMessageOptions().GetDeprecated()
+	case *desc.MethodDescriptor:
+		deprecated = v.GetMethodOptions().GetDeprecated()
+	case *desc.ServiceDescriptor:
+		deprecated = v.GetServiceOptions().GetDeprecated()
+	}
+	if deprecated {
+		return false
+	}
+
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
 
 	commentLines := []string{}
+	if l != nil {
+		commentLines = append(commentLines, strings.Split(l.GetLeadingComments(), "\n")...)
+	}
 	if f, ok := d.(*desc.FileDescriptor); ok {
 		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
 	} else {
@@ -398,8 +426,11 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, aliasMap map[string]string
 
 	// The rule may have been disabled on a parent. (For example, a field rule
 	// may be disabled at the message level to cover all fields in the message).
+	//
+	// Do not pass the source code location here, the source location in relation
+	// to the parent is not helpful.
 	if parent := d.GetParent(); parent != nil {
-		return ruleIsEnabled(rule, parent, aliasMap)
+		return ruleIsEnabled(rule, parent, nil, aliasMap)
 	}
 
 	return true
