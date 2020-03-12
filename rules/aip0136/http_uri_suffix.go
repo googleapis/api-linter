@@ -33,6 +33,8 @@ var uriSuffix = &lint.MethodRule{
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
+			var want string
+
 			// URIs should end in a `:` character followed by the name of the method.
 			// However, if the noun is the URI's resource, then we only use `:verb`,
 			// not `:verbNoun`.
@@ -40,14 +42,15 @@ var uriSuffix = &lint.MethodRule{
 			// This is somewhat tricky to test for perfectly, and may need to evolve
 			// over time, but the following rules should be mostly correct:
 			//   1. If the URI contains `{name=` or `{parent=`, expect `:verb`.
-			//   2. Otherwise, expect `:verbNoun`.
+			//   2. Address known edge cases from other AIPs.
+			//   3. For collections, expect `nouns:verb`.
+			//   4. Otherwise, expect `:verbNoun`.
 			//
 			// We blindly assume that the verb is always one word (the "noun" may be
 			// any number of words; they often include adjectives).
-			//
-			// N.B. The LowerCamel(Snake(name)) is because strcase does not translate
-			//      from upper camel to lower camel correctly.
-			want := ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
+			// There are some known exceptions, particularly around "Batch".
+			// ----------------------------------------------------------------------
+			// If the URI contains `{name=` or `{parent=`, expect `:verb`.
 			if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
 				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
 				if rpcSlice[0] == "batch" {
@@ -71,6 +74,24 @@ var uriSuffix = &lint.MethodRule{
 				if strings.HasPrefix(m.GetName(), "Delete") {
 					want = ":deleteRevision"
 				}
+			}
+
+			// If the final component of the URI (before the verb) matches the final
+			// component of the RPC name, then assume this matches `nouns:verb`.
+			//
+			// Note that we do not do any pluralization here -- both the RPC and
+			// the URI must be plural already. If the RPC is singular, step 4 should
+			// apply.
+			plainURI := httpRule.GetPlainURI()
+			segs := strings.Split(strings.Split(plainURI, ":")[0], "/")
+			segment := segs[len(segs)-1]
+			if len(want) == 0 && strings.HasSuffix(strings.ToLower(n), segment) {
+				want = segment + ":" + strings.Split(strcase.SnakeCase(n), "_")[0]
+			}
+
+			// Nothing else applied; expect `:verbNoun`.
+			if len(want) == 0 {
+				want = ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
 			}
 
 			// Do we have the suffix we expect?
