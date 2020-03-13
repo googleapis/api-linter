@@ -38,7 +38,8 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 func isResourceMessage(m *desc.MessageDescriptor) bool {
-	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request")
+	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request") &&
+		!strings.HasSuffix(m.GetName(), "Response")
 }
 
 func hasResourceAnnotation(m *desc.MessageDescriptor) bool {
