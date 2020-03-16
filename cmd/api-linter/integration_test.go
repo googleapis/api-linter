@@ -45,6 +45,18 @@ var testCases = []struct {
 		`,
 	},
 	{
+		testName: "PackageVersion",
+		rule:     "core::0215::versioned-packages",
+		proto: `
+		syntax = "proto3";
+
+		// disable-me-here
+		package google.test;
+
+		message Test {}
+		`,
+	},
+	{
 		testName: "FieldNames",
 		rule:     "core::0140::lower-snake",
 		proto: `

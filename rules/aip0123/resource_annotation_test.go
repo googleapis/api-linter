@@ -48,6 +48,7 @@ func TestResourceAnnotation(t *testing.T) {
 	}{
 		{"ValidNoNameField", "Book", "title", testutils.Problems{}},
 		{"ValidRequestMessage", "GetBookRequest", "name", testutils.Problems{}},
+		{"ValidResponseMessage", "GetBookResponse", "name", testutils.Problems{}},
 		{"Invalid", "Book", "name", testutils.Problems{{Message: "google.api.resource"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
