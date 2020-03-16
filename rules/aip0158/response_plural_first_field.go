@@ -15,8 +15,6 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -32,7 +30,7 @@ var responsePluralFirstField = &lint.MessageRule{
 		want := utils.ToPlural(firstField.GetName())
 		if want != firstField.GetName() {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("First field of Paginated RPCs' response should be plural."),
+				Message:    string("First field of Paginated RPCs' response should be plural."),
 				Suggestion: want,
 				Descriptor: firstField,
 				Location:   locations.DescriptorName(m),

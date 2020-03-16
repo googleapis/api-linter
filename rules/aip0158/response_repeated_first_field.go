@@ -15,8 +15,6 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -27,20 +25,20 @@ var responseRepeatedFirstField = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if len(m.GetFields()) == 0 {
 			return []lint.Problem{{
-				Message: fmt.Sprintf("Paginated RPCs' response should have at least 1 field."),
+				Message: string("Paginated RPCs' response should have at least 1 field."),
 			}}
 		}
 
 		if !m.FindFieldByNumber(1).IsRepeated() {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("First field by number of Paginated RPCs' response should be repeated."),
+				Message:    string("First field by number of Paginated RPCs' response should be repeated."),
 				Descriptor: m.FindFieldByNumber(1),
 			}}
 		}
 
 		if !m.GetFields()[0].IsRepeated() {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("First field by position of Paginated RPCs' response should be repeated."),
+				Message:    string("First field by position of Paginated RPCs' response should be repeated."),
 				Descriptor: m.GetFields()[0],
 			}}
 		}
