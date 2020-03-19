@@ -40,6 +40,7 @@ func TestURISuffix(t *testing.T) {
 		{"ValidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
 		{"ValidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
 		{"ValidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", testutils.Problems{}},
+		{"ValidCollection", "SortBooks", "/v1/{publisher=publishers/*}/books:sort", testutils.Problems{}},
 		{"InvalidListRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:list", testutils.Problems{{Message: ":listRevisions"}}},
 		{"InvalidTagRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tag", testutils.Problems{{Message: ":tagRevision"}}},
 		{"InvalidDeleteRevision", "DeleteBookRevision", "/v1/{name=publishers/*/books/*}:delete", testutils.Problems{{Message: ":deleteRevision"}}},
