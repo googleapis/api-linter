@@ -41,7 +41,7 @@ message ListBooksRequest {
 message ListBooksRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
+    (google.api.resource_reference).type = "library.googleapis.com/Publisher"
   ];
   int32 page_size = 2;
   string page_token = 3;
