@@ -33,14 +33,15 @@ import (
 )
 
 type cli struct {
-	ConfigPath       string
-	FormatType       string
-	OutputPath       string
-	ProtoImportPaths []string
-	ProtoFiles       []string
-	ProtoDescPath    []string
-	EnabledRules     []string
-	DisabledRules    []string
+	ConfigPath              string
+	FormatType              string
+	OutputPath              string
+	ExitStatusOnLintFailure bool
+	ProtoImportPaths        []string
+	ProtoFiles              []string
+	ProtoDescPath           []string
+	EnabledRules            []string
+	DisabledRules           []string
 }
 
 func newCli(args []string) *cli {
@@ -48,6 +49,7 @@ func newCli(args []string) *cli {
 	var cfgFlag string
 	var fmtFlag string
 	var outFlag string
+	var setExitStatusOnLintFailure bool
 	var protoImportFlag []string
 	var protoDescFlag []string
 	var ruleEnableFlag []string
@@ -58,6 +60,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
 	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
+	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
 	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
@@ -70,27 +73,28 @@ func newCli(args []string) *cli {
 	}
 
 	return &cli{
-		ConfigPath:       cfgFlag,
-		FormatType:       fmtFlag,
-		OutputPath:       outFlag,
-		ProtoImportPaths: append(protoImportFlag, "."),
-		ProtoDescPath:    protoDescFlag,
-		EnabledRules:     ruleEnableFlag,
-		DisabledRules:    ruleDisableFlag,
-		ProtoFiles:       fs.Args(),
+		ConfigPath:              cfgFlag,
+		FormatType:              fmtFlag,
+		OutputPath:              outFlag,
+		ExitStatusOnLintFailure: setExitStatusOnLintFailure,
+		ProtoImportPaths:        append(protoImportFlag, "."),
+		ProtoDescPath:           protoDescFlag,
+		EnabledRules:            ruleEnableFlag,
+		DisabledRules:           ruleDisableFlag,
+		ProtoFiles:              fs.Args(),
 	}
 }
 
-func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
+func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure bool, err error) {
 	// Pre-check if there are files to lint.
 	if len(c.ProtoFiles) == 0 {
-		return fmt.Errorf("no file to lint")
+		return lintFailure, fmt.Errorf("no file to lint")
 	}
 	// Read linter config and append it to the default.
 	if c.ConfigPath != "" {
 		config, err := lint.ReadConfigsFromFile(c.ConfigPath)
 		if err != nil {
-			return err
+			return lintFailure, err
 		}
 		configs = append(configs, config...)
 	}
@@ -105,7 +109,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Prepare proto import lookup.
 	fs, err := loadFileDescriptors(c.ProtoDescPath...)
 	if err != nil {
-		return err
+		return lintFailure, err
 	}
 	lookupImport := func(name string) (*desc.FileDescriptor, error) {
 		if f, found := fs[name]; found {
@@ -132,29 +136,33 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Resolve file absolute paths to relative ones.
 	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
 	if err != nil {
-		return err
+		return lintFailure, err
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
 		if err == protoparse.ErrInvalidSource {
 			if len(errorsWithPos) == 0 {
-				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
+				return lintFailure, errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
 			}
 			// TODO: There's multiple ways to deal with this but this prints all the errors at least
 			errStrings := make([]string, len(errorsWithPos))
 			for i, errorWithPos := range errorsWithPos {
 				errStrings[i] = errorWithPos.Error()
 			}
-			return errors.New(strings.Join(errStrings, "\n"))
+			return lintFailure, errors.New(strings.Join(errStrings, "\n"))
 		}
-		return err
+		return lintFailure, err
 	}
 
 	// Create a linter to lint the file descriptors.
 	l := lint.New(rules, configs)
 	results, err := l.LintProtos(fd...)
 	if err != nil {
-		return err
+		return lintFailure, err
+	}
+
+	if c.ExitStatusOnLintFailure && len(results) > 0 {
+		lintFailure = true
 	}
 
 	// Determine the output for writing the results.
@@ -164,7 +172,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		var err error
 		w, err = os.Create(c.OutputPath)
 		if err != nil {
-			return err
+			return lintFailure, err
 		}
 		defer w.Close()
 	}
@@ -176,12 +184,12 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Print the results.
 	b, err := marshal(results)
 	if err != nil {
-		return err
+		return lintFailure, err
 	}
 	if _, err = w.Write(b); err != nil {
-		return err
+		return lintFailure, err
 	}
-	return nil
+	return lintFailure, nil
 }
 
 func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {

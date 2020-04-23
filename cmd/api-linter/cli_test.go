@@ -34,6 +34,17 @@ func TestNewCli(t *testing.T) {
 				ProtoFiles:       []string{"a.proto", "b.proto"},
 			},
 		},
+		{
+			name: "ExitStatusOnLintFailure",
+			inputArgs: []string{
+				"--set-exit-status",
+			},
+			wantCli: &cli{
+				ExitStatusOnLintFailure: true,
+				ProtoImportPaths:        []string{"."},
+				ProtoFiles:              []string{},
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

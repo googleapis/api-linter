@@ -34,12 +34,17 @@ func init() {
 }
 
 func main() {
-	if err := runCLI(os.Args[1:]); err != nil {
+	lintFail, err := runCLI(os.Args[1:])
+	if err != nil {
 		log.Fatalln(err)
+	}
+
+	if lintFail {
+		os.Exit(1)
 	}
 }
 
-func runCLI(args []string) error {
+func runCLI(args []string) (bool, error) {
 	c := newCli(args)
 	return c.lint(globalRules, globalConfigs)
 }
