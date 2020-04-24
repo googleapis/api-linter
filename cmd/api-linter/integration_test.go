@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -132,7 +133,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 func TestBuildErrors(t *testing.T) {
 	expected := `internal/testdata/build_errors.proto:8:1: syntax error: unexpected '}', expecting ';' or '['
 internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecting ';' or '['`
-	_, err := runCLI([]string{"internal/testdata/build_errors.proto"})
+	err := runCLI([]string{"internal/testdata/build_errors.proto"})
 	if err == nil {
 		t.Fatal("expected build error for build_errors.proto")
 	}
@@ -144,7 +145,6 @@ internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecti
 
 func TestExitStatusForLintFailure(t *testing.T) {
 	for _, test := range testCases {
-
 		// checks lint failure = true when lint problems found
 		t.Run(test.testName+"ReturnsFailure", func(t *testing.T) {
 			proto := test.proto
@@ -177,6 +177,7 @@ func TestExitStatusForLintFailure(t *testing.T) {
 				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
 			}
 		})
+
 	}
 }
 
@@ -220,16 +221,16 @@ func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string
 	args = append(args, protoFileName)
 	args = append(args, appendArgs...)
 
-	lintFailure, err := runCLI(args)
-	if err != nil {
-		t.Fatal(err)
+	lintErr := runCLI(args)
+	if lintErr != nil && !errors.Is(lintErr, ExitForLintFailure) {
+		t.Fatal(lintErr)
 	}
 
 	out, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return lintFailure, string(out)
+	return errors.Is(lintErr, ExitForLintFailure), string(out)
 }
 
 func writeFile(path, content string) error {

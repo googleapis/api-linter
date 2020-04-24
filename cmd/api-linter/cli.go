@@ -44,6 +44,8 @@ type cli struct {
 	DisabledRules           []string
 }
 
+var ExitForLintFailure = errors.New("found problems during linting")
+
 func newCli(args []string) *cli {
 	// Define flag variables.
 	var cfgFlag string
@@ -85,16 +87,16 @@ func newCli(args []string) *cli {
 	}
 }
 
-func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure bool, err error) {
+func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Pre-check if there are files to lint.
 	if len(c.ProtoFiles) == 0 {
-		return lintFailure, fmt.Errorf("no file to lint")
+		return fmt.Errorf("no file to lint")
 	}
 	// Read linter config and append it to the default.
 	if c.ConfigPath != "" {
 		config, err := lint.ReadConfigsFromFile(c.ConfigPath)
 		if err != nil {
-			return lintFailure, err
+			return err
 		}
 		configs = append(configs, config...)
 	}
@@ -109,7 +111,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure b
 	// Prepare proto import lookup.
 	fs, err := loadFileDescriptors(c.ProtoDescPath...)
 	if err != nil {
-		return lintFailure, err
+		return err
 	}
 	lookupImport := func(name string) (*desc.FileDescriptor, error) {
 		if f, found := fs[name]; found {
@@ -136,33 +138,29 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure b
 	// Resolve file absolute paths to relative ones.
 	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
 	if err != nil {
-		return lintFailure, err
+		return err
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
 		if err == protoparse.ErrInvalidSource {
 			if len(errorsWithPos) == 0 {
-				return lintFailure, errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
+				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
 			}
 			// TODO: There's multiple ways to deal with this but this prints all the errors at least
 			errStrings := make([]string, len(errorsWithPos))
 			for i, errorWithPos := range errorsWithPos {
 				errStrings[i] = errorWithPos.Error()
 			}
-			return lintFailure, errors.New(strings.Join(errStrings, "\n"))
+			return errors.New(strings.Join(errStrings, "\n"))
 		}
-		return lintFailure, err
+		return err
 	}
 
 	// Create a linter to lint the file descriptors.
 	l := lint.New(rules, configs)
 	results, err := l.LintProtos(fd...)
 	if err != nil {
-		return lintFailure, err
-	}
-
-	if c.ExitStatusOnLintFailure && len(results) > 0 {
-		lintFailure = true
+		return err
 	}
 
 	// Determine the output for writing the results.
@@ -172,7 +170,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure b
 		var err error
 		w, err = os.Create(c.OutputPath)
 		if err != nil {
-			return lintFailure, err
+			return err
 		}
 		defer w.Close()
 	}
@@ -184,12 +182,19 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) (lintFailure b
 	// Print the results.
 	b, err := marshal(results)
 	if err != nil {
-		return lintFailure, err
+		return err
 	}
 	if _, err = w.Write(b); err != nil {
-		return lintFailure, err
+		return err
 	}
-	return lintFailure, nil
+
+	// Return error on lint failure which subsequently
+	// exits with a non-zero status code
+	if c.ExitStatusOnLintFailure && len(results) > 0 {
+		return ExitForLintFailure
+	}
+
+	return nil
 }
 
 func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {
