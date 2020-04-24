@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -142,7 +143,50 @@ internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecti
 	}
 }
 
+func TestExitStatusForLintFailure(t *testing.T) {
+	for _, test := range testCases {
+		// checks lint failure = true when lint problems found
+		t.Run(test.testName+"ReturnsFailure", func(t *testing.T) {
+			proto := test.proto
+			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{"--set-exit-status"})
+			expected := result != ""
+			if lintFailureStatus != expected {
+				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
+			}
+		})
+
+		// checks lint failure = false when no problems found
+		t.Run(test.testName+"ReturnsNoFailure", func(t *testing.T) {
+			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
+			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{"--set-exit-status"})
+			expected := result != ""
+			if lintFailureStatus != expected {
+				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
+			}
+		})
+	}
+
+	// checks lint failure = false when lint problems found but --set-exit-status not set
+	for _, test := range testCases {
+		t.Run(test.testName, func(t *testing.T) {
+			proto := test.proto
+			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{})
+			expected := result == ""
+			if lintFailureStatus != expected {
+				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
+			}
+		})
+
+	}
+}
+
 func runLinter(t *testing.T, protoContent, configContent string) string {
+	_, result := runLinterWithFailureStatus(t, protoContent, configContent, []string{})
+	return result
+}
+
+func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string, appendArgs []string) (bool, string) {
 	tempDir, err := ioutil.TempDir("", "test")
 	if err != nil {
 		t.Fatal(err)
@@ -175,16 +219,18 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 		t.Fatal(err)
 	}
 	args = append(args, protoFileName)
+	args = append(args, appendArgs...)
 
-	if err := runCLI(args); err != nil {
-		t.Fatal(err)
+	lintErr := runCLI(args)
+	if lintErr != nil && !errors.Is(lintErr, ExitForLintFailure) {
+		t.Fatal(lintErr)
 	}
 
 	out, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return string(out)
+	return errors.Is(lintErr, ExitForLintFailure), string(out)
 }
 
 func writeFile(path, content string) error {
