@@ -144,28 +144,41 @@ internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecti
 }
 
 func TestExitStatusForLintFailure(t *testing.T) {
-	for _, test := range testCases {
-		// checks lint failure = true when lint problems found
-		t.Run(test.testName+"ReturnsFailure", func(t *testing.T) {
-			proto := test.proto
-			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{"--set-exit-status"})
-			expected := result != ""
-			if lintFailureStatus != expected {
-				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
-			}
-		})
+	type testCase struct{ testName, rule, proto string }
+	failCase := testCase{
+		testName: "GetRequestMessage",
+		rule:     "core::0131::request-message-name",
+		proto: `
+		syntax = "proto3";
 
-		// checks lint failure = false when no problems found
-		t.Run(test.testName+"ReturnsNoFailure", func(t *testing.T) {
-			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
-			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
-			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{"--set-exit-status"})
-			expected := result != ""
-			if lintFailureStatus != expected {
-				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
-			}
-		})
+		service Library {
+			// disable-me-here
+			rpc GetBook(Book) returns (Book);
+		}
+
+		message Book {}
+		`,
 	}
+	// checks lint failure = true when lint problems found
+	t.Run(failCase.testName+"ReturnsFailure", func(t *testing.T) {
+		lintFailureStatus, result := runLinterWithFailureStatus(t, failCase.proto, "", []string{"--set-exit-status"})
+		if lintFailureStatus == false {
+			t.Log(result)
+			t.Fatalf("Expected: %v Actual: %v", true, lintFailureStatus)
+		}
+	})
+
+	// checks lint failure = false when no problems found
+	t.Run(failCase.testName+"ReturnsNoFailure", func(t *testing.T) {
+		disableAll := `[ { "disabled_rules": [ "core" ] } ]`
+		lintFailureStatus, result := runLinterWithFailureStatus(t, failCase.proto, disableAll, []string{"--set-exit-status"})
+		if lintFailureStatus {
+			t.Log(result)
+		}
+		if lintFailureStatus == true {
+			t.Fatalf("Expected: %v Actual: %v", false, lintFailureStatus)
+		}
+	})
 
 	// checks lint failure = false when lint problems found but --set-exit-status not set
 	for _, test := range testCases {
@@ -177,7 +190,6 @@ func TestExitStatusForLintFailure(t *testing.T) {
 				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
 			}
 		})
-
 	}
 }
 
