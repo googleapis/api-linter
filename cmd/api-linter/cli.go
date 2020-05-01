@@ -190,11 +190,20 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 
 	// Return error on lint failure which subsequently
 	// exits with a non-zero status code
-	if c.ExitStatusOnLintFailure && len(results) > 0 {
+	if c.ExitStatusOnLintFailure && anyProblems(results) {
 		return ExitForLintFailure
 	}
 
 	return nil
+}
+
+func anyProblems(results []lint.Response) bool {
+	for i := range results {
+		if len(results[i].Problems) > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {
