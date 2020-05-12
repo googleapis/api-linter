@@ -22,7 +22,7 @@ import (
 )
 
 func TestNoHTML(t *testing.T) {
-	rawHtmlProblem := testutils.Problems{{Message: "must not include raw HTML"}}
+	rawHTMLProblem := testutils.Problems{{Message: "must not include raw HTML"}}
 	noProblems := testutils.Problems{}
 
 	for _, test := range []struct {
@@ -35,9 +35,9 @@ func TestNoHTML(t *testing.T) {
 		{"ValidMoreMath", "x < 10 > y", noProblems},
 		{"ValidAngleBracketPlaceholders", "Format: http://<server>/<path>", noProblems},
 		{"ValidComplexTag", `<img src="https://foo.bar/mickey" />`, noProblems},
-		{"InvalidBold", "It is <b>great!</b>", rawHtmlProblem},
-		{"InvalidCode", "This is <code>code font</code>.", rawHtmlProblem},
-		{"InvalidBreak", "This spans<br />two lines.", rawHtmlProblem},
+		{"InvalidBold", "It is <b>great!</b>", rawHTMLProblem},
+		{"InvalidCode", "This is <code>code font</code>.", rawHTMLProblem},
+		{"InvalidBreak", "This spans<br />two lines.", rawHTMLProblem},
 		{"IntentionalFalseNegativeInnerSpace", "Something < b > bold < /b >", noProblems},
 	} {
 		t.Run(test.name, func(t *testing.T) {

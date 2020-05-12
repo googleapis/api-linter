@@ -26,7 +26,12 @@ import (
 var nameSuffix = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "name-suffix"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return !stringset.New("name", "display_name").Contains(f.GetName())
+		return !stringset.New(
+			"display_name",
+			"family_name",
+			"given_name",
+			"name",
+		).Contains(f.GetName())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if n := f.GetName(); strings.HasSuffix(n, "_name") {

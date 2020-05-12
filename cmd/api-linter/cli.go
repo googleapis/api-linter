@@ -33,21 +33,25 @@ import (
 )
 
 type cli struct {
-	ConfigPath       string
-	FormatType       string
-	OutputPath       string
-	ProtoImportPaths []string
-	ProtoFiles       []string
-	ProtoDescPath    []string
-	EnabledRules     []string
-	DisabledRules    []string
+	ConfigPath              string
+	FormatType              string
+	OutputPath              string
+	ExitStatusOnLintFailure bool
+	ProtoImportPaths        []string
+	ProtoFiles              []string
+	ProtoDescPath           []string
+	EnabledRules            []string
+	DisabledRules           []string
 }
+
+var ExitForLintFailure = errors.New("found problems during linting")
 
 func newCli(args []string) *cli {
 	// Define flag variables.
 	var cfgFlag string
 	var fmtFlag string
 	var outFlag string
+	var setExitStatusOnLintFailure bool
 	var protoImportFlag []string
 	var protoDescFlag []string
 	var ruleEnableFlag []string
@@ -58,6 +62,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
 	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
+	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
 	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
@@ -70,14 +75,15 @@ func newCli(args []string) *cli {
 	}
 
 	return &cli{
-		ConfigPath:       cfgFlag,
-		FormatType:       fmtFlag,
-		OutputPath:       outFlag,
-		ProtoImportPaths: append(protoImportFlag, "."),
-		ProtoDescPath:    protoDescFlag,
-		EnabledRules:     ruleEnableFlag,
-		DisabledRules:    ruleDisableFlag,
-		ProtoFiles:       fs.Args(),
+		ConfigPath:              cfgFlag,
+		FormatType:              fmtFlag,
+		OutputPath:              outFlag,
+		ExitStatusOnLintFailure: setExitStatusOnLintFailure,
+		ProtoImportPaths:        append(protoImportFlag, "."),
+		ProtoDescPath:           protoDescFlag,
+		EnabledRules:            ruleEnableFlag,
+		DisabledRules:           ruleDisableFlag,
+		ProtoFiles:              fs.Args(),
 	}
 }
 
@@ -181,7 +187,23 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	if _, err = w.Write(b); err != nil {
 		return err
 	}
+
+	// Return error on lint failure which subsequently
+	// exits with a non-zero status code
+	if c.ExitStatusOnLintFailure && anyProblems(results) {
+		return ExitForLintFailure
+	}
+
 	return nil
+}
+
+func anyProblems(results []lint.Response) bool {
+	for i := range results {
+		if len(results[i].Problems) > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {

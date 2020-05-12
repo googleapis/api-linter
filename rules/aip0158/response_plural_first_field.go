@@ -25,12 +25,13 @@ var responsePluralFirstField = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "response-plural-first-field"),
 	OnlyIf: isPaginatedResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Throw a linter warning if, the first field in the message is not named according to plural(message_name.to_snake().split('_')[1:-1]).
+		// Throw a linter warning if, the first field in the message is not named
+		// according to plural(message_name.to_snake().split('_')[1:-1]).
 		firstField := m.GetFields()[0]
 		want := utils.ToPlural(firstField.GetName())
 		if want != firstField.GetName() {
 			return []lint.Problem{{
-				Message:    string("First field of Paginated RPCs' response should be plural."),
+				Message:    "First field of Paginated RPCs' response should be plural.",
 				Suggestion: want,
 				Descriptor: firstField,
 				Location:   locations.DescriptorName(m),

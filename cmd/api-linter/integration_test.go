@@ -15,6 +15,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -142,7 +143,62 @@ internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecti
 	}
 }
 
+func TestExitStatusForLintFailure(t *testing.T) {
+	type testCase struct{ testName, rule, proto string }
+	failCase := testCase{
+		testName: "GetRequestMessage",
+		rule:     "core::0131::request-message-name",
+		proto: `
+		syntax = "proto3";
+
+		service Library {
+			// disable-me-here
+			rpc GetBook(Book) returns (Book);
+		}
+
+		message Book {}
+		`,
+	}
+	// checks lint failure = true when lint problems found
+	t.Run(failCase.testName+"ReturnsFailure", func(t *testing.T) {
+		lintFailureStatus, result := runLinterWithFailureStatus(t, failCase.proto, "", []string{"--set-exit-status"})
+		if lintFailureStatus == false {
+			t.Log(result)
+			t.Fatalf("Expected: %v Actual: %v", true, lintFailureStatus)
+		}
+	})
+
+	// checks lint failure = false when no problems found
+	t.Run(failCase.testName+"ReturnsNoFailure", func(t *testing.T) {
+		disableAll := `[ { "disabled_rules": [ "core" ] } ]`
+		lintFailureStatus, result := runLinterWithFailureStatus(t, failCase.proto, disableAll, []string{"--set-exit-status"})
+		if lintFailureStatus {
+			t.Log(result)
+		}
+		if lintFailureStatus == true {
+			t.Fatalf("Expected: %v Actual: %v", false, lintFailureStatus)
+		}
+	})
+
+	// checks lint failure = false when lint problems found but --set-exit-status not set
+	for _, test := range testCases {
+		t.Run(test.testName, func(t *testing.T) {
+			proto := test.proto
+			lintFailureStatus, result := runLinterWithFailureStatus(t, proto, "", []string{})
+			expected := result == ""
+			if lintFailureStatus != expected {
+				t.Fatalf("Expected: %v Actual: %v", expected, lintFailureStatus)
+			}
+		})
+	}
+}
+
 func runLinter(t *testing.T, protoContent, configContent string) string {
+	_, result := runLinterWithFailureStatus(t, protoContent, configContent, []string{})
+	return result
+}
+
+func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string, appendArgs []string) (bool, string) {
 	tempDir, err := ioutil.TempDir("", "test")
 	if err != nil {
 		t.Fatal(err)
@@ -175,16 +231,18 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 		t.Fatal(err)
 	}
 	args = append(args, protoFileName)
+	args = append(args, appendArgs...)
 
-	if err := runCLI(args); err != nil {
-		t.Fatal(err)
+	lintErr := runCLI(args)
+	if lintErr != nil && !errors.Is(lintErr, ExitForLintFailure) {
+		t.Fatal(lintErr)
 	}
 
 	out, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return string(out)
+	return errors.Is(lintErr, ExitForLintFailure), string(out)
 }
 
 func writeFile(path, content string) error {
