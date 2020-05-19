@@ -27,15 +27,24 @@ import (
 var versionedPackages = &lint.FileRule{
 	Name: lint.NewRuleName(215, "versioned-packages"),
 	OnlyIf: func(f *desc.FileDescriptor) bool {
-		return f.GetPackage() != ""
+		p := f.GetPackage()
+		if p != "" {
+			return false
+		}
+		for _, exemptSuffix := range []string{"master", "type"} {
+			if strings.HasSuffix(p, fmt.Sprintf(".%s", exemptSuffix)) {
+				return false
+			}
+		}
+		for _, exemptPrefix := range []string{"google.api", "google.rpc", "google.longrunning"} {
+			if strings.HasPrefix(p, exemptPrefix) {
+				return false
+			}
+		}
+		return true
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		p := f.GetPackage()
-		for _, exception := range []string{"master", "type"} {
-			if strings.HasSuffix(p, fmt.Sprintf(".%s", exception)) {
-				return nil
-			}
-		}
 		if !version.MatchString(p) {
 			return []lint.Problem{{
 				Message:    "API components should be in versioned packages.",
