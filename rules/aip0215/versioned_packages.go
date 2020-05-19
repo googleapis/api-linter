@@ -28,7 +28,7 @@ var versionedPackages = &lint.FileRule{
 	Name: lint.NewRuleName(215, "versioned-packages"),
 	OnlyIf: func(f *desc.FileDescriptor) bool {
 		p := f.GetPackage()
-		if p != "" {
+		if p == "" {
 			return false
 		}
 		for _, exemptSuffix := range []string{"master", "type"} {
@@ -44,8 +44,7 @@ var versionedPackages = &lint.FileRule{
 		return true
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		p := f.GetPackage()
-		if !version.MatchString(p) {
+		if !version.MatchString(f.GetPackage()) {
 			return []lint.Problem{{
 				Message:    "API components should be in versioned packages.",
 				Descriptor: f,
