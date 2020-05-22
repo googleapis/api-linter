@@ -36,7 +36,7 @@ var javaOuterClassname = &lint.FileRule{
 
 		// We ignore case on the comparisons to not be too pedantic on compound
 		// word protos without underscores in the filename.
-		if strings.ToUpper(f.GetFileOptions().GetJavaOuterClassname()) != strings.ToUpper(want) {
+		if !strings.EqualFold(f.GetFileOptions().GetJavaOuterClassname(), strings.ToUpper(want)) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Proto files should set `option java_outer_classname = %q`.",
