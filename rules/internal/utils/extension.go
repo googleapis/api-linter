@@ -61,6 +61,9 @@ func GetMethodSignatures(m *desc.MethodDescriptor) [][]string {
 
 // GetResource returns the google.api.resource annotation.
 func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
+	if m == nil {
+		return nil
+	}
 	opts := m.GetMessageOptions()
 	if x, err := proto.GetExtension(opts, apb.E_Resource); err == nil {
 		return x.(*apb.ResourceDescriptor)

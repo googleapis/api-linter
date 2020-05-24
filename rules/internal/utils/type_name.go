@@ -21,7 +21,7 @@ import (
 )
 
 // GetTypeName returns the name of the type of the field, as a string,
-// regardless
+// regardless of primitive, message, etc.
 //
 // TODO: Add support for map types.
 func GetTypeName(f *desc.FieldDescriptor) string {
