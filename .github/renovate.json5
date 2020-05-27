@@ -1,0 +1,15 @@
+{
+  extends: ["config:base"],
+  commitMessagePrefix: "[chore] ",
+  groupName: "all",
+  ignoreDeps: [
+    // The current version is broken:
+    // https://github.com/gertd/go-pluralize/issues/8
+    "github.com/gertd/go-pluralize",
+
+    // Excessively annoying because any update to any API published by
+    // Google triggers an update to this.
+    "google.golang.org/genproto",
+  ],
+  postUpdateOptions: ["gomodTidy"],
+}
