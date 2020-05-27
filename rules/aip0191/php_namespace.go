@@ -47,10 +47,11 @@ var phpNamespace = &lint.FileRule{
 				return []lint.Problem{{
 					Message: "PHP namespaces use UpperCamelCase.",
 					Suggestion: fmt.Sprintf(
-						"option php_namespace = %q;",
+						"option php_namespace = %s;",
 						// Even though the string value is a single backslash, we want
 						// to suggest two backslashes, because that is what should be
-						// typed into the editor.
+						// typed into the editor. We use %s to avoid additional escaping
+						// of backslashes by Sprintf.
 						strings.ReplaceAll(want, `\`, `\\`),
 					),
 					Descriptor: f,

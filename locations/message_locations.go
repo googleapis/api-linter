@@ -23,5 +23,5 @@ import (
 // MessageResource returns the precise location of the `google.api.resource`
 // annotation.
 func MessageResource(m *desc.MessageDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(m, 7, int(apb.E_Resource.Field)) // MessageDescriptor.options == 7
+	return pathLocation(m, 7, int(apb.E_Resource.TypeDescriptor().Number())) // MessageDescriptor.options == 7
 }

@@ -17,11 +17,11 @@ package aip0231
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestHttpVerb(t *testing.T) {
@@ -54,9 +54,7 @@ func TestHttpVerb(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
-			if err := proto.SetExtension(opts, annotations.E_Http, test.httpRule); err != nil {
-				t.Fatalf("Failed to set google.api.http annotation.")
-			}
+			proto.SetExtension(opts, annotations.E_Http, test.httpRule)
 
 			// Create a minimal service with a AIP-231 Get method
 			// (or with a different method, in the "Irrelevant" case).

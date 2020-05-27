@@ -31,4 +31,26 @@ func TestRequestParentRequired(t *testing.T) {
 			}
 		})
 	}
+
+	// Test the "top-level exception", which is more involved
+	// than the other tests and therefore handled separately.
+	t.Run("ValidTopLevel", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			message ListBooksRequest {}
+			message ListBooksResponse {
+				repeated Book books = 1;
+			}
+			message Book {
+				option (google.api.resource) = {
+					pattern: "books/{book}"
+				};
+				string name = 1;
+			}
+		`)
+		problems := requestParentRequired.Lint(f)
+		if diff := (testutils.Problems{}).Diff(problems); diff != "" {
+			t.Errorf(diff)
+		}
+	})
 }
