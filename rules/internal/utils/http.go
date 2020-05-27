@@ -17,9 +17,9 @@ package utils
 import (
 	"regexp"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 )
 
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
@@ -35,7 +35,7 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
 	opts := m.GetMethodOptions()
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if x, err := proto.GetExtension(opts, apb.E_Http); err == nil {
+	if x := proto.GetExtension(opts, apb.E_Http); x != nil {
 		httpRule := x.(*apb.HttpRule)
 		if parsedRule := parseRule(httpRule); parsedRule != nil {
 			rules = append(rules, parsedRule)
