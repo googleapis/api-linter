@@ -43,7 +43,7 @@ func TestGetFieldBehavior(t *testing.T) {
 	}{
 		{"name", stringset.New("IMMUTABLE", "OUTPUT_ONLY")},
 		{"title", stringset.New("REQUIRED")},
-		{"summary", nil},
+		{"summary", stringset.New()},
 	}
 	for _, test := range tests {
 		t.Run(test.fieldName, func(t *testing.T) {

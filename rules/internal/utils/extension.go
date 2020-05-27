@@ -18,17 +18,17 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	lrpb "google.golang.org/genproto/googleapis/longrunning"
+	"google.golang.org/protobuf/proto"
 )
 
 // GetFieldBehavior returns a stringset.Set of FieldBehavior annotations for
 // the given field.
 func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 	opts := f.GetFieldOptions()
-	if x, err := proto.GetExtension(opts, apb.E_FieldBehavior); err == nil {
+	if x := proto.GetExtension(opts, apb.E_FieldBehavior); x != nil {
 		answer := stringset.New()
 		for _, fb := range x.([]apb.FieldBehavior) {
 			answer.Add(fb.String())
@@ -41,7 +41,7 @@ func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	opts := m.GetMethodOptions()
-	if x, err := proto.GetExtension(opts, lrpb.E_OperationInfo); err == nil {
+	if x := proto.GetExtension(opts, lrpb.E_OperationInfo); x != nil {
 		return x.(*lrpb.OperationInfo)
 	}
 	return nil
@@ -51,7 +51,7 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 func GetMethodSignatures(m *desc.MethodDescriptor) [][]string {
 	answer := [][]string{}
 	opts := m.GetMethodOptions()
-	if x, err := proto.GetExtension(opts, apb.E_MethodSignature); err == nil {
+	if x := proto.GetExtension(opts, apb.E_MethodSignature); x != nil {
 		for _, sig := range x.([]string) {
 			answer = append(answer, strings.Split(sig, ","))
 		}
@@ -65,7 +65,7 @@ func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
 		return nil
 	}
 	opts := m.GetMessageOptions()
-	if x, err := proto.GetExtension(opts, apb.E_Resource); err == nil {
+	if x := proto.GetExtension(opts, apb.E_Resource); x != nil {
 		return x.(*apb.ResourceDescriptor)
 	}
 	return nil
@@ -74,7 +74,7 @@ func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 	opts := f.GetFieldOptions()
-	if x, err := proto.GetExtension(opts, apb.E_ResourceReference); err == nil {
+	if x := proto.GetExtension(opts, apb.E_ResourceReference); x != nil {
 		return x.(*apb.ResourceReference)
 	}
 	return nil
