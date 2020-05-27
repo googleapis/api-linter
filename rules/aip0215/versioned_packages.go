@@ -15,7 +15,6 @@
 package aip0215
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -31,12 +30,12 @@ var versionedPackages = &lint.FileRule{
 		if p == "" {
 			return false
 		}
-		for _, exemptSuffix := range []string{"master", "type"} {
-			if strings.HasSuffix(p, fmt.Sprintf(".%s", exemptSuffix)) {
+		for _, exemptSuffix := range []string{".master", ".type"} {
+			if strings.HasSuffix(p, exemptSuffix) {
 				return false
 			}
 		}
-		for _, exemptPrefix := range []string{"google.api", "google.rpc", "google.longrunning"} {
+		for _, exemptPrefix := range []string{"google.api.", "google.rpc.", "google.longrunning."} {
 			if strings.HasPrefix(p, exemptPrefix) {
 				return false
 			}
