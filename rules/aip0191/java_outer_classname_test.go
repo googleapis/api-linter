@@ -34,7 +34,7 @@ func TestJavaOuterClassname(t *testing.T) {
 		{"ValidCompoundWithUnderscore", "apple_orange.proto", []string{"package foo.v1;", `option java_outer_classname = "AppleOrangeProto";`}, testutils.Problems{}},
 		{"ValidCompoundWithPath", "foo/bar/appleorange.proto", []string{"package foo.v1;", `option java_outer_classname = "AppleOrangeProto";`}, testutils.Problems{}},
 		{"InvalidWrong", "test.proto", []string{"package foo.v1;", `option java_outer_classname = "OtherProto";`}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
-		{"InvalidWrongWithPath", "test.proto", []string{"package foo.v1;", `option java_outer_classname = "OtherProto";`}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"InvalidWrongWithPath", "foo/bar/test.proto", []string{"package foo.v1;", `option java_outer_classname = "OtherProto";`}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"InvalidMissing", "test.proto", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"InvalidMissingWithPath", "foo/bar/test.proto", []string{"package foo.v1;"}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"Ignored", "test.proto", []string{"", ""}, testutils.Problems{}},
