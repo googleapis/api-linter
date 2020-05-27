@@ -46,6 +46,9 @@ func TestVersionedPackages(t *testing.T) {
 		{"Master", "package foo.bar.master;", testutils.Problems{}},
 		{"InvalidNoVersion", "package foo.bar;", testutils.Problems{{Message: "versioned packages"}}},
 		{"InvalidSubpackage", "package foo.bar.v1.resources;", testutils.Problems{{Message: "versioned packages"}}},
+		{"IgnoredRPC", "package google.rpc.foobar;", testutils.Problems{}},
+		{"IgnoredLRO", "package google.longrunning.foobar;", testutils.Problems{}},
+		{"IgnoredAPI", "package google.api.foobar;", testutils.Problems{}},
 		{"IgnoredNoPackage", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
