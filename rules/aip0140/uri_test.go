@@ -27,9 +27,13 @@ func TestURI(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "uri", nil},
-		{"ValidPrefix", "foo_uri", nil},
+		{"ValidPrefix", "uri_foo", nil},
+		{"ValidSuffix", "foo_uri", nil},
+		{"ValidIntermixed", "foo_uri_bar", nil},
 		{"Invalid", "url", testutils.Problems{{Message: "uri", Suggestion: "uri"}}},
-		{"InvalidPrefix", "foo_url", testutils.Problems{{Message: "uri", Suggestion: "foo_uri"}}},
+		{"InvalidPrefix", "url_foo", testutils.Problems{{Message: "uri", Suggestion: "uri_foo"}}},
+		{"InvalidSuffix", "foo_url", testutils.Problems{{Message: "uri", Suggestion: "foo_uri"}}},
+		{"InvalidIntermixed", "foo_url_bar", testutils.Problems{{Message: "uri", Suggestion: "foo_uri_bar"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
