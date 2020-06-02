@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,25 +20,24 @@ import (
 )
 
 var responseRepeatedFirstField = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "response-repeated-first-field"),
-	OnlyIf: isPaginatedResponseMessage,
+	Name: lint.NewRuleName(158, "response-repeated-first-field"),
+	OnlyIf: func(m *desc.MessageDescriptor) bool {
+		return isPaginatedResponseMessage(m) && len(m.GetFields()) > 0
+	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		if len(m.GetFields()) == 0 {
+		// Sanity check: Is the first field (positionally) and the field with
+		// an ID of 1 actually the same field?
+		if m.GetFields()[0] != m.FindFieldByNumber(1) {
 			return []lint.Problem{{
-				Message: "Paginated RPCs' response should have at least 1 field.",
+				Message:    "The first field of paginated RPCs must have a protobuf ID of 1.",
+				Descriptor: m.GetFields()[0],
 			}}
 		}
 
-		if !m.FindFieldByNumber(1).IsRepeated() {
-			return []lint.Problem{{
-				Message:    "First field by number of Paginated RPCs' response should be repeated.",
-				Descriptor: m.FindFieldByNumber(1),
-			}}
-		}
-
+		// Make sure the field is repeated.
 		if !m.GetFields()[0].IsRepeated() {
 			return []lint.Problem{{
-				Message:    "First field by position of Paginated RPCs' response should be repeated.",
+				Message:    "The first field of a paginated response should be repeated.",
 				Descriptor: m.GetFields()[0],
 			}}
 		}

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,29 +27,10 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 		SecondField string
 		problems    testutils.Problems
 	}{
-		{
-			"Valid",
-			"repeated Book books = 1;",
-			"string next_page_token = 2;",
-			testutils.Problems{}},
-		{
-			// should have at least 1 field
-			"InvalidType",
-			"",
-			"",
-			testutils.Problems{{}}},
-		{
-			// first field by number should be repeated.
-			"InvalidType",
-			"repeated string next_page_token = 2;",
-			"Book books = 1;",
-			testutils.Problems{{}}},
-		{
-			// first field by position should be repeated.
-			"InvalidType",
-			"Book books = 2;",
-			"repeated string next_page_token = 1;",
-			testutils.Problems{{}}},
+		{"Valid", "repeated Book books = 1;", "string next_page_token = 2;", nil},
+		{"SkippedZeroFields", "", "", nil},
+		{"InvalidFirstFieldsNoMatch", "string next_page_token = 2;", "repeated Book books = 1;", testutils.Problems{{Message: "protobuf ID"}}},
+		{"InvalidNotRepeated", "Book book = 1;", "string next_page_token = 2;", testutils.Problems{{Message: "repeated"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -65,8 +46,8 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			`, test)
 
 			// Determine the descriptor that a failing test will attach to.
-			if f.GetMessageTypes()[1].FindFieldByName("books") != nil {
-				test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByName("books"))
+			if m := f.GetMessageTypes()[1]; len(m.GetFields()) > 0 {
+				test.problems.SetDescriptor(m.GetFields()[0])
 			}
 
 			// Run the lint rule and establish we get the correct problems.
