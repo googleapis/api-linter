@@ -10,5 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     container: golang:1.14
   steps:
-    - uses: actions/checkout@v2
+    - name: Check out the repository.
+      uses: actions/checkout@v2
     - run: go test -p 1 ./...
