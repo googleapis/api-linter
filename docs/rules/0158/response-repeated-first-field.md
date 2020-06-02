@@ -2,7 +2,7 @@
 rule:
   aip: 158
   name: [core, '0158', response-repeated-first-field]
-  summary:
+  summary: |
     First field (by both position and field number) of Paginated RPCs' response
     should be repeated.
 permalink: /158/response-repeated-first-field
@@ -26,10 +26,10 @@ position and field number) is not repeated.
 **Incorrect** code for this rule:
 
 ```proto
-// Incorrect
+// Incorrect.
 message ListBooksResponse {
-    Book books = 1; // Field should be repeated.
-    string next_page_token = 2;
+  Book books = 1;  // Field should be repeated.
+  string next_page_token = 2;
 }
 ```
 
