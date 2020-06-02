@@ -18,10 +18,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc/builder"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestHttpBody(t *testing.T) {
@@ -48,9 +48,7 @@ func TestHttpBody(t *testing.T) {
 				},
 				Body: test.body,
 			}
-			if err := proto.SetExtension(opts, annotations.E_Http, httpRule); err != nil {
-				t.Fatalf("Failed to set google.api.http annotation.")
-			}
+			proto.SetExtension(opts, annotations.E_Http, httpRule)
 
 			// Create a minimal service with a AIP-134 Update method
 			// (or with a different method, in the "Irrelevant" case).

@@ -30,13 +30,19 @@ func TestJavaOuterClassname(t *testing.T) {
 	}{
 		{"Valid", "test.proto", []string{"package foo.v1;", `option java_outer_classname = "TestProto";`}, testutils.Problems{}},
 		{"ValidWithPath", "foo/bar/test.proto", []string{"package foo.v1;", `option java_outer_classname = "TestProto";`}, testutils.Problems{}},
-		{"Invalid", "test.proto", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
-		{"InvalidWithPath", "foo/bar/test.proto", []string{"package foo.v1;"}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"ValidCompound", "appleorange.proto", []string{"package foo.v1;", `option java_outer_classname = "AppleOrangeProto";`}, testutils.Problems{}},
+		{"ValidCompoundWithUnderscore", "apple_orange.proto", []string{"package foo.v1;", `option java_outer_classname = "AppleOrangeProto";`}, testutils.Problems{}},
+		{"ValidCompoundWithPath", "foo/bar/appleorange.proto", []string{"package foo.v1;", `option java_outer_classname = "AppleOrangeProto";`}, testutils.Problems{}},
+		{"InvalidWrong", "test.proto", []string{"package foo.v1;", `option java_outer_classname = "OtherProto";`}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"InvalidWrongWithPath", "foo/bar/test.proto", []string{"package foo.v1;", `option java_outer_classname = "OtherProto";`}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"InvalidMissing", "test.proto", []string{"package foo.v1;", ""}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
+		{"InvalidMissingWithPath", "foo/bar/test.proto", []string{"package foo.v1;"}, testutils.Problems{{Message: `java_outer_classname = "TestProto"`}}},
 		{"Ignored", "test.proto", []string{"", ""}, testutils.Problems{}},
 		{"IgnoredMaster", "test.proto", []string{"package foo.master;", ""}, testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))
+			files := testutils.ParseProtoStrings(t, map[string]string{test.filename: strings.Join(test.statements, "\n")})
+			f := files[test.filename]
 			if diff := test.problems.SetDescriptor(f).Diff(javaOuterClassname.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}

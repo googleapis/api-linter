@@ -43,7 +43,7 @@ func TestGetFieldBehavior(t *testing.T) {
 	}{
 		{"name", stringset.New("IMMUTABLE", "OUTPUT_ONLY")},
 		{"title", stringset.New("REQUIRED")},
-		{"summary", nil},
+		{"summary", stringset.New()},
 	}
 	for _, test := range tests {
 		t.Run(test.fieldName, func(t *testing.T) {
@@ -146,7 +146,12 @@ func TestGetResource(t *testing.T) {
 	t.Run("Absent", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, "message Book {}")
 		if got := GetResource(f.GetMessageTypes()[0]); got != nil {
-			t.Errorf(`Got "%v", expected nil`, got)
+			t.Errorf(`Got "%v", expected nil.`, got)
+		}
+	})
+	t.Run("Nil", func(t *testing.T) {
+		if got := GetResource(nil); got != nil {
+			t.Errorf(`Got "%v", expected nil.`, got)
 		}
 	})
 }

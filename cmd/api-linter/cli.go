@@ -23,12 +23,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/spf13/pflag"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 

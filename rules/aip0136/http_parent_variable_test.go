@@ -32,6 +32,8 @@ func TestHTTPParentVariable(t *testing.T) {
 		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{parent=publishers/*}/audioBooks:write", testutils.Problems{}},
 		{"Invalid", "WritePage", "/v1/{parent=publishers/*/books/*}:writePage", testutils.Problems{{Message: "parent variable"}}},
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
+		{"ValidBatchGet", "BatchGetBooks", "/v1/{parent=publishers/*}/books:batchGet", testutils.Problems{}},
+		{"ValidBatchCreate", "BatchCreateBooks", "/v1/{parent=publishers/*}/books:batchCreate", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

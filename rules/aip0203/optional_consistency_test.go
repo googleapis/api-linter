@@ -75,11 +75,11 @@ string author = 4;`,
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			template := `
-import "google/api/field_behavior.proto";
-message Book {
-	// Title of the book
-	{{.Field}}
-}`
+				import "google/api/field_behavior.proto";
+				message Book {
+					// Title of the book
+					{{.Field}}
+				}`
 			file := testutils.ParseProto3Tmpl(t, template, struct{ Field string }{test.field})
 			// author field in the test will get the warning
 			f := file.GetMessageTypes()[0].GetFields()[3]

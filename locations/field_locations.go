@@ -23,7 +23,7 @@ import (
 // FieldResourceReference returns the precise location for a field's
 // resource reference annotation.
 func FieldResourceReference(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, 8, int(apb.E_ResourceReference.Field)) // FieldDescriptor.options == 8
+	return pathLocation(f, 8, int(apb.E_ResourceReference.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
 // FieldType returns the precise location for a field's type.
