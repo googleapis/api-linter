@@ -9,7 +9,6 @@ jobs:
     name: Run unit tests.
     runs-on: ubuntu-latest
     container: golang:1.14
-  steps:
-    - name: Check out the repository.
-      uses: actions/checkout@v2
-    - run: go test -p 1 ./...
+    steps:
+      - uses: actions/checkout@v2
+      - run: go test -p 1 ./...
