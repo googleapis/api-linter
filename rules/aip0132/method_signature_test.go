@@ -45,7 +45,9 @@ func TestMethodSignature(t *testing.T) {
 						{{.Signature}}
 					}
 				}
-				message {{.MethodName}}Request {}
+				message {{.MethodName}}Request {
+					string parent = 1;
+				}
 				message Book {}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
@@ -54,4 +56,19 @@ func TestMethodSignature(t *testing.T) {
 			}
 		})
 	}
+
+	// Run a special test for a missing parent.
+	t.Run("MissingParent", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			service Library {
+				rpc ListBooks(ListBooksRequest) returns (Book);
+			}
+			message ListBooksRequest {}
+			message Book {}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(f)); diff != "" {
+			t.Errorf(diff)
+		}
+	})
 }
