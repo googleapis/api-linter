@@ -1,0 +1,29 @@
+---
+name: ci
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    container: golang:1.14
+    steps:
+      - uses: actions/checkout@v2
+      - run: go test -p 1 ./...
+  lint:
+    runs-on: ubuntu-latest
+    container: golang:1.14
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install golangci-lint
+        run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+  quality-checker:
+    runs-on: ubuntu-latest
+    container: golang:1.14-alpine
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the quality checker (which catches obvious mistakes, missing docs, etc.)
+        run: go run ./.github/quality-checker
