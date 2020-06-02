@@ -27,6 +27,9 @@ func TestFieldNames(t *testing.T) {
 	}{
 		{"something_random", testutils.Problems{}},
 		{"content_type", testutils.Problems{{Suggestion: "mime_type"}}},
+		{"country", testutils.Problems{{Suggestion: "region_code"}}},
+		{"country_code", testutils.Problems{{Suggestion: "region_code"}}},
+		{"region_code", testutils.Problems{}},
 		{"currency", testutils.Problems{{Suggestion: "currency_code"}}},
 		{"currency_code", testutils.Problems{}},
 		{"language", testutils.Problems{{Suggestion: "language_code"}}},

@@ -27,7 +27,8 @@ var fieldNames = &lint.FieldRule{
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		variants := map[string]string{
 			"content_type": "mime_type",
-			"country":      "country_code",
+			"country":      "region_code",
+			"country_code": "region_code",
 			"currency":     "currency_code",
 			"lang":         "language_code",
 			"language":     "language_code",
