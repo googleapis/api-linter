@@ -16,9 +16,8 @@ This rule enforces that every proto file for a public API surface sets
 ## Details
 
 This rule looks at each proto file, and complains if the `java_outer_classname`
-file annotation is not present, or set to empty string. It recommends a
-sensible default based on the filename, but does **not** complain if the value
-is set to something else.
+file annotation is not present, or set to something other than the common class
+name based on the proto's filename.
 
 ## Examples
 
