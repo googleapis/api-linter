@@ -27,6 +27,9 @@ import (
 var versionedPackages = &lint.FileRule{
 	Name: lint.NewRuleName(215, "versioned-packages"),
 	OnlyIf: func(f *desc.FileDescriptor) bool {
+		if utils.IsCommonProto(f) {
+			return false
+		}
 		p := f.GetPackage()
 		if p == "" {
 			return false
@@ -35,9 +38,6 @@ var versionedPackages = &lint.FileRule{
 			if strings.HasSuffix(p, exemptSuffix) {
 				return false
 			}
-		}
-		if utils.IsCommonProto(f) {
-			return false
 		}
 		return true
 	},

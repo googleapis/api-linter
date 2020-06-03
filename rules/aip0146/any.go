@@ -24,10 +24,7 @@ import (
 var any = &lint.FieldRule{
 	Name: lint.NewRuleName(146, "any"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		if utils.IsCommonProto(f.GetFile()) {
-			return false
-		}
-		return true
+		return !utils.IsCommonProto(f.GetFile())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if utils.GetTypeName(f) == "google.protobuf.Any" {
