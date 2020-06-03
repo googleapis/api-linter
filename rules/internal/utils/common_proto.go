@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0143 contains rules defined in https://aip.dev/143.
-package aip0143
+package utils
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"strings"
+
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-143 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		143,
-		fieldNames,
-		fieldTypes,
-	)
+// IsCommonProto returns true if a proto file is considered "common".
+func IsCommonProto(f *desc.FileDescriptor) bool {
+	p := f.GetPackage()
+	for _, prefix := range []string{"google.api", "google.protobuf", "google.rpc", "google.longrunning"} {
+		if strings.HasPrefix(p, prefix) {
+			return true
+		}
+	}
+	return false
 }
