@@ -10,7 +10,7 @@ redirect_from:
 
 # Any
 
-This rule discourages the use of `google.protobuf.Any`, as encouraged in
+This rule discourages the use of `google.protobuf.Any`, as described in
 [AIP-146][].
 
 ## Details
