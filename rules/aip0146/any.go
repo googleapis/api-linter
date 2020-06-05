@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,45 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0215
+package aip0146
 
 import (
-	"regexp"
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var versionedPackages = &lint.FileRule{
-	Name: lint.NewRuleName(215, "versioned-packages"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
-		if utils.IsCommonProto(f) {
-			return false
-		}
-		p := f.GetPackage()
-		if p == "" {
-			return false
-		}
-		for _, exemptSuffix := range []string{".master", ".type"} {
-			if strings.HasSuffix(p, exemptSuffix) {
-				return false
-			}
-		}
-		return true
+var any = &lint.FieldRule{
+	Name: lint.NewRuleName(146, "any"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return !utils.IsCommonProto(f.GetFile())
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if !version.MatchString(f.GetPackage()) {
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		if utils.GetTypeName(f) == "google.protobuf.Any" {
 			return []lint.Problem{{
-				Message:    "API components should be in versioned packages.",
+				Message:    "Avoid using google.protobuf.Any fields in public APIs.",
 				Descriptor: f,
-				Location:   locations.FilePackage(f),
+				Location:   locations.FieldType(f),
 			}}
 		}
 		return nil
 	},
 }
-
-var version = regexp.MustCompile(`\.v[\d]+(p[\d]+)?(alpha|beta|eap|test)?[\d]*$`)

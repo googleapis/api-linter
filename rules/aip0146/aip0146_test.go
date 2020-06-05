@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0143 contains rules defined in https://aip.dev/143.
-package aip0143
+package aip0146
 
 import (
+	"testing"
+
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules adds all of the AIP-143 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		143,
-		fieldNames,
-		fieldTypes,
-	)
+func TestAddRules(t *testing.T) {
+	if err := AddRules(lint.NewRuleRegistry()); err != nil {
+		t.Errorf("AddRules got an error: %v", err)
+	}
 }
