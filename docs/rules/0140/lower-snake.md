@@ -8,7 +8,7 @@ redirect_from:
   - /0140/lower-snake
 ---
 
-# Field names: Abbreviations
+# Field names: Lower Snake Case
 
 This rule enforces that field names use `snake_case`, as mandated in
 [AIP-140][].
