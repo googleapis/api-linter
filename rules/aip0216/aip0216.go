@@ -24,5 +24,6 @@ func AddRules(r lint.RuleRegistry) error {
 		216,
 		nesting,
 		synonyms,
+		valueSynonyms,
 	)
 }
