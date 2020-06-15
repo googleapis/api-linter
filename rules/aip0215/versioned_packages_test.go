@@ -44,6 +44,7 @@ func TestVersionedPackages(t *testing.T) {
 		{"Test1", "package foo.bar.v1test1;", testutils.Problems{}},
 		{"Type", "package foo.bar.type;", testutils.Problems{}},
 		{"Master", "package foo.bar.master;", testutils.Problems{}},
+		{"VXMaster", "package foo.bar.v3master;", testutils.Problems{}},
 		{"InvalidNoVersion", "package foo.bar;", testutils.Problems{{Message: "versioned packages"}}},
 		{"InvalidSubpackage", "package foo.bar.v1.resources;", testutils.Problems{{Message: "versioned packages"}}},
 		{"IgnoredRPC", "package google.rpc.foobar;", testutils.Problems{}},
