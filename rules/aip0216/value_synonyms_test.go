@@ -34,7 +34,7 @@ func TestValueSynonyms(t *testing.T) {
 		{"InvalidCanceled", "State", "CANCELED", testutils.Problems{{Suggestion: "CANCELLED"}}},
 		{"InvalidFail", "State", "FAIL", testutils.Problems{{Suggestion: "FAILED"}}},
 		{"InvalidFailure", "State", "FAILURE", testutils.Problems{{Suggestion: "FAILED"}}},
-		{"Ireelevant", "Foo", "SUCCESSFUL", nil},
+		{"Irrelevant", "Foo", "SUCCESSFUL", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
