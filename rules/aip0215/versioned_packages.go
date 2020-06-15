@@ -30,14 +30,13 @@ var versionedPackages = &lint.FileRule{
 		if utils.IsCommonProto(f) {
 			return false
 		}
-		p := f.GetPackage()
-		if p == "" {
+		p := strings.Split(f.GetPackage(), ".")
+		if len(p) == 0 {
 			return false
 		}
-		for _, exemptSuffix := range []string{".master", ".type"} {
-			if strings.HasSuffix(p, exemptSuffix) {
-				return false
-			}
+		// Exempt anything ending in .type, or .v1master, .v2master, .master, etc.
+		if last := p[len(p)-1]; last == "type" || strings.HasSuffix(last, "master") {
+			return false
 		}
 		return true
 	},
