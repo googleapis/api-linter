@@ -27,18 +27,23 @@ import (
 var versionedPackages = &lint.FileRule{
 	Name: lint.NewRuleName(215, "versioned-packages"),
 	OnlyIf: func(f *desc.FileDescriptor) bool {
+		// Common protos are exempt.
 		if utils.IsCommonProto(f) {
 			return false
 		}
-		p := f.GetPackage()
-		if p == "" {
+
+		// Ignore this if there is no package.
+		p := strings.Split(f.GetPackage(), ".")
+		if len(p) == 1 && p[0] == "" {
 			return false
 		}
-		for _, exemptSuffix := range []string{".master", ".type"} {
-			if strings.HasSuffix(p, exemptSuffix) {
-				return false
-			}
+
+		// Exempt anything ending in .type, or .v1master, .v2master, .master, etc.
+		if last := p[len(p)-1]; last == "type" || strings.HasSuffix(last, "master") {
+			return false
 		}
+
+		// Everything else should follow the rule.
 		return true
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
