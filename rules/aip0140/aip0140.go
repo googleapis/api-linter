@@ -32,6 +32,7 @@ func AddRules(r lint.RuleRegistry) error {
 		base64,
 		lowerSnake,
 		noPrepositions,
+		numbers,
 		reservedWords,
 		uri,
 	)
