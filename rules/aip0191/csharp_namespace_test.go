@@ -27,8 +27,9 @@ func TestCsharpNamespace(t *testing.T) {
 		CsharpNamespace string
 		problems        testutils.Problems
 	}{
-		{"Valid", "Google.Example.V1", testutils.Problems{}},
-		{"ValidBeta", "Google.Example.V1Beta1", testutils.Problems{}},
+		{"Valid", "Google.Example.V1", nil},
+		{"ValidBeta", "Google.Example.V1Beta1", nil},
+		{"ValidPointBeta", "Google.Example.V1P1Beta1", nil},
 		{"InvalidBadChars", "Google:Example:V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google.example.v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option csharp_namespace = %q;", "Google.Example.V1"),
@@ -38,6 +39,9 @@ func TestCsharpNamespace(t *testing.T) {
 		}}},
 		{"InvalidBeta", "Google.Example.V1beta1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option csharp_namespace = %q;", "Google.Example.V1Beta1"),
+		}}},
+		{"InvalidPointBeta", "Google.Example.V1p1beta1", testutils.Problems{{
+			Suggestion: fmt.Sprintf("option csharp_namespace = %q;", "Google.Example.V1P1Beta1"),
 		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
