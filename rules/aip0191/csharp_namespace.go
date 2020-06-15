@@ -44,7 +44,11 @@ var csharpNamespace = &lint.FileRule{
 				wantSegment := csharpVersionRegexp.ReplaceAllStringFunc(
 					strcase.UpperCamelCase(segment),
 					func(s string) string {
-						stability := csharpVersionRegexp.FindStringSubmatch(s)[1]
+						point := csharpVersionRegexp.FindStringSubmatch(s)[1]
+						if point != "" {
+							s = strings.ReplaceAll(s, point, strings.ToUpper(point))
+						}
+						stability := csharpVersionRegexp.FindStringSubmatch(s)[2]
 						return strings.ReplaceAll(s, stability, strings.Title(stability))
 					},
 				)
@@ -64,4 +68,4 @@ var csharpNamespace = &lint.FileRule{
 }
 
 var csharpValidChars = regexp.MustCompile("^[A-Za-z0-9.]+$")
-var csharpVersionRegexp = regexp.MustCompile("[0-9]+(alpha|beta)")
+var csharpVersionRegexp = regexp.MustCompile("[0-9]+(p[0-9]+)?(alpha|beta)")
