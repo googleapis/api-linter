@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,10 +26,7 @@ import (
 var valueSynonyms = &lint.EnumValueRule{
 	Name: lint.NewRuleName(216, "value-synonyms"),
 	OnlyIf: func(v *desc.EnumValueDescriptor) bool {
-		if strings.HasSuffix(v.GetEnum().GetName(), "State") {
-			return true
-		}
-		return false
+		return strings.HasSuffix(v.GetEnum().GetName(), "State")
 	},
 	LintEnumValue: func(v *desc.EnumValueDescriptor) []lint.Problem {
 		for bad, good := range map[string]string{
