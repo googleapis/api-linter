@@ -82,4 +82,30 @@ func TestMethodSignature(t *testing.T) {
 			}
 		})
 	}
+
+	// Add a separate test for the no-parent case rather than introducing yet
+	// another knob on the above test.
+	t.Run("NoParent", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			import "google/api/resource.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (Book) {
+					option (google.api.method_signature) = "book,book_id";
+				}
+			}
+			message CreateBookRequest {
+				Book book = 1;
+				string book_id = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					pattern: "books/{book}"
+				};
+			}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
+			t.Errorf(diff)
+		}
+	})
 }

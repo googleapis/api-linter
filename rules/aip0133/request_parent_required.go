@@ -23,12 +23,8 @@ var requestParentRequired = &lint.MessageRule{
 			// and then inspect the pattern there (oy!).
 			singular := getResourceMsgNameFromReq(m)
 			if field := m.FindFieldByName(strcase.SnakeCase(singular)); field != nil {
-				if resource := utils.GetResource(field.GetMessageType()); resource != nil {
-					for _, pattern := range resource.GetPattern() {
-						if strings.Count(pattern, "{") == 1 {
-							return nil
-						}
-					}
+				if hasNoParent(field.GetMessageType()) {
+					return nil
 				}
 			}
 
@@ -41,4 +37,15 @@ var requestParentRequired = &lint.MessageRule{
 
 		return nil
 	},
+}
+
+func hasNoParent(m *desc.MessageDescriptor) bool {
+	if resource := utils.GetResource(m); resource != nil {
+		for _, pattern := range resource.GetPattern() {
+			if strings.Count(pattern, "{") == 1 {
+				return true
+			}
+		}
+	}
+	return false
 }

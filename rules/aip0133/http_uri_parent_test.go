@@ -25,27 +25,34 @@ func TestHttpUriField(t *testing.T) {
 		testName   string
 		URI        string
 		MethodName string
+		Pattern    string
 		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", testutils.Problems{}},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", testutils.Problems{{Message: "`parent` field"}}},
-		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", testutils.Problems{{Message: "`parent` field"}}},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", testutils.Problems{}},
+		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", nil},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` field"}}},
+		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` field"}}},
+		{"NoParent", "/v1/books/*", "CreateBook", "books/{book}", nil},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "publishers/{publisher}/books/{book}", nil},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
 			  service Library {
-					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
 						option (google.api.http) = {
-							get: "{{.URI}}"
+							post: "{{.URI}}"
 						};
 					}
 				}
 				message {{.MethodName}}Request {}
-				message {{.MethodName}}Response {}
+				message Book {
+					option (google.api.resource) = {
+						pattern: "{{.Pattern}}"
+					};
+				}
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIField.Lint(f)); diff != "" {
