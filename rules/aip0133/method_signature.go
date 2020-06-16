@@ -35,7 +35,11 @@ var methodSignature = &lint.MethodRule{
 		// Determine what signature we want. The {resource}_id is desired
 		// if and only if the field exists on the request.
 		resourceField := strcase.SnakeCase(getResourceMsgName(m))
-		want := []string{"parent", resourceField}
+		want := []string{}
+		if !hasNoParent(m.GetOutputType()) {
+			want = append(want, "parent")
+		}
+		want = append(want, resourceField)
 		if idField := resourceField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
 			want = append(want, idField)
 		}
