@@ -6,10 +6,15 @@
     // The current version is broken:
     // https://github.com/gertd/go-pluralize/issues/8
     "github.com/gertd/go-pluralize",
-
-    // Excessively annoying because any update to any API published by
-    // Google triggers an update to this.
-    "google.golang.org/genproto",
+  ],
+  packageRules: [
+    {
+      // The genproto package is updated every time that any API published by
+      // Google receives an update. This is excessively irritating, and
+      // therefore we limit updates to once a month.
+      packageNames: ["google.golang.org/genproto"],
+      extends: ["schedule:monthly"],
+    },
   ],
   postUpdateOptions: ["gomodTidy"],
 }
