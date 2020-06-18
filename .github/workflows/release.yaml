@@ -5,10 +5,12 @@ on:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-    container: golang:1.14
     steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.14"
       - uses: actions/checkout@v2
       - name: Install the cross-platform build tool.
         run: |
@@ -18,7 +20,7 @@ jobs:
         run: |
           cat > cmd/api-linter/version.go <<EOF
           package main
-          const version = "${{ github.ref }}"
+          const version = "${{ github.ref[10:] }}"
           EOF
       - name: Build for the major platforms.
         run: |
@@ -26,28 +28,25 @@ jobs:
             gox -osarch $arch -output api-linter ./... && \
             tar cvfz api-linter-${arch/\//-}.tar.gz api-linter
           done
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+        shell: bash
       - name: Create the ${{ github.ref }} GitHub release.
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: api-linter ${{ github.ref }}
+          tag_name: ${{ github.ref[10:] }}
+          release_name: api-linter ${{ github.ref[10:] }}
           draft: true # change to false once done thrashing
           prerelease: true # change to false once done thrashing
       - name: Upload the linux/amd64 release.
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-linux-amd64.tar.gz
-          asset_name: aip-linter-linux-amd64.tar.gz
+          asset_name: aip-linter-${{ github.ref[10:] }}-linux-amd64.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the linux/arm release.
         uses: actions/upload-release-asset@v1
@@ -56,7 +55,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-linux-arm.tar.gz
-          asset_name: aip-linter-linux-arm.tar.gz
+          asset_name: aip-linter-${{ github.ref[10:] }}-linux-arm.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the darwin/amd64 release.
         uses: actions/upload-release-asset@v1
@@ -65,7 +64,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-darwin-amd64.tar.gz
-          asset_name: aip-linter-darwin-amd64.tar.gz
+          asset_name: aip-linter-${{ github.ref[10:] }}-darwin-amd64.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the windows/amd64 release.
         uses: actions/upload-release-asset@v1
@@ -74,5 +73,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-windows-amd64.tar.gz
-          asset_name: aip-linter-windows-amd64.tar.gz
+          asset_name: aip-linter-${{ github.ref[10:] }}-windows-amd64.tar.gz
           asset_content_type: application/tar+gzip
