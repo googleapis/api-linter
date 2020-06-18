@@ -12,10 +12,22 @@ jobs:
         with:
           go-version: "1.14"
       - uses: actions/checkout@v2
+
+      # The API linter does not use these,  but we need them to build the
+      # binaries.
+      #
+      # Mousetrap is installed individually because it is needed for the
+      # Windows build. Since we are building on Linux, it is not installed
+      # automatically as a dependency.
       - name: Install the cross-platform build tool.
         run: |
           go get github.com/mitchellh/gox
           go get github.com/inconshreveable/mousetrap
+
+      # GitHub will only send "refs/tags/vX.Y.Z" rather than the actual
+      # tag name. In addition to writing the Go file so the version is
+      # compiled into the binary, this step stores the "vX.Y.Z" string as
+      # output so that later steps can use it.
       - name: Set the version number.
         id: version
         run: |
@@ -24,9 +36,10 @@ jobs:
           var version = "${{ github.ref }}"[10:]
           EOF
           echo "::set-output name=version::${${{ github.ref }}:10}"
-        outputs:
-          version:
-            description: The version number.
+
+      # Platforms to build on are hard-coded here.
+      # We iterate over them separately so we can tar them and only have
+      # `api-linter` as the binary name once un-tarred.
       - name: Build for the major platforms.
         run: |
           for arch in "linux/amd64" "linux/arm" "darwin/amd64" "windows/amd64"; do
@@ -34,6 +47,10 @@ jobs:
             tar cvfz api-linter-${arch/\//-}.tar.gz api-linter
           done
         shell: bash
+
+      # This creates the GitHub release.
+      # Note: A failure after this point will leave a half-completed job
+      # on GitHub and probably require manual intervention.
       - name: Create the GitHub release.
         id: create_release
         uses: actions/create-release@v1
@@ -44,6 +61,8 @@ jobs:
           release_name: api-linter ${{ github.ref }}
           draft: true # change to false once done thrashing
           prerelease: true # change to false once done thrashing
+
+      # Upload the binaries to the release.
       - name: Upload the linux/amd64 release.
         uses: actions/upload-release-asset@v1
         env:
