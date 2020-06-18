@@ -20,7 +20,7 @@ jobs:
         run: |
           cat > cmd/api-linter/version.go <<EOF
           package main
-          const version = "${{ github.ref }}"
+          var version = "${{ github.ref }}"[10:]
           EOF
       - name: Build for the major platforms.
         run: |
@@ -29,7 +29,7 @@ jobs:
             tar cvfz api-linter-${arch/\//-}.tar.gz api-linter
           done
         shell: bash
-      - name: Create the ${{ github.ref }} GitHub release.
+      - name: Create the GitHub release.
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -46,7 +46,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-linux-amd64.tar.gz
-          asset_name: aip-linter-${{ github.ref }}-linux-amd64.tar.gz
+          asset_name: aip-linter-${{ steps.create_release.outputs.name }}-linux-amd64.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the linux/arm release.
         uses: actions/upload-release-asset@v1
@@ -55,7 +55,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-linux-arm.tar.gz
-          asset_name: aip-linter-${{ github.ref }}-linux-arm.tar.gz
+          asset_name: aip-linter-${{ steps.create_release.outputs.name }}-linux-arm.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the darwin/amd64 release.
         uses: actions/upload-release-asset@v1
@@ -64,7 +64,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-darwin-amd64.tar.gz
-          asset_name: aip-linter-${{ github.ref }}-darwin-amd64.tar.gz
+          asset_name: aip-linter-${{ steps.create_release.outputs.name }}-darwin-amd64.tar.gz
           asset_content_type: application/tar+gzip
       - name: Upload the windows/amd64 release.
         uses: actions/upload-release-asset@v1
@@ -73,5 +73,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./api-linter-windows-amd64.tar.gz
-          asset_name: aip-linter-${{ github.ref }}-windows-amd64.tar.gz
+          asset_name: aip-linter-${{ steps.create_release.outputs.name }}-windows-amd64.tar.gz
           asset_content_type: application/tar+gzip
