@@ -37,6 +37,7 @@ type cli struct {
 	FormatType              string
 	OutputPath              string
 	ExitStatusOnLintFailure bool
+	VersionFlag             bool
 	ProtoImportPaths        []string
 	ProtoFiles              []string
 	ProtoDescPath           []string
@@ -52,6 +53,7 @@ func newCli(args []string) *cli {
 	var fmtFlag string
 	var outFlag string
 	var setExitStatusOnLintFailure bool
+	var versionFlag bool
 	var protoImportFlag []string
 	var protoDescFlag []string
 	var ruleEnableFlag []string
@@ -63,6 +65,7 @@ func newCli(args []string) *cli {
 	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
+	fs.BoolVar(&versionFlag, "version", false, "Print version and exit.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
 	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
@@ -84,10 +87,17 @@ func newCli(args []string) *cli {
 		EnabledRules:            ruleEnableFlag,
 		DisabledRules:           ruleDisableFlag,
 		ProtoFiles:              fs.Args(),
+		VersionFlag:             versionFlag,
 	}
 }
 
 func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
+	// Print version and exit if asked.
+	if c.VersionFlag {
+		fmt.Printf("api-linter %s\n", version)
+		return nil
+	}
+
 	// Pre-check if there are files to lint.
 	if len(c.ProtoFiles) == 0 {
 		return fmt.Errorf("no file to lint")

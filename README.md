@@ -18,6 +18,27 @@ When able, it also offers a suggestion for the correct fix.
 
 [_Read more ≫_](https://linter.aip.dev/)
 
+## Versioning
+
+The Google API linter does **not** follow semantic versioning. Semantic
+versioning is challenging for a tool like a linter because the addition or
+correction of virtually any rule is "breaking" (in the sense that a file that
+previously reported no problems may now do so).
+
+Therefore, the version numbers refer to the linter's core interface. In
+general:
+
+- Releases with only documentation, chores, dependency upgrades, and/or
+  bugfixes are patch releases.
+- Releases with new rules (or potentially removed rules) are minor releases.
+- Releases with core interface alterations are major releases. This could
+  include changes to the internal Go interface or the CLI user interface.
+
+**Note:** Releases that increment the Go version will be considered minor.
+
+This is an attempt to follow the spirit of semantic versioning while still
+being useful.
+
 ## License
 
 This software is made available under the [Apache 2.0][] license.
