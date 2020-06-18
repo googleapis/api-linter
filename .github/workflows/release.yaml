@@ -25,9 +25,10 @@ jobs:
           go get github.com/inconshreveable/mousetrap
 
       # GitHub will only send "refs/tags/vX.Y.Z" rather than the actual
-      # tag name. In addition to writing the Go file so the version is
-      # compiled into the binary, this step stores the "vX.Y.Z" string as
-      # output so that later steps can use it.
+      # tag name. We solve that problem in version.go by just slicing it in Go.
+      # In addition to writing the Go file so the version is compiled into
+      # the binary, this step stores the "vX.Y.Z" string as output so that
+      # later steps can use it.
       - name: Set the version number.
         id: version
         run: |
@@ -35,7 +36,7 @@ jobs:
           package main
           var version = "${{ github.ref }}"[10:]
           EOF
-          echo "::set-output name=version::${${{ github.ref }}:10}"
+          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
       # Platforms to build on are hard-coded here.
       # We iterate over them separately so we can tar them and only have
