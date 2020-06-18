@@ -3,9 +3,9 @@ name: release
 on:
   push:
     tags:
-      - /^v\d+\.\d+\.\d+$|^v\d+\.\d+\.\d+-[a-z]+$/
+      - v[0-9]+.[0-9]+.[0-9]+
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     container: golang:1.14
     steps:
@@ -26,6 +26,10 @@ jobs:
             gox -osarch $arch -output api-linter ./... && \
             tar cvfz api-linter-${arch/\//-}.tar.gz api-linter
           done
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Create the ${{ github.ref }} GitHub release.
         id: create_release
         uses: actions/create-release@v1
