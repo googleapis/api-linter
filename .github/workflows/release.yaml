@@ -70,7 +70,7 @@ jobs:
       # `api-linter` as the binary name once un-tarred.
       - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
-          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
+          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter* ./... && \
           tar cvfz api-linter.tar.gz api-linter
 
       # This creates the GitHub release.
