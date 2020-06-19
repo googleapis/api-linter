@@ -34,6 +34,7 @@ func TestHTTPParentVariable(t *testing.T) {
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
 		{"ValidBatchGet", "BatchGetBooks", "/v1/{parent=publishers/*}/books:batchGet", testutils.Problems{}},
 		{"ValidBatchCreate", "BatchCreateBooks", "/v1/{parent=publishers/*}/books:batchCreate", testutils.Problems{}},
+		{"ValidTwoWordNoudBatch", "BatchUpdateAudioBooks", "/v1/{parent=publishers/*}/audioBooks:batchUpdate", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
