@@ -3,6 +3,10 @@
 
 # Google API Linter
 
+![ci](https://github.com/googleapis/api-linter/workflows/ci/badge.svg)
+![latest release](https://img.shields.io/github/v/release/googleapis/api-linter)
+![go version](https://img.shields.io/github/go-mod/go-version/googleapis/api-linter)
+
 The API linter provides real-time checks for compliance with many of Google's
 API standards, documented using [API Improvement Proposals][]. It operates on
 API surfaces defined in [protocol buffers][].
@@ -39,8 +43,8 @@ It will install `api-linter` into your local Go binary directory
 `$HOME/go/bin`. Ensure that your operating system's `PATH` contains the Go
 binary directory.
 
-**Note:** For working in Google-internal source control, you should
-use the released binary `/google/bin/releases/api-linter/api-linter`.
+**Note:** For working in Google-internal source control, you should use the
+released binary `/google/bin/releases/api-linter/api-linter`.
 
 ## Usage
 
