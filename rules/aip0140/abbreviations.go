@@ -21,6 +21,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 var expectedAbbreviations = map[string]string{
@@ -51,17 +52,19 @@ var abbreviations = &lint.DescriptorRule{
 		// Iterate over each abbreviation and determine whether the descriptor's
 		// name includes the long name.
 		for long, short := range expectedAbbreviations {
-			if strings.Contains(d.GetName(), caseFunc(long)) {
-				problems = append(problems, lint.Problem{
-					Message: fmt.Sprintf(
-						"Use the common abbreviation %q instead of %q.",
-						caseFunc(short),
-						caseFunc(long),
-					),
-					Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
-					Descriptor: d,
-					Location:   locations.DescriptorName(d),
-				})
+			for _, segment := range strings.Split(strcase.SnakeCase(d.GetName()), "_") {
+				if segment == long {
+					problems = append(problems, lint.Problem{
+						Message: fmt.Sprintf(
+							"Use the common abbreviation %q instead of %q.",
+							caseFunc(short),
+							caseFunc(long),
+						),
+						Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
+						Descriptor: d,
+						Location:   locations.DescriptorName(d),
+					})
+				}
 			}
 		}
 		return

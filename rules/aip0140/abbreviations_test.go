@@ -125,5 +125,6 @@ func buildTests(caseFunc func(string) string) []abbvTest {
 		{caseFunc("book_spec"), testutils.Problems{}},
 		{caseFunc("book_statistics"), testutils.Problems{{Suggestion: caseFunc("book_stats")}}},
 		{caseFunc("book_stats"), testutils.Problems{}},
+		{caseFunc("informational_book"), testutils.Problems{}},
 	}
 }
