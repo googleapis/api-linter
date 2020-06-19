@@ -58,7 +58,7 @@ jobs:
         run: |
           cat > cmd/api-linter/version.go <<EOF
           package main
-          var version = "${{ needs.release.outputs.version }}"
+          const version = "${{ needs.release.outputs.version }}"
           EOF
       - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
