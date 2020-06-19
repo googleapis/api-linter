@@ -26,6 +26,9 @@ import (
 //
 // Anything that satisfies this interface can be used as a rule,
 // but most rule authors will want to use the implementations provided.
+//
+// Rules must only report errors in the file under which they are being run
+// (not imported files).
 type ProtoRule interface {
 	// GetName returns the name of the rule.
 	GetName() RuleName
