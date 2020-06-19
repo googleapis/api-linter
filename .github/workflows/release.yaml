@@ -19,8 +19,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: api-linter ${{ steps.version.outputs.version }}
-          draft: true # change to false once done thrashing
-          prerelease: true # change to false once done thrashing
+          draft: true # Change to false once release notes are automatic.
+          prerelease: false
     outputs:
       version: ${{ steps.version.outputs.version }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
