@@ -8,6 +8,37 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Set the version number.
+        id: version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/v}
+      - name: Create the GitHub release.
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: api-linter ${{ steps.version.outputs.version }}
+          draft: true # change to false once done thrashing
+          prerelease: true # change to false once done thrashing
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+  build:
+    runs-on: ubuntu-latest
+    needs: release
+    strategy:
+      matrix:
+        osarch:
+          - os: linux
+            arch: amd64
+          - os: linux
+            arch: arm
+          - os: darwin
+            arch: amd64
+          - os: windows
+            arch: amd64
+    steps:
       - uses: actions/setup-go@v2
         with:
           go-version: "1.14"
@@ -24,79 +55,35 @@ jobs:
           go get github.com/mitchellh/gox
           go get github.com/inconshreveable/mousetrap
 
-      # GitHub will only send "refs/tags/vX.Y.Z" rather than the actual
-      # tag name. We solve that problem in version.go by just slicing it in Go.
-      # In addition to writing the Go file so the version is compiled into
-      # the binary, this step stores the "vX.Y.Z" string as output so that
-      # later steps can use it.
+      # This makes the compiled binary respond correctly to `--version`
+      # in the CLI.
       - name: Set the version number.
         id: version
         run: |
           cat > cmd/api-linter/version.go <<EOF
           package main
-          var version = "${{ github.ref }}"[10:]
+          var version = "${{ needs.release.outputs.version }}"
           EOF
-          echo ::set-output name=version::${GITHUB_REF#refs/tags/}
 
       # Platforms to build on are hard-coded here.
       # We iterate over them separately so we can tar them and only have
       # `api-linter` as the binary name once un-tarred.
-      - name: Build for the major platforms.
+      - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
-          for arch in "linux/amd64" "linux/arm" "darwin/amd64" "windows/amd64"; do
-            gox -osarch $arch -output api-linter ./... && \
-            tar cvfz api-linter-${arch/\//-}.tar.gz api-linter
-          done
-        shell: bash
+          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
+          tar cvfz api-linter.tar.gz api-linter
 
       # This creates the GitHub release.
       # Note: A failure after this point will leave a half-completed job
       # on GitHub and probably require manual intervention.
-      - name: Create the GitHub release.
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: api-linter ${{ github.ref }}
-          draft: true # change to false once done thrashing
-          prerelease: true # change to false once done thrashing
 
       # Upload the binaries to the release.
-      - name: Upload the linux/amd64 release.
+      - name: Upload the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} release.
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-linter-linux-amd64.tar.gz
-          asset_name: api-linter-${{ steps.version.outputs.version }}-linux-amd64.tar.gz
-          asset_content_type: application/tar+gzip
-      - name: Upload the linux/arm release.
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-linter-linux-arm.tar.gz
-          asset_name: api-linter-${{ steps.version.outputs.version }}-linux-arm.tar.gz
-          asset_content_type: application/tar+gzip
-      - name: Upload the darwin/amd64 release.
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-linter-darwin-amd64.tar.gz
-          asset_name: api-linter-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz
-          asset_content_type: application/tar+gzip
-      - name: Upload the windows/amd64 release.
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-linter-windows-amd64.tar.gz
-          asset_name: api-linter-${{ steps.version.outputs.version }}-windows-amd64.tar.gz
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./api-linter.tar.gz
+          asset_name: api-linter-${{ needs.release.outputs.version }}-${{ matrix.osarch.os }}-${{ matrix.osarch.arch }}.tar.gz
           asset_content_type: application/tar+gzip
