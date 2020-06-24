@@ -156,6 +156,53 @@ func TestGetResource(t *testing.T) {
 	})
 }
 
+func TestGetResourceDefinition(t *testing.T) {
+	t.Run("Zero", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+		`)
+		if got := GetResourceDefinitions(f); got != nil {
+			t.Errorf("Got %v, expected nil.", got)
+		}
+	})
+	t.Run("One", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			option (google.api.resource_definition) = {
+				type: "library.googleapis.com/Book"
+			};
+		`)
+		defs := GetResourceDefinitions(f)
+		if got, want := len(defs), 1; got != want {
+			t.Errorf("Got %d definitions, expected %d.", got, want)
+		}
+		if got, want := defs[0].GetType(), "library.googleapis.com/Book"; got != want {
+			t.Errorf("Got %s for type, expected %s.", got, want)
+		}
+	})
+	t.Run("Two", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			option (google.api.resource_definition) = {
+				type: "library.googleapis.com/Book"
+			};
+			option (google.api.resource_definition) = {
+				type: "library.googleapis.com/Author"
+			};
+		`)
+		defs := GetResourceDefinitions(f)
+		if got, want := len(defs), 2; got != want {
+			t.Errorf("Got %d definitions, expected %d.", got, want)
+		}
+		if got, want := defs[0].GetType(), "library.googleapis.com/Book"; got != want {
+			t.Errorf("Got %s for type, expected %s.", got, want)
+		}
+		if got, want := defs[1].GetType(), "library.googleapis.com/Author"; got != want {
+			t.Errorf("Got %s for type, expected %s.", got, want)
+		}
+	})
+}
+
 func TestGetResourceReference(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, `

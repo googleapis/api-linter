@@ -71,6 +71,16 @@ func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
 	return nil
 }
 
+// GetResourceDefinitions returns the google.api.resource_definition annotations
+// for a file.
+func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
+	opts := f.GetFileOptions()
+	if x := proto.GetExtension(opts, apb.E_ResourceDefinition); x != nil {
+		return x.([]*apb.ResourceDescriptor)
+	}
+	return nil
+}
+
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 	opts := f.GetFieldOptions()
