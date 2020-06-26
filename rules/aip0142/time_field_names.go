@@ -46,19 +46,21 @@ var fieldNames = &lint.FieldRule{
 
 		// Look for timestamps that do not end in `_time` or, if repeated, `_times`.
 		if utils.GetTypeName(f) == "google.protobuf.Timestamp" && !strings.HasSuffix(f.GetName(), "_time") {
-			if !f.IsRepeated() {
-				return []lint.Problem{{
-					Message:    "Timestamp fields should end in `_time`.",
-					Descriptor: f,
-					Location:   locations.DescriptorName(f),
-				}}
-			} else if !strings.HasSuffix(f.GetName(), "_times") {
+			if f.IsRepeated() {
+				if strings.HasSuffix(f.GetName(), "_times") {
+					return nil
+				}
 				return []lint.Problem{{
 					Message:    "Repeated Timestamp fields should end in `_time` or `_times`.",
 					Descriptor: f,
 					Location:   locations.DescriptorName(f),
 				}}
 			}
+			return []lint.Problem{{
+					Message:    "Timestamp fields should end in `_time`.",
+					Descriptor: f,
+					Location:   locations.DescriptorName(f),
+			}}
 		}
 
 		return nil
