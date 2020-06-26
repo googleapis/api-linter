@@ -31,6 +31,8 @@ func TestFieldName(t *testing.T) {
 		{"InvalidIsMistake", "google.protobuf.Timestamp", "created", testutils.Problems{{Suggestion: "create_time"}}},
 		{"InvalidContainsMistake", "google.protobuf.Timestamp", "last_modified", testutils.Problems{{Suggestion: "update_time"}}},
 		{"InvalidNoSuffix", "google.protobuf.Timestamp", "create", testutils.Problems{{Message: "should end"}}},
+		{"InvalidNoSuffixRepeatedPlural", "repeated google.protobuf.Timestamp", "sample_times", testutils.Problems{}},
+		{"InvalidNoSuffixRepeated", "repeated google.protobuf.Timestamp", "sample_time", testutils.Problems{}},
 		{"InvalidIsTypeMistake", "int32", "created", testutils.Problems{{Suggestion: "create_time"}}},
 	}
 	for _, test := range tests {
