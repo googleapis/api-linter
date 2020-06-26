@@ -36,7 +36,7 @@ are used. These are:
 message Book {
   string name = 1;
   google.protobuf.Timestamp published = 2;  // Should be `publish_time`.
-  repeated google.protobuf.Timestamp created = 3; // Should be `create_time` or `create_times`.
+  repeated google.protobuf.Timestamp updated = 3; // Should be `update_time` or `update_times`.
 }
 ```
 
@@ -47,7 +47,7 @@ message Book {
 message Book {
   string name = 1;
   google.protobuf.Timestamp publish_time = 2;
-  repeated google.protobuf.Timestamp create_times = 3;
+  repeated google.protobuf.Timestamp update_times = 3;
 }
 ```
 
