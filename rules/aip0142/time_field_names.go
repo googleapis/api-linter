@@ -57,9 +57,9 @@ var fieldNames = &lint.FieldRule{
 				}}
 			}
 			return []lint.Problem{{
-					Message:    "Timestamp fields should end in `_time`.",
-					Descriptor: f,
-					Location:   locations.DescriptorName(f),
+				Message:    "Timestamp fields should end in `_time`.",
+				Descriptor: f,
+				Location:   locations.DescriptorName(f),
 			}}
 		}
 
