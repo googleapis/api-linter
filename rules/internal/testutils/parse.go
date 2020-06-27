@@ -82,20 +82,37 @@ func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
 // It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3String.
 func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescriptor {
-	// Create a new template object.
-	tmpl, err := template.New("test").Parse(src)
-	if err != nil {
-		t.Fatalf("Unable to parse Go template: %v", err)
-	}
+	return ParseProto3Tmpls(t, map[string]string{
+		"test.proto": src,
+	}, data)["test.proto"]
+}
 
-	// Execute the template and write the results to a bytes representing
-	// the desired proto.
-	var protoBytes bytes.Buffer
-	err = tmpl.Execute(&protoBytes, data)
-	if err != nil {
-		t.Fatalf("Unable to execute Go template: %v", err)
+// ParseProto3Tmpls parses template strings representing a proto file,
+// and returns FileDescriptors.
+//
+// It parses the template using Go's text/template Parse function, and then
+// calls ParseProto3Strings.
+func ParseProto3Tmpls(t *testing.T, srcs map[string]string, data interface{}) map[string]*desc.FileDescriptor {
+	strs := map[string]string{}
+	for fn, src := range srcs {
+		// Create a new template object.
+		tmpl, err := template.New("test").Parse(src)
+		if err != nil {
+			t.Fatalf("Unable to parse Go template: %v", err)
+		}
+
+		// Execute the template and write the results to a bytes representing
+		// the desired proto.
+		var protoBytes bytes.Buffer
+		err = tmpl.Execute(&protoBytes, data)
+		if err != nil {
+			t.Fatalf("Unable to execute Go template: %v", err)
+		}
+
+		// Add the proto to the map to send to parse strings.
+		strs[fn] = fmt.Sprintf("syntax = %q;\n\n%s", "proto3", protoBytes.String())
 	}
 
 	// Parse the proto as a string.
-	return ParseProto3String(t, protoBytes.String())
+	return ParseProtoStrings(t, strs)
 }
