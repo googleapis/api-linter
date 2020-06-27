@@ -39,6 +39,7 @@ var validReference = &lint.FieldRule{
 				"cloudresourcemanager.googleapis.com/Organization",
 				"cloudresourcemanager.googleapis.com/Folder",
 				"billing.googleapis.com/BillingAccount",
+				"locations.googleapis.com/Location",
 
 				// If no type is declared, ignore this.
 				"",
