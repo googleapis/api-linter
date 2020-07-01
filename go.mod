@@ -13,7 +13,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
-	google.golang.org/genproto v0.0.0-20200626011028-ee7919e894b5
+	google.golang.org/genproto v0.0.0-20200701001935-0939c5918c31
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.3.0
 )
