@@ -16,7 +16,8 @@ a `_time` suffix, as mandated in [AIP-142][].
 ## Details
 
 This rule looks at each `google.protobuf.Timestamp` field and ensures that it
-has a `_time` suffix.
+has a `_time` suffix. If it is a repeated field, the `_times` suffix is also
+allowed.
 
 It also looks for common field names, regardless of type, and complains if they
 are used. These are:
@@ -35,6 +36,7 @@ are used. These are:
 message Book {
   string name = 1;
   google.protobuf.Timestamp published = 2;  // Should be `publish_time`.
+  repeated google.protobuf.Timestamp updated = 3; // Should be `update_time` or `update_times`.
 }
 ```
 
@@ -45,6 +47,7 @@ message Book {
 message Book {
   string name = 1;
   google.protobuf.Timestamp publish_time = 2;
+  repeated google.protobuf.Timestamp update_times = 3;
 }
 ```
 
