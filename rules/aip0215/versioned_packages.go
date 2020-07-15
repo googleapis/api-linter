@@ -39,7 +39,7 @@ var versionedPackages = &lint.FileRule{
 		}
 
 		// Exempt anything ending in .type, or .v1master, .v2master, .master, etc.
-		if last := p[len(p)-1]; last == "type" || strings.HasSuffix(last, "master") {
+		if last := p[len(p)-1]; last == "type" || strings.HasSuffix(last, "master") || strings.HasSuffix(last, "main") {
 			return false
 		}
 
