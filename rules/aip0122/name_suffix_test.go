@@ -30,6 +30,7 @@ func TestNameSuffix(t *testing.T) {
 		{"ValidStandardDisplay", "display_name", testutils.Problems{}},
 		{"ValidStandardGiven", "given_name", testutils.Problems{}},
 		{"ValidStandardFamily", "family_name", testutils.Problems{}},
+		{"ValidStandardFull", "full_resource_name", testutils.Problems{}},
 		{"Invalid", "author_name", testutils.Problems{{Suggestion: "author"}}},
 	} {
 		f := testutils.ParseProto3Tmpl(t, `

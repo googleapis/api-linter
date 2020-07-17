@@ -30,6 +30,7 @@ var nameSuffix = &lint.FieldRule{
 			"display_name",
 			"family_name",
 			"given_name",
+			"full_resource_name",
 			"name",
 		).Contains(f.GetName())
 	},
