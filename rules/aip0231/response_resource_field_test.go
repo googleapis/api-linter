@@ -32,27 +32,35 @@ func TestResourceField(t *testing.T) {
 		{
 			testName: "Valid",
 			src: `
-message BatchGetBooksResponse {
-  // Books requested.
-  repeated Book books = 1;
-}`,
+				message BatchGetBooksResponse {
+					// Books requested.
+					repeated Book books = 1;
+				}`,
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "ValidEs",
+			src: `
+				message BatchGetMatchesResponse {
+					repeated Match matches = 1;
+				}`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "FieldIsNotRepeated",
 			src: `
-message BatchGetBooksResponse {
-  // Book requested.
-  Book book = 1;
-}`,
+				message BatchGetBooksResponse {
+					// Book requested.
+					Book book = 1;
+				}`,
 			problems: testutils.Problems{{Message: "The \"Book\" type field on Batch Get Response message should be repeated"}},
 		},
 		{
 			testName: "MissingField",
 			src: `
-message BatchGetBooksResponse {
-  string response = 1;
-}`,
+				message BatchGetBooksResponse {
+					string response = 1;
+				}`,
 			problems: testutils.Problems{{Message: "Message \"BatchGetBooksResponse\" has no \"Book\" type field"}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m
@@ -64,9 +72,10 @@ message BatchGetBooksResponse {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			template := `
-{{.Src}}
-message Book {
-}`
+				{{.Src}}
+				message Book {}
+				message Match {}
+			`
 			file := testutils.ParseProto3Tmpl(t, template, struct{ Src string }{test.src})
 
 			m := file.GetMessageTypes()[0]

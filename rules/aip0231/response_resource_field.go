@@ -31,7 +31,8 @@ var resourceField = &lint.MessageRule{
 		// Note: Use m.GetName()[8 : len(m.GetName())-9] to retrieve the resource
 		// name from the the batch get response, for example:
 		// "BatchGetBooksResponse" -> "Books"
-		resourceMsgName := pluralize.NewClient().Singular(m.GetName()[8 : len(m.GetName())-9])
+		plural := m.GetName()[8 : len(m.GetName())-8]
+		resourceMsgName := pluralize.NewClient().Singular(plural)
 
 		for _, fieldDesc := range m.GetFields() {
 			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
