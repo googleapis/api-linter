@@ -16,6 +16,7 @@ package aip0231
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
@@ -27,11 +28,9 @@ var resourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(231, "response-resource-field"),
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// the singular form the resource name, the first letter is Capitalized.
-		// Note: Use m.GetName()[8 : len(m.GetName())-9] to retrieve the resource
-		// name from the the batch get response, for example:
-		// "BatchGetBooksResponse" -> "Books"
-		resourceMsgName := pluralize.NewClient().Singular(m.GetName()[8 : len(m.GetName())-9])
+		// The singular form the resource message name; the first letter capitalized.
+		plural := strings.TrimSuffix(strings.TrimPrefix(m.GetName(), "BatchGet"), "Response")
+		resourceMsgName := pluralize.NewClient().Singular(plural)
 
 		for _, fieldDesc := range m.GetFields() {
 			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
