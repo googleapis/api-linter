@@ -39,7 +39,7 @@ message Book {
 
 message GetBookRequest {
   string name = 1 [(google.api.resource_reference) = {
-    type: "library.googleapis.com/Book"  // Lint warning; referennce not found.
+    type: "library.googleapis.com/Book"  // Lint warning; reference not found.
   }]
 }
 ```
