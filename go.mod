@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.8
-	github.com/bmatcuk/doublestar v1.3.1
+	github.com/bmatcuk/doublestar/v2 v2.0.0
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1
