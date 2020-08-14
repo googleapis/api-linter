@@ -37,6 +37,9 @@ var fieldTypes = &lint.FieldRule{
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if typeName := utils.GetTypeName(f); typeName != "string" {
+			if f.GetName() == "time_zone" && typeName == "google.type.TimeZone" {
+				return nil
+			}
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field %q should be a string, not %s.", f.GetName(), typeName),
 				Suggestion: "string",
