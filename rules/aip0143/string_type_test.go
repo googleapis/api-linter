@@ -29,12 +29,15 @@ func TestFieldTypes(t *testing.T) {
 	}{
 		{"Irrelevant", "int32", "book_count", testutils.Problems{}},
 		{"Valid", "string", "language_code", testutils.Problems{}},
+		{"ValidTimeZone", "google.type.TimeZone", "time_zone", nil},
 		{"InvalidScalar", "bytes", "language_code", testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidEnum", "Language", "language_code", testutils.Problems{{Suggestion: "string"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
+				import "google/type/datetime.proto";
+
 				message Foo {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
