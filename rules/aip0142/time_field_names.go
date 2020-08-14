@@ -17,6 +17,7 @@ package aip0142
 import (
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -25,6 +26,9 @@ import (
 
 var fieldNames = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-field-names"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return stringset.New("google.protobuf.Timestamp", "int32", "int64", "string").Contains(utils.GetTypeName(f))
+	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{
