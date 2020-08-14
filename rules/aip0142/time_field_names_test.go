@@ -35,6 +35,7 @@ func TestFieldName(t *testing.T) {
 		{"ValidSuffixRepeated", "repeated google.protobuf.Timestamp", "sample_time", testutils.Problems{}},
 		{"InvalidNoSuffixRepeated", "repeated google.protobuf.Timestamp", "create", testutils.Problems{{Message: "should end"}}},
 		{"InvalidIsTypeMistake", "int32", "created", testutils.Problems{{Suggestion: "create_time"}}},
+		{"IrrelevantWeirdType", "bytes", "created", nil},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
