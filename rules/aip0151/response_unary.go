@@ -26,7 +26,7 @@ var responseUnary = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if m.IsServerStreaming() {
 			return []lint.Problem{{
-				Message:    "Paginated responses must be unary, not streaming.",
+				Message:    "LRO responses must be unary, not streaming.",
 				Descriptor: m,
 				Location:   locations.MethodResponseType(m),
 			}}
