@@ -8,7 +8,7 @@ redirect_from:
   - /0132/request-field-types
 ---
 
-# Get methods: Unknown fields
+# List methods: Unknown fields
 
 This rule enforces that all `List` standard methods use the correct type for
 any optional fields described in [AIP-132][].
@@ -59,7 +59,7 @@ message ListBooksRequest {
   int32 page_size = 2;
   string page_token = 3;
 
-  // (-- api-linter: core::0134::request-field-types=disabled
+  // (-- api-linter: core::0132::request-field-types=disabled
   //     aip.dev/not-precedent: We really need this field because reasons. --)
   BookFilter filter = 4;
 }
