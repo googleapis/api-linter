@@ -31,6 +31,7 @@ func AddRules(r lint.RuleRegistry) error {
 		responsePaginationNextPageToken,
 		responseRepeatedFirstField,
 		responsePluralFirstField,
+		responseUnary,
 	)
 }
 
@@ -45,4 +46,8 @@ func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
 // Return true if this is an AIP-158 List response message, false otherwise.
 func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
 	return paginatedRes.MatchString(m.GetName()) || m.FindFieldByName("next_page_token") != nil
+}
+
+func isPaginatedMethod(m *desc.MethodDescriptor) bool {
+	return isPaginatedRequestMessage(m.GetInputType()) && isPaginatedResponseMessage(m.GetOutputType())
 }
