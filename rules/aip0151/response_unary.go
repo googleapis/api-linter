@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,32 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0151 contains rules defined in https://aip.dev/151.
 package aip0151
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-151 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		151,
-		lroAnnotationExists,
-		lroMetadata,
-		lroMetadataReachable,
-		lroResponse,
-		lroResponseReachable,
-		responseUnary,
-	)
-}
-
-func isLRO(m *desc.MethodDescriptor) bool {
-	return m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation"
-}
-
-func isAnnotatedLRO(m *desc.MethodDescriptor) bool {
-	return isLRO(m) && utils.GetOperationInfo(m) != nil
+var responseUnary = &lint.MethodRule{
+	Name:   lint.NewRuleName(151, "response-unary"),
+	OnlyIf: isLRO,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		if m.IsServerStreaming() {
+			return []lint.Problem{{
+				Message:    "Paginated responses must be unary, not streaming.",
+				Descriptor: m,
+				Location:   locations.MethodResponseType(m),
+			}}
+		}
+		return nil
+	},
 }
