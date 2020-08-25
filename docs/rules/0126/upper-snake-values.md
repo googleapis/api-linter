@@ -49,7 +49,7 @@ enum Format {
   FORMAT_UNSPECIFIED = 0;
 
   // (-- api-linter: core::0126::upper-snake-values=disabled --)
-  hardcover = 0;
+  hardcover = 1;
 }
 ```
 
