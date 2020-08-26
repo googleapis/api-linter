@@ -47,12 +47,13 @@ message Book {
 Many cases we see involving numbers like this may be better designed with a
 map:
 
-````proto
+```proto
 // Correct.
 message Book {
   string name = 1;
   map<int32, int32> review_stars_per_percentile = 2;
 }
+```
 
 ## Disabling
 
@@ -66,7 +67,7 @@ message Book {
   string name = 1;
   int32 review_90th_percentile_stars = 2;
 }
-````
+```
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
