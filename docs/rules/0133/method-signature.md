@@ -12,7 +12,7 @@ redirect_from:
 # Create methods: Method signature
 
 This rule enforces that all `Create` standard methods have a
-`google.api.method_signature` annotation with an appropirate value, as mandated
+`google.api.method_signature` annotation with an appropriate value, as mandated
 in [AIP-133][].
 
 ## Details
