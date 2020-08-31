@@ -15,6 +15,7 @@
 package aip0140
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -28,7 +29,7 @@ var base64 = &lint.FieldRule{
 		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())
 		if strings.Contains(comment, "base64") || strings.Contains(comment, "base-64") {
 			return []lint.Problem{{
-				Message:    "Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.",
+				Message:    fmt.Sprintf("Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.", f.GetName()),
 				Descriptor: f,
 			}}
 		}
