@@ -27,6 +27,7 @@ func TestBase64(t *testing.T) {
 		  {{.ProtoType}} bar = 1;
 		}
 	`
+	errMsg := "Field \"bar\" mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`."
 	tests := []struct {
 		testName  string
 		Comment   string
@@ -36,10 +37,10 @@ func TestBase64(t *testing.T) {
 		{"ValidNoBase64", "Blah blah blah.", "string", testutils.Problems{}},
 		{"ValidBytes", "base64 encoded", "bytes", testutils.Problems{}},
 		{"ValidBytesHyphen", "base-64 encoded", "bytes", testutils.Problems{}},
-		{"Invalid", "base64 encoded", "string", testutils.Problems{{Message: "bytes"}}},
-		{"InvalidHyphen", "base-64 encoded", "string", testutils.Problems{{Message: "bytes"}}},
-		{"InvalidCaps", "Base64 encoded", "string", testutils.Problems{{Message: "bytes"}}},
-		{"InvalidCapsHyphen", "Base-64 encoded", "string", testutils.Problems{{Message: "bytes"}}},
+		{"Invalid", "base64 encoded", "string", testutils.Problems{{Message: errMsg}}},
+		{"InvalidHyphen", "base-64 encoded", "string", testutils.Problems{{Message: errMsg}}},
+		{"InvalidCaps", "Base64 encoded", "string", testutils.Problems{{Message: errMsg}}},
+		{"InvalidCapsHyphen", "Base-64 encoded", "string", testutils.Problems{{Message: errMsg}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
