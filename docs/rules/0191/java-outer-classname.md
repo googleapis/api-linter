@@ -8,7 +8,7 @@ redirect_from:
   - /0191/java-outer-classname
 ---
 
-# Java package annotation
+# Java outer classname
 
 This rule enforces that every proto file for a public API surface sets
 `option java_outer_classname`, as mandated in [AIP-191][].

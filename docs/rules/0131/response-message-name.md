@@ -8,7 +8,7 @@ redirect_from:
   - /0131/response-message-name
 ---
 
-# Upper snake case values
+# Get methods: Response message
 
 This rule enforces that all `Get` RPCs have a response message of the resource,
 as mandated in [AIP-131][].
