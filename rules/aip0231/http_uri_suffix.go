@@ -29,7 +29,7 @@ var uriSuffix = &lint.MethodRule{
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{
-					Message:    `Get methods URI should be end with ":batchGet".`,
+					Message:    `Batch Get method's URI should end with ":batchGet".`,
 					Descriptor: m,
 				}}
 			}
