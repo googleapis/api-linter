@@ -16,6 +16,7 @@ package aip0126
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -27,13 +28,16 @@ import (
 var unspecified = &lint.EnumRule{
 	Name: lint.NewRuleName(126, "unspecified"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		firstValue := e.GetValues()[0]
-		want := strings.ToUpper(strcase.SnakeCase(e.GetName()) + "_UNSPECIFIED")
+		name := endNum.ReplaceAllString(e.GetName(), "${1}_${2}")
+		want := strings.ToUpper(strcase.SnakeCase(name) + "_UNSPECIFIED")
 		for _, element := range e.GetValues() {
 			if element.GetName() == want && element.GetNumber() == 0 {
 				return nil
 			}
 		}
+
+		// We did not find the enum value we wanted; complain.
+		firstValue := e.GetValues()[0]
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("The first enum value should be %q", want),
 			Suggestion: want,
@@ -42,3 +46,5 @@ var unspecified = &lint.EnumRule{
 		}}
 	},
 }
+
+var endNum = regexp.MustCompile("([0-9])([A-Z])")
