@@ -23,19 +23,22 @@ import (
 func TestUnspecified(t *testing.T) {
 	tests := []struct {
 		testName  string
+		EnumName  string
 		ValueName string
 		problems  testutils.Problems
 	}{
-		{"Valid", "BOOK_FORMAT_UNSPECIFIED", testutils.Problems{}},
-		{"InvalidNoPrefix", "UNSPECIFIED", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
-		{"InvalidWrongSuffix", "BOOK_FORMAT_UNKNOWN", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
-		{"InvalidJustWrong", "UNKNOWN", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
+		{"Valid", "BookFormat", "BOOK_FORMAT_UNSPECIFIED", testutils.Problems{}},
+		{"ValidWithNum", "Ipv6Format", "IPV6_FORMAT_UNSPECIFIED", nil},
+		{"InvalidNoPrefix", "BookFormat", "UNSPECIFIED", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
+		{"InvalidWrongSuffix", "BookFormat", "BOOK_FORMAT_UNKNOWN", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
+		{"InvalidJustWrong", "BookFormat", "UNKNOWN", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
+		{"InvalidWithNum", "Ipv6Format", "IPV6FORMAT_UNSPECIFIED", testutils.Problems{{Suggestion: "IPV6_FORMAT_UNSPECIFIED"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the proto with the enum.
 			f := testutils.ParseProto3Tmpl(t, `
-				enum BookFormat {
+				enum {{.EnumName}} {
 					{{.ValueName}} = 0;
 					HARDBACK = 1;
 					PAPERBACK = 2;
@@ -53,8 +56,8 @@ func TestUnspecified(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the proto with the enum.
 			f := testutils.ParseProto3Tmpl(t, `
-				enum BookFormat {
-					option allow_alias = true; 
+				enum {{.EnumName}} {
+					option allow_alias = true;
 					HARDBACK = 0;
 					{{.ValueName}} = 0;
 					PAPERBACK = 1;
