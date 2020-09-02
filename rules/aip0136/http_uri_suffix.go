@@ -51,13 +51,12 @@ var uriSuffix = &lint.MethodRule{
 			// There are some known exceptions, particularly around "Batch".
 			// ----------------------------------------------------------------------
 			// If the URI contains `{name=` or `{parent=`, expect `:verb`.
-			if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
+			if strings.Contains(httpRule.URI, ":batch") {
 				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
-				if rpcSlice[0] == "batch" {
-					want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
-				} else {
-					want = ":" + rpcSlice[0]
-				}
+				want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
+			} else if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
+				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+				want = ":" + rpcSlice[0]
 			}
 
 			// AIP-162 introduces some special cases around revisions, where
