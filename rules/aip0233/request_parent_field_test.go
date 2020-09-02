@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,68 +21,49 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-func TestRequestParentField(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName    string
-		MessageName string
-		Field       string
-		problems    testutils.Problems
-		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
+func TestParentField(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		RPC      string
+		Field    string
+		Pattern  string
+		problems testutils.Problems
 	}{
-		{
-			"Valid",
-			"BatchCreateBooksRequest",
-			"string parent",
-			testutils.Problems{},
-			nil},
-		{
-			"MissingField",
-			"BatchCreateBooksRequest",
-			"string name",
-			testutils.Problems{{Message: "parent"}},
-			nil,
-		},
-		{
-			"InvalidType",
-			"BatchCreateBooksRequest",
-			"int32 parent",
-			testutils.Problems{{
-				Message:    "string",
-				Suggestion: "string",
-			}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("parent")
-			},
-		},
-		{
-			"Irrelevant",
-			"EnumerateBooksRequest",
-			"string name",
-			testutils.Problems{},
-			nil,
-		},
-	}
+		{"Valid", "BatchCreateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
+		{"Missing", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"InvalidType", "BatchCreateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantRPCName", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
+		{"IrrelevantNoParent", "BatchCreateBooks", "", "books/{b}", nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
 
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
-				message {{.MessageName}} {
-					{{.Field}} = 1;
-				}`, test)
+				service Library {
+					rpc {{.RPC}}({{.RPC}}Request) returns ({{.RPC}}Response);
+				}
 
-			m := file.GetMessageTypes()[0]
+				message {{.RPC}}Request {
+					{{.Field}}
+					repeated string names = 2;
+				}
 
-			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = m
-			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(m)
+				message {{.RPC}}Response {
+					repeated Book books = 1;
+				}
+
+				message Book {
+					option (google.api.resource) = {
+						pattern: "{{.Pattern}}";
+					};
+					string name = 1;
+				}
+			`, test)
+			var d desc.Descriptor = f.GetMessageTypes()[0]
+			if test.name == "InvalidType" {
+				d = f.GetMessageTypes()[0].GetFields()[0]
 			}
-
-			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestParentField.Lint(file)
-			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(d).Diff(requestParentField.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
