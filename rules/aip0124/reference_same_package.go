@@ -23,8 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var validReference = &lint.FieldRule{
-	Name:   lint.NewRuleName(124, "valid-reference"),
+var referenceSamePackage = &lint.FieldRule{
+	Name:   lint.NewRuleName(124, "reference-same-package"),
 	OnlyIf: isUnknownType,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Get the type we are checking for.
@@ -35,43 +35,41 @@ var validReference = &lint.FieldRule{
 		}
 
 		// Iterate over each dependency file and check for a matching resource.
-		for _, file := range getAllDependencies(f.GetFile()) {
-			// Most resources will be messages. If we find a message with a
-			// resource annotation matching our universal resource type, we are done.
+		for _, file := range getNonPkgDependencies(f.GetFile(), f.GetFile().GetPackage()) {
+			// If we find a message with a resource annotation matching our universal
+			// resource type, then it is in the wrong package.
 			for _, message := range file.GetMessageTypes() {
-				if res := utils.GetResource(message); res != nil {
-					if res.GetType() == urt {
-						return nil
-					}
+				if res := utils.GetResource(message); res != nil && res.GetType() == urt {
+					return []lint.Problem{{
+						Message:    fmt.Sprintf("Resource type %q should be declared in the same package as it is referenced.", urt),
+						Descriptor: f,
+						Location:   locations.FieldResourceReference(f),
+					}}
 				}
 			}
 
 			// Some resources are defined as file annotations. Check for these too.
 			for _, rd := range utils.GetResourceDefinitions(file) {
 				if rd.GetType() == urt {
-					return nil
+					return []lint.Problem{{
+						Message:    fmt.Sprintf("Resource type %q should be declared in the same package as it is referenced.", urt),
+						Descriptor: f,
+						Location:   locations.FieldResourceReference(f),
+					}}
 				}
 			}
 		}
 
-		// We could not find a resource with that type. Return a problem.
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("Could not find resource of type %q", urt),
-			Descriptor: f,
-			Location:   locations.FieldResourceReference(f),
-		}}
+		return nil
 	},
 }
 
-// getAllDependencies returns all dependencies.
-func getAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescriptor {
-	answer := map[string]*desc.FileDescriptor{file.GetName(): file}
-	for _, f := range file.GetDependencies() {
-		if _, found := answer[f.GetName()]; !found {
-			answer[f.GetName()] = f
-			for name, f2 := range getAllDependencies(f) {
-				answer[name] = f2
-			}
+// getNonPkgDependencies returns dependencies in other packages.
+func getNonPkgDependencies(file *desc.FileDescriptor, pkg string) map[string]*desc.FileDescriptor {
+	answer := map[string]*desc.FileDescriptor{}
+	for name, dep := range getAllDependencies(file) {
+		if dep.GetPackage() != pkg {
+			answer[name] = dep
 		}
 	}
 	return answer
