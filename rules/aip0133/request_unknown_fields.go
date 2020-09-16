@@ -35,7 +35,7 @@ var unknownFields = &lint.MessageRule{
 		allowedFields := map[string]*builder.FieldType{
 			"parent":        nil, // AIP-133
 			"request_id":    nil, // AIP-155
-			"validate_only": nil, // AIP needed
+			"validate_only": nil, // AIP-163
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 

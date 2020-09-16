@@ -32,7 +32,7 @@ var unknownFields = &lint.MessageRule{
 			"force":         {}, // AIP-135
 			"etag":          {}, // AIP-154
 			"request_id":    {}, // AIP-155
-			"validate_only": {}, // AIP needed
+			"validate_only": {}, // AIP-163
 		}
 		for _, field := range m.GetFields() {
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
