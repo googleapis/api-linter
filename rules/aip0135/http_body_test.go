@@ -41,14 +41,14 @@ func TestHttpBody(t *testing.T) {
 			// Create a MethodOptions with the annotation set.
 			opts := &dpb.MethodOptions{}
 			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: "/v1/{name=publishers/*/books/*}",
+				Pattern: &annotations.HttpRule_Delete{
+					Delete: "/v1/{name=publishers/*/books/*}",
 				},
 				Body: test.body,
 			}
 			proto.SetExtension(opts, annotations.E_Http, httpRule)
 
-			// Create a minimal service with a AIP-135 Get method
+			// Create a minimal service with a AIP-135 Delete method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
 				builder.RpcTypeMessage(builder.NewMessage("DeleteBookRequest"), false),

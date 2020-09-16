@@ -29,7 +29,7 @@ var requestNameField = &lint.FieldRule{
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if f.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
-				Message:    "`name` field on Get RPCs should be a string",
+				Message:    "`name` field on Delete RPCs should be a string",
 				Suggestion: "string",
 				Descriptor: f,
 				Location:   locations.FieldType(f),
