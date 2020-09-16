@@ -16,7 +16,10 @@
 package aip0124
 
 import (
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules accepts a register function and registers each of
@@ -24,6 +27,34 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		124,
+		referenceSamePackage,
 		validReference,
 	)
+}
+
+// isUnknownType returns true if and only if the type is not a common,
+// well known type.
+func isUnknownType(f *desc.FieldDescriptor) bool {
+	if ref := utils.GetResourceReference(f); ref != nil {
+		urt := ref.GetType()
+		if urt == "" {
+			urt = ref.GetChildType()
+		}
+		return !stringset.New(
+			// Allow the common resource types in GCP.
+			// FIXME: Modularize this.
+			"cloudresourcemanager.googleapis.com/Project",
+			"cloudresourcemanager.googleapis.com/Organization",
+			"cloudresourcemanager.googleapis.com/Folder",
+			"billing.googleapis.com/BillingAccount",
+			"locations.googleapis.com/Location",
+
+			// Allow *.
+			"*",
+
+			// If no type is declared, ignore this.
+			"",
+		).Contains(urt)
+	}
+	return false
 }
