@@ -54,9 +54,14 @@ var uriSuffix = &lint.MethodRule{
 			if strings.Contains(httpRule.URI, ":batch") {
 				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
 				want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
-			} else if strings.Contains(httpRule.URI, "{name=") || strings.Contains(httpRule.URI, "{parent=") {
-				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
-				want = ":" + rpcSlice[0]
+			} else {
+				for key := range httpRule.GetVariables() {
+					if key == "name" || key == "parent" || strings.HasSuffix(key, ".name") {
+						rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+						want = ":" + rpcSlice[0]
+						break
+					}
+				}
 			}
 
 			// AIP-162 introduces some special cases around revisions, where
