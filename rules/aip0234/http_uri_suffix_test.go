@@ -28,7 +28,8 @@ func TestHttpUriSuffix(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*}/books:batchUpdate", "BatchUpdateBooks", nil},
-		{"InvalidVarName", "/v1/{parent=publishers/*}/books", "BatchUpdateBooks", testutils.Problems{{Message: ":batchUpdate"}}},
+		{"ValidNoParent", "/v1/books:batchUpdate", "BatchUpdateBooks", nil},
+		{"InvalidSuffix", "/v1/{parent=publishers/*}/books", "BatchUpdateBooks", testutils.Problems{{Message: ":batchUpdate"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 

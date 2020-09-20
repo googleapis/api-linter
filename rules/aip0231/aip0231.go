@@ -42,7 +42,7 @@ func AddRules(r lint.RuleRegistry) error {
 var batchGetMethodRegexp = regexp.MustCompile("^BatchGet(?:[A-Za-z0-9]|$)")
 var batchGetReqMessageRegexp = regexp.MustCompile("^BatchGet[A-Za-z0-9]*Request$")
 var batchGetResMessageRegexp = regexp.MustCompile("^BatchGet[A-Za-z0-9]*Response$")
-var batchGetURINameRegexp = regexp.MustCompile(`{[a-zA-Z=/*]+}/[A-Za-z0-9-=/*]+:batchGet$`)
+var batchGetURINameRegexp = regexp.MustCompile(`:batchGet$`)
 
 // Returns true if this is a AIP-231 Get method, false otherwise.
 func isBatchGetMethod(m *desc.MethodDescriptor) bool {
