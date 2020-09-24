@@ -25,7 +25,6 @@ var uriSuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(231, "http-uri-suffix"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{

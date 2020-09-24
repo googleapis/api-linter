@@ -25,11 +25,10 @@ var httpUriSuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(233, "http-uri-suffix"),
 	OnlyIf: isBatchCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchCreateURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{
-					Message:    `Batch Create methods URI should be end with ":batchCreate".`,
+					Message:    `Batch Create methods URI should end with ":batchCreate".`,
 					Descriptor: m,
 				}}
 			}
