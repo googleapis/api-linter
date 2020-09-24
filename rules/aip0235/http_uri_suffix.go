@@ -12,33 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0235 contains rules defined in https://aip.dev/235.
 package aip0235
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		235,
-		httpBody,
-		httpMethod,
-		httpUriSuffix,
-		pluralMethodName,
-		requestMessageName,
-	)
-}
+// Batch Delete methods should have a proper HTTP pattern.
+var httpUriSuffix = &lint.MethodRule{
+	Name:   lint.NewRuleName(235, "http-uri-suffix"),
+	OnlyIf: isBatchDeleteMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if !batchDeleteURIRegexp.MatchString(httpRule.URI) {
+				return []lint.Problem{{
+					Message:    `Batch Delete URI should end with ":batchDelete".`,
+					Descriptor: m,
+				}}
+			}
+		}
 
-var batchDeleteMethodRegexp = regexp.MustCompile("^BatchDelete(?:[A-Z]|$)")
-var batchDeleteURIRegexp = regexp.MustCompile(`:batchDelete$`)
-
-// Returns true if this is a AIP-235 Batch Delete method, false otherwise.
-func isBatchDeleteMethod(m *desc.MethodDescriptor) bool {
-	return batchDeleteMethodRegexp.MatchString(m.GetName())
+		return nil
+	},
 }
