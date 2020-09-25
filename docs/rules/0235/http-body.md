@@ -8,15 +8,15 @@ redirect_from:
   - /0235/http-body
 ---
 
-# Batch Delete methods: HTTP body 
+# Batch Delete methods: HTTP body
 
-This rule enforces that all `BatchDelete` RPCs use `*` as the HTTP `body`, as 
+This rule enforces that all `BatchDelete` RPCs use `*` as the HTTP `body`, as
 mandated in [AIP-235][].
 
 ## Details
 
-This rule looks at any RPC methods matching beginning with `BatchDelete`, and
-complains if HTTP `body` field is anything other than `*`.
+This rule looks at any RPC methods beginning with `BatchDelete`, and
+complains if the HTTP `body` field is anything other than `*`.
 
 ## Examples
 

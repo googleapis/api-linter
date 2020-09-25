@@ -11,7 +11,7 @@ redirect_from:
 # Batch Create methods: Requests field
 
 This rule enforces that all `BatchCreate` methods have a repeated `requests`
-field, the type of which is the standard create request(like `Create*Request`),
+field, the type of which is the standard create request (like `Create*Request`),
 in the request message, as mandated in [AIP-233][].
 
 ## Details
@@ -19,7 +19,6 @@ in the request message, as mandated in [AIP-233][].
 This rule looks at any message matching `BatchCreate*Request` and complains if
 the `requests` field is missing, if it has any type other than `Create*Request`,
 or if it is not `repeated`.
-
 
 ## Examples
 
@@ -45,7 +44,7 @@ message BatchCreateBooksRequest {
 
 ```proto
 // Correct.
-message BatchCreateBookRequest {
+message BatchCreateBooksRequest {
   string parent = 1;
   repeated CreateBookRequest requests = 2;
 }

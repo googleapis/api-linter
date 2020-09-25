@@ -8,15 +8,15 @@ redirect_from:
   - /0233/http-body
 ---
 
-# Batch Create methods: HTTP body 
+# Batch Create methods: HTTP body
 
-This rule enforces that all `BatchCreate` RPCs use `*` as the HTTP `body`, as 
+This rule enforces that all `BatchCreate` RPCs use `*` as the HTTP `body`, as
 mandated in [AIP-233][].
 
 ## Details
 
-This rule looks at any RPC methods matching beginning with `BatchCreate`, and
-complains if HTTP `body` field is anything other than `*`.
+This rule looks at any RPC methods beginning with `BatchCreate`, and
+complains if the HTTP `body` field is anything other than `*`.
 
 ## Examples
 

@@ -8,15 +8,15 @@ redirect_from:
   - /0234/http-body
 ---
 
-# Batch Update methods: HTTP body 
+# Batch Update methods: HTTP body
 
-This rule enforces that all `BatchUpdate` RPCs use `*` as the HTTP `body`, as 
+This rule enforces that all `BatchUpdate` RPCs use `*` as the HTTP `body`, as
 mandated in [AIP-234][].
 
 ## Details
 
-This rule looks at any RPC methods matching beginning with `BatchUpdate`, and
-complains if HTTP `body` field is anything other than `*`.
+This rule looks at any RPC methods beginning with `BatchUpdate`, and
+complains if the HTTP `body` field is anything other than `*`.
 
 ## Examples
 

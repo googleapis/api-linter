@@ -15,7 +15,7 @@ mandated in [AIP-231][].
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchGet`, and
+This rule looks at any method beginning with `BatchGet`, and
 complains if the HTTP verb is anything other than `GET`. It _does_ check
 additional bindings if they are present.
 
