@@ -33,7 +33,7 @@ message BatchUpdateBooksRequest {
 
 ```proto
 // Incorrect.
-message BatchUpdateBookRequest {
+message BatchUpdateBooksRequest {
   bytes parent = 1;  // Field type should be `string`.
   repeated UpdateBookRequest requests = 2;
 }
@@ -43,7 +43,7 @@ message BatchUpdateBookRequest {
 
 ```proto
 // Correct.
-message BatchUpdateBookRequest {
+message BatchUpdateBooksRequest {
   string parent = 1;
   repeated UpdateBookRequest requests = 2;
 }

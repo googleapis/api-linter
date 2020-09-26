@@ -25,7 +25,7 @@ if the name of the resource in the method name is singular.
 ```proto
 // Incorrect.
 // Method name should be `BatchGetBooks`
-rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookRespose) {
+rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books:batchGet"
   };
@@ -36,7 +36,7 @@ rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookRespose) {
 
 ```proto
 // Correct.
-rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksRespose) {
+rpc BatchGetBooks(BatchGetBooksRequest) returns (BatchGetBooksResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books:batchGet"
   };
@@ -51,7 +51,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 ```proto
 // (-- api-linter: core::0231::plural-method-name=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
-rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookRespose) {
+rpc BatchGetBook(BatchGetBookRequest) returns (BatchGetBookResponse) {
   option (google.api.http) = {
     get: "/v1/{parent=publishers/*}/books:batchGet"
   };

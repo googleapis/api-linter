@@ -15,7 +15,7 @@ This rule enforces that all `BatchGet` RPCs have a response message name of
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchGet`, and
+This rule looks at any method beginning with `BatchGet`, and
 complains if the name of the corresponding returned message does not match the
 name of the RPC with the suffix `Response` appended.
 

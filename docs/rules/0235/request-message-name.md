@@ -15,7 +15,7 @@ This rule enforces that all `BatchDelete` RPCs have a request message name of
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchDelete`, and complains
+This rule looks at any message beginning with `BatchDelete`, and complains
 if the name of the corresponding input message does not match the name of the
 RPC with the suffix `Request` appended.
 

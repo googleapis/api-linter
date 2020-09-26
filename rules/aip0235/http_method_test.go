@@ -59,7 +59,7 @@ func TestHttpMethod(t *testing.T) {
 			// Create a minimal service with a AIP-235 Batch Delete method
 			// (or with a different method, in the "Irrelevant" case).
 			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchDeleteBookRequests"), false),
+				builder.RpcTypeMessage(builder.NewMessage("BatchDeleteBooksRequests"), false),
 				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
 			).SetOptions(opts)).Build()
 			if err != nil {
