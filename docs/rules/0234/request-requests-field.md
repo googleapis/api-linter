@@ -20,7 +20,6 @@ This rule looks at any message matching `BatchUpdate*Request` and complains if
 the `requests` field is missing, if it has any type other than `Update*Request`,
 or if it is not `repeated`.
 
-
 ## Examples
 
 **Incorrect** code for this rule:
@@ -45,7 +44,7 @@ message BatchUpdateBooksRequest {
 
 ```proto
 // Correct.
-message BatchUpdateBookRequest {
+message BatchUpdateBooksRequest {
   string parent = 1;
   repeated UpdateBookRequest requests = 2;
 }

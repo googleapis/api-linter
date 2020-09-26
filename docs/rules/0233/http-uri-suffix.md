@@ -10,7 +10,7 @@ redirect_from:
 
 # Batch Create methods: URI suffix
 
-This rule enforces that ` BatchCreate` methods include the `:batchCreate` suffix
+This rule enforces that `BatchCreate` methods include the `:batchCreate` suffix
 in the REST URI, as mandated in [AIP-233][].
 
 ## Details
