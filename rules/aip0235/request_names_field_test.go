@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0235
 
 import (
 	"testing"
@@ -32,43 +32,43 @@ func TestNamesField(t *testing.T) {
 		{
 			testName: "Valid-Names",
 			src: `
-				message BatchGetBooksRequest {
+				message BatchDeleteBooksRequest {
 					repeated string names = 1;
 				}
 			`,
 			problems: testutils.Problems{},
 		},
 		{
-			testName: "Valid-StandardGetReq",
+			testName: "Valid-StandardDeleteReq",
 			src: `
-				message BatchGetBooksRequest {
-				repeated GetBookRequest requests = 1;
+				message BatchDeleteBooksRequest {
+					repeated DeleteBookRequest requests = 1;
 				}
 
-				message GetBookRequest {}
+				message DeleteBookRequest {}
 			`,
 			problems: testutils.Problems{},
 		},
 		{
 			testName: "Invalid-MissingNamesField",
 			src: `
-				message BatchGetBooksRequest {
-				string parent = 1;
+				message BatchDeleteBooksRequest {
+					string parent = 1;
 				}
 			`,
-			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" has no "names" field`}},
+			problems: testutils.Problems{{Message: `Message "BatchDeleteBooksRequest" has no "names" field`}},
 		},
 		{
 			testName: "Invalid-KeepingNamesFieldOnly",
 			src: `
-				message BatchGetBooksRequest {
-				repeated string names = 1;
-				repeated GetBookRequest requests = 2;
+				message BatchDeleteBooksRequest {
+					repeated string names = 1;
+					repeated DeleteBookRequest requests = 2;
 				}
 
-				message GetBookRequest {}
+				message DeleteBookRequest {}
 			`,
-			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" should delete "requests" field, only keep the "names" field`}},
+			problems: testutils.Problems{{Message: `Message "BatchDeleteBooksRequest" should delete "requests" field, only keep the "names" field`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},
@@ -76,7 +76,7 @@ func TestNamesField(t *testing.T) {
 		{
 			testName: "Invalid-NamesFieldIsNotRepeated",
 			src: `
-				message BatchGetBooksRequest {
+				message BatchDeleteBooksRequest {
 					string names = 1;
 				}`,
 			problems: testutils.Problems{{Suggestion: "repeated string"}},
@@ -87,7 +87,7 @@ func TestNamesField(t *testing.T) {
 		{
 			testName: "Invalid-NamesFieldWrongType",
 			src: `
-				message BatchGetBooksRequest {
+				message BatchDeleteBooksRequest {
 					repeated int32 names = 1;
 				}
 			`,
@@ -97,13 +97,13 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-GetReqFieldIsNotRepeated",
+			testName: "Invalid-DeleteReqFieldIsNotRepeated",
 			src: `
-				message BatchGetBooksRequest {
-				GetBookRequest requests = 1;
+				message BatchDeleteBooksRequest {
+					DeleteBookRequest requests = 1;
 				}
 
-				message GetBookRequest {}
+				message DeleteBookRequest {}
 			`,
 			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
@@ -111,20 +111,20 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-GetReqFieldWrongType",
+			testName: "Invalid-DeleteReqFieldWrongType",
 			src: `
-				message BatchGetBooksRequest {
+				message BatchDeleteBooksRequest {
 					repeated string requests = 1;
 				}
 			`,
-			problems: testutils.Problems{{Message: `The "requests" field on Batch Get Request should be a "GetBookRequest" type`}},
+			problems: testutils.Problems{{Message: `The "requests" field on Batch Delete Request should be a "DeleteBookRequest" type`}},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},
 		},
 		{
 			testName: "Irrelevant-UnmatchedMessageName",
-			src:      `message GetBooksRequest {}`,
+			src:      `message DeleteBooksRequest {}`,
 			problems: testutils.Problems{},
 		},
 	}
@@ -142,7 +142,7 @@ func TestNamesField(t *testing.T) {
 				problemDesc = test.problemDesc(m)
 			}
 
-			problems := namesField.Lint(file)
+			problems := requestNamesField.Lint(file)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Errorf(diff)
 			}
