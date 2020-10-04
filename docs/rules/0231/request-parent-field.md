@@ -33,7 +33,7 @@ message BatchGetBooksRequest {
 
 ```proto
 // Incorrect.
-message BatchGetBookRequest {
+message BatchGetBooksRequest {
   bytes parent = 1;  // Field type should be `string`.
   repeated string names = 2;
 }
@@ -43,7 +43,7 @@ message BatchGetBookRequest {
 
 ```proto
 // Correct.
-message CreateBookRequest {
+message BatchGetBooksRequest {
   string parent = 1;
   repeated string names = 2;
 }

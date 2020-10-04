@@ -10,12 +10,12 @@ redirect_from:
 
 # Batch Get methods: No HTTP body
 
-This rule enforces that all `Get` RPCs omit the HTTP `body`, as mandated in
+This rule enforces that all `BatchGet` RPCs omit the HTTP `body`, as mandated in
 [AIP-231][].
 
 ## Details
 
-This rule looks at any message matching beginning with `BatchGet`, and
+This rule looks at any method beginning with `BatchGet`, and
 complains if the HTTP `body` field is set.
 
 ## Examples
