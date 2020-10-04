@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0235
 
 import (
 	"fmt"
@@ -24,18 +24,18 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// The Batch Get standard method should have repeated name field or repeated
-// standard get request message field, but the latter one is not suggested.
-var namesField = &lint.MessageRule{
-	Name:   lint.NewRuleName(231, "request-names-field"),
-	OnlyIf: isBatchGetRequestMessage,
+// The Batch Delete standard method should have repeated name field or repeated
+// standard delete request message field, but the latter one is not suggested.
+var requestNamesField = &lint.MessageRule{
+	Name:   lint.NewRuleName(235, "request-names-field"),
+	OnlyIf: isBatchDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
 		names := m.FindFieldByName("names")
-		getReqMsg := m.FindFieldByName("requests")
+		deleteReqMsg := m.FindFieldByName("requests")
 
 		// Rule check: Ensure that the names field is present.
-		if names == nil && getReqMsg == nil {
+		if names == nil && deleteReqMsg == nil {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.GetName()),
 				Descriptor: m,
@@ -43,10 +43,10 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that only the suggested names field is present.
-		if names != nil && getReqMsg != nil {
+		if names != nil && deleteReqMsg != nil {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.GetName()),
-				Descriptor: getReqMsg,
+				Descriptor: deleteReqMsg,
 			})
 		}
 
@@ -63,30 +63,30 @@ var namesField = &lint.MessageRule{
 		// Rule check: Ensure that the names field is the correct type.
 		if names != nil && names.GetType() != builder.FieldTypeString().GetType() {
 			problems = append(problems, lint.Problem{
-				Message:    `"names" field on Batch Get Request should be a "string" type`,
+				Message:    `"names" field on Batch Delete Request should be a "string" type`,
 				Suggestion: "string",
 				Descriptor: names,
 				Location:   locations.FieldType(names),
 			})
 		}
 
-		// Rule check: Ensure that the standard get request message field is repeated.
-		if getReqMsg != nil && !getReqMsg.IsRepeated() {
+		// Rule check: Ensure that the standard delete request message field is repeated.
+		if deleteReqMsg != nil && !deleteReqMsg.IsRepeated() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "requests" field should be repeated`,
-				Descriptor: getReqMsg,
+				Descriptor: deleteReqMsg,
 			})
 		}
 
-		// Rule check: Ensure that the standard get request message field is the
-		// correct type. Note: Use m.GetName()[8:len(m.GetName())-7]) to retrieve
-		// the resource name from the batch get request, for example:
-		// "BatchGetBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.GetName()[8:len(m.GetName())-7]))
-		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().GetName() != rightTypeName) {
+		// Rule check: Ensure that the standard delete request message field is the
+		// correct type. Note: Use m.GetName()[11:len(m.GetName())-7]) to retrieve
+		// the resource name from the batch delete request, for example:
+		// "BatchDeleteBooksRequest" -> "Books"
+		rightTypeName := fmt.Sprintf("Delete%sRequest", pluralize.NewClient().Singular(m.GetName()[11:len(m.GetName())-7]))
+		if deleteReqMsg != nil && (deleteReqMsg.GetMessageType() == nil || deleteReqMsg.GetMessageType().GetName() != rightTypeName) {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
-				Descriptor: getReqMsg,
+				Message:    fmt.Sprintf(`The "requests" field on Batch Delete Request should be a %q type`, rightTypeName),
+				Descriptor: deleteReqMsg,
 			})
 		}
 		return
