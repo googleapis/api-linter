@@ -31,7 +31,7 @@ var requestParentField = &lint.MessageRule{
 	Name: lint.NewRuleName(231, "request-parent-field"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		// Sanity check: If the resource has a pattern, and that pattern
-		// contains only one variable, then a parent field is not expected.
+		// contains no variables, then a parent field is not expected.
 		//
 		// In order to parse out the pattern, we get the resource message
 		// from the response, then get the resource annotation from that,
@@ -41,7 +41,7 @@ var requestParentField = &lint.MessageRule{
 			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
 				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
 					for _, pattern := range resource.GetPattern() {
-						if strings.Count(pattern, "{") == 1 {
+						if strings.Count(pattern, "{") == 0 {
 							return false
 						}
 					}
@@ -64,7 +64,7 @@ var requestParentField = &lint.MessageRule{
 		// Rule check: Establish that the parent field is a string.
 		if parentField.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
-				Message:    "`parent` field on create request message must be a string",
+				Message:    "`parent` field on Batch Get request message must be a string",
 				Suggestion: "string",
 				Descriptor: parentField,
 				Location:   locations.FieldType(parentField),
