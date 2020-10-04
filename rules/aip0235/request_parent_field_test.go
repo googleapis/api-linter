@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0234
+package aip0235
 
 import (
 	"testing"
@@ -29,11 +29,11 @@ func TestParentField(t *testing.T) {
 		Pattern  string
 		problems testutils.Problems
 	}{
-		{"Valid", "BatchUpdateBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"Missing", "BatchUpdateBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
-		{"InvalidType", "BatchUpdateBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
+		{"Valid", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
+		{"Missing", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
+		{"InvalidType", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", "publishers/{p}/books", nil},
-		{"IrrelevantNoParent", "BatchUpdateBooks", "", "books", nil},
+		{"IrrelevantNoParent", "BatchDeleteBooks", "", "books", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
