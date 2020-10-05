@@ -29,7 +29,10 @@ accepted in its place.
 ```proto
 // Incorrect.
 message BatchGetBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated string books = 2;  // Field name should be `names`.
 }
 ```
@@ -37,7 +40,10 @@ message BatchGetBooksRequest {
 ```proto
 // Incorrect.
 message BatchGetBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   string names = 2;  // Field should be repeated.
 }
 ```
@@ -47,8 +53,14 @@ message BatchGetBooksRequest {
 ```proto
 // Correct.
 message BatchGetBooksRequest {
-  string parent = 1;
-  repeated string names = 2;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
