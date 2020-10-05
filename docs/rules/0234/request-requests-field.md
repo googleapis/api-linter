@@ -27,7 +27,10 @@ or if it is not `repeated`.
 ```proto
 // Incorrect.
 message BatchUpdateBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated UpdateBookRequest req = 2;  // Field name should be `requests`.
 }
 ```
@@ -35,7 +38,10 @@ message BatchUpdateBooksRequest {
 ```proto
 // Incorrect.
 message BatchUpdateBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   UpdateBookRequest requests = 2;  // Field should be repeated.
 }
 ```
@@ -45,7 +51,10 @@ message BatchUpdateBooksRequest {
 ```proto
 // Correct.
 message BatchUpdateBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated UpdateBookRequest requests = 2;
 }
 ```
@@ -60,7 +69,10 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0234::request-requests-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message BatchUpdateBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated string books = 2; // should be "repeated UpdateBookRequest requests"
 }
 ```
