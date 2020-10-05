@@ -89,7 +89,7 @@ var uriSuffix = &lint.MethodRule{
 			plainURI := httpRule.GetPlainURI()
 			segs := strings.Split(strings.Split(plainURI, ":")[0], "/")
 			segment := segs[len(segs)-1]
-			if len(want) == 0 && strings.HasSuffix(strings.ToLower(n), segment) {
+			if len(want) == 0 && strings.HasSuffix(strings.ToLower(n), strings.ToLower(segment)) {
 				want = segment + ":" + strings.Split(strcase.SnakeCase(n), "_")[0]
 			}
 
