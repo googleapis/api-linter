@@ -27,6 +27,7 @@ func TestURISuffix(t *testing.T) {
 		URI        string
 		problems   testutils.Problems
 	}{
+		{"ValidTwoWordNoParent", "SearchAudioBooks", "/v1/audioBooks:search", nil},
 		{"ValidVerb", "ArchiveBook", "/v1/{name=publishers/*/books}:archive", testutils.Problems{}},
 		{"ValidVerbNested", "ArchiveBook", "/v1/{book.name=publishers/*/books}:archive", testutils.Problems{}},
 		{"ValidVerbParent", "ImportBooks", "/v1/{parent=publishers/*}/books:import", testutils.Problems{}},
