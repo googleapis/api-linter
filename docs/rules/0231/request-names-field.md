@@ -38,7 +38,7 @@ message BatchGetBooksRequest {
 // Incorrect.
 message BatchGetBooksRequest {
   string parent = 1;
-  string books = 2;  // Field should be repeated.
+  string names = 2;  // Field should be repeated.
 }
 ```
 

@@ -33,7 +33,7 @@ var unknownFields = &lint.MessageRule{
 			fieldNameFromResource(resource), // AIP-134
 			"request_id",                    // AIP-155
 			"update_mask",                   // AIP-134
-			"validate_only",                 // AIP needed
+			"validate_only",                 // AIP-163
 		)
 		for _, field := range m.GetFields() {
 			if !allowedFields.Contains(field.GetName()) {

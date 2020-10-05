@@ -62,7 +62,3 @@ top of the file.
 
 [aip-231]: https://aip.dev/231
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
-
-```
-
-```

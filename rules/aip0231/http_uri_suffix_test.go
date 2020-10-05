@@ -32,7 +32,8 @@ func TestHttpUrl(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*}/books:batchGet", "BatchGetBooks", nil},
-		{"InvalidVarName", "/v1/{parent=publishers/*}/books", "BatchGetBooks", testutils.Problems{{Message: `Batch Get method's URI should end with ":batchGet".`}}},
+		{"ValidNoParent", "/v1/books:batchGet", "BatchGetBooks", nil},
+		{"InvalidSuffix", "/v1/{parent=publishers/*}/books", "BatchGetBooks", testutils.Problems{{Message: `Batch Get method's URI should end with ":batchGet".`}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 

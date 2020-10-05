@@ -34,7 +34,7 @@ var namesField = &lint.MessageRule{
 		names := m.FindFieldByName("names")
 		getReqMsg := m.FindFieldByName("requests")
 
-		// Rule check: Ensure that the names field is existed.
+		// Rule check: Ensure that the names field is present.
 		if names == nil && getReqMsg == nil {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.GetName()),
@@ -42,7 +42,7 @@ var namesField = &lint.MessageRule{
 			})
 		}
 
-		// Rule check: Ensure that only the suggested names field is existed.
+		// Rule check: Ensure that only the suggested names field is present.
 		if names != nil && getReqMsg != nil {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.GetName()),
@@ -80,7 +80,7 @@ var namesField = &lint.MessageRule{
 
 		// Rule check: Ensure that the standard get request message field is the
 		// correct type. Note: Use m.GetName()[8:len(m.GetName())-7]) to retrieve
-		// the resource name from the the batch get request, for example:
+		// the resource name from the batch get request, for example:
 		// "BatchGetBooksRequest" -> "Books"
 		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.GetName()[8:len(m.GetName())-7]))
 		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().GetName() != rightTypeName) {

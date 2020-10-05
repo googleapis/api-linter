@@ -29,11 +29,11 @@ func TestParentField(t *testing.T) {
 		Pattern  string
 		problems testutils.Problems
 	}{
-		{"Valid", "BatchCreateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"Missing", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
-		{"InvalidType", "BatchCreateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantRPCName", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
-		{"IrrelevantNoParent", "BatchCreateBooks", "", "books/{b}", nil},
+		{"Valid", "BatchCreateBooks", "string parent = 1;", "publishers/{p}/books", nil},
+		{"Missing", "BatchCreateBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
+		{"InvalidType", "BatchCreateBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantRPCName", "EnumerateBooks", "", "publishers/{p}/books", nil},
+		{"IrrelevantNoParent", "BatchCreateBooks", "", "books", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

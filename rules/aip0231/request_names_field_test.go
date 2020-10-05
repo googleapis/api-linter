@@ -111,7 +111,7 @@ func TestNamesField(t *testing.T) {
 			},
 		},
 		{
-			testName: "Invalid-NamesFieldWrongType",
+			testName: "Invalid-GetReqFieldWrongType",
 			src: `
 				message BatchGetBooksRequest {
 					repeated string requests = 1;
@@ -121,6 +121,11 @@ func TestNamesField(t *testing.T) {
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},
+		},
+		{
+			testName: "Irrelevant-UnmatchedMessageName",
+			src:      `message GetBooksRequest {}`,
+			problems: testutils.Problems{},
 		},
 	}
 
