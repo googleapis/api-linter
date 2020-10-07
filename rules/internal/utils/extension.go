@@ -71,6 +71,15 @@ func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
 	return nil
 }
 
+// IsResource returns true if the message has a populated google.api.resource
+// annotation with a non-empty "type" field.
+func IsResource(m *desc.MessageDescriptor) bool {
+	if res := GetResource(m); res != nil {
+		return res.GetType() != ""
+	}
+	return false
+}
+
 // GetResourceDefinitions returns the google.api.resource_definition annotations
 // for a file.
 func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
