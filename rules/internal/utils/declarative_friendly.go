@@ -166,10 +166,7 @@ func findMethod(f *desc.FileDescriptor, name string) *desc.MethodDescriptor {
 // getServices finds all services in a file and all imports within the
 // same package.
 func getServices(f *desc.FileDescriptor) []*desc.ServiceDescriptor {
-	answer := []*desc.ServiceDescriptor{}
-	for _, s := range f.GetServices() {
-		answer = append(answer, s)
-	}
+	answer := f.GetServices()
 	for _, dep := range f.GetDependencies() {
 		if f.GetPackage() == dep.GetPackage() {
 			answer = append(answer, getServices(dep)...)
