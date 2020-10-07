@@ -39,11 +39,13 @@ func AddRules(r lint.RuleRegistry) error {
 		requestParentReference,
 		requestRequestsBehavior,
 		requestUnknownFields,
+		responseResourceField,
 	)
 }
 
 var batchDeleteMethodRegexp = regexp.MustCompile("^BatchDelete(?:[A-Z]|$)")
 var batchDeleteReqMessageRegexp = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Request$")
+var batchDeleteResponseMessageRegexp = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Response$")
 var batchDeleteURIRegexp = regexp.MustCompile(`:batchDelete$`)
 
 // Returns true if this is a AIP-235 Batch Delete method, false otherwise.
@@ -54,4 +56,9 @@ func isBatchDeleteMethod(m *desc.MethodDescriptor) bool {
 // Returns true if this is an AIP-235 Batch Delete request message, false otherwise.
 func isBatchDeleteRequestMessage(m *desc.MessageDescriptor) bool {
 	return batchDeleteReqMessageRegexp.MatchString(m.GetName())
+}
+
+// Returns true if this is an AIP-235 Batch Delete response message, false otherwise.
+func isBatchDeleteResponseMessage(m *desc.MessageDescriptor) bool {
+	return batchDeleteResponseMessageRegexp.MatchString(m.GetName())
 }
