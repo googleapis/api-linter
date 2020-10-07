@@ -28,8 +28,12 @@ value of `REQUIRED`.
 ```proto
 // Incorrect.
 message BatchDeleteBooksRequest {
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   // The `google.api.field_behavior` annotation should also be included.
-  repeated string names = 1 [(google.api.resource_reference) = {
+  repeated string names = 2 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
 }
@@ -40,7 +44,11 @@ message BatchDeleteBooksRequest {
 ```proto
 // Correct.
 message BatchDeleteBooksRequest {
-  repeated string names = 1 [
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
+  repeated string names = 2 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -54,9 +62,13 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchDeleteBooksRequest {
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   // (-- api-linter: core::0235::request-names-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  repeated string names = 1 [(google.api.resource_reference) = {
+  repeated string names = 2 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
 }

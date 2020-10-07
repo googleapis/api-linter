@@ -1,24 +1,25 @@
 ---
 rule:
   aip: 235
-  name: [core, '0235', request-names-reference]
+  name: [core, '0235', request-requests-behavior]
   summary: |
-    Batch Delete requests should annotate the `names` field with `google.api.resource_reference`.
-permalink: /235/request-names-reference
+    Batch Delete requests should annotate the `requests` field with `google.api.field_behavior`.
+permalink: /235/request-requests-behavior
 redirect_from:
-  - /0235/request-names-reference
+  - /0235/request-requests-behavior
 ---
 
-# Batch Delete methods: Resource reference
+# Batch Delete methods: `requests` field behavior
 
 This rule enforces that all `BatchDelete` requests have
-`google.api.resource_reference` on their `repeated string names` field, as mandated in
-[AIP-235][].
+`google.api.field_behavior` set to `REQUIRED` on their `requests` field, as
+mandated in [AIP-235][].
 
 ## Details
 
-This rule looks at the `names` field of any message matching `BatchDelete*Request` and
-complains if it does not have a `google.api.resource_reference` annotation.
+This rule looks at any message matching `BatchDelete*Request` and complains if the
+`requests` field does not have a `google.api.field_behavior` annotation with a
+value of `REQUIRED`.
 
 ## Examples
 
@@ -31,8 +32,8 @@ message BatchDeleteBooksRequest {
     (google.api.resource_reference).child_type = "library.googleapis.com/Book"
   ];
 
-  // The `google.api.resource_reference` annotation should also be included.
-  repeated string names = 2 [(google.api.field_behavior) = REQUIRED];
+  // The `google.api.field_behavior` annotation should be included.
+  repeated DeleteBookRequest requests = 2;
 }
 ```
 
@@ -45,9 +46,8 @@ message BatchDeleteBooksRequest {
     (google.api.resource_reference).child_type = "library.googleapis.com/Book"
   ];
 
-  repeated string names = 2 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  repeated DeleteBookRequest requests = 2 [
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 ```
@@ -63,9 +63,9 @@ message BatchDeleteBooksRequest {
     (google.api.resource_reference).child_type = "library.googleapis.com/Book"
   ];
 
-  // (-- api-linter: core::0235::request-names-reference=disabled
+  // (-- api-linter: core::0235::request-requests-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  repeated string names = 2 [(google.api.field_behavior) = REQUIRED];
+  repeated DeleteBookRequest requests = 2;
 }
 ```
 

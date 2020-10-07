@@ -29,7 +29,10 @@ accepted in its place.
 ```proto
 // Incorrect.
 message BatchDeleteBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated string books = 2;  // Field name should be `names`.
 }
 ```
@@ -37,7 +40,10 @@ message BatchDeleteBooksRequest {
 ```proto
 // Incorrect.
 message BatchDeleteBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   string names = 2;  // Field should be repeated.
 }
 ```
@@ -47,8 +53,14 @@ message BatchDeleteBooksRequest {
 ```proto
 // Correct.
 message BatchDeleteBooksRequest {
-  string parent = 1;
-  repeated string names = 2;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -62,7 +74,10 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 // (-- api-linter: core::0235::request-names-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message BatchDeleteBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated string books = 2;
 }
 ```

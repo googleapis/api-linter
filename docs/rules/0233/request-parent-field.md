@@ -44,7 +44,10 @@ message BatchCreateBooksRequest {
 ```proto
 // Correct.
 message BatchCreateBooksRequest {
-  string parent = 1;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
   repeated CreateBookRequest requests = 2;
 }
 ```

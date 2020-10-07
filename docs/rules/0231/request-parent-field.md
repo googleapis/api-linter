@@ -27,7 +27,11 @@ either the `parent` field is missing, or if it has any type other than
 // Incorrect.
 message BatchGetBooksRequest {
   string publisher = 1;  // Field name should be `parent`.
-  repeated string names = 2;
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -35,7 +39,11 @@ message BatchGetBooksRequest {
 // Incorrect.
 message BatchGetBooksRequest {
   bytes parent = 1;  // Field type should be `string`.
-  repeated string names = 2;
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -44,8 +52,14 @@ message BatchGetBooksRequest {
 ```proto
 // Correct.
 message BatchGetBooksRequest {
-  string parent = 1;
-  repeated string names = 2;
+  string parent = 1 [
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
+  ];
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -60,7 +74,11 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message BatchGetBooksRequest {
   string publisher = 1;  // Field name should be `parent`.
-  repeated string names = 2;
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 

@@ -50,7 +50,7 @@ above the field. Remember to also include an [aip.dev/not-precedent][] comment
 explaining why.
 
 ```proto
-// (-- api-linter: core::0158::response-repeated-first-field
+// (-- api-linter: core::0158::response-repeated-first-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message ListBooksResponse {
     Book books = 1;

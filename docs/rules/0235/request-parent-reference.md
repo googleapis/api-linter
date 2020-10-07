@@ -1,23 +1,23 @@
 ---
 rule:
   aip: 235
-  name: [core, '0235', request-names-reference]
+  name: [core, '0235', request-parent-reference]
   summary: |
-    Batch Delete requests should annotate the `names` field with `google.api.resource_reference`.
-permalink: /235/request-names-reference
+    Batch Delete requests should annotate the `parent` field with `google.api.resource_reference`.
+permalink: /235/request-parent-reference
 redirect_from:
-  - /0235/request-names-reference
+  - /0235/request-parent-reference
 ---
 
-# Batch Delete methods: Resource reference
+# Batch Delete methods: Parent resource reference
 
 This rule enforces that all `BatchDelete` requests have
-`google.api.resource_reference` on their `repeated string names` field, as mandated in
+`google.api.resource_reference` on their `string parent` field, as mandated in
 [AIP-235][].
 
 ## Details
 
-This rule looks at the `names` field of any message matching `BatchDelete*Request` and
+This rule looks at the `parent` field of any message matching `BatchDelete*Request` and
 complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -27,12 +27,13 @@ complains if it does not have a `google.api.resource_reference` annotation.
 ```proto
 // Incorrect.
 message BatchDeleteBooksRequest {
-  string parent = 1 [
-    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
-  ];
-
   // The `google.api.resource_reference` annotation should also be included.
-  repeated string names = 2 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1;
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
@@ -59,13 +60,14 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message BatchDeleteBooksRequest {
-  string parent = 1 [
-    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
-  ];
-
-  // (-- api-linter: core::0235::request-names-reference=disabled
+  // (-- api-linter: core::0235::request-parent-reference=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  repeated string names = 2 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1;
+
+  repeated string names = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
+  ];
 }
 ```
 
