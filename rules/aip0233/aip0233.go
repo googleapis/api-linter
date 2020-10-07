@@ -37,6 +37,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestParentReference,
 		requestRequestsBehavior,
 		requestRequestsField,
+		requestUnknownFields,
 		responseResourceField,
 	)
 }
