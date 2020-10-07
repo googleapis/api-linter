@@ -79,7 +79,7 @@ func IsDeclarativeFriendly(d desc.Descriptor) bool {
 		// If this is a Delete method (AIP-135) with a return value of Empty,
 		// try to find the resource.
 		if strings.HasPrefix(m.GetName(), "Delete") && m.GetOutputType().GetName() == "Empty" {
-			if resource := findMessage(m.GetFile(), m.GetName()[6:]); resource != nil {
+			if resource := findMessage(m.GetFile(), strings.TrimPrefix(m.GetName(), "Delete")); resource != nil {
 				return IsDeclarativeFriendly(resource)
 			}
 		}
