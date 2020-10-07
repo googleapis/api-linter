@@ -33,7 +33,7 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 		{"FalseOtherStyle", "style: STYLE_UNSPECIFIED", false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			m := testutils.ParseProto3Tmpl(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 
 				message Book {
@@ -42,9 +42,21 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 						{{.Style}}
 					};
 				}
-			`, test).GetMessageTypes()[0]
-			if got := IsDeclarativeFriendly(m); got != test.want {
-				t.Errorf("Got %v, expected %v.", got, test.want)
+
+				message CreateBookRequest {
+					Book book = 1;
+				}
+
+				service Library {
+					rpc CreateBook(CreateBookRequest) returns (Book);
+				}
+			`, test)
+			for _, m := range f.GetMessageTypes() {
+				t.Run(m.GetName(), func(t *testing.T) {
+					if got := IsDeclarativeFriendlyMessage(m); got != test.want {
+						t.Errorf("Got %v, expected %v.", got, test.want)
+					}
+				})
 			}
 		})
 	}
@@ -52,7 +64,7 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 	// Test the case where the google.api.resource annotation is not present.
 	t.Run("NotResource", func(t *testing.T) {
 		m := testutils.ParseProto3String(t, "message Book {}").GetMessageTypes()[0]
-		if IsDeclarativeFriendly(m) {
+		if IsDeclarativeFriendlyMessage(m) {
 			t.Errorf("Got true, expected false.")
 		}
 	})
@@ -154,7 +166,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 						}
 					`, tmpl), s)
 					m := f.GetServices()[0].GetMethods()[0]
-					if got := IsDeclarativeFriendly(m); got != test.want {
+					if got := IsDeclarativeFriendlyMethod(m); got != test.want {
 						t.Errorf("Got %v, expected %v.", got, test.want)
 					}
 				})
@@ -177,7 +189,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 		`)
 		m := f.GetServices()[0].GetMethods()[0]
 		want := false
-		if got := IsDeclarativeFriendly(m); got != want {
+		if got := IsDeclarativeFriendlyMethod(m); got != want {
 			t.Errorf("Got %v, expected %v.", got, want)
 		}
 	})
