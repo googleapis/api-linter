@@ -21,7 +21,7 @@ import (
 )
 
 var allowMissing = &lint.MessageRule{
-	Name: lint.NewRuleName(134, "allow-missing"),
+	Name: lint.NewRuleName(134, "request-allow-missing-field"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		return isUpdateRequestMessage(m) && utils.IsDeclarativeFriendlyMessage(m)
 	},

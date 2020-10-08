@@ -19,6 +19,7 @@ This rule looks at any message matching `Update*Request` and complains if it
 comes across any fields other than:
 
 - `{Resource} {resource}` ([AIP-134][])
+- `bool allow_missing` ([AIP-134][])
 - `google.protobuf.FieldMask update_mask` ([AIP-134][])
 - `string request_id` ([AIP-155][])
 
