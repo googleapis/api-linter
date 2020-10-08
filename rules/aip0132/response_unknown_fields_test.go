@@ -23,17 +23,19 @@ import (
 
 func TestResponseUnknownFields(t *testing.T) {
 	for _, test := range []struct {
-		FieldName string
-		problems  testutils.Problems
+		MessageName string
+		FieldName   string
+		problems    testutils.Problems
 	}{
-		{"total_size", testutils.Problems{}},
-		{"unreachable", testutils.Problems{}},
-		{"unreachable_locations", testutils.Problems{}},
-		{"extra", testutils.Problems{{Message: "List responses"}}},
+		{"ListBooksResponse", "total_size", nil},
+		{"ListBooksResponse", "unreachable", nil},
+		{"ListBooksResponse", "unreachable_locations", nil},
+		{"ListBookRevisionsResponse", "total_size", nil},
+		{"ListBooksResponse", "extra", testutils.Problems{{Message: "List responses"}}},
 	} {
 		t.Run(strcase.UpperCamelCase(test.FieldName), func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				message ListBooksResponse {
+				message {{.MessageName}} {
 					repeated Book books = 1;
 					string next_page_token = 2;
 					string {{.FieldName}} = 3;
