@@ -20,6 +20,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -42,10 +43,14 @@ func AddRules(r lint.RuleRegistry) error {
 func checkLeadingComments(f *desc.FieldDescriptor, pattern *regexp.Regexp, annotation string) []lint.Problem {
 	leadingComments := f.GetSourceInfo().GetLeadingComments()
 	if pattern.MatchString(leadingComments) {
-		return []lint.Problem{lint.Problem{
+		return []lint.Problem{{
 			Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q in the leading comments. For example, `string name = 1 [(google.api.field_behavior) = %s];`.", pattern.FindString(leadingComments), annotation),
 			Descriptor: f,
 		}}
 	}
 	return nil
+}
+
+func withoutFieldBehavior(f *desc.FieldDescriptor) bool {
+	return utils.GetFieldBehavior(f).Len() == 0
 }
