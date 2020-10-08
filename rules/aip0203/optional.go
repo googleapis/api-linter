@@ -24,17 +24,13 @@ import (
 
 var optional = &lint.FieldRule{
 	Name:   lint.NewRuleName(203, "optional"),
-	OnlyIf: withoutOptionalFieldBehavior,
+	OnlyIf: withoutFieldBehavior,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return checkLeadingComments(f, optionalRegexp, "OPTIONAL")
 	},
 }
 
 var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
-
-func withoutOptionalFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("OPTIONAL")
-}
 
 func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
 	for _, f := range m.GetFields() {
