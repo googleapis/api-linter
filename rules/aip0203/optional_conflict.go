@@ -38,3 +38,7 @@ var optionalBehaviorConflict = &lint.FieldRule{
 		return nil
 	},
 }
+
+func withoutOptionalFieldBehavior(f *desc.FieldDescriptor) bool {
+	return !utils.GetFieldBehavior(f).Contains("OPTIONAL")
+}
