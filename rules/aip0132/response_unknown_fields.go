@@ -15,8 +15,11 @@
 package aip0132
 
 import (
+	"strings"
+
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -37,7 +40,15 @@ var responseUnknownFields = &lint.FieldRule{
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// A repeated variant of the resource should be permitted.
-		resource := strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(f.GetOwner().GetName())[1])
+		msgName := f.GetOwner().GetName()
+		resource := strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(msgName)[1])
+		if strings.HasSuffix(resource, "_revisions") {
+			// This is an AIP-162 ListFooRevisions response, which is subtly
+			// different from an AIP-132 List response. We need to modify the RPC
+			// name to what the AIP-132 List response would be in order to permit
+			// the resource field properly.
+			resource = utils.ToPlural(strings.TrimSuffix(resource, "_revisions"))
+		}
 		if f.GetName() == resource {
 			return nil
 		}
