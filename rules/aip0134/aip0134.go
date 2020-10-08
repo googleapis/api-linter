@@ -29,6 +29,7 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		134,
+		allowMissing,
 		httpBody,
 		httpMethod,
 		httpNameField,
