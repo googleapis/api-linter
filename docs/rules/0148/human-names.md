@@ -2,7 +2,7 @@
 rule:
   aip: 148
   name: [core, '0148', human-names]
-  summary: Avoid `google.protobuf.human-names` fields.
+  summary: Avoid imprecise terms for human names.
 permalink: /148/standardized-codes
 redirect_from:
   - /0148/standardized-codes
