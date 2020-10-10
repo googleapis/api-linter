@@ -28,42 +28,39 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		// Sanity check: If the resource is not declarative-friendly, none of
 		// this logic applies.
-		resource := utils.DeclarativeFriendlyResource(m)
-		if resource == nil {
-			return false
-		}
+		if resource := utils.DeclarativeFriendlyResource(m); resource != nil {
+			// This should apply if the resource in question is declarative-friendly,
+			// but our IsDeclarativeFriendly method will return true for both
+			// resources and request messages, and they need to be handled subtly
+			// differently.
+			if m == resource {
+				return true
+			}
 
-		// This should apply if the resource in question is declarative-friendly,
-		// but our IsDeclarativeFriendly method will return true for both
-		// resources and request messages, and they need to be handled subtly
-		// differently.
-		if m == resource {
-			return true
-		}
+			// If this is a request message, then make several more checks based on
+			// what the method looks like.
+			if name := m.GetName(); strings.HasSuffix(name, "Request") {
+				name = strings.TrimSuffix(name, "Request")
 
-		// If this is a request message, then make several more checks based on
-		// what the method looks like.
-		if name := m.GetName(); strings.HasSuffix(name, "Request") {
-			name = strings.TrimSuffix(name, "Request")
+				// If this is a GET request, then this message is exempt.
+				if method := utils.FindMethod(m.GetFile(), name); method != nil {
+					for _, rule := range utils.GetHTTPRules(method) {
+						if rule.Method == "GET" {
+							return false
+						}
+					}
+				}
 
-			// If this is a GET request, then this message is exempt.
-			if method := utils.FindMethod(m.GetFile(), name); method != nil {
-				for _, rule := range utils.GetHTTPRules(method) {
-					if rule.Method == "GET" {
+				// If the message contains the resource, then this message is exempt.
+				for _, field := range m.GetFields() {
+					if field.GetMessageType() == resource {
 						return false
 					}
 				}
-			}
 
-			// If the message contains the resource, then this message is exempt.
-			for _, field := range m.GetFields() {
-				if field.GetMessageType() == resource {
-					return false
-				}
+				// Okay, this message should include an etag.
+				return true
 			}
-
-			// Okay, this message should include an etag.
-			return true
 		}
 
 		return false
