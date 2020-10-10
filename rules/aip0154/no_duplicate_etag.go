@@ -24,11 +24,16 @@ import (
 var noDuplicateEtag = &lint.FieldRule{
 	Name: lint.NewRuleName(154, "no-duplicate-etag"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return strings.HasSuffix(f.GetOwner().GetName(), "Request")
+		return f.GetName() == "etag" && strings.HasSuffix(f.GetOwner().GetName(), "Request")
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		for _, otherField := range f.GetOwner().GetFields() {
 			if m := otherField.GetMessageType(); m != nil {
+				// if strings.Contains("UpdateBookRequest", "Book")
+				//
+				// If this is a random, unrelated (not the resource) message, we want to ignore it.
+				// Ditto for *other* resources, which could be relevant for custom methods,
+				// which is why we do a string check and not a google.api.resource check.
 				if strings.Contains(f.GetOwner().GetName(), m.GetName()) && m.FindFieldByName("etag") != nil {
 					return []lint.Problem{{
 						Message:    "Request messages that include the resource should omit etag.",
