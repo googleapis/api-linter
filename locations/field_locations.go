@@ -33,3 +33,8 @@ func FieldType(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
 	}
 	return pathLocation(f, 5) // FieldDescriptor.type == 5
 }
+
+// FieldLabel returns the precise location for a field's label.
+func FieldLabel(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 4) // FieldDescriptor.label == 4
+}
