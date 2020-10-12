@@ -34,7 +34,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "publishers/{publisher}/books/{book}"
     style: DECLARATIVE_FRIENDLY
-  }
+  };
 
   string name = 1;
   // A string etag field should exist.
