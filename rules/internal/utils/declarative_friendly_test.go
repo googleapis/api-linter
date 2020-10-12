@@ -194,27 +194,3 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 		}
 	})
 }
-
-func TestFindMessage(t *testing.T) {
-	files := testutils.ParseProtoStrings(t, map[string]string{
-		"a.proto": `
-			package test;
-			message Book {}
-		`,
-		"b.proto": `
-			package other;
-			message Scroll {}
-		`,
-		"c.proto": `
-			package test;
-			import "a.proto";
-			import "b.proto";
-		`,
-	})
-	if book := findMessage(files["c.proto"], "Book"); book == nil {
-		t.Errorf("Got nil, expected Book message.")
-	}
-	if scroll := findMessage(files["c.proto"], "Scroll"); scroll != nil {
-		t.Errorf("Got Sctoll message, expected nil.")
-	}
-}
