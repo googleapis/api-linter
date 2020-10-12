@@ -20,7 +20,7 @@ includes `style: DECLARATIVE_FRIENDLY`, and complains if it lacks a
 `string etag` field.
 
 Additionally, it looks at certain corresponding request messages (e.g.
-`DeleteBookRequest`) that _do not_ include the resource, and make the same
+`DeleteBookRequest`) that _do not_ include the resource, and makes the same
 check.
 
 ## Examples
@@ -60,7 +60,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "publishers/{publisher}/books/{book}"
     style: DECLARATIVE_FRIENDLY
-  }
+  };
 
   string name = 1;
   string etag = 2;
@@ -90,7 +90,7 @@ message Book {
     type: "library.googleapis.com/Book"
     pattern: "publishers/{publisher}/books/{book}"
     style: DECLARATIVE_FRIENDLY
-  }
+  };
 
   string name = 1;
 }

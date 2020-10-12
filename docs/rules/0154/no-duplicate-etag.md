@@ -29,7 +29,7 @@ request message including a resource that itself includes an etag.
 // Incorrect.
 message UpdateBookRequest {
   Book book = 1;
-  google.protobuf.FieldMask = 2;
+  google.protobuf.FieldMask update_mask = 2;
   string etag = 3;  // The Book message already includes etag.
 }
 ```
@@ -40,7 +40,7 @@ message UpdateBookRequest {
 // Correct.
 message UpdateBookRequest {
   Book book = 1;
-  google.protobuf.FieldMask = 2;
+  google.protobuf.FieldMask update_mask = 2;
 }
 ```
 
@@ -52,7 +52,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 ```proto
 message UpdateBookRequest {
   Book book = 1;
-  google.protobuf.FieldMask = 2;
+  google.protobuf.FieldMask update_mask = 2;
   // (-- api-linter: core::0154::no-duplicate-etag=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string etag = 3;
