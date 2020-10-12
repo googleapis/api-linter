@@ -47,6 +47,30 @@ func TestFieldLocations(t *testing.T) {
 	}
 }
 
+func TestFieldLabel(t *testing.T) {
+	f := parse(t, `
+		message Book {
+			string name = 1;
+			optional string author = 2;
+		}
+	`)
+	for _, test := range []struct {
+		name  string
+		field *desc.FieldDescriptor
+		span  []int32
+	}{
+		{"Present", f.GetMessageTypes()[0].GetFields()[1], []int32{4, 8, 16}},
+		{"Absent", f.GetMessageTypes()[0].GetFields()[0], nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			l := FieldLabel(test.field)
+			if diff := cmp.Diff(l.GetSpan(), test.span); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
 func TestFieldResourceReference(t *testing.T) {
 	f := parse(t, `
 		import "google/api/resource.proto";
