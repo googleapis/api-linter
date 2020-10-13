@@ -1,13 +1,13 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', declarative-friendly-required]
+  name: [core, '0133', request-id-field]
   summary: |
     Declarative-friendly create methods should have a client-specified
     ID field.
-permalink: /133/declarative-friendly-required
+permalink: /133/request-id-field
 redirect_from:
-  - /0133/declarative-friendly-required
+  - /0133/request-id-field
 ---
 
 # Client-specified IDs
@@ -61,7 +61,7 @@ If you need to violate this rule, use a leading comment above the message.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0133::declarative-friendly-required=disabled
+// (-- api-linter: core::0133::request-id-field=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message CreateBookRequest {
   string parent = 1 [(google.api.resource_reference) = {
