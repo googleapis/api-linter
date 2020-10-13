@@ -17,6 +17,7 @@ package utils
 import (
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
@@ -66,9 +67,22 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 			}
 		}
 	case *desc.MethodDescriptor:
-		// Get the return type for the method. If the method is an LRO, then
-		// get the response type from the operation_info annotation.
 		response := m.GetOutputType()
+
+		// If this is a Delete method (AIP-135) with a return value of Empty,
+		// try to find the resource.
+		//
+		// Note: This needs to precede the LRO logic because Delete requests
+		// may resolve to Empty, in which case FindMessage will return nil and
+		// short-circuit this logic.
+		if strings.HasPrefix(m.GetName(), "Delete") && stringset.New("Empty", "Operation").Contains(m.GetOutputType().GetName()) {
+			if resource := FindMessage(m.GetFile(), strings.TrimPrefix(m.GetName(), "Delete")); resource != nil {
+				return DeclarativeFriendlyResource(resource)
+			}
+		}
+
+		// If the method is an LRO, then get the response type from the
+		// operation_info annotation.
 		if response.GetFullyQualifiedName() == "google.longrunning.Operation" {
 			if opInfo := GetOperationInfo(m); opInfo != nil {
 				response = FindMessage(m.GetFile(), opInfo.GetResponseType())
@@ -95,14 +109,6 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 				if field.IsRepeated() && field.GetMessageType() != nil {
 					return DeclarativeFriendlyResource(field.GetMessageType())
 				}
-			}
-		}
-
-		// If this is a Delete method (AIP-135) with a return value of Empty,
-		// try to find the resource.
-		if strings.HasPrefix(m.GetName(), "Delete") && m.GetOutputType().GetName() == "Empty" {
-			if resource := FindMessage(m.GetFile(), strings.TrimPrefix(m.GetName(), "Delete")); resource != nil {
-				return DeclarativeFriendlyResource(resource)
 			}
 		}
 
