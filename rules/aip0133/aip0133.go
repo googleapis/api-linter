@@ -41,6 +41,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestParentRequired,
 		requestResourceBehavior,
 		resourceField,
+		responseLRO,
 		synonyms,
 		unknownFields,
 	)
