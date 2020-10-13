@@ -8,7 +8,7 @@ redirect_from:
   - /0163/declarative-friendly-required
 ---
 
-# Required etags
+# Required change validation
 
 This rule enforces that declarative-friendly mutations have a `validate_only`
 field, as mandated in [AIP-163][].
