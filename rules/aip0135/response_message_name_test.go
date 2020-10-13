@@ -86,11 +86,11 @@ func TestResponseMessageName(t *testing.T) {
 		Style        string
 		problems     map[string]testutils.Problems
 	}{
-		// {"ValidEmpty", "DeleteBook", "google.protobuf.Empty", "", problems["none"]},
-		// {"ValidResource", "DeleteBook", "Book", "", problems["none"]},
-		// {"Invalid", "DeleteBook", "DeleteBookResponse", "", problems["empty"]},
+		{"ValidEmpty", "DeleteBook", "google.protobuf.Empty", "", problems["none"]},
+		{"ValidResource", "DeleteBook", "Book", "", problems["none"]},
+		{"Invalid", "DeleteBook", "DeleteBookResponse", "", problems["empty"]},
 		{"InvalidEmptyDF", "DeleteBook", "google.protobuf.Empty", "style: DECLARATIVE_FRIENDLY", problems["book"]},
-		// {"Irrelevant", "DestroyBook", "DestroyBookResponse", "", problems["none"]},
+		{"Irrelevant", "DestroyBook", "DestroyBookResponse", "", problems["none"]},
 	}
 
 	// Run each test individually.

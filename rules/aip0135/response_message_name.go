@@ -75,12 +75,16 @@ var responseMessageName = &lint.MethodRule{
 				suggestion = "" // We can not offer a precise enough location to make a suggestion.
 			}
 
-			return []lint.Problem{{
+			// Create and return the problem.
+			problem := lint.Problem{
 				Message:    fmt.Sprintf(msg, got),
-				Suggestion: suggestion,
 				Descriptor: m,
 				Location:   location,
-			}}
+			}
+			if len(suggestion) > 0 {
+				problem.Suggestion = suggestion
+			}
+			return []lint.Problem{problem}
 		}
 
 		return nil
