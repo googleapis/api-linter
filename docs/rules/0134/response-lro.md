@@ -30,7 +30,7 @@ and complains if it does not use long-running operations.
 // return a long-running operation.
 rpc UpdateBook(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{parent=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -43,7 +43,7 @@ rpc UpdateBook(UpdateBookRequest) returns (Book) {
 // Assuming that Book is styled declarative-friendly...
 rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.api.http) = {
-    post: "/v1/{parent=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
   option (google.longrunning.operation_info) = {
@@ -63,7 +63,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBook(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{parent=publishers/*}/books"
+    patch: "/v1/{book.name=publishers/*/books/*}"
     body: "book"
   };
 }
