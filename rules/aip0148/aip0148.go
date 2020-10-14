@@ -23,6 +23,7 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		148,
+		declarativeFriendlyRequired,
 		humanNames,
 	)
 }

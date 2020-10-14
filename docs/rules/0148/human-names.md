@@ -3,9 +3,9 @@ rule:
   aip: 148
   name: [core, '0148', human-names]
   summary: Avoid imprecise terms for human names.
-permalink: /148/standardized-codes
+permalink: /148/human-names
 redirect_from:
-  - /0148/standardized-codes
+  - /0148/human-names
 ---
 
 # Human names
