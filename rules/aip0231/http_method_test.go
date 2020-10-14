@@ -17,59 +17,41 @@ package aip0231
 import (
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestHttpVerb(t *testing.T) {
-	// Set up GET and POST HTTP annotations.
-	httpGet := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Get{
-			Get: "/v1/{parent=publishers/*}/books:batchGet",
-		},
-	}
-	httpPost := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Post{
-			Post: "/v1/{name=publishers/*/books/*}",
-		},
-	}
-
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		httpRule   *annotations.HttpRule
-		methodName string
+		Method     string
+		MethodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", httpGet, "BatchGetBooks", nil},
-		{"Invalid", httpPost, "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods must use the HTTP GET verb."}}},
-		{"Irrelevant", httpPost, "AcquireBook", nil},
+		{"Valid", "get", "BatchGetBooks", nil},
+		{"Invalid", "post", "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods must use the HTTP GET verb."}}},
+		{"Irrelevant", "post", "AcquireBook", nil},
 	}
 
 	// Run each test.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			proto.SetExtension(opts, annotations.E_Http, test.httpRule)
-
-			// Create a minimal service with a AIP-231 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksResponse"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := httpVerb.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							{{.Method}}: "/v1/{name=publishers/*/books/*}:batchGet"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.MethodName}}Response {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := httpVerb.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

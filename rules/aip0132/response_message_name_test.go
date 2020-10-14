@@ -18,15 +18,14 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestResponseMessageName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName        string
-		methodName      string
-		respMessageName string
+		MethodName      string
+		RespMessageName string
 		problems        testutils.Problems
 	}{
 		{"Valid", "ListBooks", "ListBooksResponse", testutils.Problems{}},
@@ -37,21 +36,17 @@ func TestResponseMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-131 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("ListBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage(test.respMessageName), false),
-			)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			problems := responseMessageName.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+			file := testutils.ParseProto3Tmpl(t, `
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespMessageName}}) {}
+				}
+				message {{.MethodName}}Request {}
+				message {{.RespMessageName}} {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := responseMessageName.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}
