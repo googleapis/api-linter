@@ -8,7 +8,7 @@ redirect_from:
   - /0135/response-message-name
 ---
 
-# Delete methods: Empty response message
+# Delete methods: Response message
 
 This rule enforces that all `Delete` RPCs have a response message of
 `google.protobuf.Empty` or the resource, as mandated in [AIP-135][].
@@ -20,6 +20,9 @@ if the name of the corresponding output message is not one of:
 
 - `google.protobuf.Empty`
 - The name of the RPC with the prefix `Delete` removed.
+
+**Important:** For declarative-friendly resources, only the resource is
+permitted as a return type.
 
 It also permits a response of `google.longrunning.Operation`; in this case, it
 checks the `response_type` in the `google.longrunning.operation_info`
@@ -61,6 +64,9 @@ rpc DeleteBook(DeleteBookRequest) returns (Book) {
   };
 }
 ```
+
+**Important:** For declarative-friendly resources, only the resource is
+permitted as a return type (and therefore only the second example is valid).
 
 ### Long-running operation
 

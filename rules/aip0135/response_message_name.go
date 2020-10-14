@@ -32,20 +32,25 @@ var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "response-message-name"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		declFriendly := utils.IsDeclarativeFriendlyMethod(m)
+		resource := strings.Replace(m.GetName(), "Delete", "", 1)
+
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
 		// message is `google.protobuf.Empty` or `Foo`.
 		got := m.GetOutputType().GetName()
 		if stringset.New("Empty", "Operation").Contains(got) {
 			got = m.GetOutputType().GetFullyQualifiedName()
 		}
-		want := stringset.New(
-			"google.protobuf.Empty",
-			strings.Replace(m.GetName(), "Delete", "", 1),
-		)
+		want := stringset.New(resource)
+		if !declFriendly {
+			want.Add("google.protobuf.Empty")
+		}
 
 		// If the return type is an Operation, use the annotated response type.
+		lro := false
 		if got == "google.longrunning.Operation" {
 			got = utils.GetOperationInfo(m).GetResponseType()
+			lro = true
 		}
 
 		// If we did not get a permitted value, return a problem.
@@ -54,15 +59,32 @@ var responseMessageName = &lint.MethodRule{
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
 		if !want.Contains(got) && got != "" {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Delete RPCs should have response message type of Empty or the resource, not %q.",
-					got,
-				),
-				Suggestion: "google.protobuf.Empty",
+			// Customize the error message (by including Empty iff the resource is
+			// not marked declarative-friendly)
+			msg := "Delete RPCs should have response message type of Empty or the resource, not %q."
+			suggestion := "google.protobuf.Empty"
+			if declFriendly {
+				msg = strings.Replace(msg, "Empty or ", "", 1)
+				suggestion = resource
+			}
+
+			// Customize the location based on whether an LRO is in use.
+			location := locations.MethodResponseType(m)
+			if lro {
+				location = locations.MethodOperationInfo(m)
+				suggestion = "" // We can not offer a precise enough location to make a suggestion.
+			}
+
+			// Create and return the problem.
+			problem := lint.Problem{
+				Message:    fmt.Sprintf(msg, got),
 				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
-			}}
+				Location:   location,
+			}
+			if len(suggestion) > 0 {
+				problem.Suggestion = suggestion
+			}
+			return []lint.Problem{problem}
 		}
 
 		return nil
