@@ -50,6 +50,7 @@ func (c *commit) String() string {
 type changelog struct {
 	features       []*commit
 	fixes          []*commit
+	docs           []*commit
 	otherVisible   []*commit
 	otherInvisible []*commit
 	breaking       bool
@@ -57,7 +58,7 @@ type changelog struct {
 
 func newChangelog(gitlog string) *changelog {
 	breaking := false
-	var feat, fix, vis, invis []*commit
+	var feat, fix, docs, vis, invis []*commit
 	for _, line := range strings.Split(gitlog, "\n") {
 		cmt := newCommit(line)
 		if cmt.breaking {
@@ -68,7 +69,9 @@ func newChangelog(gitlog string) *changelog {
 			feat = append(feat, cmt)
 		case "fix":
 			fix = append(fix, cmt)
-		case "docs", "refactor":
+		case "docs":
+			docs = append(docs, cmt)
+		case "refactor":
 			vis = append(vis, cmt)
 		default:
 			invis = append(invis, cmt)
@@ -77,6 +80,7 @@ func newChangelog(gitlog string) *changelog {
 	return &changelog{
 		features:       feat,
 		fixes:          fix,
+		docs:           docs,
 		otherVisible:   vis,
 		otherInvisible: invis,
 		breaking:       breaking,
@@ -109,7 +113,7 @@ func (cl *changelog) notes() string {
 		return ""
 	}
 	return strings.TrimSuffix(
-		section("Features", cl.features)+section("Fixes", cl.fixes)+section("Other", cl.otherVisible),
+		section("Features", cl.features)+section("Fixes", cl.fixes)+section("Documentation", cl.docs)+section("Other", cl.otherVisible),
 		"%0A",
 	)
 }
