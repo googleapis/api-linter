@@ -60,7 +60,7 @@ var responseMessageName = &lint.MethodRule{
 		// would be confusing.
 		if !want.Contains(got) && got != "" {
 			// Customize the error message (by including Empty iff the resource is
-			// not marked declarative-friendly).)
+			// not marked declarative-friendly)
 			msg := "Delete RPCs should have response message type of Empty or the resource, not %q."
 			suggestion := "google.protobuf.Empty"
 			if declFriendly {
