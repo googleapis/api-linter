@@ -47,7 +47,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "Book"
     metadata_type: "OperationMetadata"
-  }
+  };
 }
 ```
 
@@ -62,7 +62,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc DeleteBook(DeleteBookRequest) returns (Book) {
   option (google.api.http) = {
     delete: "/v1/{name=publishers/*/books/*}"
-    body: "book"
   };
 }
 ```
