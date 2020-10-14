@@ -22,6 +22,7 @@ comes across any fields other than:
 - `bool force` ([AIP-135][])
 - `string etag` ([AIP-154][])
 - `string request_id` ([AIP-155][])
+- `bool validate_only` ([AIP-163][])
 
 ## Examples
 
@@ -65,4 +66,5 @@ top of the file.
 [aip-135]: https://aip.dev/135
 [aip-154]: https://aip.dev/154
 [aip-155]: https://aip.dev/155
+[aip-163]: https://aip.dev/163
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
