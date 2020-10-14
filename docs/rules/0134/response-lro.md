@@ -49,7 +49,7 @@ rpc UpdateBook(UpdateBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "Book"
     metadata_type: "OperationMetadata"
-  }
+  };
 }
 ```
 
