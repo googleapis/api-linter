@@ -15,63 +15,43 @@
 package aip0235
 
 import (
-	"strings"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestHttpMethod(t *testing.T) {
-	// Set up POST and DELETE HTTP annotations.
-	httpPost := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Post{
-			Post: "/v1/{name=publishers/*/books/*}",
-		},
-	}
-	httpDelete := &annotations.HttpRule{
-		Pattern: &annotations.HttpRule_Delete{
-			Delete: "/v1/{name=publishers/*/books/*}",
-		},
-	}
-
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		httpRule   *annotations.HttpRule
-		methodName string
-		msg        string
+		Method     string
+		MethodName string
+		problems   testutils.Problems
 	}{
-		{"Valid", httpPost, "BatchDeleteBooks", ""},
-		{"Invalid", httpDelete, "BatchDeleteBooks", "HTTP POST"},
-		{"Irrelevant", httpPost, "AcquireBook", ""},
+		{"Valid", "post", "BatchDeleteBooks", nil},
+		{"Invalid", "delete", "BatchDeleteBooks", testutils.Problems{{Message: "HTTP POST"}}},
+		{"Irrelevant", "post", "AcquireBook", nil},
 	}
 
 	// Run each test.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			proto.SetExtension(opts, annotations.E_Http, test.httpRule)
-
-			// Create a minimal service with a AIP-235 Batch Delete method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchDeleteBooksRequests"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := httpMethod.Lint(service.GetFile())
-			if test.msg == "" && len(problems) > 0 {
-				t.Errorf("Got %v, expected no problems.", problems)
-			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
-				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							{{.Method}}: "/v1/{name=publishers/*/books/*}:batchDelete"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.MethodName}}Response {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := httpMethod.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

@@ -15,57 +15,41 @@
 package aip0135
 
 import (
-	"strings"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestHttpNameField(t *testing.T) {
 	tests := []struct {
 		testName   string
-		uri        string
-		methodName string
-		msg        string
+		URI        string
+		MethodName string
+		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{name=publishers/*/books/*}", "DeleteBook", ""},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", "`name` field"},
-		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", "`name` field"},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", ""},
+		{"Valid", "/v1/{name=publishers/*/books/*}", "DeleteBook", nil},
+		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
+		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Delete{
-					Delete: test.uri,
-				},
-			}
-			proto.SetExtension(opts, annotations.E_Http, httpRule)
-
-			// Create a minimal service with a AIP-135 Delete method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("DeleteBookRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := httpNameField.Lint(service.GetFile())
-			if test.msg == "" && len(problems) > 0 {
-				t.Errorf("Got %v, expected no problems.", problems)
-			} else if test.msg != "" && len(problems) == 0 {
-				t.Errorf("Got no problems, expected 1.")
-			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
-				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
+						option (google.api.http) = {
+							delete: "{{.URI}}"
+						};
+					}
+				}
+				message Book {}
+				message {{.MethodName}}Request {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
+				t.Errorf(diff)
 			}
 		})
 	}

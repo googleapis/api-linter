@@ -17,18 +17,14 @@ package aip0231
 import (
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestHttpUrl(t *testing.T) {
 	tests := []struct {
 		testName   string
-		uri        string
-		methodName string
+		URI        string
+		MethodName string
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*}/books:batchGet", "BatchGetBooks", nil},
@@ -39,28 +35,20 @@ func TestHttpUrl(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Get{
-					Get: test.uri,
-				},
-			}
-			proto.SetExtension(opts, annotations.E_Http, httpRule)
-
-			// Create a minimal service with a AIP-231 Get method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("BookService").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("BatchGetBooksResponse"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := uriSuffix.Lint(service.GetFile())
-			if diff := test.problems.SetDescriptor(service.GetMethods()[0]).Diff(problems); diff != "" {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							get: "{{.URI}}"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.MethodName}}Response {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(uriSuffix.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
