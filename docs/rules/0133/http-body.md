@@ -18,6 +18,8 @@ as mandated in [AIP-133][].
 This rule looks at any message matching beginning with `Create`, and complains
 if the HTTP `body` field is not set to the resource being created.
 
+Note that any `additional_bindings` need their own `body` field.
+
 ## Examples
 
 **Incorrect** code for this rule:
@@ -32,6 +34,20 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
 }
 ```
 
+```proto
+// Incorrect.
+rpc CreateBook(CreateBookRequest) returns (Book) {
+  option (google.api.http) = {
+    post: "/v1/{parent=publishers/*}/books"
+    body: "book"
+    additional_bindings: {
+      post: "/v1/books"
+      // There should be a "body" here too.
+    }
+  };
+}
+```
+
 **Correct** code for this rule:
 
 ```proto
@@ -40,6 +56,21 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{parent=publishers/*}/books"
     body: "book"
+  };
+}
+```
+
+
+```proto
+// Correct.
+rpc CreateBook(CreateBookRequest) returns (Book) {
+  option (google.api.http) = {
+    post: "/v1/{parent=publishers/*}/books"
+    body: "book"
+    additional_bindings: {
+      post: "/v1/books"
+      body: "book"
+    }
   };
 }
 ```
