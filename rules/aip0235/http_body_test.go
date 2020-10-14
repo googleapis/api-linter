@@ -15,55 +15,42 @@
 package aip0235
 
 import (
-	"strings"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/jhump/protoreflect/desc/builder"
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestHttpBody(t *testing.T) {
 	tests := []struct {
 		testName   string
-		body       string
-		methodName string
-		msg        string
+		Body       string
+		MethodName string
+		problems   testutils.Problems
 	}{
-		{"Valid", "*", "BatchDeleteBooks", ""},
-		{"Invalid", "", "BatchDeleteBooks", "HTTP body"},
-		{"Irrelevant", "*", "AcquireBook", ""},
+		{"Valid", "*", "BatchDeleteBooks", nil},
+		{"Invalid", "", "BatchDeleteBooks", testutils.Problems{{Message: "HTTP body"}}},
+		{"Irrelevant", "*", "AcquireBook", nil},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a MethodOptions with the annotation set.
-			opts := &dpb.MethodOptions{}
-			httpRule := &annotations.HttpRule{
-				Pattern: &annotations.HttpRule_Post{
-					Post: "/v1/{name=publishers/*/books/*}",
-				},
-				Body: test.body,
-			}
-			proto.SetExtension(opts, annotations.E_Http, httpRule)
-
-			// Create a minimal service with a AIP-235 Batch Delete method
-			// (or with a different method, in the "Irrelevant" case).
-			service, err := builder.NewService("Library").AddMethod(builder.NewMethod(test.methodName,
-				builder.RpcTypeMessage(builder.NewMessage("BatchDeleteBooksRequest"), false),
-				builder.RpcTypeMessage(builder.NewMessage("Book"), false),
-			).SetOptions(opts)).Build()
-			if err != nil {
-				t.Fatalf("Could not build %s method.", test.methodName)
-			}
-
-			// Run the method, ensure we get what we expect.
-			problems := httpBody.Lint(service.GetFile())
-			if test.msg == "" && len(problems) > 0 {
-				t.Errorf("Got %v, expected no problems.", problems)
-			} else if test.msg != "" && !strings.Contains(problems[0].Message, test.msg) {
-				t.Errorf("Got %q, expected message containing %q", problems[0].Message, test.msg)
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							post: "/v1/{parent=publishers/*}/books:batchDelete"
+							body: "{{.Body}}"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message {{.MethodName}}Response {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := httpBody.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}
