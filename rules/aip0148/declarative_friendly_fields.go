@@ -25,7 +25,7 @@ import (
 )
 
 var declarativeFriendlyRequired = &lint.MessageRule{
-	Name: lint.NewRuleName(148, "declarative-friendly-required"),
+	Name: lint.NewRuleName(148, "declarative-friendly-fields"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		if resource := utils.DeclarativeFriendlyResource(m); resource == m {
 			return true
