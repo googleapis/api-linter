@@ -44,7 +44,7 @@ message Book {
   string display_name = 2;
   google.protobuf.Timestamp create_time = 3;
   google.protobuf.Timestamp update_time = 4;
-  // google.protobuf.TImestamp delete_time should be included!
+  // google.protobuf.Timestamp delete_time should be included!
 }
 ```
 
@@ -88,7 +88,7 @@ message Book {
   string display_name = 2;
   google.protobuf.Timestamp create_time = 3;
   google.protobuf.Timestamp update_time = 4;
-  // google.protobuf.TImestamp delete_time should be included!
+  // google.protobuf.Timestamp delete_time should be included!
 }
 ```
 
