@@ -27,7 +27,7 @@ if the HTTP `body` field is anything other than `*`.
 rpc UndeleteBook(UndeleteBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:undelete"
-    body: ""  // This should be "*".
+    // body: "*" should be set.
   };
 }
 ```
@@ -55,7 +55,6 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc UndeleteBook(UndeleteBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:undelete"
-    body: ""
   };
 }
 ```
