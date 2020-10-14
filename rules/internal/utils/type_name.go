@@ -15,6 +15,7 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jhump/protoreflect/desc"
@@ -22,9 +23,10 @@ import (
 
 // GetTypeName returns the name of the type of the field, as a string,
 // regardless of primitive, message, etc.
-//
-// TODO: Add support for map types.
 func GetTypeName(f *desc.FieldDescriptor) string {
+	if k, v := f.GetMapKeyType(), f.GetMapValueType(); k != nil && v != nil {
+		return fmt.Sprintf("map<%s, %s>", GetTypeName(k), GetTypeName(v))
+	}
 	if m := f.GetMessageType(); m != nil {
 		return m.GetFullyQualifiedName()
 	}
