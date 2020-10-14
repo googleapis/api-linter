@@ -25,13 +25,5 @@ var requestParentReference = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isBatchDeleteRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if ref := utils.GetResourceReference(f); ref == nil {
-			return []lint.Problem{{
-				Message:    "Batch Delete methods: The `parent` field should include a `google.api.resource_reference` annotation.",
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintFieldResourceReference,
 }

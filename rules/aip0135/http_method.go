@@ -17,24 +17,11 @@ package aip0135
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Delete methods should use the HTTP DELETE method.
 var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(135, "http-method"),
-	OnlyIf: isDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that the RPC uses HTTP DELETE.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Method != "DELETE" {
-				return []lint.Problem{{
-					Message:    "Delete methods must use the HTTP DELETE verb.",
-					Descriptor: m,
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(135, "http-method"),
+	OnlyIf:     isDeleteMethod,
+	LintMethod: utils.LintHTTPMethod("DELETE"),
 }

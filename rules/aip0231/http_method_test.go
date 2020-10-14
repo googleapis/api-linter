@@ -29,7 +29,7 @@ func TestHttpVerb(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "get", "BatchGetBooks", nil},
-		{"Invalid", "post", "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods must use the HTTP GET verb."}}},
+		{"Invalid", "post", "BatchGetBooks", testutils.Problems{{Message: "HTTP GET"}}},
 		{"Irrelevant", "post", "AcquireBook", nil},
 	}
 
