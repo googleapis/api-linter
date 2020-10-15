@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 )
 
 func TestLintStringField(t *testing.T) {
@@ -74,6 +75,36 @@ func TestLintFieldResourceReference(t *testing.T) {
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			problems := LintFieldResourceReference(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintParentFieldPresenceAndType(t *testing.T) {
+	for _, test := range []struct {
+		testName string
+		Field    string
+		problems testutils.Problems
+	}{
+		{"Valid", `string parent = 1;`, nil},
+		{"Missing", ``, testutils.Problems{{Message: "has no `parent` field"}}},
+		{"WrongType", `bytes parent = 1;`, testutils.Problems{{Suggestion: "string"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message Message {
+					{{.Field}}
+					int32 other = 2;
+				}
+			`, test)
+			message := f.GetMessageTypes()[0]
+			var d desc.Descriptor = message
+			if test.testName == "WrongType" {
+				d = message.GetFields()[0]
+			}
+			problems := LintParentFieldPresenceAndType(message)
+			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

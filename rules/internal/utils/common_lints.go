@@ -58,6 +58,19 @@ func LintFieldResourceReference(f *desc.FieldDescriptor) []lint.Problem {
 	return nil
 }
 
+// LintParentFieldPresenceAndType returns a problem if the message does not have a `parent` field
+// or if its type is not `string`.
+func LintParentFieldPresenceAndType(m *desc.MessageDescriptor) []lint.Problem {
+	parentField := m.FindFieldByName("parent")
+	if parentField == nil {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
+			Descriptor: m,
+		}}
+	}
+	return LintStringField(parentField)
+}
+
 func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
 	for _, httpRule := range GetHTTPRules(m) {
 		if httpRule.Body != want {
