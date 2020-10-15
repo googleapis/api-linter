@@ -16,9 +16,8 @@ package aip0133
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The type of the parent field in a creat request should be string.
@@ -27,16 +26,5 @@ var requestParentField = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isCreateRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`parent` field on create request message must be a string",
-				Suggestion: "string",
-				Descriptor: f,
-				Location:   locations.FieldType(f),
-			}}
-		}
-
-		return nil
-	},
+	LintField: utils.LintStringField,
 }

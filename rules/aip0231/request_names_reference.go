@@ -25,13 +25,5 @@ var requestNamesReference = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isBatchGetRequestMessage(f.GetOwner()) && f.GetName() == "names"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if ref := utils.GetResourceReference(f); ref == nil {
-			return []lint.Problem{{
-				Message:    "Batch Get methods: The `names` field should include a `google.api.resource_reference` annotation.",
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintFieldResourceReference,
 }

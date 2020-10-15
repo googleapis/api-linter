@@ -28,7 +28,7 @@ func TestHttpBody(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "", "BatchGetBooks", nil},
-		{"Invalid", "*", "BatchGetBooks", testutils.Problems{{Message: "Batch Get methods should not have an HTTP body."}}},
+		{"Invalid", "*", "BatchGetBooks", testutils.Problems{{Message: "HTTP body"}}},
 		{"Irrelevant", "*", "AcquireBook", nil},
 	}
 
