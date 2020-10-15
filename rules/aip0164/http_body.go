@@ -17,24 +17,11 @@ package aip0164
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-// Undelete methods should not have an HTTP body.
+// Undelete methods should have "*" as the HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(164, "http-body"),
-	OnlyIf: isUndeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has correct HTTP body.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Body != "*" {
-				return []lint.Problem{{
-					Message:    `Undelete methods should use "*" as the HTTP body.`,
-					Descriptor: m,
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(164, "http-body"),
+	OnlyIf:     isUndeleteMethod,
+	LintMethod: utils.LintWildcardHTTPBody,
 }

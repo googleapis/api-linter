@@ -17,24 +17,11 @@ package aip0231
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Batch Get methods should use the HTTP GET verb.
 var httpVerb = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "http-method"),
-	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that the RPC uses HTTP GET.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Method != "GET" {
-				return []lint.Problem{{
-					Message:    "Batch Get methods must use the HTTP GET verb.",
-					Descriptor: m,
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(231, "http-method"),
+	OnlyIf:     isBatchGetMethod,
+	LintMethod: utils.LintHTTPMethod("GET"),
 }

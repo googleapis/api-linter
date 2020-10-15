@@ -17,24 +17,11 @@ package aip0164
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Undelete methods should use the HTTP POST method.
 var httpMethod = &lint.MethodRule{
-	Name:   lint.NewRuleName(164, "http-method"),
-	OnlyIf: isUndeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that the RPC uses HTTP POST.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Method != "POST" {
-				return []lint.Problem{{
-					Message:    "Undelete methods must use the HTTP POST verb.",
-					Descriptor: m,
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(164, "http-method"),
+	OnlyIf:     isUndeleteMethod,
+	LintMethod: utils.LintHTTPMethod("POST"),
 }
