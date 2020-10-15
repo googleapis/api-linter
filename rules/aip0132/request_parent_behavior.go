@@ -25,13 +25,5 @@ var requestParentBehavior = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
-			return []lint.Problem{{
-				Message:    "List requests: The `parent` field should include `(google.api.field_behavior) = REQUIRED`.",
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintRequiredField,
 }

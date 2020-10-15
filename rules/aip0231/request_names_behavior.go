@@ -25,13 +25,5 @@ var requestNamesBehavior = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isBatchGetRequestMessage(f.GetOwner()) && f.GetName() == "names"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
-			return []lint.Problem{{
-				Message:    "Batch Get requests: The `names` field should include `(google.api.field_behavior) = REQUIRED`.",
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintRequiredField,
 }

@@ -17,24 +17,11 @@ package aip0234
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Batch Update methods should use "*" as the HTTP body.
 var httpBody = &lint.MethodRule{
-	Name:   lint.NewRuleName(234, "http-body"),
-	OnlyIf: isBatchUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has correct HTTP body.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if httpRule.Body != "*" {
-				return []lint.Problem{{
-					Message:    `Batch Update methods should use "*" as the HTTP body.`,
-					Descriptor: m,
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(234, "http-body"),
+	OnlyIf:     isBatchUpdateMethod,
+	LintMethod: utils.LintWildcardHTTPBody,
 }

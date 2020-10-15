@@ -15,8 +15,6 @@
 package aip0133
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
@@ -35,16 +33,5 @@ var requestResourceBehavior = &lint.FieldRule{
 		}
 		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Create requests: The `%s` field should include `(google.api.field_behavior) = REQUIRED`.",
-					f.GetName(),
-				),
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintRequiredField,
 }

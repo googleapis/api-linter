@@ -25,13 +25,5 @@ var requestNameBehavior = &lint.FieldRule{
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isUndeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
-			return []lint.Problem{{
-				Message:    "Undelete requests: The `name` field should include `(google.api.field_behavior) = REQUIRED`.",
-				Descriptor: f,
-			}}
-		}
-		return nil
-	},
+	LintField: utils.LintRequiredField,
 }
