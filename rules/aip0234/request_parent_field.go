@@ -37,7 +37,7 @@ var requestParentField = &lint.MessageRule{
 		// from the response, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
 		plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "BatchUpdate")
-		if resp := m.GetFile().FindMessage(fmt.Sprintf("BatchUpdate%sResponse", plural)); resp != nil {
+		if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("BatchUpdate%sResponse", plural)); resp != nil {
 			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
 				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
 					for _, pattern := range resource.GetPattern() {

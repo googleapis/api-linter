@@ -24,7 +24,7 @@ var requestParentRequired = &lint.MessageRule{
 			// from the response, then get the resource annotation from that,
 			// and then inspect the pattern there (oy!).
 			plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "List")
-			if resp := m.GetFile().FindMessage(fmt.Sprintf("List%sResponse", plural)); resp != nil {
+			if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("List%sResponse", plural)); resp != nil {
 				if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
 					if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
 						for _, pattern := range resource.GetPattern() {
