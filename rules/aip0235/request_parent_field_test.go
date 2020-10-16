@@ -24,19 +24,27 @@ import (
 func TestParentField(t *testing.T) {
 	for _, test := range []struct {
 		name     string
+		Package  string
 		RPC      string
 		Field    string
 		Pattern  string
 		problems testutils.Problems
 	}{
-		{"Valid", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"Missing", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
-		{"InvalidType", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantRPCName", "EnumerateBooks", "", "publishers/{p}/books", nil},
-		{"IrrelevantNoParent", "BatchDeleteBooks", "", "books", nil},
+		{"Valid", "", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
+		{"Missing", "", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
+		{"InvalidType", "", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books", nil},
+		{"IrrelevantNoParent", "", "BatchDeleteBooks", "", "books", nil},
+
+		{"PackageValid", "package foo;", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
+		{"PackageMissing", "package foo;", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
+		{"PackageInvalidType", "package foo;", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
+		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books", nil},
+		{"PackageIrrelevantNoParent", "package foo;", "BatchDeleteBooks", "", "books", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				{{.Package}}
 				import "google/api/resource.proto";
 
 				service Library {
@@ -60,7 +68,7 @@ func TestParentField(t *testing.T) {
 				}
 			`, test)
 			var d desc.Descriptor = f.GetMessageTypes()[0]
-			if test.name == "InvalidType" {
+			if test.name == "InvalidType" || test.name == "PackageInvalidType" {
 				d = f.GetMessageTypes()[0].GetFields()[0]
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(requestParentField.Lint(f)); diff != "" {
