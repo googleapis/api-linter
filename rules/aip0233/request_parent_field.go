@@ -41,7 +41,7 @@ var requestParentField = &lint.MessageRule{
 			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
 				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
 					for _, pattern := range resource.GetPattern() {
-						if strings.Count(pattern, "{") == 0 {
+						if strings.Count(pattern, "{") == 1 {
 							return false
 						}
 					}
@@ -64,7 +64,7 @@ var requestParentField = &lint.MessageRule{
 		// Rule check: Establish that the parent field is a string.
 		if parentField.GetType() != builder.FieldTypeString().GetType() {
 			return []lint.Problem{{
-				Message:    "`parent` field on Batch Create request message must be a string.",
+				Message:    "`parent` field on create request message must be a string.",
 				Descriptor: parentField,
 				Location:   locations.FieldType(parentField),
 				Suggestion: "string",
