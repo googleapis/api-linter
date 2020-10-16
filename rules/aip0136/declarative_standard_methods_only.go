@@ -28,7 +28,7 @@ var standardMethodsOnly = &lint.MethodRule{
 	OnlyIf: utils.IsDeclarativeFriendlyMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Standard methods are fine.
-		standard := stringset.New("Get", "List", "Create", "Update", "Delete", "Undelete")
+		standard := stringset.New("Get", "List", "Create", "Update", "Delete", "Undelete", "Batch")
 		for s := range standard {
 			if strings.HasPrefix(m.GetName(), s) {
 				return nil
