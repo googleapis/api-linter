@@ -33,6 +33,7 @@ func TestDeclarativeFriendly(t *testing.T) {
 		{"ValidUpdate", "UpdateBook", "", nil},
 		{"ValidDelete", "DeleteBook", "", nil},
 		{"ValidUndelete", "UndeleteBook", "", nil},
+		{"ValidBatch", "BatchGetBooks", "", nil},
 		{"ValidCustomImperativeOnly", "FrobBook", "IMPERATIVE ONLY.", nil},
 		{"Invalid", "FrobBook", "", testutils.Problems{{Message: "avoid custom methods"}}},
 	} {
