@@ -33,6 +33,7 @@ func AddRules(r lint.RuleRegistry) error {
 		httpNameVariable,
 		httpParentVariable,
 		noPrepositions,
+		standardMethodsOnly,
 		uriSuffix,
 		verbNoun,
 	)
