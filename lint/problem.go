@@ -52,6 +52,8 @@ type Problem struct {
 	// do this is by using the helper methods in `location.go`.
 	Location *dpb.SourceCodeInfo_Location
 
+	Fixes []Fix
+
 	// RuleID provides the ID of the rule that this problem belongs to.
 	// DO NOT SET: The linter sets this automatically.
 	RuleID RuleName // FIXME: Make this private (cmd/summary_cli.go is the challenge).
@@ -84,16 +86,18 @@ func (p Problem) marshal() interface{} {
 
 	// Return a marshal-able structure.
 	return struct {
-		Message    string       `json:"message" yaml:"message"`
-		Suggestion string       `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
-		Location   fileLocation `json:"location" yaml:"location"`
-		RuleID     RuleName     `json:"rule_id" yaml:"rule_id"`
-		RuleDocURI string       `json:"rule_doc_uri" yaml:"rule_doc_uri"`
-		Category   string       `json:"category,omitempty" yaml:"category,omitempty"`
+		Message    string           `json:"message" yaml:"message"`
+		Suggestion string           `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
+		Location   fileLocation     `json:"location" yaml:"location"`
+		Fixes      []marshalableFix `json:"fixes" yaml:"fixes"`
+		RuleID     RuleName         `json:"rule_id" yaml:"rule_id"`
+		RuleDocURI string           `json:"rule_doc_uri" yaml:"rule_doc_uri"`
+		Category   string           `json:"category,omitempty" yaml:"category,omitempty"`
 	}{
 		p.Message,
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
+		marshalableFixes(p.Fixes),
 		p.RuleID,
 		getRuleURL(string(p.RuleID), ruleURLMappings),
 		p.category,
@@ -158,4 +162,49 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 			Column: int(span[2]),
 		},
 	}
+}
+
+type Fix struct {
+	Description  string
+	Replacements []Replacement
+}
+
+type Replacement struct {
+	FilePath   string
+	Location   *dpb.SourceCodeInfo_Location
+	NewContent string
+}
+
+type marshalableFix struct {
+	Description  string                   `json:"description" yaml:"description"`
+	Replacements []marshalableReplacement `json:"replacements" yaml:"replacements"`
+}
+
+type marshalableReplacement struct {
+	FilePath   string       `json:"file_path" yaml:"file_path"`
+	Location   fileLocation `json:"location" yaml:"location"`
+	NewContent string       `json:"new_content" yaml:"new_content"`
+}
+
+func marshalableFixes(fs []Fix) []marshalableFix {
+	mfs := []marshalableFix{}
+	for _, f := range fs {
+		mfs = append(mfs, marshalableFix{
+			Description:  f.Description,
+			Replacements: marshalableReplacements(f.Replacements),
+		})
+	}
+	return mfs
+}
+
+func marshalableReplacements(rs []Replacement) []marshalableReplacement {
+	mrs := []marshalableReplacement{}
+	for _, r := range rs {
+		mrs = append(mrs, marshalableReplacement{
+			FilePath:   r.FilePath,
+			Location:   fileLocationFromPBLocation(r.Location),
+			NewContent: r.NewContent,
+		})
+	}
+	return mrs
 }

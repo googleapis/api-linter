@@ -17,6 +17,8 @@ package aip0128
 import (
 	"testing"
 
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -33,7 +35,25 @@ func TestResourceAnnotationsField(t *testing.T) {
 		{"ValidBadTypeNotDF", "", "int32 annotations = 2;", nil},
 		{"ValidPresentDF", "style: DECLARATIVE_FRIENDLY", "map<string, string> annotations = 2;", nil},
 		{"InvalidMissingDF", "style: DECLARATIVE_FRIENDLY", "", testutils.Problems{{Message: "annotations"}}},
-		{"InvalidBadTypeDF", "style: DECLARATIVE_FRIENDLY", "map<string, int32> annotations = 2;", testutils.Problems{{Suggestion: "map<string, string>"}}},
+		{"InvalidBadTypeDF", "style: DECLARATIVE_FRIENDLY", "map<string, int32> annotations = 2;", testutils.Problems{{
+			Suggestion: "map<string, string>",
+			Fixes: []lint.Fix{{
+				Description: "Change type of `annotations` field to `map<string, string>`.",
+				Replacements: []lint.Replacement{{
+					FilePath: "test.proto",
+					Location: &dpb.SourceCodeInfo_Location{
+						Path: []int32{
+							4, // messages in file
+							0, // 0th message
+							2, // fields
+							1, // 1st field
+							6, // type name
+						},
+					},
+					NewContent: `map<string, string>`,
+				}},
+			}},
+		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

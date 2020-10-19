@@ -46,6 +46,14 @@ var resourceAnnotationsField = &lint.MessageRule{
 				Descriptor: f,
 				Location:   locations.FieldType(f),
 				Suggestion: "map<string, string>",
+				Fixes: []lint.Fix{{
+					Description: "Change type of `annotations` field to `map<string, string>`.",
+					Replacements: []lint.Replacement{{
+						FilePath:   f.GetFile().GetName(),
+						Location:   locations.FieldType(f),
+						NewContent: `map<string, string>`,
+					}},
+				}},
 			}}
 		}
 

@@ -29,6 +29,14 @@ func TestProblemJSON(t *testing.T) {
 		Message:  "foo bar",
 		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
 		RuleID:   "core::0131",
+		Fixes: []Fix{{
+			Description: "xyz",
+			Replacements: []Replacement{{
+				FilePath:   "abc",
+				Location:   &dpb.SourceCodeInfo_Location{Span: []int32{3, 6, 8, 10}},
+				NewContent: "!!!",
+			}},
+		}},
 	}
 	serialized, err := json.Marshal(problem)
 	if err != nil {
@@ -43,6 +51,11 @@ func TestProblemJSON(t *testing.T) {
 		{"ColumnNumberStart", `"column_number":1`},
 		{"ColumnNumberEnd", `"column_number":42`},
 		{"RuleID", `"rule_id":"core::0131"`},
+		{"Fixes", `"description":"xyz"`},
+		{"ReplacementFilePath", `"file_path":"abc"`},
+		{"ReplacementStart", `"start_position":{"line_number":4,"column_number":7}`},
+		{"ReplacementEnd", `"end_position":{"line_number":9,"column_number":10}`},
+		{"ReplacementNewContent", `"new_content":"!!!"`},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -58,6 +71,14 @@ func TestProblemYAML(t *testing.T) {
 		Message:  "foo bar",
 		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
 		RuleID:   "core::0131",
+		Fixes: []Fix{{
+			Description: "xyz",
+			Replacements: []Replacement{{
+				FilePath:   "abc",
+				Location:   &dpb.SourceCodeInfo_Location{Span: []int32{3, 6, 8, 10}},
+				NewContent: "!!!",
+			}},
+		}},
 	}
 	serialized, err := yaml.Marshal(problem)
 	if err != nil {
@@ -73,6 +94,11 @@ func TestProblemYAML(t *testing.T) {
 		{"ColumnNumberStart", `column_number: 1`},
 		{"ColumnNumberEnd", `column_number: 70`},
 		{"RuleID", `rule_id: core::0131`},
+		{"Fixes", `description: xyz`},
+		{"ReplacementFilePath", `file_path: abc`},
+		{"ReplacementStart", `line_number: 4`},
+		{"ReplacementEnd", `line_number: 9`},
+		{"ReplacementNewContent", `new_content: '!!!'`},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

@@ -56,6 +56,34 @@ func (problems Problems) Diff(other []lint.Problem) string {
 		if !strings.Contains(y.Message, x.Message) {
 			return cmp.Diff(problems, other)
 		}
+
+		if len(x.Fixes) != len(y.Fixes) {
+			return cmp.Diff(problems, other)
+		}
+
+		for j := range x.Fixes {
+			fx, fy := x.Fixes[j], y.Fixes[j]
+
+			if len(fx.Replacements) != len(fy.Replacements) {
+				return cmp.Diff(problems, other)
+			}
+
+			for k := range fx.Replacements {
+				rx, ry := fx.Replacements[k], fy.Replacements[k]
+
+				if rx.FilePath != ry.FilePath {
+					return cmp.Diff(problems, other)
+				}
+
+				if !cmp.Equal(rx.Location.GetPath(), ry.Location.GetPath()) {
+					return cmp.Diff(problems, other)
+				}
+
+				if rx.NewContent != ry.NewContent {
+					return cmp.Diff(problems, other)
+				}
+			}
+		}
 	}
 
 	// These sets of problems are sufficiently equal.
