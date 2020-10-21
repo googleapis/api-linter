@@ -2,7 +2,7 @@
 rule:
   aip: 192
   name: [core, '0192', absolute-links]
-  summary: Comments must not use raw HTML
+  summary: Comments must use absolute links
 permalink: /192/absolute-links
 redirect_from:
   - /0192/absolute-links
