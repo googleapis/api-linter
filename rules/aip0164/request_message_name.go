@@ -15,32 +15,13 @@
 package aip0164
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Undelete messages should have a properly named request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(164, "request-message-name"),
-	OnlyIf: isUndeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `UndeleteFoo`, the request
-		// message is named `UndeleteFooRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Undelete RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(164, "request-message-name"),
+	OnlyIf:     isUndeleteMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

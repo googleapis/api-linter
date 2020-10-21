@@ -174,3 +174,29 @@ func TestLintHTTPMethod(t *testing.T) {
 		})
 	}
 }
+
+func TestLintMethodHasMatchingRequestName(t *testing.T) {
+	for _, test := range []struct {
+		testName    string
+		MessageName string
+		problems    testutils.Problems
+	}{
+		{"Valid", "GetBookRequest", nil},
+		{"Invalid", "AcquireBookRequest", testutils.Problems{{Suggestion: "GetBookRequest"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				service Library {
+					rpc GetBook({{.MessageName}}) returns (Book);
+				}
+				message Book {}
+				message {{.MessageName}} {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			problems := LintMethodHasMatchingRequestName(method)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

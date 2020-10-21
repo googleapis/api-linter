@@ -31,7 +31,6 @@ func TestInputName(t *testing.T) {
 		{"Valid", "CreateBook", "CreateBookRequest", nil},
 		{"Invalid", "CreateBook", "Book",
 			testutils.Problems{{
-				Message:    `Post RPCs should have a properly named request message "CreateBookRequest", but not "Book"`,
 				Suggestion: "CreateBookRequest",
 			}}},
 		{"Irrelevant_OutputWrong", "CreateIamPolicy", "CreateIamPolicyRequest", nil},
