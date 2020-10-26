@@ -15,34 +15,13 @@
 package aip0133
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Create method should have a properly named input message.
 var inputName = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "request-message-name"),
-	OnlyIf: isCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		resourceMsgName := getResourceMsgName(m)
-
-		// Rule check: Establish that for methods such as `CreateFoo`, the request
-		// message is named `CreateFooRequest`.
-		if got, want := m.GetInputType().GetName(), fmt.Sprintf("Create%sRequest", resourceMsgName); got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Post RPCs should have a properly named request message %q, but not %q",
-					want, got,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(133, "request-message-name"),
+	OnlyIf:     isCreateMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

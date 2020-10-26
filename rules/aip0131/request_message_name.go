@@ -15,32 +15,13 @@
 package aip0131
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Get messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(131, "request-message-name"),
-	OnlyIf: isGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `GetFoo`, the request
-		// message is named `GetFooRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Get RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(131, "request-message-name"),
+	OnlyIf:     isGetMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

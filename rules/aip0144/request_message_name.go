@@ -15,32 +15,13 @@
 package aip0144
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Add/Remove methods should have a properly named request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(144, "request-message-name"),
-	OnlyIf: isAddRemoveMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `AddAuthor`, the request
-		// message is named `AddAuthorRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Add/Remove RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(144, "request-message-name"),
+	OnlyIf:     isAddRemoveMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

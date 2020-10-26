@@ -15,32 +15,13 @@
 package aip0235
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Batch Delete messages should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(235, "request-message-name"),
-	OnlyIf: isBatchDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `BatchDeleteFoos`, the request
-		// message is named `BatchDeleteFoosRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Batch Delete RPCs should have a request message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(235, "request-message-name"),
+	OnlyIf:     isBatchDeleteMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

@@ -94,3 +94,17 @@ func LintHTTPMethod(verb string) func(*desc.MethodDescriptor) []lint.Problem {
 		return nil
 	}
 }
+
+// LintMethodHasMatchingRequestName returns a problem if the given method's request type does not
+// have a name matching the method's, with a "Request" suffix.
+func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
+	if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("Request message should be named after the RPC, i.e. %q.", want),
+			Suggestion: want,
+			Descriptor: m,
+			Location:   locations.MethodRequestType(m),
+		}}
+	}
+	return nil
+}
