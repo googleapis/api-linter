@@ -15,32 +15,13 @@
 package aip0231
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // Batch Get method should have a properly named Request message.
 var inputName = &lint.MethodRule{
-	Name:   lint.NewRuleName(231, "request-message-name"),
-	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `BatchGetFoos`, the request
-		// message is named `BatchGetFoosRequest`.
-		if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Batch Get RPCs should have a properly named request message %q, but not %q",
-					want, got,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodRequestType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(231, "request-message-name"),
+	OnlyIf:     isBatchGetMethod,
+	LintMethod: utils.LintMethodHasMatchingRequestName,
 }
