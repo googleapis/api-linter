@@ -36,7 +36,7 @@ service Library {
   rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
       get: "/v1/{name=publishers/*/books/*}"
-    }
+    };
   }
 }
 
@@ -53,7 +53,7 @@ service Library {
   rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
       get: "/v1/{name=publishers/*/books/*}"
-    }
+    };
   }
 }
 
@@ -86,7 +86,7 @@ service Library {
   rpc GetBook(GetBookRequest) returns (Book) {
     option (google.api.http) = {
       get: "/v1/{name=publishers/*/books/*}"
-    }
+    };
   }
 }
 

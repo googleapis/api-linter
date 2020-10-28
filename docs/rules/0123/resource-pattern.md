@@ -30,7 +30,7 @@ message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
     // pattern should be here
-  }
+  };
 
   string name = 1;
 }
@@ -43,7 +43,7 @@ message ElectronicBook {
     type: "library.googleapis.com/ElectronicBook"
     // Should be: publishers/{publisher}/electronicBooks/{electronic_book}
     pattern: "publishers/{publisher}/electronic_books/{electronic_book}"
-  }
+  };
 
   string name = 1;
 }
@@ -85,7 +85,7 @@ If you need to violate this rule, use a leading comment above the message.
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
-  }
+  };
 
   string name = 1;
 }

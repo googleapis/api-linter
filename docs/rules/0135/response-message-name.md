@@ -82,7 +82,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
     // Should be "google.protobuf.Empty" or "Book".
     response_type: "DeleteBookResponse"
     metadata_type: "DeleteBookMetadata"
-  }
+  };
 }
 ```
 
@@ -97,7 +97,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "google.protobuf.Empty"
     metadata_type: "DeleteBookMetadata"
-  }
+  };
 }
 ```
 
@@ -110,7 +110,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "Book"
     metadata_type: "DeleteBookMetadata"
-  }
+  };
 }
 ```
 

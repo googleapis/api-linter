@@ -67,7 +67,7 @@ rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "CreateBookResponse"  // Should be "Book".
     metadata_type: "CreateBookMetadata"
-  }
+  };
 }
 ```
 
@@ -83,7 +83,7 @@ rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "Book"
     metadata_type: "CreateBookMetadata"
-  }
+  };
 }
 ```
 

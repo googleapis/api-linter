@@ -29,7 +29,7 @@ message Book {
     type: "library.googleapis.com/Book"
     // Should be: publishers/{publisher}/books/{book}
     pattern: "publishers/{publisher_id}/books/{book_id}"
-  }
+  };
 
   string name = 1;
 }
@@ -42,7 +42,7 @@ message ElectronicBook {
     type: "library.googleapis.com/ElectronicBook"
     // Should be: publishers/{publisher}/electronicBooks/{electronic_book}
     pattern: "publishers/{publisher}/electronicBooks/{electronicBook}"
-  }
+  };
 
   string name = 1;
 }
@@ -85,7 +85,7 @@ message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
     pattern: "publishers/{publisher_id}/books/{book_id}"
-  }
+  };
 
   string name = 1;
 }

@@ -60,7 +60,7 @@ rpc CheckoutBook(CheckoutBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/{name=publishers/*/books/*}:checkout"
     body: "*"
-  }
+  };
 }
 ```
 
@@ -75,7 +75,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 rpc GetBookWithAuthor(GetBookWithAuthorRequest) returns (Book) {
   option (google.api.http) = {
     get: "/v1/{name=publishers/*/books/*}:getWithAuthor"
-  }
+  };
 }
 ```
 
