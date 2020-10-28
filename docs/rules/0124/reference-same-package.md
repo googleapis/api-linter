@@ -48,7 +48,7 @@ package google.example.libray.v1;  // Typo: Different package.
 message GetBookRequest {
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"  // Lint warning: package mismatch.
-  }]
+  }];
 }
 ```
 
@@ -72,7 +72,7 @@ message Book {
 message GetBookRequest {
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
-  }]
+  }];
 }
 ```
 
@@ -100,7 +100,7 @@ message GetBookRequest {
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
-  }]
+  }];
 }
 ```
 

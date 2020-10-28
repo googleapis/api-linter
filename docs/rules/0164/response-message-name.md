@@ -68,7 +68,7 @@ rpc UndeleteBook(UndeleteBookRequest) returns (google.longrunning.Operation) {
     // Should be "Book".
     response_type: "UndeleteBookResponse"
     metadata_type: "UndeleteBookMetadata"
-  }
+  };
 }
 ```
 
@@ -84,7 +84,7 @@ rpc UndeleteBook(UndeleteBookRequest) returns (google.longrunning.Operation) {
   option (google.longrunning.operation_info) = {
     response_type: "Book"
     metadata_type: "UndeleteBookMetadata"
-  }
+  };
 }
 ```
 
