@@ -48,7 +48,7 @@ var standardMethodsOnly = &lint.MethodRule{
 		return []lint.Problem{{
 			Message: strings.Join([]string{
 				"Declarative-friendly resources should generally avoid custom methods.\n",
-				"However, if this is an imperative-only mnethod that does *not* need ",
+				"However, if this is an imperative-only method that does *not* need ",
 				`declarative tooling support, add the text "Imperative only." to the comment. `,
 				"(Using an internal comment is fine.)",
 			}, ""),
