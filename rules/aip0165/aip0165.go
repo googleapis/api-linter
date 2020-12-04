@@ -36,6 +36,7 @@ func AddRules(r lint.RuleRegistry) error {
 		requestParentBehavior,
 		requestParentField,
 		requestParentReference,
+		responseMessageName,
 		responsePurgeCountField,
 		responsePurgeSampleField,
 		responsePurgeSampleReference,
