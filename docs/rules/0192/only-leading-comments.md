@@ -8,7 +8,7 @@ redirect_from:
   - /0192/only-leading-comments
 ---
 
-# Proto3 syntax
+# Only leading comments
 
 This rule enforces that every descriptor in every proto file has a public
 comment information only in leading comment (not trailing comments or detached
