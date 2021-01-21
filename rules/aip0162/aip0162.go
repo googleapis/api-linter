@@ -28,6 +28,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		162,
 		commitHTTPURISuffix,
+		commitResponseMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
@@ -55,7 +56,7 @@ func isTagRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 	return tagRevisionReqMessageRegexp.MatchString(m.GetName())
 }
 
-var commitMethodRegexp = regexp.MustCompile(`^Commit(?:[A-Za-z0-9]+)$`)
+var commitMethodRegexp = regexp.MustCompile(`^Commit([A-Za-z0-9]+)$`)
 var commitURINameRegexp = regexp.MustCompile(`:commit$`)
 
 // Returns true if this is an AIP-162 Commit method, false otherwise.
