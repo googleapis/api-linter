@@ -32,6 +32,7 @@ func AddRules(r lint.RuleRegistry) error {
 		commitHTTPURISuffix,
 		commitRequestNameField,
 		commitRequestMessageName,
+		commitResponseMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
@@ -59,7 +60,7 @@ func isTagRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 	return tagRevisionReqMessageRegexp.MatchString(m.GetName())
 }
 
-var commitMethodRegexp = regexp.MustCompile(`^Commit(?:[A-Za-z0-9]+)$`)
+var commitMethodRegexp = regexp.MustCompile(`^Commit([A-Za-z0-9]+)$`)
 var commitReqMessageRegexp = regexp.MustCompile(`^Commit(?:[A-Za-z0-9]+)Request$`)
 var commitURINameRegexp = regexp.MustCompile(`:commit$`)
 
