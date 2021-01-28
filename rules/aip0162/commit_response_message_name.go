@@ -22,20 +22,20 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var tagRevisionResponseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(162, "tag-revision-response-message-name"),
-	OnlyIf: isTagRevisionMethod,
+var commitResponseMessageName = &lint.MethodRule{
+	Name:   lint.NewRuleName(162, "commit-response-message-name"),
+	OnlyIf: isCommitMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `TagBookRevision`, the response
+		// Rule check: Establish that for methods such as `CommitBook`, the response
 		// message is `Book`.
-		want := tagRevisionMethodRegexp.FindStringSubmatch(m.GetName())[1]
+		want := commitMethodRegexp.FindStringSubmatch(m.GetName())[1]
 		got := m.GetOutputType().GetName()
 
 		// Return a problem if we did not get the expected return name.
 		if got != want {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
-					"Tag Revision RPCs should have response message type %q, not %q.",
+					"Commit RPCs should have response message type %q, not %q.",
 					want,
 					got,
 				),
