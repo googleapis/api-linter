@@ -30,6 +30,7 @@ func AddRules(r lint.RuleRegistry) error {
 		commitHTTPBody,
 		commitHTTPMethod,
 		commitHTTPURISuffix,
+		commitRequestMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
