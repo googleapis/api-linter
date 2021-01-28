@@ -27,8 +27,11 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		162,
+		commitHTTPBody,
+		commitHTTPMethod,
 		commitHTTPURISuffix,
 		commitRequestNameField,
+		commitRequestMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
