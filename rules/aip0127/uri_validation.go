@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0127 contains rules defined in https://aip.dev/127.
 package aip0127
 
 import (
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-127 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		127,
-		hasAnnotation,
-		resourceNameExtraction,
-		uriValidation,
-	)
+var uriValidation = &lint.MethodRule{
+	Name: lint.NewRuleName(127, "uri-validation"),
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		for _, rule := range utils.GetHTTPRules(m) {
+			if !strings.HasPrefix(rule.URI, "/") {
+				return []lint.Problem{{
+					Message:    `URI must begin with a "/".`,
+					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
+				}}
+			}
+		}
+		return nil
+	},
 }
