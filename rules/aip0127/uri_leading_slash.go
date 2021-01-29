@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0127 contains rules defined in https://aip.dev/127.
 package aip0127
 
 import (
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-127 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		127,
-		hasAnnotation,
-		leadingSlash,
-		resourceNameExtraction,
-	)
+var leadingSlash = &lint.MethodRule{
+	Name: lint.NewRuleName(127, "uri-leading-slash"),
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		for _, http := range utils.GetHTTPRules(m) {
+			if !strings.HasPrefix(http.GetPlainURI(), "/") {
+				return []lint.Problem{{
+					Message:    "URIs must begin with a leading slash.",
+					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
+				}}
+			}
+		}
+		return nil
+	},
 }
