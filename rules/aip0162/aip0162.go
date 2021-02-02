@@ -35,6 +35,8 @@ func AddRules(r lint.RuleRegistry) error {
 		commitRequestNameField,
 		commitRequestNameReference,
 		commitResponseMessageName,
+		rollbackHTTPBody,
+		rollbackHTTPMethod,
 		rollbackHTTPURISuffix,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
