@@ -35,6 +35,7 @@ func AddRules(r lint.RuleRegistry) error {
 		commitRequestNameField,
 		commitRequestNameReference,
 		commitResponseMessageName,
+		rollbackHTTPURISuffix,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
@@ -74,4 +75,12 @@ func isCommitMethod(m *desc.MethodDescriptor) bool {
 // Returns true if this is an AIP-162 Commit request message, false otherwise.
 func isCommitRequestMessage(m *desc.MessageDescriptor) bool {
 	return commitReqMessageRegexp.MatchString(m.GetName())
+}
+
+var rollbackMethodRegexp = regexp.MustCompile(`^Rollback(?:[A-Za-z0-9]+)$`)
+var rollbackURINameRegexp = regexp.MustCompile(`:rollback$`)
+
+// Returns true if this is an AIP-162 Rollback method, false otherwise.
+func isRollbackMethod(m *desc.MethodDescriptor) bool {
+	return rollbackMethodRegexp.MatchString(m.GetName())
 }
