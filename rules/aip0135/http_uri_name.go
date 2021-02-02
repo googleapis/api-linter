@@ -27,7 +27,7 @@ var httpNameField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if !deleteURINameRegexp.MatchString(httpRule.URI) {
+			if _, ok := httpRule.GetVariables()["name"]; !ok {
 				return []lint.Problem{{
 					Message:    "Delete methods should include the `name` field in the URI.",
 					Descriptor: m,
