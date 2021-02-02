@@ -25,16 +25,18 @@ func TestHttpMethod(t *testing.T) {
 		testName   string
 		MethodName string
 		HTTPMethod string
+		Suffix     string
 		problems   testutils.Problems
 	}{
-		{"ValidGet", "ArchiveBook", "get", testutils.Problems{}},
-		{"ValidPost", "ArchiveBook", "post", testutils.Problems{}},
-		{"InvalidPut", "ArchiveBook", "put", testutils.Problems{{Message: "POST or GET"}}},
-		{"InvalidPatch", "ArchiveBook", "patch", testutils.Problems{{Message: "POST or GET"}}},
-		{"InvalidDelete", "ArchiveBook", "delete", testutils.Problems{{Message: "POST or GET"}}},
-		{"IrrelevantPatch", "UpdateBook", "patch", testutils.Problems{}},
-		{"IrrelevantDelete", "DeleteBook", "delete", testutils.Problems{}},
-		{"IrrelevantPut", "ReplaceBook", "put", testutils.Problems{}},
+		{"ValidGet", "ArchiveBook", "get", "", nil},
+		{"ValidPost", "ArchiveBook", "post", "", nil},
+		{"ValidDeleteRevision", "DeleteBookRevision", "delete", ":deleteRevision", nil},
+		{"InvalidPut", "ArchiveBook", "put", ":archive", testutils.Problems{{Message: "POST or GET"}}},
+		{"InvalidPatch", "ArchiveBook", "patch", ":archive", testutils.Problems{{Message: "POST or GET"}}},
+		{"InvalidDelete", "ArchiveBook", "delete", "", testutils.Problems{{Message: "POST or GET"}}},
+		{"IrrelevantPatch", "UpdateBook", "patch", "", nil},
+		{"IrrelevantDelete", "DeleteBook", "delete", "", nil},
+		{"IrrelevantPut", "ReplaceBook", "put", "", nil},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -43,7 +45,7 @@ func TestHttpMethod(t *testing.T) {
 				service Library {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
-							{{.HTTPMethod}}: "/v1/{{.MethodName}}"
+							{{.HTTPMethod}}: "/v1/{{.MethodName}}{{.Suffix}}"
 						};
 					}
 				}
