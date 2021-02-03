@@ -6,7 +6,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestLintStringField(t *testing.T) {
+func TestLintSingularStringField(t *testing.T) {
 	for _, test := range []struct {
 		testName  string
 		FieldType string
@@ -14,6 +14,7 @@ func TestLintStringField(t *testing.T) {
 	}{
 		{"Valid", `string`, nil},
 		{"Invalid", `int32`, testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidRepeated", `repeated string`, testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -22,7 +23,7 @@ func TestLintStringField(t *testing.T) {
 				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := LintStringField(field)
+			problems := LintSingularStringField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

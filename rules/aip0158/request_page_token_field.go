@@ -15,37 +15,12 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 var requestPaginationPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "request-page-token-field"),
-	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// Rule check: Establish that a page_size field is present.
-		pageToken := m.FindFieldByName("page_token")
-		if pageToken == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `page_token` field.", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name page_size is the correct type.
-		if pageToken.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`page_token` field on List RPCs should be a string",
-				Suggestion: "string",
-				Descriptor: pageToken,
-				Location:   locations.FieldType(pageToken),
-			}}
-		}
-
-		return nil
-	},
+	Name:        lint.NewRuleName(158, "request-page-token-field"),
+	OnlyIf:      isPaginatedRequestMessage,
+	LintMessage: utils.LintFieldPresentAndSingularString("page_token"),
 }

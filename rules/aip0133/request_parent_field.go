@@ -20,11 +20,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// The type of the parent field in a creat request should be string.
+// The type of the parent field in a create request should be string.
 var requestParentField = &lint.FieldRule{
 	Name: lint.NewRuleName(133, "request-parent-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isCreateRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
-	LintField: utils.LintStringField,
+	LintField: utils.LintSingularStringField,
 }
