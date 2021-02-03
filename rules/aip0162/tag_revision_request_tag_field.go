@@ -15,38 +15,13 @@
 package aip0162
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // The Tag Revision request message should have a tag field.
 var tagRevisionRequestTagField = &lint.MessageRule{
-	Name:   lint.NewRuleName(162, "tag-revision-request-tag-field"),
-	OnlyIf: isTagRevisionRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `tag` field is present.
-		tagField := m.FindFieldByName("tag")
-		if tagField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `tag` field.", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the tag field is a string.
-		if tagField.GetType() != builder.FieldTypeString().GetType() || tagField.IsRepeated() {
-			return []lint.Problem{{
-				Message:    "`tag` field on Tag Revision request message must be a singular string.",
-				Descriptor: tagField,
-				Location:   locations.FieldType(tagField),
-				Suggestion: "string",
-			}}
-		}
-
-		return nil
-	},
+	Name:        lint.NewRuleName(162, "tag-revision-request-tag-field"),
+	OnlyIf:      isTagRevisionRequestMessage,
+	LintMessage: utils.LintFieldPresentAndSingularString("tag"),
 }

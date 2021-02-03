@@ -23,17 +23,40 @@ import (
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
-// LintStringField returns a problem if the field is not a string.
-func LintStringField(f *desc.FieldDescriptor) []lint.Problem {
-	if f.GetType() != builder.FieldTypeString().GetType() {
+// LintFieldPresent returns a problem if the given message does not have the given field.
+func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescriptor, []lint.Problem) {
+	f := m.FindFieldByName(field)
+	if f == nil {
+		return nil, []lint.Problem{{
+			Message:    fmt.Sprintf("Message `%s` has no `%s` field.", m.GetName(), field),
+			Descriptor: m,
+		}}
+	}
+	return f, nil
+}
+
+// LintSingularStringField returns a problem if the field is not a singular string.
+func LintSingularStringField(f *desc.FieldDescriptor) []lint.Problem {
+	if f.GetType() != builder.FieldTypeString().GetType() || f.IsRepeated() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field must be a string.", f.GetType()),
+			Message:    fmt.Sprintf("The `%s` field must be a singular string.", f.GetType()),
 			Suggestion: "string",
 			Descriptor: f,
 			Location:   locations.FieldType(f),
 		}}
 	}
 	return nil
+}
+
+// LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.
+func LintFieldPresentAndSingularString(field string) func(*desc.MessageDescriptor) []lint.Problem {
+	return func(m *desc.MessageDescriptor) []lint.Problem {
+		f, problems := LintFieldPresent(m, field)
+		if f == nil {
+			return problems
+		}
+		return LintSingularStringField(f)
+	}
 }
 
 // LintRequiredField returns a problem if the field's behavior is not REQUIRED.
