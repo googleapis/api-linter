@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0135
+package aip0162
 
 import (
 	"testing"
@@ -20,37 +20,37 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestHttpNameField(t *testing.T) {
+func TestRollbackHTTPBody(t *testing.T) {
 	tests := []struct {
 		testName   string
-		URI        string
+		Body       string
 		MethodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{name=publishers/*/books/*}", "DeleteBook", nil},
-		{"ValidRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", "DeleteBookRevision", nil},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
-		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
+		{"Valid", "*", "RollbackBook", nil},
+		{"Invalid", "", "RollbackBook", testutils.Problems{{Message: "HTTP body"}}},
+		{"Irrelevant", "", "AcquireBook", nil},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
 						option (google.api.http) = {
-							delete: "{{.URI}}"
+							post: "/v1/{name=publishers/*/books/*}:rollback"
+							body: "{{.Body}}"
 						};
 					}
 				}
 				message Book {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
-			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
-				t.Errorf(diff)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := rollbackHTTPBody.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

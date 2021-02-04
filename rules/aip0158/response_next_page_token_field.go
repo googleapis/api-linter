@@ -15,37 +15,12 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 var responsePaginationNextPageToken = &lint.MessageRule{
-	Name:   lint.NewRuleName(158, "response-next-page-token-field"),
-	OnlyIf: isPaginatedResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a next_page_token field is present.
-		nextPageToken := m.FindFieldByName("next_page_token")
-		if nextPageToken == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `next_page_token` field.", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name next_page_token is the correct type.
-		if nextPageToken.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`next_page_token` field on List RPCs should be a string",
-				Suggestion: "string",
-				Descriptor: nextPageToken,
-				Location:   locations.FieldType(nextPageToken),
-			}}
-		}
-
-		return nil
-	},
+	Name:        lint.NewRuleName(158, "response-next-page-token-field"),
+	OnlyIf:      isPaginatedResponseMessage,
+	LintMessage: utils.LintFieldPresentAndSingularString("next_page_token"),
 }

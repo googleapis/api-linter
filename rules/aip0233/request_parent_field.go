@@ -19,10 +19,8 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -51,26 +49,5 @@ var requestParentField = &lint.MessageRule{
 
 		return isBatchCreateRequestMessage(m)
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `parent` field is present.
-		parentField := m.FindFieldByName("parent")
-		if parentField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the parent field is a string.
-		if parentField.GetType() != builder.FieldTypeString().GetType() {
-			return []lint.Problem{{
-				Message:    "`parent` field on create request message must be a string.",
-				Descriptor: parentField,
-				Location:   locations.FieldType(parentField),
-				Suggestion: "string",
-			}}
-		}
-
-		return nil
-	},
+	LintMessage: utils.LintFieldPresentAndSingularString("parent"),
 }

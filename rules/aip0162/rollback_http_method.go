@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0164
+package aip0162
 
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
-var requestNameField = &lint.MessageRule{
-	Name:        lint.NewRuleName(164, "request-name-field"),
-	OnlyIf:      isUndeleteRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+// Rollback methods should use the HTTP POST method.
+var rollbackHTTPMethod = &lint.MethodRule{
+	Name:       lint.NewRuleName(162, "rollback-http-method"),
+	OnlyIf:     isRollbackMethod,
+	LintMethod: utils.LintHTTPMethod("POST"),
 }
