@@ -39,7 +39,7 @@ func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescr
 func LintSingularStringField(f *desc.FieldDescriptor) []lint.Problem {
 	if f.GetType() != builder.FieldTypeString().GetType() || f.IsRepeated() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field must be a singular string.", f.GetType()),
+			Message:    fmt.Sprintf("The `%s` field must be a singular string.", f.GetName()),
 			Suggestion: "string",
 			Descriptor: f,
 			Location:   locations.FieldType(f),

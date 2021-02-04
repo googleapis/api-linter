@@ -48,7 +48,6 @@ func AddRules(r lint.RuleRegistry) error {
 
 var updateMethodRegexp = regexp.MustCompile("^Update(?:[A-Z]|$)")
 var updateReqMessageRegexp = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
-var updateURINameRegexp = regexp.MustCompile(`{([A-Za-z0-9_]+).name=[a-zA-Z/*]+}$`)
 
 // Returns true if this is a AIP-134 Update method, false otherwise.
 func isUpdateMethod(m *desc.MethodDescriptor) bool {
