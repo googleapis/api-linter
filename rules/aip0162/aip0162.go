@@ -38,6 +38,8 @@ func AddRules(r lint.RuleRegistry) error {
 		rollbackHTTPBody,
 		rollbackHTTPMethod,
 		rollbackHTTPURISuffix,
+		rollbackRequestMessageName,
+		rollbackResponseMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
 		tagRevisionHTTPURISuffix,
@@ -79,7 +81,7 @@ func isCommitRequestMessage(m *desc.MessageDescriptor) bool {
 	return commitReqMessageRegexp.MatchString(m.GetName())
 }
 
-var rollbackMethodRegexp = regexp.MustCompile(`^Rollback(?:[A-Za-z0-9]+)$`)
+var rollbackMethodRegexp = regexp.MustCompile(`^Rollback([A-Za-z0-9]+)$`)
 var rollbackURINameRegexp = regexp.MustCompile(`:rollback$`)
 
 // Returns true if this is an AIP-162 Rollback method, false otherwise.
