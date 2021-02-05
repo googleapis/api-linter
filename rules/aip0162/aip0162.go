@@ -42,6 +42,8 @@ func AddRules(r lint.RuleRegistry) error {
 		rollbackRequestNameBehavior,
 		rollbackRequestNameField,
 		rollbackRequestNameReference,
+		rollbackRequestRevisionIDBehavior,
+		rollbackRequestRevisionIDField,
 		rollbackResponseMessageName,
 		tagRevisionHTTPBody,
 		tagRevisionHTTPMethod,
