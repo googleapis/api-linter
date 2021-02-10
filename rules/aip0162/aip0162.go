@@ -35,6 +35,8 @@ func AddRules(r lint.RuleRegistry) error {
 		commitRequestNameField,
 		commitRequestNameReference,
 		commitResponseMessageName,
+		deleteRevisionHTTPBody,
+		deleteRevisionHTTPMethod,
 		rollbackHTTPBody,
 		rollbackHTTPMethod,
 		rollbackHTTPURISuffix,
@@ -98,4 +100,11 @@ func isRollbackMethod(m *desc.MethodDescriptor) bool {
 // Returns true if this is an AIP-162 Rollback request message, false otherwise.
 func isRollbackRequestMessage(m *desc.MessageDescriptor) bool {
 	return rollbackReqMessageRegexp.MatchString(m.GetName())
+}
+
+var deleteRevisionMethodRegexp = regexp.MustCompile(`^Delete(?:[A-Za-z0-9]+)Revision$`)
+
+// Returns true if this is an AIP-162 Delete Revision method, false otherwise.
+func isDeleteRevisionMethod(m *desc.MethodDescriptor) bool {
+	return deleteRevisionMethodRegexp.MatchString(m.GetName())
 }
