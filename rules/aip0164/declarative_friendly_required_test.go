@@ -56,7 +56,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 			message GetBookRequest {}
 		`)
 		problems := declarativeFriendlyRequired.Lint(file)
-		if problems != nil && len(problems) > 0 {
+		if len(problems) > 0 {
 			t.Errorf("Got %v, expected no problems.", problems)
 		}
 	})
