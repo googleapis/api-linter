@@ -20,7 +20,8 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resource := m.GetName()
 		want := fmt.Sprintf("Undelete%s", resource)
-		if utils.FindMethod(m.GetFile(), want) == nil {
+		delete := fmt.Sprintf("Delete%s", resource)
+		if utils.FindMethod(m.GetFile(), want) == nil && utils.FindMethod(m.GetFile(), delete) != nil {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Declarative-friendly %s should have an Undelete method.", resource),
 				Descriptor: m,
