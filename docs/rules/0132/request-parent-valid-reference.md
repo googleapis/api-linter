@@ -47,7 +47,7 @@ message ListBooksRequest {
 message ListBooksRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Publisher"
+    (google.api.resource_reference).child_type = "library.googleapis.com/Book"
   ];
   int32 page_size = 2;
   string page_token = 3;
@@ -65,7 +65,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message ListBooksRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type = "library.googleapis.com/Books"
+    (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
 }
 ```
