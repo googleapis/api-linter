@@ -23,11 +23,9 @@ import (
 )
 
 var outputOnly = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "output-only"),
-	OnlyIf: withoutOutputOnlyFieldBehavior,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkLeadingComments(f, outputOnlyRegexp, "OUTPUT_ONLY")
-	},
+	Name:      lint.NewRuleName(203, "output-only"),
+	OnlyIf:    withoutOutputOnlyFieldBehavior,
+	LintField: checkLeadingComments(outputOnlyRegexp, "OUTPUT_ONLY"),
 }
 
 var outputOnlyRegexp = regexp.MustCompile("(?i).*output.?only.*")
