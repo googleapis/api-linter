@@ -25,8 +25,7 @@ either the `name` field is missing or it has any type other than `string`.
 ```proto
 // Incorrect.
 // Should include a `string name` field.
-message DeleteBookRevisionRequest {
-}
+message DeleteBookRevisionRequest {}
 ```
 
 ```proto
