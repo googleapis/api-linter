@@ -18,15 +18,12 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
 )
 
 var required = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "required"),
-	OnlyIf: withoutFieldBehavior,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkLeadingComments(f, requiredRegexp, "REQUIRED")
-	},
+	Name:      lint.NewRuleName(203, "required"),
+	OnlyIf:    withoutFieldBehavior,
+	LintField: checkLeadingComments(requiredRegexp, "REQUIRED", optionalRegexp),
 }
 
 var requiredRegexp = regexp.MustCompile("(?i).*required.*")

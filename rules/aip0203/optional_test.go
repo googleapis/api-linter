@@ -51,6 +51,12 @@ func TestOptional(t *testing.T) {
 			}},
 		},
 		{
+			name:     "valid-required-and-optional",
+			comment:  "optional required",
+			field:    titleField,
+			problems: nil,
+		},
+		{
 			name:    "Invalid-Optional",
 			comment: "Optional",
 			field:   titleField,

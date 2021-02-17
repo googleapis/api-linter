@@ -23,11 +23,9 @@ import (
 )
 
 var optional = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "optional"),
-	OnlyIf: withoutFieldBehavior,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkLeadingComments(f, optionalRegexp, "OPTIONAL")
-	},
+	Name:      lint.NewRuleName(203, "optional"),
+	OnlyIf:    withoutFieldBehavior,
+	LintField: checkLeadingComments(optionalRegexp, "OPTIONAL", requiredRegexp),
 }
 
 var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
