@@ -32,6 +32,7 @@ func TestUnknownFields(t *testing.T) {
 	}{
 		{"Force", "DeleteBookRequest", "force", builder.FieldTypeBool(), testutils.Problems{}},
 		{"Etag", "DeleteBookRequest", "etag", builder.FieldTypeString(), testutils.Problems{}},
+		{"AllowMissing", "DeleteBookRequest", "allow_missing", builder.FieldTypeString(), testutils.Problems{}},
 		{"RequestId", "DeleteBookRequest", "request_id", builder.FieldTypeString(), testutils.Problems{}},
 		{"ValidateOnly", "DeleteBookRequest", "validate_only", builder.FieldTypeBool(), testutils.Problems{}},
 		{"Invalid", "DeleteBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
