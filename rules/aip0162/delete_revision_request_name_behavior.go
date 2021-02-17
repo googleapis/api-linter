@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0162
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var optional = &lint.FieldRule{
-	Name:      lint.NewRuleName(203, "optional"),
-	OnlyIf:    withoutFieldBehavior,
-	LintField: checkLeadingComments(optionalRegexp, "OPTIONAL", requiredRegexp),
-}
-
-var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
-
-func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
-	for _, f := range m.GetFields() {
-		if utils.GetFieldBehavior(f).Contains("OPTIONAL") {
-			return true
-		}
-	}
-	return false
+var deleteRevisionRequestNameBehavior = &lint.FieldRule{
+	Name: lint.NewRuleName(162, "delete-revision-request-name-behavior"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isDeleteRevisionRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	},
+	LintField: utils.LintRequiredField,
 }
