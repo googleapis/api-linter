@@ -23,11 +23,9 @@ import (
 )
 
 var inputOnly = &lint.FieldRule{
-	Name:   lint.NewRuleName(203, "input-only"),
-	OnlyIf: withoutInputOnlyFieldBehavior,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return checkLeadingComments(f, inputOnlyRegexp, "INPUT_ONLY")
-	},
+	Name:      lint.NewRuleName(203, "input-only"),
+	OnlyIf:    withoutInputOnlyFieldBehavior,
+	LintField: checkLeadingComments(inputOnlyRegexp, "INPUT_ONLY"),
 }
 
 var inputOnlyRegexp = regexp.MustCompile("(?i).*input.?only.*")
