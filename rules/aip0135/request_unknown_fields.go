@@ -30,6 +30,7 @@ var unknownFields = &lint.MessageRule{
 		allowedFields := map[string]struct{}{
 			"name":          {}, // AIP-135
 			"force":         {}, // AIP-135
+			"allow_missing": {}, // AIP-135
 			"etag":          {}, // AIP-154
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
