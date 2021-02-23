@@ -15,37 +15,12 @@
 package aip0152
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 var requestNameField = &lint.MessageRule{
-	Name:   lint.NewRuleName(152, "request-name-field"),
-	OnlyIf: isRunRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		// Rule check: Establish that a `name` field is present.
-		nameField := m.FindFieldByName("name")
-		if nameField == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `name` field.", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Establish that the `name` field is a string.
-		if nameField.GetType() != builder.FieldTypeString().GetType() || nameField.IsRepeated() {
-			return []lint.Problem{{
-				Message:    "`name` field on Run request message must be a singular string.",
-				Descriptor: nameField,
-				Location:   locations.FieldType(nameField),
-				Suggestion: "string",
-			}}
-		}
-
-		return nil
-	},
+	Name:        lint.NewRuleName(152, "request-name-field"),
+	OnlyIf:      isRunRequestMessage,
+	LintMessage: utils.LintFieldPresentAndSingularString("name"),
 }

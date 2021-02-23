@@ -42,15 +42,22 @@ func AddRules(r lint.RuleRegistry) error {
 
 // check leading comments of a field and produce a problem
 // if the comments match the give pattern.
-func checkLeadingComments(f *desc.FieldDescriptor, pattern *regexp.Regexp, annotation string) []lint.Problem {
-	leadingComments := f.GetSourceInfo().GetLeadingComments()
-	if pattern.MatchString(leadingComments) {
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q in the leading comments. For example, `string name = 1 [(google.api.field_behavior) = %s];`.", pattern.FindString(leadingComments), annotation),
-			Descriptor: f,
-		}}
+func checkLeadingComments(pattern *regexp.Regexp, annotation string, unless ...*regexp.Regexp) func(*desc.FieldDescriptor) []lint.Problem {
+	return func(f *desc.FieldDescriptor) []lint.Problem {
+		leadingComments := f.GetSourceInfo().GetLeadingComments()
+		for _, ul := range unless {
+			if ul.MatchString(leadingComments) {
+				return nil
+			}
+		}
+		if pattern.MatchString(leadingComments) {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q in the leading comments. For example, `string name = 1 [(google.api.field_behavior) = %s];`.", pattern.FindString(leadingComments), annotation),
+				Descriptor: f,
+			}}
+		}
+		return nil
 	}
-	return nil
 }
 
 func withoutFieldBehavior(f *desc.FieldDescriptor) bool {

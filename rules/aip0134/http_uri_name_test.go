@@ -27,8 +27,8 @@ func TestHttpNameField(t *testing.T) {
 		MethodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{big_book.name=publishers/*/books/*}",
-			"UpdateBigBook", nil},
+		{"Valid", "/v1/{big_book.name=publishers/*/books/*}", "UpdateBigBook", nil},
+		{"ValidWithNumber", "/v1/{dv360.name=publishers/*/dv360s/*}", "UpdateDv360", nil},
 		{"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
 			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
 		{"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",

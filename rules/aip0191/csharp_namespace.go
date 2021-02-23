@@ -68,4 +68,4 @@ var csharpNamespace = &lint.FileRule{
 }
 
 var csharpValidChars = regexp.MustCompile("^[A-Za-z0-9.]+$")
-var csharpVersionRegexp = regexp.MustCompile("[0-9]+(p[0-9]+)?(alpha|beta)")
+var csharpVersionRegexp = regexp.MustCompile("[0-9]+(p[0-9]+)?(alpha|beta|main)")

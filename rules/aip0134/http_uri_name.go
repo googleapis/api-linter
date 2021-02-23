@@ -29,12 +29,13 @@ var httpNameField = &lint.MethodRule{
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
+		want := fmt.Sprintf("%s.name", fieldName)
+
 		// Establish that the RPC has expected HTTP pattern.
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			matches := updateURINameRegexp.FindStringSubmatch(httpRule.URI)
-			if matches == nil || matches[1] != fieldName {
+			if _, ok := httpRule.GetVariables()[want]; !ok {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("Update methods should include the `%s.name` field in the URI.", fieldName),
+					Message:    fmt.Sprintf("Update methods should include the `%s` field in the URI.", want),
 					Descriptor: m,
 				}}
 			}

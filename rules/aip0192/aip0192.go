@@ -28,6 +28,8 @@ func AddRules(r lint.RuleRegistry) error {
 		absoluteLinks,
 		hasComments,
 		noHTML,
+		noMarkdownHeadings,
+		noMarkdownTables,
 		onlyLeadingComments,
 		trademarkedNames,
 	)

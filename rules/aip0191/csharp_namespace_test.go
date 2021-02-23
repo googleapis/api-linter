@@ -29,6 +29,7 @@ func TestCsharpNamespace(t *testing.T) {
 	}{
 		{"Valid", "Google.Example.V1", nil},
 		{"ValidBeta", "Google.Example.V1Beta1", nil},
+		{"ValidMain", "Google.Example.V1Main", nil},
 		{"ValidPointBeta", "Google.Example.V1P1Beta1", nil},
 		{"InvalidBadChars", "Google:Example:V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google.example.v1", testutils.Problems{{
