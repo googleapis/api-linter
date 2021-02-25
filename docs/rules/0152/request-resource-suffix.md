@@ -3,7 +3,6 @@ rule:
   aip: 152
   name: [core, '0152', request-resource-suffix]
   summary: |
-    
     Run requests should identify a resource type which ends in "Job".
 permalink: /152/request-resource-suffix
 redirect_from:
