@@ -19,6 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/aip0162"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -48,15 +49,15 @@ var listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
 
 // Return true if this is an AIP-132 List method, false otherwise.
 func isListMethod(m *desc.MethodDescriptor) bool {
-	return listMethodRegexp.MatchString(m.GetName())
+	return listMethodRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsMethod(m)
 }
 
 // Return true if this is an AIP-132 List request message, false otherwise.
 func isListRequestMessage(m *desc.MessageDescriptor) bool {
-	return listReqMessageRegexp.MatchString(m.GetName())
+	return listReqMessageRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsRequestMessage(m)
 }
 
 // Return true if this is an AIP-132 List response message, false otherwise.
 func isListResponseMessage(m *desc.MessageDescriptor) bool {
-	return listRespMessageRegexp.MatchString(m.GetName())
+	return listRespMessageRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsResponseMessage(m)
 }
