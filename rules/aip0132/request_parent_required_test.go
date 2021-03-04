@@ -16,6 +16,7 @@ func TestRequestParentRequired(t *testing.T) {
 		{"Valid", "ListBooksRequest", "parent", nil},
 		{"InvalidName", "ListBooksRequest", "publisher", testutils.Problems{{Message: "no `parent` field"}}},
 		{"Irrelevant", "EnumerateBooksRequest", "id", nil},
+		{"IrrelevantAIP162", "ListBookRevisionsRequest", "name", nil},
 	}
 
 	for _, test := range tests {
