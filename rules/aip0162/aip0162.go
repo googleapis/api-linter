@@ -42,6 +42,7 @@ func AddRules(r lint.RuleRegistry) error {
 		deleteRevisionRequestNameBehavior,
 		deleteRevisionRequestNameField,
 		deleteRevisionRequestNameReference,
+		listRevisionsHTTPURISuffix,
 		rollbackHTTPBody,
 		rollbackHTTPMethod,
 		rollbackHTTPURISuffix,
@@ -124,6 +125,7 @@ func isDeleteRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 var listRevisionsMethodRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
 var listRevisionsReqMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
 var listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
+var listRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
 
 // Returns true if this is an AIP-162 List Revisions method, false otherwise.
 func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
