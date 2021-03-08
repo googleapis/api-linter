@@ -43,6 +43,7 @@ type cli struct {
 	ProtoDescPath           []string
 	EnabledRules            []string
 	DisabledRules           []string
+	ListRulesFlag           bool
 }
 
 var ExitForLintFailure = errors.New("found problems during linting")
@@ -58,6 +59,7 @@ func newCli(args []string) *cli {
 	var protoDescFlag []string
 	var ruleEnableFlag []string
 	var ruleDisableFlag []string
+	var listRulesFlag bool
 
 	// Register flag variables.
 	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
@@ -70,6 +72,7 @@ func newCli(args []string) *cli {
 	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
+	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit.  Honors the output-format flag.")
 
 	// Parse flags.
 	err := fs.Parse(args)
@@ -88,6 +91,7 @@ func newCli(args []string) *cli {
 		DisabledRules:           ruleDisableFlag,
 		ProtoFiles:              fs.Args(),
 		VersionFlag:             versionFlag,
+		ListRulesFlag:           listRulesFlag,
 	}
 }
 
@@ -96,6 +100,10 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	if c.VersionFlag {
 		fmt.Printf("api-linter %s\n", version)
 		return nil
+	}
+
+	if c.ListRulesFlag {
+		return outputRules(c.FormatType)
 	}
 
 	// Pre-check if there are files to lint.
@@ -245,7 +253,14 @@ var outputFormatFuncs = map[string]formatFunc{
 	"yml":  yaml.Marshal,
 	"json": json.Marshal,
 	"summary": func(i interface{}) ([]byte, error) {
-		return printSummaryTable(i.([]lint.Response))
+		switch v := i.(type) {
+		case []lint.Response:
+			return printSummaryTable(v)
+		case listedRules:
+			return v.printSummaryTable()
+		default:
+			return json.Marshal(v)
+		}
 	},
 }
 
