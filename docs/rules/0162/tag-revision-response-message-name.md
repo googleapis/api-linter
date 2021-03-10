@@ -2,7 +2,7 @@
 rule:
   aip: 162
   name: [core, '0162', tag-revision-response-message-name]
-  summary: Tag Revision methods must return a long-running operation.
+  summary: Tag Revision methods must have standardized response message names.
 permalink: /162/tag-revision-response-message-name
 redirect_from:
   - /0162/tag-revision-response-message-name
