@@ -15,32 +15,13 @@
 package aip0132
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
 // List messages should use a `ListFoosResponse` response message.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(132, "response-message-name"),
-	OnlyIf: isListMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Rule check: Establish that for methods such as `ListFoos`, the response
-		// message is named `ListFoosResponse`.
-		if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"List RPCs should have a response message named after the RPC, such as %q.",
-					want,
-				),
-				Suggestion: want,
-				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
-			}}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(132, "response-message-name"),
+	OnlyIf:     isListMethod,
+	LintMethod: utils.LintMethodHasMatchingResponseName,
 }
