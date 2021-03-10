@@ -2,7 +2,7 @@
 rule:
   aip: 162
   name: [core, '0162', commit-response-message-name]
-  summary: Commit methods must return a long-running operation.
+  summary: Commit methods must have standardized response message names.
 permalink: /162/commit-response-message-name
 redirect_from:
   - /0162/commit-response-message-name
