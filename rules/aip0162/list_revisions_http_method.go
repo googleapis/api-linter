@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0132
+package aip0162
 
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
-// List messages should use a `ListFoosResponse` response message.
-var responseMessageName = &lint.MethodRule{
-	Name:       lint.NewRuleName(132, "response-message-name"),
-	OnlyIf:     isListMethod,
-	LintMethod: utils.LintMethodHasMatchingResponseName,
+// List Revisions methods should use the HTTP GET method.
+var listRevisionsHTTPMethod = &lint.MethodRule{
+	Name:       lint.NewRuleName(162, "list-revisions-http-method"),
+	OnlyIf:     IsListRevisionsMethod,
+	LintMethod: utils.LintHTTPMethod("GET"),
 }

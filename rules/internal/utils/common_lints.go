@@ -131,3 +131,17 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 	}
 	return nil
 }
+
+// LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
+// have a name matching the method's, with a "Resposne" suffix.
+func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
+	if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("Response message should be named after the RPC, i.e. %q.", want),
+			Suggestion: want,
+			Descriptor: m,
+			Location:   locations.MethodResponseType(m),
+		}}
+	}
+	return nil
+}
