@@ -47,6 +47,7 @@ func AddRules(r lint.RuleRegistry) error {
 		listRevisionsHTTPURISuffix,
 		listRevisionsRequestMessageName,
 		listRevisionsRequestNameField,
+		listRevisionsRequestNoOrderByField,
 		listRevisionsResponseMessageName,
 		rollbackHTTPBody,
 		rollbackHTTPMethod,
