@@ -3,12 +3,12 @@ rule:
   aip: 203
   name: [core, '0203', unordered-list-repeated]
   summary: Only repeated fields may be annotated with `UNORDERED_LIST`.
-permalink: /203/optional
+permalink: /203/unordered-list-repeated
 redirect_from:
-  - /0203/optional
+  - /0203/unordered-list-repeated
 ---
 
-# Optional fields
+# Repeated fields: Unordered
 
 This rule enforces that only repeated fields, not singular ones, are annotated
 with `(google.api.field_behavior) = UNORDERED_LIST`, as mandated by [AIP-203][].
