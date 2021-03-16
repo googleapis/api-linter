@@ -15,13 +15,11 @@
 package aip0235
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
 // The Batch Delete request message should have parent field.
@@ -29,19 +27,18 @@ var requestParentField = &lint.MessageRule{
 	Name: lint.NewRuleName(235, "request-parent-field"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		// Sanity check: If the resource has a pattern, and that pattern
-		// contains no variables, then a parent field is not expected.
+		// contains only one variable, then a parent field is not expected.
 		//
 		// In order to parse out the pattern, we get the resource message
-		// from the response, then get the resource annotation from that,
+		// from the request name, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
 		plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "BatchDelete")
-		if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("BatchDelete%sResponse", plural)); resp != nil {
-			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
-				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
-					for _, pattern := range resource.GetPattern() {
-						if strings.Count(pattern, "{") == 0 {
-							return false
-						}
+		singular := utils.ToSingular(plural)
+		if msg := utils.FindMessage(m.GetFile(), singular); msg != nil {
+			if resource := utils.GetResource(msg); resource != nil {
+				for _, pattern := range resource.GetPattern() {
+					if strings.Count(pattern, "{") == 1 {
+						return false
 					}
 				}
 			}
