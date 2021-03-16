@@ -27,3 +27,8 @@ func ToPlural(s string) string {
 
 	return pluralizeClient.Plural(pluralizeClient.Singular(s))
 }
+
+// ToSingular converts a string to its singular form.
+func ToSingular(s string) string {
+	return pluralizeClient.Singular(s)
+}

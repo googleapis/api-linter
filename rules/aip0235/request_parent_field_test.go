@@ -30,41 +30,36 @@ func TestParentField(t *testing.T) {
 		Pattern  string
 		problems testutils.Problems
 	}{
-		{"Valid", "", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"Missing", "", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
-		{"InvalidType", "", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
-		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books", nil},
-		{"IrrelevantNoParent", "", "BatchDeleteBooks", "", "books", nil},
+		{"Valid", "", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
+		{"Missing", "", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"InvalidType", "", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
+		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
+		{"IrrelevantNoParent", "", "BatchDeleteBooks", "", "books/{b}", nil},
 
-		{"PackageValid", "package foo;", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"PackageMissing", "package foo;", "BatchDeleteBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
-		{"PackageInvalidType", "package foo;", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
-		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books", nil},
-		{"PackageIrrelevantNoParent", "package foo;", "BatchDeleteBooks", "", "books", nil},
+		{"PackageValid", "package foo;", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
+		{"PackageMissing", "package foo;", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"PackageInvalidType", "package foo;", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
+		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
+		{"PackageIrrelevantNoParent", "package foo;", "BatchDeleteBooks", "", "books/{b}", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				{{.Package}}
 				import "google/api/resource.proto";
+				import "google/protobuf/empty.proto";
 
 				service Library {
-					rpc {{.RPC}}({{.RPC}}Request) returns ({{.RPC}}Response);
+					rpc {{.RPC}}({{.RPC}}Request) returns (google.protobuf.Empty);
 				}
 
 				message {{.RPC}}Request {
 					{{.Field}}
-					repeated string names = 2;
-				}
-
-				message {{.RPC}}Response {
-					repeated Book books = 1;
 				}
 
 				message Book {
 					option (google.api.resource) = {
 						pattern: "{{.Pattern}}";
 					};
-					string name = 1;
 				}
 			`, test)
 			var d desc.Descriptor = f.GetMessageTypes()[0]
