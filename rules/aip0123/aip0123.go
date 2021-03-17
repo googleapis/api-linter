@@ -34,6 +34,7 @@ func AddRules(r lint.RuleRegistry) error {
 		duplicateResource,
 		resourceAnnotation,
 		resourcePattern,
+		resourceReferenceType,
 		resourceVariables,
 	)
 }
