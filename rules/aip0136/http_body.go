@@ -19,6 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -42,6 +43,7 @@ var httpBody = &lint.MethodRule{
 					return []lint.Problem{{
 						Message:    "Custom POST methods should set `body: \"*\"`.",
 						Descriptor: m,
+						Location:   locations.MethodHTTPRule(m),
 					}}
 				}
 			} else if noBody.Contains(httpRule.Method) && httpRule.Body != "" {
@@ -51,6 +53,7 @@ var httpBody = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    "Custom GET (or DELETE) methods should not set a body clause.",
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}

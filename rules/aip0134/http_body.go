@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -35,6 +36,7 @@ var httpBody = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Update methods should have an HTTP body equal to `%q`.", fieldName),
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}
