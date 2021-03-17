@@ -51,7 +51,7 @@ message Book {
 ```
 
 ```proto
-// Incorrect.
+// Correct.
 message Book {
   string name = 1;
 
