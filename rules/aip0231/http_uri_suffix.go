@@ -16,6 +16,7 @@ package aip0231
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -30,6 +31,7 @@ var uriSuffix = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    `Batch Get method's URI should end with ":batchGet".`,
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}

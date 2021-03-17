@@ -16,6 +16,7 @@ package aip0127
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -28,6 +29,7 @@ var hasAnnotation = &lint.MethodRule{
 			return []lint.Problem{{
 				Message:    "Bi-directional streaming RPCs should omit `google.api.http`.",
 				Descriptor: m,
+				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
 		if !hasHTTPRule && !(m.IsClientStreaming() && m.IsServerStreaming()) {
