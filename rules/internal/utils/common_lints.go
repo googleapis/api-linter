@@ -87,6 +87,7 @@ func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The `%s` method should %s HTTP body.", m.GetName(), msg),
 				Descriptor: m,
+				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
 	}
@@ -111,6 +112,7 @@ func LintHTTPMethod(verb string) func(*desc.MethodDescriptor) []lint.Problem {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("The `%s` method should use the HTTP %s verb.", m.GetName(), verb),
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}

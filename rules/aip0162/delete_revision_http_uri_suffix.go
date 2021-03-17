@@ -16,6 +16,7 @@ package aip0162
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -30,6 +31,7 @@ var deleteRevisionHTTPURISuffix = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    `Delete Revision URI should end with ":deleteRevision".`,
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}

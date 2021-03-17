@@ -19,6 +19,7 @@ import (
 
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -47,6 +48,7 @@ var httpParentVariable = &lint.MethodRule{
 					return []lint.Problem{{
 						Message:    "The parent variable should only be used if the RPC noun matches the URI.",
 						Descriptor: m,
+						Location:   locations.MethodHTTPRule(m),
 					}}
 				}
 			}

@@ -16,6 +16,7 @@ package aip0235
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -30,6 +31,7 @@ var httpUriSuffix = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    `Batch Delete URI should end with ":batchDelete".`,
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}

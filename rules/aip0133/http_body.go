@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -46,6 +47,7 @@ var httpBody = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    "Post methods should have an HTTP body.",
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 				// When resource field is not set in the request message, the problem
 				// will not be triggered by the rule"core::0133::http-body". It will be
@@ -59,6 +61,7 @@ var httpBody = &lint.MethodRule{
 						resourceFieldName,
 					),
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}
