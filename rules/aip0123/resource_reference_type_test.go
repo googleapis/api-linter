@@ -45,7 +45,7 @@ func TestResourceReferenceType(t *testing.T) {
 			field := file.GetMessageTypes()[0].GetFields()[0]
 			got := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(got); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
