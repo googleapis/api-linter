@@ -31,6 +31,7 @@ func TestResourceReferenceType(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "string", annotation, nil},
+		{"ValidRepeated", "repeated string", annotation, nil},
 		{"Invalid", "Author", annotation, testutils.Problems{{Suggestion: ""}}},
 		{"Irrelevant", "Author", "", nil},
 	} {
