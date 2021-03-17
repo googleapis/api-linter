@@ -42,7 +42,7 @@ message Book {
 **Correct** code for this rule:
 
 ```proto
-// Incorrect.
+// Correct.
 message Book {
   string name = 1;
 
