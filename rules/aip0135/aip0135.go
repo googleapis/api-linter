@@ -27,7 +27,6 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		135,
-		httpBody,
 		httpMethod,
 		httpNameField,
 		methodSignature,

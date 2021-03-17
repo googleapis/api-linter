@@ -12,16 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0162
+package aip0127
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// Delete Revision methods should have no HTTP body.
-var deleteRevisionHTTPBody = &lint.MethodRule{
-	Name:       lint.NewRuleName(162, "delete-revision-http-body"),
-	OnlyIf:     isDeleteRevisionMethod,
-	LintMethod: utils.LintNoHTTPBody,
+// GET and DELETE methods must not have an HTTP body.
+var httpBody = &lint.MethodRule{
+	Name: lint.NewRuleName(127, "http-body"),
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		var ps []lint.Problem
+		for _, r := range utils.GetHTTPRules(m) {
+			if r.Method != "GET" && r.Method != "DELETE" {
+				continue
+			}
+			if r.Body != "" {
+				ps = append(ps, lint.Problem{
+					Message:    "`GET` and `DELETE` HTTP methods must not have an HTTP `body`.",
+					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
+				})
+			}
+		}
+		return ps
+	},
 }

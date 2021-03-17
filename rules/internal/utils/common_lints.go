@@ -93,11 +93,6 @@ func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
 	return nil
 }
 
-// LintNoHTTPBody returns a problem for each HTTP rule whose body is not "".
-func LintNoHTTPBody(m *desc.MethodDescriptor) []lint.Problem {
-	return lintHTTPBody(m, "", "not have an")
-}
-
 // LintWildcardHTTPBody returns a problem for each HTTP rule whose body is not "*".
 func LintWildcardHTTPBody(m *desc.MethodDescriptor) []lint.Problem {
 	return lintHTTPBody(m, "*", `use "*" as the`)

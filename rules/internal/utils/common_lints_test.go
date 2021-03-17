@@ -81,38 +81,6 @@ func TestLintFieldResourceReference(t *testing.T) {
 	}
 }
 
-func TestLintNoHTTPBody(t *testing.T) {
-	for _, test := range []struct {
-		testName string
-		Body     string
-		problems testutils.Problems
-	}{
-		{"Valid", ``, nil},
-		{"Invalid", `*`, testutils.Problems{{Message: "not have an HTTP body"}}},
-	} {
-		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
-				import "google/api/annotations.proto";
-				service Library {
-					rpc GetBook(GetBookRequest) returns (Book) {
-						option (google.api.http) = {
-							get: "/v1/{name=publishers/*/books/*}"
-							body: "{{.Body}}"
-						};
-					}
-				}
-				message Book {}
-				message GetBookRequest {}
-			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
-			problems := LintNoHTTPBody(method)
-			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Error(diff)
-			}
-		})
-	}
-}
-
 func TestLintWildcardHTTPBody(t *testing.T) {
 	for _, test := range []struct {
 		testName string

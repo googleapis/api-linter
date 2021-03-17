@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0231
+package aip0127
 
 import (
 	"testing"
@@ -20,16 +20,18 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestHttpBody(t *testing.T) {
+func TestHTTPBody(t *testing.T) {
 	tests := []struct {
-		testName   string
-		Body       string
-		MethodName string
-		problems   testutils.Problems
+		testName string
+		Verb     string
+		Body     string
+		problems testutils.Problems
 	}{
-		{"Valid", "", "BatchGetBooks", nil},
-		{"Invalid", "*", "BatchGetBooks", testutils.Problems{{Message: "HTTP body"}}},
-		{"Irrelevant", "*", "AcquireBook", nil},
+		{"ValidGet", "get", "", nil},
+		{"ValidDelete", "delete", "", nil},
+		{"InvalidGet", "get", "*", testutils.Problems{{Message: "must not have an HTTP `body`"}}},
+		{"InvalidDelete", "delete", "*", testutils.Problems{{Message: "must not have an HTTP `body`"}}},
+		{"IrrelevantPost", "post", "*", nil},
 	}
 
 	for _, test := range tests {
@@ -37,15 +39,15 @@ func TestHttpBody(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
-					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+					rpc FooBook(FooBookRequest) returns (FooBookResponse) {
 						option (google.api.http) = {
-							get: "/v1/{parent=publishers/*}/books:batchGet"
+							{{.Verb}}: "/v1/books"
 							body: "{{.Body}}"
 						};
 					}
 				}
-				message {{.MethodName}}Request {}
-				message {{.MethodName}}Response {}
+				message FooBookRequest {}
+				message FooBookResponse {}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
 			problems := httpBody.Lint(file)

@@ -25,7 +25,6 @@ var httpNameField = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "http-uri-name"),
 	OnlyIf: isDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if _, ok := httpRule.GetVariables()["name"]; !ok {
 				return []lint.Problem{{
