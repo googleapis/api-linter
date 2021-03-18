@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -30,6 +31,7 @@ var lowerSnake = &lint.FieldRule{
 				Message:    fmt.Sprintf("Field `%s` must use lower_snake_case.", got),
 				Suggestion: want,
 				Descriptor: f,
+				Location:   locations.DescriptorName(f),
 			}}
 		}
 		return nil
