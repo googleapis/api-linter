@@ -29,9 +29,9 @@ var fieldType = &lint.FieldRule{
 		return f.GetName() == "etag"
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if t := utils.GetTypeName(f); t != "string" {
+		if t := utils.GetTypeName(f); t != "string" || f.IsRepeated() {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("The etag field should be a string, not %s.", t),
+				Message:    fmt.Sprintf("The etag field should be a singular string, not %s.", t),
 				Descriptor: f,
 				Location:   locations.FieldType(f),
 				Suggestion: "string",

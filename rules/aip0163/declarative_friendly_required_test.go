@@ -31,6 +31,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 		{"ValidNotDF", "", "", nil},
 		{"ValidDF", "style: DECLARATIVE_FRIENDLY", "bool validate_only = 2;", nil},
 		{"InvalidDFWrongType", "style: DECLARATIVE_FRIENDLY", "int32 validate_only = 2;", problems},
+		{"InvalidDFRepeated", "style: DECLARATIVE_FRIENDLY", "repeated bool validate_only = 2;", problems},
 		{"InvalidDFMissing", "style: DECLARATIVE_FRIENDLY", "", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
