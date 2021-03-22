@@ -26,9 +26,9 @@ var requestMaskField = &lint.FieldRule{
 		return isUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != "google.protobuf.FieldMask" {
+		if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != "google.protobuf.FieldMask" || f.IsRepeated() {
 			return []lint.Problem{{
-				Message:    "The `update_mask` field should be a google.protobuf.FieldMask.",
+				Message:    "The `update_mask` field should be a singular google.protobuf.FieldMask.",
 				Suggestion: "google.protobuf.FieldMask",
 				Descriptor: f,
 				Location:   locations.FieldType(f),

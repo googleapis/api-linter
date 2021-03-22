@@ -28,6 +28,7 @@ func TestFieldType(t *testing.T) {
 	}{
 		{"ValidString", "string", nil},
 		{"Invalid", "bytes", testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidRepeated", "repeated string", testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -37,7 +38,7 @@ func TestFieldType(t *testing.T) {
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(fieldType.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

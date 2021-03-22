@@ -87,6 +87,7 @@ var namesField = &lint.MessageRule{
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
 				Descriptor: getReqMsg,
+				Location:   locations.FieldType(getReqMsg),
 			})
 		}
 		return

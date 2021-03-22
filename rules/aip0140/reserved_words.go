@@ -19,6 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -29,6 +30,7 @@ var reservedWords = &lint.FieldRule{
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("%q is a reserved word in a common language and should not be used.", name),
 				Descriptor: f,
+				Location:   locations.DescriptorName(f),
 			}}
 		}
 		return nil

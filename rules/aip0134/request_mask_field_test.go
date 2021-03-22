@@ -30,6 +30,7 @@ func TestRequestMaskField(t *testing.T) {
 	}{
 		{"Valid", "UpdateBookRequest", "google.protobuf.FieldMask", "update_mask", nil},
 		{"InvalidType", "UpdateBookRequest", "string", "update_mask", testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}}},
+		{"InvalidRepeated", "UpdateBookRequest", "repeated google.protobuf.FieldMask", "update_mask", testutils.Problems{{Suggestion: "google.protobuf.FieldMask"}}},
 		{"IrrelevantMessage", "ModifyBookRequest", "string", "update_mask", nil},
 		{"IrrelevantField", "UpdateBookRequest", "string", "modify_mask", nil},
 	}
@@ -45,7 +46,7 @@ func TestRequestMaskField(t *testing.T) {
 			field := file.GetMessageTypes()[0].GetFields()[0]
 			problems := requestMaskField.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
