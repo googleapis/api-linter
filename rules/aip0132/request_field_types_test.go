@@ -18,42 +18,38 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestRequestFieldTypes(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName    string
-		messageName string
-		fieldName   string
-		fieldType   *builder.FieldType
-		problems    testutils.Problems
+		testName string
+		Message  string
+		Field    string
+		problems testutils.Problems
 	}{
-		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), testutils.Problems{}},
-		{"FilterInvalid", "ListBooksRequest", "filter", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
-		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
-		{"OrderByInvalid", "ListBooksRequest", "order_by", builder.FieldTypeBytes(), testutils.Problems{{Message: "string"}}},
+		{"Filter", "ListBooksRequest", "string filter", nil},
+		{"FilterInvalid", "ListBooksRequest", "bytes filter", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
+		{"FilterInvalidRepeated", "ListBooksRequest", "repeated string filter", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
+		{"OrderBy", "ListBooksRequest", "string order_by", nil},
+		{"OrderByInvalid", "ListBooksRequest", "bytes order_by", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
+		{"OrderByInvalidRepeated", "ListBooksRequest", "repeated string order_by", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
+		{"IrrelevantMessage", "Book", "bytes order_by", nil},
+		{"IrrelevantField", "ListBooksRequest", "bytes foo", nil},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField("parent", builder.FieldTypeString()),
-			).AddField(
-				builder.NewField(test.fieldName, test.fieldType),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build GetBookRequest message.")
-			}
-
-			// Run the lint rule, and establish that it returns the correct
-			// number of problems.
-			problems := requestFieldTypes.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(message.GetFields()[1]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.Message}} {
+					{{.Field}} = 1;
+				}
+			`, test)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := requestFieldTypes.Lint(f)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

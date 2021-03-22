@@ -27,13 +27,13 @@ var allowMissing = &lint.MessageRule{
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		for _, field := range m.GetFields() {
-			if field.GetName() == "allow_missing" && utils.GetTypeName(field) == "bool" {
+			if field.GetName() == "allow_missing" && utils.GetTypeName(field) == "bool" && !field.IsRepeated() {
 				return nil
 			}
 		}
 		return []lint.Problem{{
 			Descriptor: m,
-			Message:    "Update requests on declarative-friendly resources should include `bool allow_missing`.",
+			Message:    "Update requests on declarative-friendly resources should include a singular `bool allow_missing` field.",
 		}}
 	},
 }
