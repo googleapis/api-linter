@@ -87,6 +87,7 @@ var requestNamesField = &lint.MessageRule{
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Delete Request should be a %q type`, rightTypeName),
 				Descriptor: deleteReqMsg,
+				Location:   locations.FieldType(deleteReqMsg),
 			})
 		}
 		return
