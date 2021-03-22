@@ -31,9 +31,9 @@ var requestIDField = &lint.MessageRule{
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "Create")) + "_id"
-		if field := m.FindFieldByName(idField); field == nil || utils.GetTypeName(field) != "string" {
+		if field := m.FindFieldByName(idField); field == nil || utils.GetTypeName(field) != "string" || field.IsRepeated() {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Declarative-friendly create methods should contain a `string %s` field.", idField),
+				Message:    fmt.Sprintf("Declarative-friendly create methods should contain a singular `string %s` field.", idField),
 				Descriptor: m,
 			}}
 		}

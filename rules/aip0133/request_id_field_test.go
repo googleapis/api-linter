@@ -32,6 +32,7 @@ func TestRequestIDField(t *testing.T) {
 		{"ValidClientSpecified", "style: DECLARATIVE_FRIENDLY", "string book_id = 3;", nil},
 		{"InvalidDF", "style: DECLARATIVE_FRIENDLY", "", problems},
 		{"InvalidType", "style: DECLARATIVE_FRIENDLY", "bytes book_id = 3;", problems},
+		{"InvalidRepeated", "style: DECLARATIVE_FRIENDLY", "repeated string book_id = 3;", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

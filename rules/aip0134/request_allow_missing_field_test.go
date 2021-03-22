@@ -21,7 +21,7 @@ import (
 )
 
 func TestAllowMissing(t *testing.T) {
-	problems := testutils.Problems{{Message: "include `bool allow_missing`"}}
+	problems := testutils.Problems{{Message: "include a singular `bool allow_missing`"}}
 	for _, test := range []struct {
 		name         string
 		Style        string
@@ -32,6 +32,7 @@ func TestAllowMissing(t *testing.T) {
 		{"ValidIncluded", "style: DECLARATIVE_FRIENDLY", "bool allow_missing = 2;", nil},
 		{"Invalid", "style: DECLARATIVE_FRIENDLY", "", problems},
 		{"InvalidWrongType", "style: DECLARATIVE_FRIENDLY", "string allow_missing = 2;", problems},
+		{"InvalidRepeated", "style: DECLARATIVE_FRIENDLY", "repeated bool allow_missing = 2;", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -55,7 +56,7 @@ func TestAllowMissing(t *testing.T) {
 			`, test)
 			m := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(allowMissing.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

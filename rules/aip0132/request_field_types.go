@@ -15,8 +15,6 @@
 package aip0132
 
 import (
-	"fmt"
-
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -25,20 +23,11 @@ import (
 
 var knownFields = stringset.New("filter", "order_by")
 
-// List methods should not have unrecognized fields.
+// List request filter and order_by fields should be singular strings.
 var requestFieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return isListRequestMessage(f.GetOwner()) && knownFields.Contains(f.GetName())
 	},
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
-		// Establish that the field being checked is a string.
-		if utils.GetTypeName(f) != "string" {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Field %q should be a string.", f.GetName()),
-				Descriptor: f,
-			}}
-		}
-		return
-	},
+	LintField: utils.LintSingularStringField,
 }
