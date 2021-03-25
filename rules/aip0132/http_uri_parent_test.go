@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0132
 
 import (
 	"testing"
@@ -22,37 +22,34 @@ import (
 
 func TestHTTPURIParent(t *testing.T) {
 	tests := []struct {
-		testName   string
-		URI        string
-		MethodName string
-		Pattern    string
-		problems   testutils.Problems
+		testName     string
+		URI          string
+		MethodName   string
+		RequestField string
+		problems     testutils.Problems
 	}{
-		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", nil},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
-		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
-		{"NoParent", "/v1/books/*", "CreateBook", "books/{book}", nil},
-		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "publishers/{publisher}/books/{book}", nil},
+		{"Valid", "/v1/{parent=publishers/*/books/*}", "ListBooks", "string parent = 1;", nil},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "`parent` variable"}}},
+		{"InvalidNoVarParent", "/v1/publishers/*/books/*", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "`parent` variable"}}},
+		{"ValidNoParent", "/v1/books/*", "ListBooks", "", nil},
+		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "string parent = 1;", nil},
 	}
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				import "google/api/resource.proto";
 				service Library {
-					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
-							post: "{{.URI}}"
+							get: "{{.URI}}"
 						};
 					}
 				}
-				message {{.MethodName}}Request {}
-				message Book {
-					option (google.api.resource) = {
-						pattern: "{{.Pattern}}"
-					};
+				message {{.MethodName}}Request {
+					{{.RequestField}}
 				}
+				message {{.MethodName}}Response {}
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {

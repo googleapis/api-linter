@@ -15,7 +15,7 @@ URI, as mandated in [AIP-133][].
 
 ## Details
 
-This rule looks at any message matching beginning with `Create`, and complains
+This rule looks at any message beginning with `Create`, and complains
 if the `parent` variable is not included in the URI. It _does_ check additional
 bindings if they are present.
 
