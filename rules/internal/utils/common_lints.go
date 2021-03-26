@@ -87,6 +87,7 @@ func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The `%s` method should %s HTTP body.", m.GetName(), msg),
 				Descriptor: m,
+				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
 	}
@@ -111,6 +112,7 @@ func LintHTTPMethod(verb string) func(*desc.MethodDescriptor) []lint.Problem {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("The `%s` method should use the HTTP %s verb.", m.GetName(), verb),
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}
@@ -127,6 +129,20 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 			Suggestion: want,
 			Descriptor: m,
 			Location:   locations.MethodRequestType(m),
+		}}
+	}
+	return nil
+}
+
+// LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
+// have a name matching the method's, with a "Resposne" suffix.
+func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
+	if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("Response message should be named after the RPC, i.e. %q.", want),
+			Suggestion: want,
+			Descriptor: m,
+			Location:   locations.MethodResponseType(m),
 		}}
 	}
 	return nil

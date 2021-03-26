@@ -54,4 +54,14 @@ func TestResponsePluralFirstField(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("ValidNoFields", func(t *testing.T) {
+		f := testutils.ParseProto3Tmpl(t, `
+			message ListStudentProfilesResponse {}
+		`, nil)
+		problems := responsePluralFirstField.Lint(f)
+		if diff := (testutils.Problems{}).Diff(problems); diff != "" {
+			t.Error(diff)
+		}
+	})
 }

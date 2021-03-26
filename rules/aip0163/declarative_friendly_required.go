@@ -40,9 +40,9 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		return false
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		if vo := m.FindFieldByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" {
+		if vo := m.FindFieldByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" || vo.IsRepeated() {
 			return []lint.Problem{{
-				Message:    "Declarative-friendly mutate requests should include `bool validate_only`.",
+				Message:    "Declarative-friendly mutate requests should include a singular `bool validate_only` field.",
 				Descriptor: m,
 			}}
 		}

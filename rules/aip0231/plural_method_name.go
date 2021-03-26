@@ -19,6 +19,7 @@ import (
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -40,6 +41,7 @@ var pluralMethodResourceName = &lint.MethodRule{
 					m.GetName(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
 				),
 				Descriptor: m,
+				Location:   locations.DescriptorName(m),
 			}}
 		}
 

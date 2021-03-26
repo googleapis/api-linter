@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -49,6 +50,7 @@ var requestParentValidReference = &lint.FieldRule{
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("The `google.api.resource_reference` on `%s` field should reference the parent(s) of `%s`.", f.GetName(), res),
 					Descriptor: f,
+					Location:   locations.FieldResourceReference(f),
 				}}
 			}
 		}

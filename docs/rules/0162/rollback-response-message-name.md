@@ -2,7 +2,7 @@
 rule:
   aip: 162
   name: [core, '0162', rollback-response-message-name]
-  summary: Rollback methods must return a long-running operation.
+  summary: Rollback methods must have standardized response message names.
 permalink: /162/rollback-response-message-name
 redirect_from:
   - /0162/rollback-response-message-name

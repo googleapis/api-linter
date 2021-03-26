@@ -19,6 +19,7 @@ This rule looks at any message matching `Delete*Request` and complains if it
 comes across any fields other than:
 
 - `string name` ([AIP-135][])
+- `bool allow_missing` ([AIP-135][])
 - `bool force` ([AIP-135][])
 - `string etag` ([AIP-154][])
 - `string request_id` ([AIP-155][])

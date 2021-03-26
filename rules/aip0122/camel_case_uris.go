@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -32,6 +33,7 @@ var httpURICase = &lint.MethodRule{
 				problems = append(problems, lint.Problem{
 					Message:    "HTTP URI patterns should use camel case, not snake case.",
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				})
 			}
 			for v := range httpRule.GetVariables() {
@@ -39,6 +41,7 @@ var httpURICase = &lint.MethodRule{
 					problems = append(problems, lint.Problem{
 						Message:    "Variable names in URI patterns should use snake case, not camel case.",
 						Descriptor: m,
+						Location:   locations.MethodHTTPRule(m),
 					})
 				}
 			}

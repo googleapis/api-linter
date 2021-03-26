@@ -16,6 +16,7 @@ package aip0131
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -31,6 +32,7 @@ var httpNameField = &lint.MethodRule{
 				return []lint.Problem{{
 					Message:    "Get methods should include the `name` field in the URI.",
 					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
 				}}
 			}
 		}
