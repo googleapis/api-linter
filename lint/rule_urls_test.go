@@ -23,6 +23,25 @@ func TestCoreRuleURL(t *testing.T) {
 	}
 }
 
+func TestClientLibrariesRuleURL(t *testing.T) {
+	tests := []struct {
+		name string
+		rule string
+		url  string
+	}{
+		{"ClientLibrariesRule", "client-libraries::4232::repeated-fields", "https://linter.aip.dev/4232/repeated-fields"},
+		{"NotClientLibrariesRule", "test::0122::camel-case-uri", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := clientLibrariesRuleUrl(test.rule); got != test.url {
+				t.Errorf("clientLibrariesRuleUrl(%s) got %s, but want %s", test.name, got, test.url)
+			}
+		})
+	}
+}
+
 func TestGetRuleURL(t *testing.T) {
 	var mapping1 = func(name string) string {
 		if name == "one" {

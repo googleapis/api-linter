@@ -20,8 +20,7 @@ values are inclusive. {% endcomment -%}
       <use xlink:href="#mi-arrow-circle"></use>
     </svg>
   </div>
-
-  {% assign rule_pages = site.pages | where_exp: "p", "p.rule != nil" | sort: "rule.name" | group_by: "rule.aip" -%}
+  {% assign rule_pages = site.pages | where_exp: "p", "p.rule != nil" | where_exp: "p", "p.rule.aip >= include.start" | where_exp: "p", "p.rule.aip <= include.end" | sort: "rule.name" | group_by: "rule.aip" -%}
   {% for pbr in rule_pages -%}
   <div class="glue-expansion-panel">
     <div class="glue-expansion-panel-toggle"

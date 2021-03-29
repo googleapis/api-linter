@@ -11,18 +11,6 @@
     </li>
     {%- if (page.url | slice: 0, 7) == '/rules/' %}
     {%- assign url_segments = page.url | split: '/' %}
-    {%- if url_segments | first | abs %}
-    <li class="glue-breadcrumbs__item" aria-level="2">
-      <a class="glue-breadcrumbs__link" href="{{ site.url }}/rules/">
-        Rule Documentation
-      </a>
-    </li>
-    <li class="glue-breadcrumbs__item" aria-level="2">
-      <a class="glue-breadcrumbs__link" href="{{ site.url }}/rules/core/">
-        Core rules
-      </a>
-    </li>
-    {%- endif %}
     {%- assign url_limit = url_segments | size | minus: 2 %}
     {%- assign cursor = '' %}
     {%- for segment in url_segments offset: 1 limit: url_limit %}
