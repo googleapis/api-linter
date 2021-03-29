@@ -23,6 +23,25 @@ func TestAIPCoreGroup(t *testing.T) {
 	}
 }
 
+func TestAIPClientLibrariesGroup(t *testing.T) {
+	tests := []struct {
+		name  string
+		aip   int
+		group string
+	}{
+		{"InClientLibrariesGroup", 4232, "client-libraries"},
+		{"NotInClientLibrariesGroup_AIP>=4300", 4300, ""},
+		{"NotInClientLibrariesGroup_AIP<4200", 4000, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := aipClientLibrariesGroup(test.aip); got != test.group {
+				t.Errorf("aipClientLibrariesGroup(%d) got %s, but want %s", test.aip, got, test.group)
+			}
+		})
+	}
+}
+
 func TestGetRuleGroupPanic(t *testing.T) {
 	var groups []func(int) string
 	defer func() {
