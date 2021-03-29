@@ -17,12 +17,21 @@ import "strings"
 // }
 var ruleURLMappings = []func(string) string{
 	coreRuleURL,
+	clientLibrariesRuleUrl,
 }
 
 func coreRuleURL(ruleName string) string {
+	return groupUrl(ruleName, "core")
+}
+
+func clientLibrariesRuleUrl(ruleName string) string {
+	return groupUrl(ruleName, "client-libraries")
+}
+
+func groupUrl(ruleName, groupName string) string {
 	base := "https://linter.aip.dev/"
-	nameParts := strings.Split(ruleName, "::") // e.g., core::0122::camel-case-uri -> ["core", "0122", "camel-case-uri"]
-	if len(nameParts) == 0 || nameParts[0] != "core" {
+	nameParts := strings.Split(ruleName, "::") // e.g., client-libraries::0122::camel-case-uri -> ["client-libraries", "0122", "camel-case-uri"]
+	if len(nameParts) == 0 || nameParts[0] != groupName {
 		return ""
 	}
 	path := strings.TrimPrefix(strings.Join(nameParts[1:], "/"), "0")

@@ -21,11 +21,19 @@ import "fmt"
 // }
 var aipGroups = []func(int) string{
 	aipCoreGroup,
+	aipClientLibrariesGroup,
 }
 
 func aipCoreGroup(aip int) string {
 	if aip > 0 && aip < 1000 {
 		return "core"
+	}
+	return ""
+}
+
+func aipClientLibrariesGroup(aip int) string {
+	if aip >= 4200 && aip <= 4299 {
+		return "client-libraries"
 	}
 	return ""
 }
