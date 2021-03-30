@@ -29,7 +29,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		133,
 		httpBody,
-		httpURIField,
+		httpURIParent,
 		httpMethod,
 		inputName,
 		methodSignature,
