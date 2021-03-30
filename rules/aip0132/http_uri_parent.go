@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0132
 
 import (
 	"github.com/googleapis/api-linter/lint"
@@ -20,11 +20,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Create methods should have a parent variable if the resource isn't top-level.
+// List methods should have a parent variable if the request has a parent field.
 var httpURIParent = &lint.MethodRule{
-	Name: lint.NewRuleName(133, "http-uri-parent"),
+	Name: lint.NewRuleName(132, "http-uri-parent"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCreateMethod(m) && !hasNoParent(m.GetOutputType())
+		return isListMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
 	},
 	LintMethod: utils.LintHTTPURIHasParentVariable,
 }
