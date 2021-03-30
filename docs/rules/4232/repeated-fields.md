@@ -4,8 +4,6 @@ rule:
   name: [client-libraries, '4232', repeated-fields]
   summary: Method Signatures can only have repeated fields in the last element.
 permalink: /4232/repeated-fields
-redirect_from:
-  - /4232/repeated-fields
 ---
 
 # Method Signature: Repeated fields
