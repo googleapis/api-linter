@@ -28,6 +28,7 @@ func AddRules(r lint.RuleRegistry) error {
 		165,
 		httpBody,
 		httpMethod,
+		httpParentVariable,
 		httpURISuffix,
 		requestFilterBehavior,
 		requestFilterField,
