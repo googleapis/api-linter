@@ -72,3 +72,17 @@ func getServices(f *desc.FileDescriptor) []*desc.ServiceDescriptor {
 	}
 	return answer
 }
+
+// GetAllDependencies returns all dependencies.
+func GetAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescriptor {
+	answer := map[string]*desc.FileDescriptor{file.GetName(): file}
+	for _, f := range file.GetDependencies() {
+		if _, found := answer[f.GetName()]; !found {
+			answer[f.GetName()] = f
+			for name, f2 := range GetAllDependencies(f) {
+				answer[name] = f2
+			}
+		}
+	}
+	return answer
+}

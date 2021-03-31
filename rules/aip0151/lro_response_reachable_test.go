@@ -56,7 +56,7 @@ func TestLROResponseReachable(t *testing.T) {
 				problems := lroResponseReachable.Lint(f)
 				m := f.GetServices()[0].GetMethods()[0]
 				if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}
@@ -95,7 +95,50 @@ func TestLROResponseReachable(t *testing.T) {
 				problems := lroResponseReachable.Lint(files["test.proto"])
 				method := files["test.proto"].GetServices()[0].GetMethods()[0]
 				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
+				}
+			})
+		}
+	})
+	t.Run("Transitive", func(t *testing.T) {
+		for _, test := range []struct {
+			name     string
+			message  string
+			problems testutils.Problems
+		}{
+			{"Present", "message WriteBookResponse {}", testutils.Problems{}},
+			{"Absent", "", testutils.Problems{{Message: "WriteBookResponse"}}},
+		} {
+			t.Run(test.name, func(t *testing.T) {
+				files := testutils.ParseProtoStrings(t, map[string]string{
+					"transitive.proto": strings.ReplaceAll(`
+						syntax = "proto3";
+						---
+						message OperationMetadata {}
+					`, "---", test.message),
+					"imported.proto": `
+						syntax = "proto3";
+						import "transitive.proto";
+						message WriteBookRequest {}
+					`,
+					"test.proto": `
+						syntax = "proto3";
+						import "google/longrunning/operations.proto";
+						import "imported.proto";
+						service Library {
+							rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+								option (google.longrunning.operation_info) = {
+									response_type: "WriteBookResponse"
+									metadata_type: "OperationMetadata"
+								};
+							}
+						}
+					`,
+				})
+				problems := lroResponseReachable.Lint(files["test.proto"])
+				method := files["test.proto"].GetServices()[0].GetMethods()[0]
+				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+					t.Error(diff)
 				}
 			})
 		}

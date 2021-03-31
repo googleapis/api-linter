@@ -35,7 +35,7 @@ var validReference = &lint.FieldRule{
 		}
 
 		// Iterate over each dependency file and check for a matching resource.
-		for _, file := range getAllDependencies(f.GetFile()) {
+		for _, file := range utils.GetAllDependencies(f.GetFile()) {
 			// Most resources will be messages. If we find a message with a
 			// resource annotation matching our universal resource type, we are done.
 			for _, message := range file.GetMessageTypes() {
@@ -61,18 +61,4 @@ var validReference = &lint.FieldRule{
 			Location:   locations.FieldResourceReference(f),
 		}}
 	},
-}
-
-// getAllDependencies returns all dependencies.
-func getAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescriptor {
-	answer := map[string]*desc.FileDescriptor{file.GetName(): file}
-	for _, f := range file.GetDependencies() {
-		if _, found := answer[f.GetName()]; !found {
-			answer[f.GetName()] = f
-			for name, f2 := range getAllDependencies(f) {
-				answer[name] = f2
-			}
-		}
-	}
-	return answer
 }

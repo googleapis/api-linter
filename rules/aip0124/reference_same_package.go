@@ -67,7 +67,7 @@ var referenceSamePackage = &lint.FieldRule{
 // getNonPkgDependencies returns dependencies in other packages.
 func getNonPkgDependencies(file *desc.FileDescriptor, pkg string) map[string]*desc.FileDescriptor {
 	answer := map[string]*desc.FileDescriptor{}
-	for name, dep := range getAllDependencies(file) {
+	for name, dep := range utils.GetAllDependencies(file) {
 		if dep.GetPackage() != pkg {
 			answer[name] = dep
 		}
