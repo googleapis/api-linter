@@ -17,6 +17,7 @@ package aip0158
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
@@ -40,7 +41,14 @@ var paginatedRes = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Response$")
 
 // Return true if this is an AIP-158 List request message, false otherwise.
 func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
-	return paginatedReq.MatchString(m.GetName()) || m.FindFieldByName("page_size") != nil || m.FindFieldByName("page_token") != nil
+	if paginatedReq.MatchString(m.GetName()) {
+		return true
+	}
+	// Ignore messages that happen to have these fields but are not requests.
+	if !strings.HasSuffix(m.GetName(), "Request") {
+		return false
+	}
+	return m.FindFieldByName("page_size") != nil || m.FindFieldByName("page_token") != nil
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
