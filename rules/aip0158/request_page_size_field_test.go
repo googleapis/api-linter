@@ -53,6 +53,13 @@ func TestRequestPaginationPageSize(t *testing.T) {
 				return m.FindFieldByName("page_size")
 			},
 		},
+		{
+			"IrrelevantMessage",
+			"ListFooPageToken",
+			[]field{{"page_token", builder.FieldTypeString()}},
+			nil,
+			nil,
+		},
 	}
 
 	// Run each test individually.
@@ -81,7 +88,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := requestPaginationPageSize.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
