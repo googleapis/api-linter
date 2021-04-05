@@ -49,14 +49,14 @@ message Book {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the method.
+If you need to violate this rule, use a leading comment above the field.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0141::forbidden-types=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   string name = 1;
+  // (-- api-linter: core::0141::forbidden-types=disabled
+  //     aip.dev/not-precedent: We need to do this because reasons. --)
   uint32 page_count = 2;
 }
 ```
