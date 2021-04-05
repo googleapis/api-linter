@@ -124,7 +124,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
   option (google.api.http) = {
-    delete: "/v1/{book.name=publishers/*/books/*}"
+    delete: "/v1/{name=publishers/*/books/*}"
   };
 }
 ```
