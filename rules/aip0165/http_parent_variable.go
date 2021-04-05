@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0165
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Create methods should have a parent variable if the resource isn't top-level.
-var httpURIParent = &lint.MethodRule{
-	Name: lint.NewRuleName(133, "http-uri-parent"),
+// Purge methods should have a parent variable in the URI unless the resource is top-level.
+var httpParentVariable = &lint.MethodRule{
+	Name: lint.NewRuleName(165, "http-parent-variable"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCreateMethod(m) && !hasNoParent(m.GetOutputType())
+		return isPurgeMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
 	},
-	LintMethod: utils.LintHTTPURIHasParentVariable,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		for _, httpRule := range utils.GetHTTPRules(m) {
+			if _, ok := httpRule.GetVariables()["parent"]; !ok {
+				return []lint.Problem{{
+					Message:    "Purge methods should include the `parent` field in the URI.",
+					Descriptor: m,
+					Location:   locations.MethodHTTPRule(m),
+				}}
+			}
+		}
+
+		return nil
+	},
 }

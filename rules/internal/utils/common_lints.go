@@ -135,7 +135,7 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 }
 
 // LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
-// have a name matching the method's, with a "Resposne" suffix.
+// have a name matching the method's, with a "Response" suffix.
 func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
 	if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
 		return []lint.Problem{{
@@ -144,6 +144,21 @@ func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem 
 			Descriptor: m,
 			Location:   locations.MethodResponseType(m),
 		}}
+	}
+	return nil
+}
+
+// LintHTTPURIHasParentVariable returns a problem if any of the given method's HTTP rules do not
+// have a parent variable in the URI.
+func LintHTTPURIHasParentVariable(m *desc.MethodDescriptor) []lint.Problem {
+	for _, httpRule := range GetHTTPRules(m) {
+		if _, ok := httpRule.GetVariables()["parent"]; !ok {
+			return []lint.Problem{{
+				Message:    "HTTP URI should include a `parent` variable.",
+				Descriptor: m,
+				Location:   locations.MethodHTTPRule(m),
+			}}
+		}
 	}
 	return nil
 }
