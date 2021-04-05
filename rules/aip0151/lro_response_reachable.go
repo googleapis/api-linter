@@ -45,9 +45,7 @@ func checkReachable(m *desc.MethodDescriptor, name string) []lint.Problem {
 	}
 
 	// If the message is defined in the file, we are good to go.
-	files := []*desc.FileDescriptor{f}
-	files = append(files, f.GetDependencies()...)
-	for _, file := range files {
+	for _, file := range utils.GetAllDependencies(f) {
 		if file.FindMessage(name) != nil {
 			return nil
 		}
