@@ -49,7 +49,7 @@ message Book {
 
 ## Disabling
 
-If you need to violate this rule, use a leading comment above the message.
+If you need to violate this rule, use a leading comment above the field.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
