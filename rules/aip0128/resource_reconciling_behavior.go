@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0128 contains rules defined in https://aip.dev/128.
 package aip0128
 
 import (
@@ -21,20 +20,10 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		128,
-		resourceAnnotationsField,
-		resourceReconcilingBehavior,
-		resourceReconcilingField,
-	)
-}
-
-func isDeclarativeFriendlyResource(m *desc.MessageDescriptor) bool {
-	// IsDeclarativeFriendly returns true for both
-	// resources and request messages, but we only care about resources.
-	resource := utils.DeclarativeFriendlyResource(m)
-	return resource != nil && resource == m
+var resourceReconcilingBehavior = &lint.FieldRule{
+	Name: lint.NewRuleName(128, "resource-reconciling-behavior"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isDeclarativeFriendlyResource(f.GetOwner()) && f.GetName() == "reconciling"
+	},
+	LintField: utils.LintOutputOnlyField,
 }
