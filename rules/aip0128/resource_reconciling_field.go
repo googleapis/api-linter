@@ -19,19 +19,13 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var resourceReconcilingField = &lint.MessageRule{
-	Name: lint.NewRuleName(128, "resource-reconciling-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		// IsDeclarativeFriendly returns true for both
-		// resources and request messages, but we only care about resources.
-		resource := utils.DeclarativeFriendlyResource(m)
-		return resource != nil && resource == m
-	},
+	Name:   lint.NewRuleName(128, "resource-reconciling-field"),
+	OnlyIf: isDeclarativeFriendlyResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		f := m.FindFieldByName("reconciling")
 		if f == nil {
