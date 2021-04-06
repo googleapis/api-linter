@@ -34,6 +34,9 @@ func TestRequestFieldTypes(t *testing.T) {
 		{"OrderBy", "ListBooksRequest", "string order_by", nil},
 		{"OrderByInvalid", "ListBooksRequest", "bytes order_by", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
 		{"OrderByInvalidRepeated", "ListBooksRequest", "repeated string order_by", testutils.Problems{{Message: "singular string", Suggestion: "string"}}},
+		{"ShowDeleted", "ListBooksRequest", "bool show_deleted", nil},
+		{"ShowDeletedInvalid", "ListBooksRequest", "int32 show_deleted", testutils.Problems{{Message: "singular bool", Suggestion: "bool"}}},
+		{"ShowDeletedInvalidRepeated", "ListBooksRequest", "repeated bool show_deleted", testutils.Problems{{Message: "singular bool", Suggestion: "bool"}}},
 		{"IrrelevantMessage", "Book", "bytes order_by", nil},
 		{"IrrelevantField", "ListBooksRequest", "bytes foo", nil},
 	}
