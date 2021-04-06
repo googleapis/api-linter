@@ -96,9 +96,43 @@ func TestDeclarativeFriendlyFields(t *testing.T) {
 					m := f.GetMessageTypes()[0]
 					got := declarativeFriendlyRequired.Lint(f)
 					if diff := subtest.problems.SetDescriptor(m).Diff(got); diff != "" {
-						t.Errorf(diff)
+						t.Error(diff)
 					}
 				})
+			}
+		})
+	}
+}
+
+func TestDeclarativeFriendlyFieldsSingleton(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		Fields string
+		want   testutils.Problems
+	}{
+		{"InvalidNoCreateTime", `string name = 1; string display_name = 2; google.protobuf.Timestamp update_time = 3;`,
+			testutils.Problems{{Message: "create_time"}}},
+		{"ValidNoDeleteTimeNoUid", `string name = 1; string display_name = 2; ` +
+			`google.protobuf.Timestamp create_time = 3; google.protobuf.Timestamp update_time = 4;`,
+			nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+				import "google/protobuf/timestamp.proto";
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Settings"
+						pattern: "publishers/{publisher}/settings"
+						style: DECLARATIVE_FRIENDLY
+					};
+					{{.Fields}}
+				}
+			`, test)
+			m := f.GetMessageTypes()[0]
+			got := declarativeFriendlyRequired.Lint(f)
+			if diff := test.want.SetDescriptor(m).Diff(got); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}
