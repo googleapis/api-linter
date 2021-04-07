@@ -23,7 +23,11 @@ import (
 var allowMissing = &lint.MessageRule{
 	Name: lint.NewRuleName(134, "request-allow-missing-field"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return isUpdateRequestMessage(m) && utils.IsDeclarativeFriendlyMessage(m)
+		if !isUpdateRequestMessage(m) {
+			return false
+		}
+		r := utils.DeclarativeFriendlyResource(m)
+		return r != nil && !utils.IsSingletonResource(r)
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		for _, field := range m.GetFields() {

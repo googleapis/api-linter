@@ -33,7 +33,7 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		return false
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		singleton := isSingletonResource(m)
+		singleton := utils.IsSingletonResource(m)
 		// Define the fields that are expected.
 		missingFields := stringset.New()
 		for name, typ := range reqFields {
@@ -79,17 +79,3 @@ var singletonExceptions = stringset.New(
 	"delete_time",
 	"uid",
 )
-
-func isSingletonResource(m *desc.MessageDescriptor) bool {
-	// If the pattern ends in something other than "}", that indicates that this is a singleton.
-	//
-	// For example:
-	//   publishers/{publisher}/books/{book} -- not a singleton, many books
-	//   publishers/*/settings -- a singleton; one settings object per publisher
-	for _, pattern := range utils.GetResource(m).GetPattern() {
-		if !strings.HasSuffix(pattern, "}") {
-			return true
-		}
-	}
-	return false
-}
