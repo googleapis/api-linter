@@ -37,15 +37,24 @@ func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescr
 
 // LintSingularStringField returns a problem if the field is not a singular string.
 func LintSingularStringField(f *desc.FieldDescriptor) []lint.Problem {
-	if f.GetType() != builder.FieldTypeString().GetType() || f.IsRepeated() {
+	return lintSingularField(f, builder.FieldTypeString(), "string")
+}
+
+func lintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
+	if f.GetType() != t.GetType() || f.IsRepeated() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field must be a singular string.", f.GetName()),
-			Suggestion: "string",
+			Message:    fmt.Sprintf("The `%s` field must be a singular %s.", f.GetName(), want),
+			Suggestion: want,
 			Descriptor: f,
 			Location:   locations.FieldType(f),
 		}}
 	}
 	return nil
+}
+
+// LintSingularBoolField returns a problem if the field is not a singular bool.
+func LintSingularBoolField(f *desc.FieldDescriptor) []lint.Problem {
+	return lintSingularField(f, builder.FieldTypeBool(), "bool")
 }
 
 // LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.

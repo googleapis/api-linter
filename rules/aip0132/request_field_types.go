@@ -15,19 +15,24 @@
 package aip0132
 
 import (
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var knownFields = stringset.New("filter", "order_by")
+var knownFields = map[string]func(*desc.FieldDescriptor) []lint.Problem{
+	"filter":       utils.LintSingularStringField,
+	"order_by":     utils.LintSingularStringField,
+	"show_deleted": utils.LintSingularBoolField,
+}
 
-// List request filter and order_by fields should be singular strings.
+// List fields should have the correct type.
 var requestFieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner()) && knownFields.Contains(f.GetName())
+		return isListRequestMessage(f.GetOwner()) && knownFields[f.GetName()] != nil
 	},
-	LintField: utils.LintSingularStringField,
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		return knownFields[f.GetName()](f)
+	},
 }
