@@ -23,7 +23,7 @@ comes across any fields other than:
 - `string page_token` ([AIP-158][])
 - `string filter` ([AIP-132][])
 - `string order_by` ([AIP-132][])
-- `bool show_deleted` ([AIP-135][])
+- `bool show_deleted` ([AIP-132][])
 - `google.protobuf.FieldMask read_mask` ([AIP-157][])
 - `View view` ([AIP-157][])
 

@@ -21,6 +21,7 @@ type:
 
 - `string filter`
 - `string order_by`
+- `bool show_deleted`
 
 ## Examples
 
