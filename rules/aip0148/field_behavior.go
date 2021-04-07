@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0148 contains rules defined in https://aip.dev/148.
 package aip0148
 
 import (
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules adds all of the AIP-148 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		148,
-		declarativeFriendlyRequired,
-		fieldBehavior,
-		humanNames,
-	)
+var fieldBehavior = &lint.FieldRule{
+	Name: lint.NewRuleName(148, "field-behavior"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return utils.IsResource(f.GetOwner()) && outputOnlyFields.Contains(f.GetName())
+	},
+	LintField: utils.LintOutputOnlyField,
 }
+
+var outputOnlyFields = stringset.New(
+	"create_time",
+	"delete_time",
+	"uid",
+	"update_time",
+)
