@@ -29,8 +29,8 @@ func TestHttpNameField(t *testing.T) {
 	}{
 		{"Valid", "/v1/{name=publishers/*/books/*}", "DeleteBook", nil},
 		{"ValidRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", "DeleteBookRevision", nil},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
-		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "`name` field"}}},
+		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "`name`"}}},
+		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "`name`"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 
@@ -50,7 +50,7 @@ func TestHttpNameField(t *testing.T) {
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
