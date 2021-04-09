@@ -27,8 +27,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		192,
 		absoluteLinks,
-		deprecatedMethodComment,
-		deprecatedServiceComment,
+		deprecatedComment,
 		hasComments,
 		noHTML,
 		noMarkdownHeadings,
@@ -39,19 +38,23 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 // Returns true if this is a deprecated method, false otherwise.
-func isDeprecatedMethod(m *desc.MethodDescriptor) bool {
-	if m.GetMethodOptions() == nil {
+func isDeprecated(d desc.Descriptor) bool {
+	switch d.(type) {
+	case *desc.MethodDescriptor:
+		m := d.(*desc.MethodDescriptor)
+		if m.GetMethodOptions() == nil {
+			return false
+		}
+		return *m.GetMethodOptions().Deprecated
+	case *desc.ServiceDescriptor:
+		s := d.(*desc.ServiceDescriptor)
+		if s.GetServiceOptions() == nil {
+			return false
+		}
+		return *s.GetServiceOptions().Deprecated
+	default:
 		return false
 	}
-	return *m.GetMethodOptions().Deprecated
-}
-
-// Returns true if this is a deprecated service, false otherwise.
-func isDeprecatedService(s *desc.ServiceDescriptor) bool {
-	if s.GetServiceOptions() == nil {
-		return false
-	}
-	return *s.GetServiceOptions().Deprecated
 }
 
 func separateInternalComments(comments ...string) struct {

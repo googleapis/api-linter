@@ -21,6 +21,28 @@ import (
 )
 
 // These are split up since templating doesn't play nicely with inserting protobuf options.
+func TestValidDescriptor(t *testing.T) {
+	file := testutils.ParseProto3String(t, `
+    // A library service.
+    service Library {
+      // Retrieves a book.
+      rpc GetBook(GetBookRequest) returns (Book);
+    }
+    message GetBookRequest {}
+    message Book {}
+  `)
+
+	serviceProblems := testutils.Problems{}
+	if diff := serviceProblems.Diff(deprecatedComment.Lint(file)); diff != "" {
+		t.Error(diff)
+	}
+
+	methodProblems := testutils.Problems{}
+	if diff := methodProblems.Diff(deprecatedComment.Lint(file)); diff != "" {
+		t.Error(diff)
+	}
+}
+
 func TestDeprecatedMethod(t *testing.T) {
 	tests := []struct {
 		testName      string
@@ -28,7 +50,7 @@ func TestDeprecatedMethod(t *testing.T) {
 		problems      testutils.Problems
 	}{
 		{"ValidMethodDeprecated", "// Deprecated: Don't use this.\n// Method comment.", nil},
-		{"InvalidMethodDeprecated", "// Method comment.", testutils.Problems{{Message: "Deprecated methods"}}},
+		{"InvalidMethodDeprecated", "// Method comment.", testutils.Problems{{Message: `Use "Deprecated: <reason>"`}}},
 	}
 
 	for _, test := range tests {
@@ -45,9 +67,9 @@ func TestDeprecatedMethod(t *testing.T) {
         message Book {}
       `, test)
 
-			problems := deprecatedMethodComment.Lint(file)
+			problems := deprecatedComment.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -60,7 +82,7 @@ func TestDeprecatedService(t *testing.T) {
 		problems       testutils.Problems
 	}{
 		{"ValidServiceDeprecated", "// Deprecated: Don't use this.\n// Service comment.", nil},
-		{"InvalidServiceDeprecated", "// Service comment.", testutils.Problems{{Message: "Deprecated services"}}},
+		{"InvalidServiceDeprecated", "// Service comment.", testutils.Problems{{Message: `Use "Deprecated: <reason>"`}}},
 	}
 
 	for _, test := range tests {
@@ -75,9 +97,9 @@ func TestDeprecatedService(t *testing.T) {
         message Book {}
       `, test)
 
-			problems := deprecatedServiceComment.Lint(file)
+			problems := deprecatedComment.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetServices()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

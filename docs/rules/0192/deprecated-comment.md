@@ -1,21 +1,23 @@
---------------------------------------------------------------------------------
+---
+rule:
+  aip: 192
+  name: [core, '0192', deprecated-comment]
+  summary: Deprecated methods must have a corresponding comment.
+permalink: /192/deprecated-comment
+redirect_from:
+  - /0192/deprecated-comment
+---
 
-rule: aip: 192 name: [core, '0192', deprecated-method-comment] summary:
-Deprecated methods must have a corresponding comment. permalink:
-/192/deprecated-method-comment redirect_from:
+# Deprecated comments
 
-## - /0192/deprecated-method-comment
-
-# Omnipresent comments
-
-This rule enforces that every RPC marked with the protobuf `deprecated`option
+This rule enforces that every RPC marked with the protobuf `deprecated` option
 has `"Deprecated: <reason>"` as the first line in the public leading comment, as
 mandated in [AIP-192][].
 
 ## Details
 
 This rule looks at each method descriptor in each proto file, and complains if
-the protobuf `deprecated` option is set, but the first line of the public
+the protobuf `deprecated` option is set to `true`, but the first line of the public
 comment does not begin with "Deprecated: ".
 
 ## Examples
@@ -53,11 +55,15 @@ If you need to violate this rule, use a leading comment above the descriptor.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// A representation of a book.
-message Book {
-  // (-- api-linter: core::0192::deprecated-method-comment=disabled
+// A library service.
+service Library {
+  // (-- api-linter: core::0192::deprecated-comment=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1;
+  // Incorrect.
+  // Retrieves a book.
+  rpc GetBook(GetBookRequest) returns (Book) {
+    option deprecated = true;
+  }
 }
 ```
 
