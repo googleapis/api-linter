@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules adds all of the AIP-192 rules to the provided registry.
@@ -26,6 +27,8 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		192,
 		absoluteLinks,
+		deprecatedMethodComment,
+		deprecatedServiceComment,
 		hasComments,
 		noHTML,
 		noMarkdownHeadings,
@@ -33,6 +36,22 @@ func AddRules(r lint.RuleRegistry) error {
 		onlyLeadingComments,
 		trademarkedNames,
 	)
+}
+
+// Returns true if this is a deprecated method, false otherwise.
+func isDeprecatedMethod(m *desc.MethodDescriptor) bool {
+	if m.GetMethodOptions() == nil {
+		return false
+	}
+	return *m.GetMethodOptions().Deprecated
+}
+
+// Returns true if this is a deprecated service, false otherwise.
+func isDeprecatedService(s *desc.ServiceDescriptor) bool {
+	if s.GetServiceOptions() == nil {
+		return false
+	}
+	return *s.GetServiceOptions().Deprecated
 }
 
 func separateInternalComments(comments ...string) struct {
