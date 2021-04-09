@@ -37,7 +37,7 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-// Returns true if this is a deprecated method, false otherwise.
+// Returns true if this is a deprecated method or service, false otherwise.
 func isDeprecated(d desc.Descriptor) bool {
 	switch d.(type) {
 	case *desc.MethodDescriptor:

@@ -30,7 +30,7 @@ var deprecatedComment = &lint.DescriptorRule{
 			return nil
 		}
 		return []lint.Problem{{
-			Message:    `Use "Deprecated: <reason>" as the first line in the  comment.`,
+			Message:    `Use "Deprecated: <reason>" as the first line in the comment.`,
 			Descriptor: d,
 		}}
 	},
