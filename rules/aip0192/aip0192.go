@@ -45,13 +45,13 @@ func isDeprecated(d desc.Descriptor) bool {
 		if m.GetMethodOptions() == nil {
 			return false
 		}
-		return *m.GetMethodOptions().Deprecated
+		return m.GetMethodOptions().GetDeprecated()
 	case *desc.ServiceDescriptor:
 		s := d.(*desc.ServiceDescriptor)
 		if s.GetServiceOptions() == nil {
 			return false
 		}
-		return *s.GetServiceOptions().Deprecated
+		return s.GetServiceOptions().GetDeprecated()
 	default:
 		return false
 	}
