@@ -39,19 +39,11 @@ func AddRules(r lint.RuleRegistry) error {
 
 // Returns true if this is a deprecated method or service, false otherwise.
 func isDeprecated(d desc.Descriptor) bool {
-	switch d.(type) {
+	switch d := d.(type) {
 	case *desc.MethodDescriptor:
-		m := d.(*desc.MethodDescriptor)
-		if m.GetMethodOptions() == nil {
-			return false
-		}
-		return m.GetMethodOptions().GetDeprecated()
+		return d.GetMethodOptions().GetDeprecated()
 	case *desc.ServiceDescriptor:
-		s := d.(*desc.ServiceDescriptor)
-		if s.GetServiceOptions() == nil {
-			return false
-		}
-		return s.GetServiceOptions().GetDeprecated()
+		return d.GetServiceOptions().GetDeprecated()
 	default:
 		return false
 	}
