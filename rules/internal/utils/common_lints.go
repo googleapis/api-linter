@@ -169,14 +169,26 @@ func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem 
 // LintHTTPURIHasParentVariable returns a problem if any of the given method's HTTP rules do not
 // have a parent variable in the URI.
 func LintHTTPURIHasParentVariable(m *desc.MethodDescriptor) []lint.Problem {
+	return LintHTTPURIHasVariable(m, "parent")
+}
+
+// LintHTTPURIHasVariable returns a problem if any of the given method's HTTP rules do not
+// have the given variable in the URI.
+func LintHTTPURIHasVariable(m *desc.MethodDescriptor, v string) []lint.Problem {
 	for _, httpRule := range GetHTTPRules(m) {
-		if _, ok := httpRule.GetVariables()["parent"]; !ok {
+		if _, ok := httpRule.GetVariables()[v]; !ok {
 			return []lint.Problem{{
-				Message:    "HTTP URI should include a `parent` variable.",
+				Message:    fmt.Sprintf("HTTP URI should include a `%s` variable.", v),
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
 	}
 	return nil
+}
+
+// LintHTTPURIHasNameVariable returns a problem if any of the given method's HTTP rules do not
+// have a name variable in the URI.
+func LintHTTPURIHasNameVariable(m *desc.MethodDescriptor) []lint.Problem {
+	return LintHTTPURIHasVariable(m, "name")
 }

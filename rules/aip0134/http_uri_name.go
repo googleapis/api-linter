@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
@@ -31,18 +30,6 @@ var httpNameField = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		want := fmt.Sprintf("%s.name", fieldName)
-
-		// Establish that the RPC has expected HTTP pattern.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if _, ok := httpRule.GetVariables()[want]; !ok {
-				return []lint.Problem{{
-					Message:    fmt.Sprintf("Update methods should include the `%s` field in the URI.", want),
-					Descriptor: m,
-					Location:   locations.MethodHTTPRule(m),
-				}}
-			}
-		}
-
-		return nil
+		return utils.LintHTTPURIHasVariable(m, want)
 	},
 }
