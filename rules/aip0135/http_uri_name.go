@@ -16,27 +16,12 @@ package aip0135
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // Delete methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
-	Name:   lint.NewRuleName(135, "http-uri-name"),
-	OnlyIf: isDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Establish that the RPC has no HTTP body.
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if _, ok := httpRule.GetVariables()["name"]; !ok {
-				return []lint.Problem{{
-					Message:    "Delete methods should include the `name` field in the URI.",
-					Descriptor: m,
-					Location:   locations.MethodHTTPRule(m),
-				}}
-			}
-		}
-
-		return nil
-	},
+	Name:       lint.NewRuleName(135, "http-uri-name"),
+	OnlyIf:     isDeleteMethod,
+	LintMethod: utils.LintHTTPURIHasNameVariable,
 }

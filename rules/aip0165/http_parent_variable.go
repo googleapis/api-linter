@@ -16,7 +16,6 @@ package aip0165
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -27,17 +26,5 @@ var httpParentVariable = &lint.MethodRule{
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		return isPurgeMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		for _, httpRule := range utils.GetHTTPRules(m) {
-			if _, ok := httpRule.GetVariables()["parent"]; !ok {
-				return []lint.Problem{{
-					Message:    "Purge methods should include the `parent` field in the URI.",
-					Descriptor: m,
-					Location:   locations.MethodHTTPRule(m),
-				}}
-			}
-		}
-
-		return nil
-	},
+	LintMethod: utils.LintHTTPURIHasParentVariable,
 }

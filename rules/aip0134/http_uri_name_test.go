@@ -30,15 +30,15 @@ func TestHttpNameField(t *testing.T) {
 		{"Valid", "/v1/{big_book.name=publishers/*/books/*}", "UpdateBigBook", nil},
 		{"ValidWithNumber", "/v1/{dv360.name=publishers/*/dv360s/*}", "UpdateDv360", nil},
 		{"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
-			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
+			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name`"}}},
 		{"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",
-			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
+			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name`"}}},
 		{"InvalidVarNameName", "/v1/{name=publishers/*/books/*}",
-			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
+			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name`"}}},
 		{"InvalidVarNameReversed", "/v1/{name.big_book=publishers/*/books/*}",
-			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
+			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name`"}}},
 		{"NoVarName", "/v1/publishers/*/books/*",
-			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name` field"}}},
+			"UpdateBigBook", testutils.Problems{{Message: "`big_book.name`"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}",
 			"AcquireBigBook", nil},
 	}
@@ -59,7 +59,7 @@ func TestHttpNameField(t *testing.T) {
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
