@@ -15,7 +15,7 @@ resolves to a response with a corresponding name, as mandated in [AIP-152][].
 
 ## Details
 
-This rule looks at any message beginning with `Run`, and complains if the
+This rule looks at any method beginning with `Run`, and complains if the
 response is not a long-running operation that resolves to a response matching
 the name of the method with a `Response` suffix.
 
