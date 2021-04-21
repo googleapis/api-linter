@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0165
+package aip0135
 
 import (
 	"github.com/googleapis/api-linter/lint"
@@ -20,11 +20,10 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Purge methods should have a parent variable in the URI unless the resource is top-level.
-var httpParentVariable = &lint.MethodRule{
-	Name: lint.NewRuleName(165, "http-parent-variable"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isPurgeMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
+var requestForceField = &lint.FieldRule{
+	Name: lint.NewRuleName(135, "request-force-field"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return isDeleteRequestMessage(f.GetOwner()) && f.GetName() == "force"
 	},
-	LintMethod: utils.LintHTTPURIHasParentVariable,
+	LintField: utils.LintSingularBoolField,
 }

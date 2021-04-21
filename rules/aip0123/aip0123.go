@@ -33,6 +33,7 @@ func AddRules(r lint.RuleRegistry) error {
 		123,
 		duplicateResource,
 		resourceAnnotation,
+		resourceNameField,
 		resourcePattern,
 		resourceReferenceType,
 		resourceVariables,
