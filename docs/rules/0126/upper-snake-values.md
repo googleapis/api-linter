@@ -11,7 +11,7 @@ redirect_from:
 # Upper snake case values
 
 This rule enforces that all enum values be in upper snake case, as mandated in
-[AIP-126](http://aip.dev/126).
+[AIP-126][].
 
 ## Details
 
@@ -55,3 +55,5 @@ enum Format {
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
+
+[aip-126]: https://aip.dev/126

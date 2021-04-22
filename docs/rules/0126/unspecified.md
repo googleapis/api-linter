@@ -11,7 +11,7 @@ redirect_from:
 # Enum unspecified value
 
 This rule enforces that all enums have a default unspecified value, as mandated
-in [AIP-126](http://aip.dev/126).
+in [AIP-126][].
 
 Because our APIs create automatically-generated client libraries, we need to
 consider languages that have varying behavior around default values. To avoid
@@ -69,4 +69,5 @@ enum Format {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-126]: https://aip.dev/126
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

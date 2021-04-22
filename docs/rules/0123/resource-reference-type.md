@@ -65,4 +65,4 @@ message Book {
 
 Do not violate this rule; it will break several tools.
 
-[aip-123]: http://aip.dev/123
+[aip-123]: https://aip.dev/123
