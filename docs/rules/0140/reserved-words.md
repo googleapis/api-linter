@@ -64,7 +64,7 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 <!-- prettier-ignore-start -->
-[aip-136]: https://aip.dev/136
+[aip-140]: https://aip.dev/140
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
 [the code]: https://github.com/googleapis/api-linter/blob/main/rules/aip0140/reserved_words.go
 <!-- prettier-ignore-end -->

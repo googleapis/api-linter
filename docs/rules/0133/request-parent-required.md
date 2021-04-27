@@ -11,7 +11,7 @@ redirect_from:
 # Create methods: Parent field
 
 This rule enforces that all `Create` standard methods have a `string parent`
-field in the request message, as mandated in [AIP-133](http://aip.dev/133).
+field in the request message, as mandated in [AIP-133][].
 
 ## Details
 
@@ -61,4 +61,5 @@ message CreateBookRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-133]: https://aip.dev/133
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

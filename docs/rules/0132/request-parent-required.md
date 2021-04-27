@@ -11,7 +11,7 @@ redirect_from:
 # List methods: Parent field
 
 This rule enforces that all `List` standard methods have a `string parent`
-field in the request message, as mandated in [AIP-132](http://aip.dev/132).
+field in the request message, as mandated in [AIP-132][].
 
 ## Details
 
@@ -61,4 +61,5 @@ message ListBooksRequest {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
+[aip-132]: https://aip.dev/132
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
