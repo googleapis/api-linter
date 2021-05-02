@@ -18,6 +18,10 @@ machine-readable annotation, as mandated by [AIP-203][].
 This rule looks at any field with "required" (or similar forms) in the comment,
 and complains if it does not have a `google.api.field_behavior` annotation.
 
+**Note:** if a field is conditionally required (i.e. it is only required if
+another field is set), the phrases 'Required if' or 'Required when' in the
+comment will disable this rule.
+
 ## Examples
 
 **Incorrect** code for this rule:
@@ -52,6 +56,18 @@ message Book {
 
   // The title of the book.
   string title = 2 [(google.api.field_behavior) = REQUIRED];
+}
+```
+
+Conditionally required fields do not need to be annotated.
+
+```proto
+// Correct.
+message Book {
+  string name = 1;
+
+  // The title of the book. Required if the book has been published.
+  string title = 2;
 }
 ```
 
