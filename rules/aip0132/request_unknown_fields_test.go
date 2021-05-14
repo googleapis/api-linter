@@ -40,6 +40,7 @@ func TestUnknownFields(t *testing.T) {
 	}{
 		{"PageSize", "ListBooksRequest", "page_size", builder.FieldTypeInt32(), testutils.Problems{}},
 		{"PageToken", "ListBooksRequest", "page_token", builder.FieldTypeString(), testutils.Problems{}},
+		{"Skip", "ListBooksRequest", "skip", builder.FieldTypeInt32(), testutils.Problems{}},
 		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), testutils.Problems{}},
 		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
 		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), testutils.Problems{}},

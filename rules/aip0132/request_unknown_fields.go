@@ -24,6 +24,7 @@ var allowedFields = stringset.New(
 	"parent",       // AIP-132
 	"page_size",    // AIP-158
 	"page_token",   // AIP-158
+	"skip",         // AIP-158
 	"filter",       // AIP-132
 	"order_by",     // AIP-132
 	"show_deleted", // AIP-135
