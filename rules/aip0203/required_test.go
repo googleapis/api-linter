@@ -43,6 +43,47 @@ func TestRequired(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "Valid-Required-if",
+			comment:  "Required if other condition",
+			field:    title,
+			problems: nil,
+		},
+		{
+			name:     "Valid-Required-when",
+			comment:  "Only required when other condition",
+			field:    title,
+			problems: nil,
+		},
+		{
+			name:     "Valid-Required-if-whitespace",
+			comment:  "Required   if other condition",
+			field:    title,
+			problems: nil,
+		},
+		{
+			name:     "Valid-Required-if-free-text",
+			comment:  "Only required if other condition",
+			field:    title,
+			problems: nil,
+		},
+		{
+			name:    "Valid-Required-starts-with-if",
+			comment: "Required iframe name",
+			field:   title,
+			problems: testutils.Problems{{
+				Message: "google.api.field_behavior",
+			}},
+		},
+		{
+			// Note this explicitly adds a comment marker on the second line in order
+			// to leverage the existing test setup.
+			name: "Valid-Required-if-multiline",
+			comment: `This field is only required
+		            // if condition is true`,
+			field:    title,
+			problems: nil,
+		},
+		{
 			name:    "Invalid-required",
 			comment: "required",
 			field:   title,
