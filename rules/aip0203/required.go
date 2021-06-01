@@ -23,7 +23,10 @@ import (
 var required = &lint.FieldRule{
 	Name:      lint.NewRuleName(203, "required"),
 	OnlyIf:    withoutFieldBehavior,
-	LintField: checkLeadingComments(requiredRegexp, "REQUIRED", optionalRegexp),
+	LintField: checkLeadingComments(requiredRegexp, "REQUIRED", optionalRegexp, conditionallyRequiredRegexp),
 }
 
 var requiredRegexp = regexp.MustCompile("(?i).*required.*")
+
+// 'Conditionally required' fields (denoted by 'required if/when') do not require an annotation.
+var conditionallyRequiredRegexp = regexp.MustCompile(`(?i).*required\s+(when|if)\s.*`)
