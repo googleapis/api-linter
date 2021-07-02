@@ -22,7 +22,7 @@ var requestShowDeletedRequired = &lint.MessageRule{
 		// from the corresponding response message.
 		plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "List")
 		if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("List%sResponse", plural)); resp != nil {
-			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
+			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil && paged.GetMessageType() != nil {
 				singular := paged.GetMessageType().GetName()
 				return utils.FindMethod(m.GetFile(), "Undelete"+singular) != nil
 			}
