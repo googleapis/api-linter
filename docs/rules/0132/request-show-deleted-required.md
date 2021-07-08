@@ -2,8 +2,9 @@
 rule:
   aip: 132
   name: [core, '0132', request-show-deleted-required]
-  summary: List requests must have a `show-deleted` field for resources
-  supporting soft delete.
+  summary: |
+    List requests must have a `show-deleted` field for resources
+    supporting soft delete.
 permalink: /132/request-show-deleted-required
 redirect_from:
   - /0132/request-show-deleted-required
