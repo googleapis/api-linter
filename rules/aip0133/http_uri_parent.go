@@ -21,10 +21,19 @@ import (
 )
 
 // Create methods should have a parent variable if the resource isn't top-level.
+// This should be the only variable in the URI path.
 var httpURIParent = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-parent"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		return isCreateMethod(m) && !hasNoParent(m.GetOutputType())
 	},
-	LintMethod: utils.LintHTTPURIHasParentVariable,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		if problems := utils.LintHTTPURIHasParentVariable(m); problems != nil {
+			return problems
+		}
+		if problems := utils.LintHTTPURIVariableCount(m, 1); problems != nil {
+			return problems
+		}
+		return nil
+	},
 }

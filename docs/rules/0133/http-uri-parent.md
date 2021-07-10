@@ -16,8 +16,8 @@ URI, as mandated in [AIP-133][].
 ## Details
 
 This rule looks at any message beginning with `Create`, and complains
-if the `parent` variable is not included in the URI. It _does_ check additional
-bindings if they are present.
+if `parent` is not the only variable in the URI path. It _does_ check
+additional bindings if they are present.
 
 ## Examples
 
@@ -29,6 +29,19 @@ rpc CreateBook(CreateBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/publishers/*/books"  // The `parent` field should be extracted.
     body: "book"
+  };
+}
+```
+
+**Incorrect** code for this rule:
+
+```proto
+// Incorrect.
+rpc CreateBook(CreateBookRequest) returns (Book) {
+  option (google.api.http) = {
+    // The only variable should be `parent`.
+    post: "/v1/{parent=publishers/*}/{book=books/*}"
+    body: "*"
   };
 }
 ```

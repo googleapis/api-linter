@@ -32,6 +32,7 @@ func TestHTTPURIParent(t *testing.T) {
 		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
 		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
 		{"NoParent", "/v1/books/*", "CreateBook", "books/{book}", nil},
+		{"MultipleVars", "/v1/{parent=publishers/*}/{book=books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "1 variable"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "publishers/{publisher}/books/{book}", nil},
 	}
 

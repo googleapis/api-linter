@@ -187,6 +187,28 @@ func LintHTTPURIHasVariable(m *desc.MethodDescriptor, v string) []lint.Problem {
 	return nil
 }
 
+// LintHTTPURIVariableCount returns a problem if the given method's HTTP rules
+// do not contain the given number of variables in the URI.
+func LintHTTPURIVariableCount(m *desc.MethodDescriptor, n int) []lint.Problem {
+	varsText := "variables"
+	if n == 1 {
+		varsText = "variable"
+	}
+
+	varsCount := 0
+	for _, httpRule := range GetHTTPRules(m) {
+		varsCount += len(httpRule.GetVariables())
+	}
+	if varsCount != n {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("HTTP URI should contain %d %s.", n, varsText),
+			Descriptor: m,
+			Location:   locations.MethodHTTPRule(m),
+		}}
+	}
+	return nil
+}
+
 // LintHTTPURIHasNameVariable returns a problem if any of the given method's HTTP rules do not
 // have a name variable in the URI.
 func LintHTTPURIHasNameVariable(m *desc.MethodDescriptor) []lint.Problem {
