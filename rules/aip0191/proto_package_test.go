@@ -38,10 +38,10 @@ func TestProtoPkg(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			f, err := builder.NewFile(test.filename).SetPackageName(test.pkg).Build()
 			if err != nil {
-				t.Fatalf("Failed to build file.")
+				t.Fatalf("Failed to build file: %s", err)
 			}
 			if diff := test.problems.SetDescriptor(f).Diff(protoPkg.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
