@@ -61,4 +61,34 @@ func TestHTTPURIParent(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("AdditionalBinding", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/annotations.proto";
+			import "google/api/resource.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (Book) {
+					option (google.api.http) = {
+						post: "/v1/{parent=publishers/*}/books"
+						body: "book"
+						additional_bindings: {
+							post: "/v1/{parent=publishers/*/locations/*}/books"
+							body: "book"
+						}
+					};
+				}
+			}
+			message CreateBookRequest {}
+			message Book {
+				option (google.api.resource) = {
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+			}
+		`)
+		method := f.GetServices()[0].GetMethods()[0]
+		problems := testutils.Problems{}
+		if diff := problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
+			t.Error(diff)
+		}
+	})
 }

@@ -197,7 +197,7 @@ func LintHTTPURIVariableCount(m *desc.MethodDescriptor, n int) []lint.Problem {
 
 	varsCount := 0
 	for _, httpRule := range GetHTTPRules(m) {
-		varsCount += len(httpRule.GetVariables())
+		varsCount = max(varsCount, len(httpRule.GetVariables()))
 	}
 	if varsCount != n {
 		return []lint.Problem{{
@@ -213,4 +213,11 @@ func LintHTTPURIVariableCount(m *desc.MethodDescriptor, n int) []lint.Problem {
 // have a name variable in the URI.
 func LintHTTPURIHasNameVariable(m *desc.MethodDescriptor) []lint.Problem {
 	return LintHTTPURIHasVariable(m, "name")
+}
+
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
