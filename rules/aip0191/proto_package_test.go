@@ -29,7 +29,6 @@ func TestProtoPkg(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "google/example/library/v1/library.proto", "google.example.library.v1", testutils.Problems{}},
-		{"ValidSuffix", "other/parent/google/example/library/v1/library.proto", "google.example.library.v1", testutils.Problems{}},
 		{"InvalidPackage", "google/example/library/v1/library.proto", "google.library.v1", testutils.Problems{{Message: "directory structure"}}},
 		{"InvalidDirectory", "google/v1/library.proto", "google.example.library.v1", testutils.Problems{{Message: "directory structure"}}},
 		{"IgnoreRootDirectory", "library.proto", "google.example.library.v1", testutils.Problems{}},
