@@ -31,6 +31,7 @@ var requestUnknownFields = &lint.FieldRule{
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
+			"allow_missing", // AIP-134
 			"parent",        // AIP-234
 			"request_id",    // AIP-155
 			"requests",      // AIP-234

@@ -18,6 +18,7 @@ fields, as mandated in [AIP-234][].
 This rule looks at any message matching `BatchUpdate*Request` and complains if it comes
 across any fields other than:
 
+- `bool allow_missing` ([AIP-134][])
 - `string parent` ([AIP-234][])
 - `string request_id` ([AIP-155][])
 - `repeated Update*Request requests` ([AIP-234][])

@@ -27,6 +27,7 @@ func TestRequestUnknownFields(t *testing.T) {
 		FieldName   string
 		problems    testutils.Problems
 	}{
+		{"Valid-AllowMissing", "BatchUpdateBooks", "allow_missing", testutils.Problems{}},
 		{"Valid-Parent", "BatchUpdateBooks", "parent", testutils.Problems{}},
 		{"Valid-RequestID", "BatchCreateBooks", "request_id", testutils.Problems{}},
 		{"Valid-Requests", "BatchUpdateBooks", "requests", testutils.Problems{}},
