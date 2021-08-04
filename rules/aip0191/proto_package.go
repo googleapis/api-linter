@@ -30,7 +30,7 @@ var protoPkg = &lint.FileRule{
 		dir := filepath.Dir(f.GetName())
 		pkg := strings.ReplaceAll(f.GetPackage(), ".", "/")
 
-		if dir != "." && !strings.HasSuffix(dir, pkg) {
+		if dir != "." && dir != pkg {
 			return []lint.Problem{{
 				Message:    "Proto package and directory structure mismatch: The proto package must match the proto directory structure.",
 				Descriptor: f,
