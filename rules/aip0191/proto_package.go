@@ -28,7 +28,7 @@ var protoPkg = &lint.FileRule{
 	Name: lint.NewRuleName(191, "proto-package"),
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		dir := filepath.Dir(f.GetName())
-		pkg := strings.ReplaceAll(f.GetPackage(), ".", "/")
+		pkg := strings.ReplaceAll(f.GetPackage(), ".", string(filepath.Separator))
 
 		if dir != "." && dir != pkg {
 			return []lint.Problem{{
