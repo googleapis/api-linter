@@ -57,6 +57,20 @@ func LintSingularBoolField(f *desc.FieldDescriptor) []lint.Problem {
 	return lintSingularField(f, builder.FieldTypeBool(), "bool")
 }
 
+// LintFieldMask returns a problem if the field is not a singular google.protobuf.FieldMask.
+func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
+	const want = "google.protobuf.FieldMask"
+	if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != want || f.IsRepeated() {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("The `%s` field should be a singular %s.", f.GetName(), want),
+			Suggestion: want,
+			Descriptor: f,
+			Location:   locations.FieldType(f),
+		}}
+	}
+	return nil
+}
+
 // LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.
 func LintFieldPresentAndSingularString(field string) func(*desc.MessageDescriptor) []lint.Problem {
 	return func(m *desc.MessageDescriptor) []lint.Problem {
