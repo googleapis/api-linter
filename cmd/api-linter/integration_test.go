@@ -17,7 +17,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -199,11 +198,7 @@ func runLinter(t *testing.T, protoContent, configContent string) string {
 }
 
 func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string, appendArgs []string) (bool, string) {
-	tempDir, err := ioutil.TempDir("", "test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	// Prepare command line flags.
 	args := []string{}
@@ -238,7 +233,7 @@ func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string
 		t.Fatal(lintErr)
 	}
 
-	out, err := ioutil.ReadFile(outPath)
+	out, err := os.ReadFile(outPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -253,5 +248,5 @@ func writeFile(path, content string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(path, []byte(content), 0644)
+	return os.WriteFile(path, []byte(content), 0644)
 }

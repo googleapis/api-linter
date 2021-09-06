@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
@@ -237,7 +236,7 @@ func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, 
 }
 
 func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
-	in, err := ioutil.ReadFile(filePath)
+	in, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}

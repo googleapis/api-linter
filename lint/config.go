@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,7 +64,7 @@ func ReadConfigsFromFile(path string) (Configs, error) {
 
 // ReadConfigsJSON reads Configs from a JSON file.
 func ReadConfigsJSON(f io.Reader) (Configs, error) {
-	b, err := ioutil.ReadAll(f)
+	b, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +77,7 @@ func ReadConfigsJSON(f io.Reader) (Configs, error) {
 
 // ReadConfigsYAML reads Configs from a JSON file.
 func ReadConfigsYAML(f io.Reader) (Configs, error) {
-	b, err := ioutil.ReadAll(f)
+	b, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
