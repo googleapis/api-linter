@@ -19,6 +19,7 @@ import (
 	"regexp"
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
@@ -29,9 +30,10 @@ var unspecified = &lint.EnumRule{
 	Name: lint.NewRuleName(126, "unspecified"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		name := endNum.ReplaceAllString(e.GetName(), "${1}_${2}")
-		want := strings.ToUpper(strcase.SnakeCase(name) + "_UNSPECIFIED")
+		unspec := strings.ToUpper(strcase.SnakeCase(name) + "_UNSPECIFIED")
+		allowed := stringset.New(unspec, "UNKNOWN")
 		for _, element := range e.GetValues() {
-			if element.GetName() == want && element.GetNumber() == 0 {
+			if allowed.Contains(element.GetName()) && element.GetNumber() == 0 {
 				return nil
 			}
 		}
@@ -39,8 +41,8 @@ var unspecified = &lint.EnumRule{
 		// We did not find the enum value we wanted; complain.
 		firstValue := e.GetValues()[0]
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The first enum value should be %q", want),
-			Suggestion: want,
+			Message:    fmt.Sprintf("The first enum value should be %q", unspec),
+			Suggestion: unspec,
 			Descriptor: firstValue,
 			Location:   locations.DescriptorName(firstValue),
 		}}
