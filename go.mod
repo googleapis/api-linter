@@ -8,7 +8,7 @@ require (
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.6
-	github.com/jhump/protoreflect v1.10.0
+	github.com/jhump/protoreflect v1.10.1
 	github.com/lithammer/dedent v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.5
