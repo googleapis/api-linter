@@ -35,6 +35,9 @@ func newCommit(line string) *commit {
 			breaking = true
 			cat = strings.TrimSuffix(cat, "!")
 		}
+		if scope := strings.Index(cat, "("); scope != -1 {
+			cat = cat[:scope]
+		}
 		msg = strings.TrimSpace(lineSplit[1])
 	} else {
 		cat = "unknown"
