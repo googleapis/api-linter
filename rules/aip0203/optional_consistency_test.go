@@ -70,6 +70,22 @@ string author = 4;`,
 				Message: "Within a single message, either all optional fields should be indicated, or none of them should be.",
 			}},
 		},
+		{
+			name: "Valid-IgnoreOneofFields",
+			field: `
+string name = 1 [
+	(google.api.field_behavior) = IMMUTABLE,
+	(google.api.field_behavior) = OUTPUT_ONLY];
+
+string title = 2 [(google.api.field_behavior) = REQUIRED];
+
+string summary = 3 [(google.api.field_behavior) = OPTIONAL];
+
+oneof other {
+	string author = 4;	
+}`,
+			problems: nil,
+		},
 	}
 
 	for _, test := range testCases {
