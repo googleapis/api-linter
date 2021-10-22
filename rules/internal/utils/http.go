@@ -108,5 +108,5 @@ func (h *HTTPRule) GetPlainURI() string {
 	return plainVar.ReplaceAllString(varSegment.ReplaceAllString(h.URI, "$2"), "*")
 }
 
-var plainVar = regexp.MustCompile(`\{([^}=]+)}`)
+var plainVar = regexp.MustCompile(`\{([^$}=]+)}`)
 var varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)

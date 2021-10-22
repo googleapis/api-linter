@@ -136,6 +136,7 @@ func TestGetVariables(t *testing.T) {
 		{"KeyOnly", "/v1/publishers/{pub_id}/books/{book_id}", map[string]string{"pub_id": "*", "book_id": "*"}},
 		{"KeyValue", "/v1/{name=publishers/*/books/*}", map[string]string{"name": "publishers/*/books/*"}},
 		{"MultiKeyValue", "/v1/{publisher=publishers/*}/{book=books/*}", map[string]string{"publisher": "publishers/*", "book": "books/*"}},
+		{"IgnoreVersioningVariable", "/{$api_version}/{name=publishers/*/books/*}", map[string]string{"name": "publishers/*/books/*"}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
