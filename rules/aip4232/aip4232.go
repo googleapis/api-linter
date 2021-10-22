@@ -27,6 +27,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		4232,
 		repeatedFields,
+		requiredFields,
 	)
 }
 
