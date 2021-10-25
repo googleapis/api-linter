@@ -6,7 +6,7 @@ rule:
 permalink: /4232/required-fields
 ---
 
-# Method Signature: Repeated fields
+# Method Signature: Required fields
 
 This rule enforces that all `google.api.method_signature` annotations contain
 all top-level request message fields that are annotated with `REQUIRED`, as 
@@ -31,7 +31,7 @@ rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
   };
   // The field "names" is annotated with REQUIRED and is missing from the
   // method_signature.
-  option (google.api.method_signature) = "parent"
+  option (google.api.method_signature) = "parent";
 }
 ```
 
@@ -44,7 +44,7 @@ rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
     post: "/v1/{parent=publishers/*}/books:batchDelete"
     body: "*"
   };
-  option (google.api.method_signature) = "parent,names"
+  option (google.api.method_signature) = "parent,names";
 }
 ```
 
@@ -61,7 +61,7 @@ rpc BatchDeleteBooks(BatchDeleteBooksRequest) returns (google.protobuf.Empty) {
     post: "/v1/{parent=publishers/*}/books:batchDelete"
     body: "*"
   };
-  option (google.api.method_signature) = "parent"
+  option (google.api.method_signature) = "parent";
 }
 ```
 
