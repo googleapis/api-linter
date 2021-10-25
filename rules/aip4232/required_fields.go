@@ -20,6 +20,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -39,12 +40,13 @@ var requiredFields = &lint.MethodRule{
 				requiredFields = append(requiredFields, f.GetName())
 			}
 		}
-		for _, sig := range sigs {
+		for i, sig := range sigs {
 			sigset := stringset.New(sig...)
 			if !sigset.Contains(requiredFields...) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Method signature %q missing at least one of the required fields: %q", strings.Join(sig, ","), strings.Join(requiredFields, ",")),
 					Descriptor: m,
+					Location:   locations.MethodSignature(m, i),
 				})
 			}
 		}
