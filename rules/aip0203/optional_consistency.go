@@ -21,13 +21,13 @@ import (
 )
 
 // If a message has a field which is described as optional, ensure that every
-// optional field on the message has this indicator.
+// optional field on the message has this indicator. Oneof fields do not count.
 var optionalBehaviorConsistency = &lint.MessageRule{
 	Name:   lint.NewRuleName(203, "optional-consistency"),
 	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		for _, f := range m.GetFields() {
-			if utils.GetFieldBehavior(f).Len() == 0 {
+			if utils.GetFieldBehavior(f).Len() == 0 && f.GetOneOf() == nil {
 				problems = append(problems, lint.Problem{
 					Message:    "Within a single message, either all optional fields should be indicated, or none of them should be.",
 					Descriptor: f,
