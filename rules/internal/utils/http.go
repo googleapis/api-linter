@@ -94,10 +94,13 @@ type HTTPRule struct {
 // GetVariables returns the variable segments in a URI as a map.
 func (h *HTTPRule) GetVariables() map[string]string {
 	vars := map[string]string{}
-	for _, match := range plainVar.FindAllStringSubmatch(h.URI, -1) {
+
+	// Replace the version template variable with "v".
+	uri := templateSegment.ReplaceAllString(h.URI, "v")
+	for _, match := range plainVar.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = "*"
 	}
-	for _, match := range varSegment.FindAllStringSubmatch(h.URI, -1) {
+	for _, match := range varSegment.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = match[2]
 	}
 	return vars
@@ -105,8 +108,13 @@ func (h *HTTPRule) GetVariables() map[string]string {
 
 // GetPlainURI returns the URI with variable segment information removed.
 func (h *HTTPRule) GetPlainURI() string {
-	return plainVar.ReplaceAllString(varSegment.ReplaceAllString(h.URI, "$2"), "*")
+	return plainVar.ReplaceAllString(
+		varSegment.ReplaceAllString(
+			templateSegment.ReplaceAllString(h.URI, "v"),
+			"$2"),
+		"*")
 }
 
-var plainVar = regexp.MustCompile(`\{([^$}=]+)}`)
+var plainVar = regexp.MustCompile(`\{([^}=]+)}`)
 var varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+var templateSegment = regexp.MustCompile(`\{\$api_version\}`)

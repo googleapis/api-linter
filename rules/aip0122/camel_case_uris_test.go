@@ -33,6 +33,7 @@ func TestHttpUriField(t *testing.T) {
 		{"ValidSnakeVariable", "/v1/{book_name=publishers/*/books/*}:frob", testutils.Problems{}},
 		{"ValidSnakeSoloVariable", "/v1/{book_name}:frob", testutils.Problems{}},
 		{"InvalidCamelSoloVariable", "/v1/{bookName}:frob", testutils.Problems{{Message: "Variable names"}}},
+		{"ValidVersionTemplateVariable", "/{$api_version}/{book_name}:frob", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
