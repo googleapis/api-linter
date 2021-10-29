@@ -116,6 +116,7 @@ func TestGetPlainURI(t *testing.T) {
 		{"KeyOnly", "/v1/publishers/{pub_id}/books/{book_id}", "/v1/publishers/*/books/*"},
 		{"KeyValue", "/v1/{name=publishers/*/books/*}", "/v1/publishers/*/books/*"},
 		{"MultiKeyValue", "/v1/{publisher=publishers/*}/{book=books/*}", "/v1/publishers/*/books/*"},
+		{"TemplateVariableSegment", "/{$api_version}/publishers/{pub_id}/books/{book_id}", "/v/publishers/*/books/*"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
