@@ -170,7 +170,7 @@ func TestExitStatusForLintFailure(t *testing.T) {
 
 	// checks lint failure = false when no problems found
 	t.Run(failCase.testName+"ReturnsNoFailure", func(t *testing.T) {
-		disableAll := `[ { "disabled_rules": [ "core" ] } ]`
+		disableAll := `[ { "disabled_rules": [ "all" ] } ]`
 		lintFailureStatus, result := runLinterWithFailureStatus(t, failCase.proto, disableAll, []string{"--set-exit-status"})
 		if lintFailureStatus {
 			t.Log(result)
