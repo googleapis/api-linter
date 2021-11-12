@@ -117,3 +117,34 @@ func TestMethodSignature(t *testing.T) {
 		}
 	}
 }
+
+func TestMethodOption(t *testing.T) {
+	f := parse(t, `
+		service Library {
+		  rpc GetBook(GetBookRequest) returns (Book) {
+		    option deprecated = true;
+		  }
+		  rpc UpdateBook(UpdateBookRequest) returns (Book) {}
+		}
+		message GetBookRequest{}
+		message Book {}
+		message UpdateBookRequest {}
+	`)
+
+	for _, test := range []struct {
+		name      string
+		methodIdx int
+		want      []int32
+	}{
+		{"OptionSet", 0, []int32{4, 4, 29}},
+		{"OptionNotSet", 1, nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			// field number of the deprecated option == 33
+			loc := MethodOption(f.GetServices()[0].GetMethods()[test.methodIdx], 33)
+			if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
+				t.Errorf("Diff: %s", diff)
+			}
+		})
+	}
+}

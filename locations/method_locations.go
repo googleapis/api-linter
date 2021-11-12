@@ -34,17 +34,22 @@ func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 // MethodHTTPRule returns the precise location of the method's `google.api.http`
 // rule, if any.
 func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(m, 4, int(apb.E_Http.TypeDescriptor().Number())) // MethodDescriptor.options == 4
+	return MethodOption(m, int(apb.E_Http.TypeDescriptor().Number()))
 }
 
 // MethodOperationInfo returns the precise location of the method's
 // `google.longrunning.operation_info` annotation, if any.
 func MethodOperationInfo(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
-	return pathLocation(m, 4, int(lrpb.E_OperationInfo.TypeDescriptor().Number())) // MethodDescriptor.options == 4
+	return MethodOption(m, int(lrpb.E_OperationInfo.TypeDescriptor().Number()))
 }
 
 // MethodSignature returns the precise location of the method's
 // `google.api.method_signature` annotation, if any.
 func MethodSignature(m *desc.MethodDescriptor, index int) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 4, int(apb.E_MethodSignature.TypeDescriptor().Number()), index) // MethodDescriptor.options == 4
+}
+
+// MethodOption returns the precise location of the method's option with the given field number, if any.
+func MethodOption(m *desc.MethodDescriptor, fieldNumber int) *dpb.SourceCodeInfo_Location {
+	return pathLocation(m, 4, fieldNumber) // MethodDescriptor.options == 4
 }
