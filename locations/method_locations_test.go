@@ -124,11 +124,11 @@ func TestMethodOption(t *testing.T) {
 		  rpc GetBook(GetBookRequest) returns (Book) {
 		    option deprecated = true;
 		  }
-		  rpc WriteBook(NewBook) returns (Book) {}
+		  rpc UpdateBook(UpdateBookRequest) returns (Book) {}
 		}
 		message GetBookRequest{}
 		message Book {}
-		message NewBook {}
+		message UpdateBookRequest {}
 	`)
 
 	for _, test := range []struct {
@@ -140,7 +140,6 @@ func TestMethodOption(t *testing.T) {
 		{"OptionNotSet", 1, nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-
 			// field number of the deprecated option == 33
 			loc := MethodOption(f.GetServices()[0].GetMethods()[test.methodIdx], 33)
 			if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
