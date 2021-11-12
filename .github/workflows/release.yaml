@@ -3,6 +3,7 @@ name: release
 on:
   schedule:
     - cron: 0 20 * * 3 # Wednesdays at 20:00 UTC
+  workflow_dispatch: {} # Allow manual triggering
 jobs:
   inspect:
     runs-on: ubuntu-latest
