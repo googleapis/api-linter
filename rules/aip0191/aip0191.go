@@ -34,7 +34,7 @@ func AddRules(r lint.RuleRegistry) error {
 		javaOuterClassname,
 		javaPackage,
 		phpNamespace,
-		//protoPkg,
+		//protoPkg, //TODO: Shawn please make this not look at the path from Root.
 		rubyPackage,
 		syntax,
 	)
