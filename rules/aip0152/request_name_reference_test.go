@@ -25,7 +25,7 @@ func TestRequestNameReference(t *testing.T) {
 		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
 			message RunWriteBookJobRequest {
-				string name = 1 [(google.api.resource_reference) = {
+				string resource_name = 1 [(google.api.resource_reference) = {
 					type: "library.googleapis.com/Book"
 				}];
 			}
@@ -40,7 +40,7 @@ func TestRequestNameReference(t *testing.T) {
 			FieldName string
 			problems  testutils.Problems
 		}{
-			{"Error", "name", testutils.Problems{{Message: "google.api.resource_reference"}}},
+			{"Error", "resource_name", testutils.Problems{{Message: "google.api.resource_reference"}}},
 			{"Irrelevant", "something_else", nil},
 		} {
 			t.Run(test.name, func(t *testing.T) {

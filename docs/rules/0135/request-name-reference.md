@@ -3,7 +3,7 @@ rule:
   aip: 135
   name: [core, '0135', request-name-reference]
   summary: |
-    Delete RPCs should annotate the `name` field with `google.api.resource_reference`.
+    Delete RPCs should annotate the `resource_name` field with `google.api.resource_reference`.
 permalink: /135/request-name-reference
 redirect_from:
   - /0135/request-name-reference
@@ -12,12 +12,12 @@ redirect_from:
 # Delete methods: Resource reference
 
 This rule enforces that all `Delete` standard methods have
-`google.api.resource_reference` on their `string name` field, as mandated in
+`google.api.resource_reference` on their `string resource_name` field, as mandated in
 [AIP-135][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Delete*Request`
+This rule looks at the `resource_name` field of any message matching `Delete*Request`
 and complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -28,7 +28,7 @@ and complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message DeleteBookRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -37,7 +37,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -53,7 +53,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message DeleteBookRequest {
   // (-- api-linter: core::0135::request-name-reference=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 

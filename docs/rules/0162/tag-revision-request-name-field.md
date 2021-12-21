@@ -2,7 +2,7 @@
 rule:
   aip: 162
   name: [core, '0162', tag-revision-request-name-field]
-  summary: Tag Revision RPCs must have a `name` field in the request.
+  summary: Tag Revision RPCs must have a `resource_name` field in the request.
 permalink: /162/tag-revision-request-name-field
 redirect_from:
   - /0162/tag-revision-request-name-field
@@ -10,13 +10,13 @@ redirect_from:
 
 # Tag Revision requests: Name field
 
-This rule enforces that all Tag Revision methods have a `string name`
+This rule enforces that all Tag Revision methods have a `string resource_name`
 field in the request message, as mandated in [AIP-162][].
 
 ## Details
 
 This rule looks at any message matching `Tag*RevisionRequest` and complains if
-either the `name` field is missing or it has any type other than `string`.
+either the `resource_name` field is missing or it has any type other than `string`.
 
 ## Examples
 
@@ -34,7 +34,7 @@ message TagBookRevisionRequest {
 // Incorrect.
 message TagBookRevisionRequest {
   // Field type should be `string`.
-  bytes name = 1 [
+  bytes resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -48,7 +48,7 @@ message TagBookRevisionRequest {
 ```proto
 // Correct.
 message TagBookRevisionRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -60,7 +60,7 @@ message TagBookRevisionRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+the `resource_name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto

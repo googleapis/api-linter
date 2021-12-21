@@ -23,7 +23,7 @@ import (
 var commitRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "commit-request-name-behavior"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isCommitRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return isCommitRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: utils.LintRequiredField,
 }

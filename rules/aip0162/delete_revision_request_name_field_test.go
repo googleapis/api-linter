@@ -28,9 +28,9 @@ func TestDeleteRevisionRequestNameField(t *testing.T) {
 		Field    string
 		problems testutils.Problems
 	}{
-		{"Valid", "DeleteBookRevision", "string name = 1;", nil},
-		{"Missing", "DeleteBookRevision", "", testutils.Problems{{Message: "no `name`"}}},
-		{"InvalidType", "DeleteBookRevision", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"Valid", "DeleteBookRevision", "string resource_name = 1;", nil},
+		{"Missing", "DeleteBookRevision", "", testutils.Problems{{Message: "no `resource_name`"}}},
+		{"InvalidType", "DeleteBookRevision", "int32 resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

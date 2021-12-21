@@ -3,22 +3,22 @@ rule:
   aip: 162
   name: [core, '0162', commit-request-name-behavior]
   summary: |
-    Commit requests should annotate the `name` field with `google.api.field_behavior`.
+    Commit requests should annotate the `resource_name` field with `google.api.field_behavior`.
 permalink: /162/commit-request-name-behavior
 redirect_from:
   - /0162/commit-request-name-behavior
 ---
 
-# Commit requests: Name field behavior
+# Commit requests: Resource Name field behavior
 
 This rule enforces that all `Commit` requests have
-`google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
+`google.api.field_behavior` set to `REQUIRED` on their `string resource_name` field, as
 mandated in [AIP-162][].
 
 ## Details
 
 This rule looks at any message matching `Commit*Request` and complains if the
-`name` field does not have a `google.api.field_behavior` annotation with a
+`resource_name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -29,7 +29,7 @@ value of `REQUIRED`.
 // Incorrect.
 message CommitBookRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
 }
@@ -40,7 +40,7 @@ message CommitBookRequest {
 ```proto
 // Correct.
 message CommitBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -56,7 +56,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message CommitBookRequest {
   // (-- api-linter: core::0162::commit-request-name-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
 }

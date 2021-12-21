@@ -3,7 +3,7 @@ rule:
   aip: 152
   name: [core, '0152', request-name-behavior]
   summary: |
-    Run requests should annotate the `name` field with `google.api.field_behavior`.
+    Run requests should annotate the `resource_name` field with `google.api.field_behavior`.
 permalink: /152/request-name-behavior
 redirect_from:
   - /0152/request-name-behavior
@@ -12,13 +12,13 @@ redirect_from:
 # Run requests: Field behavior
 
 This rule enforces that all `Run` requests have
-`google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
+`google.api.field_behavior` set to `REQUIRED` on their `string resource_name` field, as
 mandated in [AIP-152][].
 
 ## Details
 
 This rule looks at any message matching `Run*JobRequest` and complains if the
-`name` field does not have a `google.api.field_behavior` annotation with a
+`resource_name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -29,7 +29,7 @@ value of `REQUIRED`.
 // Incorrect.
 message RunWriteBookJobRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string name = 1 [(google.api.resource_reference) = {
+  string resource_name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/WriteBookJob"
   }];
 }
@@ -41,7 +41,7 @@ message RunWriteBookJobRequest {
 // Correct.
 message RunWriteBookJobRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
       type: "library.googleapis.com/WriteBookJob"
@@ -58,7 +58,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message RunWriteBookJobRequest {
   // (-- api-linter: core::0152::request-name-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.resource_reference) = {
+  string resource_name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/WriteBookJob"
   }];
 }

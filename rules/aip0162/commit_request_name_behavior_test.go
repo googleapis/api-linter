@@ -28,9 +28,9 @@ func TestCommitRequestNameBehavior(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "CommitBook", "name", " [(google.api.field_behavior) = REQUIRED]", nil},
-		{"Missing", "CommitBook", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "CommitBook", "resource_name", " [(google.api.field_behavior) = REQUIRED]", nil},
+		{"Missing", "CommitBook", "resource_name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "CommitBook", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

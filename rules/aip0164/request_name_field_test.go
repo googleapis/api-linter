@@ -28,9 +28,9 @@ func TestRequestNameField(t *testing.T) {
 		Field       string
 		problems    testutils.Problems
 	}{
-		{"Valid", "UndeleteBookRequest", `string name = 1;`, nil},
+		{"Valid", "UndeleteBookRequest", `string resource_name = 1;`, nil},
 		{"InvalidMissing", "UndeleteBookRequest", "", testutils.Problems{{Message: "has no"}}},
-		{"InvalidType", "UndeleteBookRequest", "bytes name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidType", "UndeleteBookRequest", "bytes resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantMessage", "RemoveBookRequest", "", nil},
 	}
 

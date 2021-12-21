@@ -3,7 +3,7 @@ rule:
   aip: 131
   name: [core, '0131', request-name-reference]
   summary: |
-    Get RPCs should annotate the `name` field with `google.api.resource_reference`.
+    Get RPCs should annotate the `resource_name` field with `google.api.resource_reference`.
 permalink: /131/request-name-reference
 redirect_from:
   - /0131/request-name-reference
@@ -12,12 +12,12 @@ redirect_from:
 # Get methods: Resource reference
 
 This rule enforces that all `Get` standard methods have
-`google.api.resource_reference` on their `string name` field, as mandated in
+`google.api.resource_reference` on their `string resource_name` field, as mandated in
 [AIP-131][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Get*Request` and
+This rule looks at the `resource_name` field of any message matching `Get*Request` and
 complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -28,7 +28,7 @@ complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message GetBookRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -37,7 +37,7 @@ message GetBookRequest {
 ```proto
 // Correct.
 message GetBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];

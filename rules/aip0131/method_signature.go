@@ -35,17 +35,17 @@ var methodSignature = &lint.MethodRule{
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Get methods should include `(google.api.method_signature) = %q`",
-					"name",
+					"resource_name",
 				),
 				Descriptor: m,
 			}}
 		}
 
 		// Check if the signature is wrong.
-		if !reflect.DeepEqual(signatures[0], []string{"name"}) {
+		if !reflect.DeepEqual(signatures[0], []string{"resource_name"}) {
 			return []lint.Problem{{
-				Message:    `The method signature for Get methods should be "name".`,
-				Suggestion: `option (google.api.method_signature) = "name";`,
+				Message:    `The method signature for Get methods should be "resource_name".`,
+				Suggestion: `option (google.api.method_signature) = "resource_name";`,
 				Descriptor: m,
 				Location:   locations.MethodSignature(m, 0),
 			}}

@@ -28,11 +28,11 @@ file itself) and complains if _public_ comments include Markdown tables.
 //
 // Name     | Type
 // -------- | --------
-// `name`   | `string`
+// `resource_name`   | `string`
 // `author` | `string`
 message Book {
   // The resource name of the book.
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 
@@ -42,11 +42,11 @@ message Book {
 // Correct.
 // Fields on the book include:
 //
-// - `name`: `string`
+// - `resource_name`: `string`
 // - `author`: `string`
 message Book {
   // The resource name of the book.
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 
@@ -60,13 +60,13 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //
 // Name     | Type
 // -------- | --------
-// `name`   | `string`
+// `resource_name`   | `string`
 // `author` | `string`
 // (-- api-linter: core::0192::no-markdown-tables=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   // The resource name of the book.
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 

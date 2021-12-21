@@ -15,7 +15,7 @@ This rule enforces that singleton resources do not define `List`, `Create`, or
 
 ## Details
 
-This rule looks at any message with a `name` variable in the URI where the name
+This rule looks at any message with a `resource_name` variable in the URI where the resource_name
 ends in anything other than `*`. It assumes that this is a method operating on
 a singleton resource, and complains if the method is a `List`, `Create`, or
 `Delete` standard method.
@@ -28,13 +28,13 @@ a singleton resource, and complains if the method is a `List`, `Create`, or
 // Incorrect.
 rpc GetSettings(GetSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/settings}"
+    get: "/v1/{resource_name=publishers/*/settings}"
   };
 }
 
 rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    patch: "/v1/{settings.name=publishers/*/settings}"
+    patch: "/v1/{settings.resource_name=publishers/*/settings}"
     body: "settings"
   };
 }
@@ -43,7 +43,7 @@ rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
 // when the publisher is created.
 rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/settings}"
+    post: "/v1/{resource_name=publishers/*/settings}"
     body: "settings"
   };
 }
@@ -51,7 +51,7 @@ rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
 // This method should not exist. The settings should always implicitly exist.
 rpc DeleteSettings(DeleteSettingsRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/settings}"
+    delete: "/v1/{resource_name=publishers/*/settings}"
   };
 }
 ```
@@ -62,13 +62,13 @@ rpc DeleteSettings(DeleteSettingsRequest) returns (google.protobuf.Empty) {
 // Correct.
 rpc GetSettings(GetSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/settings}"
+    get: "/v1/{resource_name=publishers/*/settings}"
   };
 }
 
 rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    patch: "/v1/{settings.name=publishers/*/settings}"
+    patch: "/v1/{settings.resource_name=publishers/*/settings}"
     body: "settings"
   };
 }
@@ -82,13 +82,13 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 ```proto
 rpc GetSettings(GetSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/settings}"
+    get: "/v1/{resource_name=publishers/*/settings}"
   };
 }
 
 rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    patch: "/v1/{settings.name=publishers/*/settings}"
+    patch: "/v1/{settings.resource_name=publishers/*/settings}"
     body: "settings"
   };
 }
@@ -97,7 +97,7 @@ rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/settings}"
+    post: "/v1/{resource_name=publishers/*/settings}"
     body: "settings"
   };
 }
@@ -106,7 +106,7 @@ rpc CreateSettings(CreateSettingsRequest) returns (Settings) {
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc DeleteSettings(DeleteSettingsRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/settings}"
+    delete: "/v1/{resource_name=publishers/*/settings}"
   };
 }
 ```

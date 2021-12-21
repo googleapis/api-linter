@@ -28,7 +28,7 @@ import (
 var requestResourceSuffix = &lint.FieldRule{
 	Name: lint.NewRuleName(152, "request-resource-suffix"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isRunRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return isRunRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Rule check: Establish that the `resource_reference` annotation's

@@ -23,5 +23,5 @@ import (
 var tagRevisionRequestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(162, "tag-revision-request-name-field"),
 	OnlyIf:      isTagRevisionRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

@@ -23,5 +23,5 @@ import (
 var rollbackRequestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(162, "rollback-request-name-field"),
 	OnlyIf:      isRollbackRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

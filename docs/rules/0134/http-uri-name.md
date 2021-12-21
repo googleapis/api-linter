@@ -10,13 +10,13 @@ redirect_from:
 
 # Update methods: HTTP URI name field
 
-This rule enforces that all `Update` RPCs map the `name` field from the
+This rule enforces that all `Update` RPCs map the `resource_name` field from the
 resource object to the HTTP URI, as mandated in [AIP-134][].
 
 ## Details
 
 This rule looks at any message matching beginning with `Update`, and complains
-if the `name` variable from the resource (not the request message) is not
+if the `resource_name` variable from the resource (not the request message) is not
 included in the URI. It _does_ check additional bindings if they are present.
 
 Additionally, if the resource uses multiple words, it ensures that word
@@ -30,7 +30,7 @@ separation uses `snake_case`.
 // Incorrect.
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"  // Should be `book.name`.
+    post: "/v1/{resource_name=publishers/*/books/*}"  // Should be `book.resource_name`.
     body: "book"
   };
 }
@@ -42,7 +42,7 @@ rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
 // Correct.
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{book.name=publishers/*/books/*}"
+    post: "/v1/{book.resource_name=publishers/*/books/*}"
     body: "book"
   };
 }
@@ -58,7 +58,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc UpdateBookRequest(UpdateBookRequest) returns (Book) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}"
+    post: "/v1/{resource_name=publishers/*/books/*}"
     body: "book"
   };
 }

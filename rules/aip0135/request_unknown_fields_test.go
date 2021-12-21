@@ -46,7 +46,7 @@ func TestUnknownFields(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create an appropriate message descriptor.
 			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField("name", builder.FieldTypeString()),
+				builder.NewField("resource_name", builder.FieldTypeString()),
 			).AddField(
 				builder.NewField(test.fieldName, test.fieldType),
 			).Build()

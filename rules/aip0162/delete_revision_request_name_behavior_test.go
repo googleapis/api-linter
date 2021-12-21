@@ -28,9 +28,9 @@ func TestDeleteRevisionRequestNameBehavior(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "DeleteBookRevision", "name", " [(google.api.field_behavior) = REQUIRED]", nil},
-		{"Missing", "DeleteBookRevision", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "DeleteBookRevision", "resource_name", " [(google.api.field_behavior) = REQUIRED]", nil},
+		{"Missing", "DeleteBookRevision", "resource_name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "DeleteBookRevision", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

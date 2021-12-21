@@ -28,9 +28,9 @@ func TestTagRevisionRequestNameField(t *testing.T) {
 		Field    string
 		problems testutils.Problems
 	}{
-		{"Valid", "TagBookRevision", "string name = 1;", nil},
-		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: "no `name`"}}},
-		{"InvalidType", "TagBookRevision", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"Valid", "TagBookRevision", "string resource_name = 1;", nil},
+		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: "no `resource_name`"}}},
+		{"InvalidType", "TagBookRevision", "int32 resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

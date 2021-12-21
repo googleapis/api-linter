@@ -3,22 +3,22 @@ rule:
   aip: 162
   name: [core, '0162', tag-revision-request-name-behavior]
   summary: |
-    Tag Revision requests should annotate the `name` field with `google.api.field_behavior`.
+    Tag Revision requests should annotate the `resource_name` field with `google.api.field_behavior`.
 permalink: /162/tag-revision-request-name-behavior
 redirect_from:
   - /0162/tag-revision-request-name-behavior
 ---
 
-# Tag Revision requests: Name field behavior
+# Tag Revision requests: Resource Name field behavior
 
 This rule enforces that all Tag Revision requests have
-`google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
+`google.api.field_behavior` set to `REQUIRED` on their `string resource_name` field, as
 mandated in [AIP-162][].
 
 ## Details
 
 This rule looks at any message matching `Tag*RevisionRequest` and complains if the
-`name` field does not have a `google.api.field_behavior` annotation with a
+`resource_name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -29,7 +29,7 @@ value of `REQUIRED`.
 // Incorrect.
 message TagBookRevisionRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
 
@@ -42,7 +42,7 @@ message TagBookRevisionRequest {
 ```proto
 // Correct.
 message TagBookRevisionRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -60,7 +60,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message TagBookRevisionRequest {
   // (-- api-linter: core::0162::tag-revision-request-name-behavior=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
 

@@ -28,9 +28,9 @@ func TestRollbackRequestNameReference(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "RollbackBook", "name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
-		{"Missing", "RollbackBook", "name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "RollbackBook", "resource_name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
+		{"Missing", "RollbackBook", "resource_name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "RollbackBook", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

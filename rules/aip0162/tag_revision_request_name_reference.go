@@ -23,7 +23,7 @@ import (
 var tagRevisionRequestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "tag-revision-request-name-reference"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isTagRevisionRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return isTagRevisionRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

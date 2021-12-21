@@ -2,21 +2,21 @@
 rule:
   aip: 131
   name: [core, '0131', request-name-field]
-  summary: Get RPCs must have a `string name` field in the request.
+  summary: Get RPCs must have a `string resource_name` field in the request.
 permalink: /131/request-name-field
 redirect_from:
   - /0131/request-name-field
 ---
 
-# Get methods: Name field
+# Get methods: Resource Name field
 
-This rule enforces that all `Get` standard methods have a `string name` field
+This rule enforces that all `Get` standard methods have a `string rsource_name` field
 in the request message, as mandated in [AIP-131][].
 
 ## Details
 
 This rule looks at any message matching `Get*Request` and complains if
-the `name` field type is not `string`.
+the `resource_name` field type is not `string`.
 
 ## Examples
 
@@ -34,7 +34,7 @@ message GetBookRequest {
 ```proto
 // Correct.
 message GetBookRequest {
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 

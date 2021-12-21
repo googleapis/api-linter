@@ -23,7 +23,7 @@ import (
 var rollbackRequestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "rollback-request-name-reference"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isRollbackRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return isRollbackRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

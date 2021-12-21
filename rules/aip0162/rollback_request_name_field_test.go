@@ -28,9 +28,9 @@ func TestRollbackRequestNameField(t *testing.T) {
 		Field    string
 		problems testutils.Problems
 	}{
-		{"Valid", "RollbackBook", "string name = 1;", nil},
-		{"Missing", "RollbackBook", "", testutils.Problems{{Message: "no `name`"}}},
-		{"InvalidType", "RollbackBook", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"Valid", "RollbackBook", "string resource_name = 1;", nil},
+		{"Missing", "RollbackBook", "", testutils.Problems{{Message: "no `resource_name`"}}},
+		{"InvalidType", "RollbackBook", "int32 resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

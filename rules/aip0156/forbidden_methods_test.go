@@ -39,7 +39,7 @@ func TestForbiddenMethods(t *testing.T) {
 			service Library {
 				rpc {{.MethodName}}({{.MethodName}}Request) returns (Settings) {
 					option (google.api.http) = {
-						post: "/v1/{name=publishers/*{{.Suffix}}}"
+						post: "/v1/{resource_name=publishers/*{{.Suffix}}}"
 						body: "settings"
 					};
 				}

@@ -28,9 +28,9 @@ func TestTagRevisionRequestNameBehavior(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "TagBookRevision", "name", " [(google.api.field_behavior) = REQUIRED]", nil},
-		{"Missing", "TagBookRevision", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "TagBookRevision", "resource_name", " [(google.api.field_behavior) = REQUIRED]", nil},
+		{"Missing", "TagBookRevision", "resource_name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "TagBookRevision", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

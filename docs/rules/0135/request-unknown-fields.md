@@ -18,7 +18,7 @@ fields, as mandated in [AIP-135][].
 This rule looks at any message matching `Delete*Request` and complains if it
 comes across any fields other than:
 
-- `string name` ([AIP-135][])
+- `string resource_name` ([AIP-135][])
 - `bool allow_missing` ([AIP-135][])
 - `bool force` ([AIP-135][])
 - `string etag` ([AIP-154][])
@@ -42,7 +42,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 
@@ -53,7 +53,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRequest {
-  string name = 1;
+  string resource_name = 1;
 
   // (-- api-linter: core::0135::request-unknown-fields=disabled
   //     aip.dev/not-precedent: We really need this field because reasons. --)

@@ -28,9 +28,9 @@ func TestRequestNameBehavior(t *testing.T) {
 		FieldBehavior string
 		problems      testutils.Problems
 	}{
-		{"Valid", "UndeleteBookRequest", "name", " [(google.api.field_behavior) = REQUIRED]", testutils.Problems{}},
-		{"Missing", "UndeleteBookRequest", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"IrrelevantMessage", "AcquireBookRequest", "name", "", testutils.Problems{}},
+		{"Valid", "UndeleteBookRequest", "resource_name", " [(google.api.field_behavior) = REQUIRED]", testutils.Problems{}},
+		{"Missing", "UndeleteBookRequest", "resource_name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"IrrelevantMessage", "AcquireBookRequest", "resource_name", "", testutils.Problems{}},
 		{"IrrelevantField", "UndeleteBookRequest", "something_else", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {

@@ -22,5 +22,5 @@ import (
 var requestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(164, "request-name-field"),
 	OnlyIf:      isUndeleteRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

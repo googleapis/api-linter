@@ -30,7 +30,7 @@ var unknownFields = &lint.FieldRule{
 		return isGetRequestMessage(f.GetOwner())
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
-		allowedFields := stringset.New("name", "read_mask", "view")
+		allowedFields := stringset.New("resource_name", "read_mask", "view")
 		if !allowedFields.Contains(field.GetName()) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(

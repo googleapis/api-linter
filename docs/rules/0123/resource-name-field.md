@@ -2,21 +2,21 @@
 rule:
   aip: 123
   name: [core, '0123', resource-name-field]
-  summary: Resource messages should have a `string name` field.
+  summary: Resource messages should have a `string resource_name` field.
 permalink: /123/resource-name-field
 redirect_from:
   - /0123/resource-name-field
 ---
 
-# Resource `name` field
+# Resource `resource_name` field
 
 This rule enforces that messages that appear to represent resources have a
-`string name` field, as described in [AIP-123][].
+`string resource_name` field, as described in [AIP-123][].
 
 ## Details
 
 This rule scans all messages that have a `google.api.resource` annotation, and
-complains if the `name` field is missing or if it is any type other than
+complains if the `resource_name` field is missing or if it is any type other than
 singular `string`.
 
 ## Examples
@@ -24,7 +24,7 @@ singular `string`.
 **Incorrect** code for this rule:
 
 ```proto
-// Incorrect: missing `string name` field.
+// Incorrect: missing `string resource_name` field.
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -42,7 +42,7 @@ message Book {
   };
 
   // Should be `string`, not `bytes`.
-  bytes name = 1;
+  bytes resource_name = 1;
 }
 ```
 
@@ -56,7 +56,7 @@ message Book {
     pattern: "publishers/{publisher}/books/{book}"
   };
 
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 

@@ -27,13 +27,13 @@ func TestMethodSignature(t *testing.T) {
 		Signature  string
 		problems   testutils.Problems
 	}{
-		{"Valid", "GetBook", `option (google.api.method_signature) = "name";`, testutils.Problems{}},
-		{"Missing", "GetBook", "", testutils.Problems{{Message: `(google.api.method_signature) = "name"`}}},
+		{"Valid", "GetBook", `option (google.api.method_signature) = "resource_name";`, testutils.Problems{}},
+		{"Missing", "GetBook", "", testutils.Problems{{Message: `(google.api.method_signature) = "resource_name"`}}},
 		{
 			"Wrong",
 			"GetBook",
 			`option (google.api.method_signature) = "book";`,
-			testutils.Problems{{Suggestion: `option (google.api.method_signature) = "name";`}},
+			testutils.Problems{{Suggestion: `option (google.api.method_signature) = "resource_name";`}},
 		},
 		{"Irrelevant", "ReadBook", "", testutils.Problems{}},
 	} {

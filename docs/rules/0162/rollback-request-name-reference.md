@@ -3,7 +3,7 @@ rule:
   aip: 162
   name: [core, '0162', rollback-request-name-reference]
   summary: |
-    Rollback requests should annotate the `name` field with `google.api.resource_reference`.
+    Rollback requests should annotate the `resource_name` field with `google.api.resource_reference`.
 permalink: /162/rollback-request-name-reference
 redirect_from:
   - /0162/rollback-request-name-reference
@@ -17,7 +17,7 @@ This rule enforces that all `Rollback` requests have
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Rollback*Request`
+This rule looks at the `resource_name` field of any message matching `Rollback*Request`
 and complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -28,7 +28,7 @@ and complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message RollbackBookRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 
   string revision_id = 2 [(google.api.field_behavior) = REQUIRED];
 }
@@ -39,7 +39,7 @@ message RollbackBookRequest {
 ```proto
 // Correct.
 message RollbackBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -57,7 +57,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message RollbackBookRequest {
   // (-- api-linter: core::0162::rollback-request-name-reference=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 
   string revision_id = 2 [(google.api.field_behavior) = REQUIRED];
 }
