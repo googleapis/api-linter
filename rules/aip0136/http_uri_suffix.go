@@ -56,7 +56,7 @@ var uriSuffix = &lint.MethodRule{
 				want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
 			} else {
 				for key := range httpRule.GetVariables() {
-					if key == "name" || key == "parent" || strings.HasSuffix(key, ".name") {
+					if key == "resource_name" || key == "parent" || strings.HasSuffix(key, ".resource_name") {
 						rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
 						want = ":" + rpcSlice[0]
 						break

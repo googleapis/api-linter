@@ -18,7 +18,7 @@ as mandated in [AIP-136][].
 This rule looks at any method that is not a standard method, and tries to find
 the appropriate suffix at the end of the URI. More specifically:
 
-- If the URI contains a `name` or `parent` variable, then it expects `:verb` at
+- If the URI contains a `resource_name` or `parent` variable, then it expects `:verb` at
   the end of the URI.
 - Otherwise, it expects `:verbNoun` at the end of the URI.
 
@@ -37,7 +37,7 @@ issues raised by this rule are _actually_ violations of one of those.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
     // Should end with ":checkout", because the book is implied.
-    post: "/v1/{name=publishers/*/books/*}:checkoutBook"
+    post: "/v1/{resource_name=publishers/*/books/*}:checkoutBook"
     body: "*"
   };
 }
@@ -49,7 +49,7 @@ rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
 // Correct.
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkout"
+    post: "/v1/{resource_name=publishers/*/books/*}:checkout"
     body: "*"
   };
 }
@@ -102,7 +102,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc CheckoutBook(CheckoutBookRequest) returns (CheckoutBookResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:checkoutBook"
+    post: "/v1/{resource_name=publishers/*/books/*}:checkoutBook"
     body: "*"
   };
 }

@@ -3,7 +3,7 @@ rule:
   aip: 131
   name: [core, '0131', request-name-reference-type]
   summary: |
-    The `google.api.resource_reference` on the `name` field of a Get RPC request
+    The `google.api.resource_reference` on the `resource_name` field of a Get RPC request
     message should use `type`, not `child_type`.
 permalink: /131/request-name-reference-type
 redirect_from:
@@ -12,13 +12,13 @@ redirect_from:
 
 # Get methods: Resource reference
 
-This rule enforces that the `google.api.resource_reference` on the `name` field
+This rule enforces that the `google.api.resource_reference` on the `resource_name` field
 of a Get RPC request message uses `type`, not `child_type`, as suggested in
 [AIP-131][].
 
 ## Details
 
-This rule looks at the `google.api.resource_reference` annotation on the `name`
+This rule looks at the `google.api.resource_reference` annotation on the `resource_name`
 field of any message matching `Get*Request` and complains if it does not use a
 direct `type` reference.
 

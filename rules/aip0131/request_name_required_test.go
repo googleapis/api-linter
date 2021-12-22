@@ -28,8 +28,8 @@ func TestRequestHasNameField(t *testing.T) {
 		FieldName   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "GetBookRequest", "name", testutils.Problems{}},
-		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Valid", "GetBookRequest", "resource_name", testutils.Problems{}},
+		{"InvalidName", "GetBookRequest", "id", testutils.Problems{{Message: "resource_name"}}},
 		{"Irrelevant", "AcquireBookRequest", "id", testutils.Problems{}},
 	}
 

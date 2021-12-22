@@ -16,7 +16,7 @@ It identifies common mistakes and inconsistencies in API surfaces:
 ```proto
 // Incorrect.
 message GetBookRequest {
-  // This is wrong; it should be spelled `name`.
+  // This is wrong; it should be spelled `resource_name`.
   string book = 1;
 }
 ```

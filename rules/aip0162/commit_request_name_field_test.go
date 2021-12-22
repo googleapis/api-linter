@@ -28,9 +28,9 @@ func TestCommitRequestNameField(t *testing.T) {
 		Field    string
 		problems testutils.Problems
 	}{
-		{"Valid", "CommitBook", "string name = 1;", nil},
-		{"Missing", "CommitBook", "", testutils.Problems{{Message: "no `name`"}}},
-		{"InvalidType", "CommitBook", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"Valid", "CommitBook", "string resource_name = 1;", nil},
+		{"Missing", "CommitBook", "", testutils.Problems{{Message: "no `resource_name`"}}},
+		{"InvalidType", "CommitBook", "int32 resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

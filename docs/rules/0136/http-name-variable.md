@@ -3,7 +3,7 @@ rule:
   aip: 136
   name: [core, '0136', http-name-variable]
   summary:
-    Custom methods should only use `name` if the RPC noun matches the resource.
+    Custom methods should only use `resource_name` if the RPC noun matches the resource.
 permalink: /136/http-name-variable
 redirect_from:
   - /0136/http-name-variable
@@ -11,12 +11,12 @@ redirect_from:
 
 # Custom methods: HTTP name variable
 
-This rule enforces that custom methods only use the `name` variable if the RPC
+This rule enforces that custom methods only use the `resource_name` variable if the RPC
 noun matches the resource, as mandated in [AIP-136][].
 
 ## Details
 
-This rule looks at custom methods and, if the URI contains a `name` variable,
+This rule looks at custom methods and, if the URI contains a `resource_name` variable,
 it ensures that the RPC name ends with the same text as the final component in
 the URI (after adjusting for case).
 
@@ -29,7 +29,7 @@ the URI (after adjusting for case).
 // The variable should be "book", or the RPC name should change.
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:writePage"
+    post: "/v1/{resource_name=publishers/*/books/*}:writePage"
     body: "*"
   };
 }
@@ -39,7 +39,7 @@ rpc WritePage(WritePageRequest) return (WritePageResponse) {
 
 ```proto
 // Correct.
-// If Page is not a first-class resource, use `book` as the variable name
+// If Page is not a first-class resource, use `book` as the variable resource_name
 // and a verb-noun suffix.
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
@@ -51,11 +51,11 @@ rpc WritePage(WritePageRequest) return (WritePageResponse) {
 
 ```proto
 // Correct.
-// If Page is a first-class, already-created resource, use `name` as the
+// If Page is a first-class, already-created resource, use `resource_name` as the
 // variable name and a verb-only suffix.
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*/pages/*}:write"
+    post: "/v1/{resource_name=publishers/*/books/*/pages/*}:write"
     body: "*"
   };
 }
@@ -74,7 +74,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc WritePage(WritePageRequest) return (WritePageResponse) {
   option (google.api.http) = {
-    post: "/v1/{name=publishers/*/books/*}:writePage"
+    post: "/v1/{resource_name=publishers/*/books/*}:writePage"
     body: "*"
   };
 }

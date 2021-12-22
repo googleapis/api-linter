@@ -27,9 +27,9 @@ func TestHttpNameField(t *testing.T) {
 		MethodName string
 		problems   testutils.Problems
 	}{
-		{"Valid", "/v1/{name=publishers/*/books/*}", "GetBook", testutils.Problems{}},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "GetBook", testutils.Problems{{Message: "`name`"}}},
-		{"NoVarName", "/v1/publishers/*/books/*", "GetBook", testutils.Problems{{Message: "`name`"}}},
+		{"Valid", "/v1/{resource_name=publishers/*/books/*}", "GetBook", testutils.Problems{}},
+		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "GetBook", testutils.Problems{{Message: "`resource_name`"}}},
+		{"NoVarName", "/v1/publishers/*/books/*", "GetBook", testutils.Problems{{Message: "`resource_name`"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", testutils.Problems{}},
 	}
 

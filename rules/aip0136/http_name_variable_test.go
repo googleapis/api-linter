@@ -27,12 +27,12 @@ func TestHTTPVariables(t *testing.T) {
 		URI        string
 		problems   testutils.Problems
 	}{
-		{"Valid", "WriteBook", "/v1/{name=publishers/*/books/*}:write", testutils.Problems{}},
-		{"ValidRevision", "TagBookRevision", "/v1/{name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
-		{"ValidRevisions", "ListBookRevisions", "/v1/{name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
-		{"Invalid", "WritePage", "/v1/{name=publishers/*/books/*}:writePage", testutils.Problems{{Message: "name variable"}}},
+		{"Valid", "WriteBook", "/v1/{resource_name=publishers/*/books/*}:write", testutils.Problems{}},
+		{"ValidRevision", "TagBookRevision", "/v1/{resource_name=publishers/*/books/*}:tagRevision", testutils.Problems{}},
+		{"ValidRevisions", "ListBookRevisions", "/v1/{resource_name=publishers/*/books/*}:listRevisions", testutils.Problems{}},
+		{"Invalid", "WritePage", "/v1/{resource_name=publishers/*/books/*}:writePage", testutils.Problems{{Message: "name variable"}}},
 		{"ValidBookVar", "WritePage", "/v1/{book=publishers/*/books/*}:writePage", testutils.Problems{}},
-		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
+		{"ValidTwoWordNoun", "WriteAudioBook", "/v1/{resource_name=publishers/*/audioBooks/*}:write", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

@@ -23,5 +23,5 @@ import (
 var listRevisionsRequestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(162, "list-revisions-request-name-field"),
 	OnlyIf:      IsListRevisionsRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

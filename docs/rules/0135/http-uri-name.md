@@ -10,13 +10,13 @@ redirect_from:
 
 # Delete methods: HTTP URI name field
 
-This rule enforces that all `Delete` RPCs map the `name` field to the HTTP URI,
+This rule enforces that all `Delete` RPCs map the `resource_name` field to the HTTP URI,
 as mandated in [AIP-135][].
 
 ## Details
 
 This rule looks at any message matching beginning with `Delete`, and complains
-if the `name` variable is not included in the URI. It _does_ check additional
+if the `resource_name` variable is not included in the URI. It _does_ check additional
 bindings if they are present.
 
 ## Examples
@@ -27,7 +27,7 @@ bindings if they are present.
 // Incorrect.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/publishers/*/books/*"  // The `name` field should be extracted.
+    delete: "/v1/publishers/*/books/*"  // The `resource_name` field should be extracted.
   };
 }
 ```
@@ -38,7 +38,7 @@ rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
 // Correct.
 rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
   option (google.api.http) = {
-    delete: "/v1/{name=publishers/*/books/*}"
+    delete: "/v1/{resource_name=publishers/*/books/*}"
   };
 }
 ```

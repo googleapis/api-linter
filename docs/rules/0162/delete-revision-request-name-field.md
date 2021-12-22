@@ -2,21 +2,21 @@
 rule:
   aip: 162
   name: [core, '0162', delete-revision-request-name-field]
-  summary: Delete Revision RPCs must have a `name` field in the request.
+  summary: Delete Revision RPCs must have a `resource_name` field in the request.
 permalink: /162/delete-revision-request-name-field
 redirect_from:
   - /0162/delete-revision-request-name-field
 ---
 
-# Delete Revision requests: Name field
+# Delete Revision requests: Resource Name field
 
-This rule enforces that all Delete Revision methods have a `string name`
+This rule enforces that all Delete Revision methods have a `string resource_name`
 field in the request message, as mandated in [AIP-162][].
 
 ## Details
 
 This rule looks at any message matching `Delete*RevisionRequest` and complains if
-either the `name` field is missing or it has any type other than `string`.
+either the `resource_name` field is missing or it has any type other than `string`.
 
 ## Examples
 
@@ -24,7 +24,7 @@ either the `name` field is missing or it has any type other than `string`.
 
 ```proto
 // Incorrect.
-// Should include a `string name` field.
+// Should include a `string resource_name` field.
 message DeleteBookRevisionRequest {}
 ```
 
@@ -32,7 +32,7 @@ message DeleteBookRevisionRequest {}
 // Incorrect.
 message DeleteBookRevisionRequest {
   // Field type should be `string`.
-  bytes name = 1 [
+  bytes resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -44,7 +44,7 @@ message DeleteBookRevisionRequest {
 ```proto
 // Correct.
 message DeleteBookRevisionRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -54,14 +54,14 @@ message DeleteBookRevisionRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+the `resource_name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message DeleteBookRevisionRequest {
   // (-- api-linter: core::0162::delete-revision-request-name-field=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  bytes name = 1 [
+  bytes resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];

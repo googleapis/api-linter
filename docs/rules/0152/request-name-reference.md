@@ -3,7 +3,7 @@ rule:
   aip: 152
   name: [core, '0152', request-name-reference]
   summary: |
-    Run requests should annotate the `name` field with `google.api.resource_reference`.
+    Run requests should annotate the `resource_name` field with `google.api.resource_reference`.
 permalink: /152/request-name-reference
 redirect_from:
   - /0152/request-name-reference
@@ -12,12 +12,12 @@ redirect_from:
 # Run requests: Resource reference
 
 This rule enforces that all `RUn` methods have
-`google.api.resource_reference` on their `string name` field, as mandated in
+`google.api.resource_reference` on their `string resource_name` field, as mandated in
 [AIP-152][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Run*JobRequest`
+This rule looks at the `resource_name` field of any message matching `Run*JobRequest`
 and complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -28,7 +28,7 @@ and complains if it does not have a `google.api.resource_reference` annotation.
 // Incorrect.
 message RunWriteBookJobRequest {
   // The `google.api.resource_reference` annotation should also be included.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -37,7 +37,7 @@ message RunWriteBookJobRequest {
 ```proto
 // Correct.
 message RunWriteBookJobRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/WriteBookJob"
   ];
@@ -53,7 +53,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message RunWriteBookJobRequest {
   // (-- api-linter: core::0152::request-name-reference=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 

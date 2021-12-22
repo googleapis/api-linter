@@ -2,21 +2,21 @@
 rule:
   aip: 164
   name: [core, '0164', request-name-field]
-  summary: Undelete RPCs must have a `name` field in the request.
+  summary: Undelete RPCs must have a `resource_name` field in the request.
 permalink: /164/request-name-field
 redirect_from:
   - /0164/request-name-field
 ---
 
-# Undelete methods: Name field
+# Undelete methods: Resource Name field
 
-This rule enforces that all `Undelete` methods have a `string name`
+This rule enforces that all `Undelete` methods have a `string resource_name`
 field in the request message, as mandated in [AIP-164][].
 
 ## Details
 
 This rule looks at any message matching `Undelete*Request` and complains if
-either the `name` field is missing, or if it has any type other than `string`.
+either the `resource_name` field is missing, or if it has any type other than `string`.
 
 ## Examples
 
@@ -25,14 +25,14 @@ either the `name` field is missing, or if it has any type other than `string`.
 ```proto
 // Incorrect.
 message UndeleteBookRequest {
-  string book = 1;  // Field name should be `name`.
+  string book = 1;  // Field name should be `resource_name`.
 }
 ```
 
 ```proto
 // Incorrect.
 message UndeleteBookRequest {
-  bytes name = 1;  // Field type should be `string`.
+  bytes resource_name = 1;  // Field type should be `string`.
 }
 ```
 
@@ -41,7 +41,7 @@ message UndeleteBookRequest {
 ```proto
 // Correct.
 message UndeleteBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -51,7 +51,7 @@ message UndeleteBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+the `resource_name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto

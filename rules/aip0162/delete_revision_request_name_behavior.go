@@ -23,7 +23,7 @@ import (
 var deleteRevisionRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "delete-revision-request-name-behavior"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isDeleteRevisionRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return isDeleteRevisionRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: utils.LintRequiredField,
 }

@@ -23,7 +23,7 @@ import (
 var listRevisionsRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "list-revisions-request-name-behavior"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return IsListRevisionsRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return IsListRevisionsRequestMessage(f.GetOwner()) && f.GetName() == "resource_name"
 	},
 	LintField: utils.LintRequiredField,
 }

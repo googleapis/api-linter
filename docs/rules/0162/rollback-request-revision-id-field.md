@@ -26,7 +26,7 @@ either the `revision_id` field is missing or it has any type other than `string`
 // Incorrect.
 // Should include a `string revision_id` field.
 message RollbackBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -36,7 +36,7 @@ message RollbackBookRequest {
 ```proto
 // Incorrect.
 message RollbackBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -51,7 +51,7 @@ message RollbackBookRequest {
 ```proto
 // Correct.
 message RollbackBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -63,12 +63,12 @@ message RollbackBookRequest {
 ## Disabling
 
 If you need to violate this rule, use a leading comment above the message (if
-the `name` field is missing) or above the field (if it is the wrong type).
+the `resource_name` field is missing) or above the field (if it is the wrong type).
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message RollbackBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];

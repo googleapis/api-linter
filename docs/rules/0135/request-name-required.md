@@ -2,21 +2,21 @@
 rule:
   aip: 135
   name: [core, '0135', request-name-required]
-  summary: Delete RPCs must have a `name` field in the request.
+  summary: Delete RPCs must have a `resource_name` field in the request.
 permalink: /135/request-name-required
 redirect_from:
   - /0135/request-name-required
 ---
 
-# Delete methods: Name field
+# Delete methods: Resource Name field
 
-This rule enforces that all `Delete` standard methods have a `string name`
+This rule enforces that all `Delete` standard methods have a `string resource_name`
 field in the request message, as mandated in [AIP-135][].
 
 ## Details
 
 This rule looks at any message matching `Delete*Request` and complains if
-the `name` field is missing.
+the `resource_name` field is missing.
 
 ## Examples
 
@@ -25,7 +25,7 @@ the `name` field is missing.
 ```proto
 // Incorrect.
 message DeleteBookRequest {
-  // Field name should be `name`.
+  // Field name should be `resource_name`.
   string book = 1;
 }
 ```
@@ -35,7 +35,7 @@ message DeleteBookRequest {
 ```proto
 // Correct.
 message DeleteBookRequest {
-  string name = 1;
+  string resource_name = 1;
 }
 ```
 

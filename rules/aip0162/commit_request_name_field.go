@@ -23,5 +23,5 @@ import (
 var commitRequestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(162, "commit-request-name-field"),
 	OnlyIf:      isCommitRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

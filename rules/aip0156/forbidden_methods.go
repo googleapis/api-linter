@@ -33,7 +33,7 @@ var forbiddenMethods = &lint.MethodRule{
 		//   publishers/*/books/* -- not a singleton, many books
 		//   publishers/*/settings -- a singleton; one settings object per publisher
 		for _, http := range utils.GetHTTPRules(m) {
-			if name, ok := http.GetVariables()["name"]; ok {
+			if name, ok := http.GetVariables()["resource_name"]; ok {
 				if !strings.HasSuffix(name, "*") {
 					return true
 				}

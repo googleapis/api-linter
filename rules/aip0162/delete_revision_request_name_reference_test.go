@@ -28,10 +28,10 @@ func TestDeleteRevisionRequestNameReference(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "DeleteBookRevision", "name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
-		{"Missing", "DeleteBookRevision", "name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
-		{"IrrelevantField", "DeleteBookRevision", "names", "", nil},
+		{"Valid", "DeleteBookRevision", "resource_name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
+		{"Missing", "DeleteBookRevision", "resource_name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
+		{"IrrelevantField", "DeleteBookRevision", "resource_names", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

@@ -28,11 +28,11 @@ func TestRequestResourceSuffix(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"ValidPresent", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "WriteBookJob" }]`, nil},
-		{"ValidMissing", "RunWriteBookJob", "name", "", nil},
-		{"IncorrectSuffix", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "Book" }]`,
+		{"ValidPresent", "RunWriteBookJob", "resource_name", ` [(google.api.resource_reference) = { type: "WriteBookJob" }]`, nil},
+		{"ValidMissing", "RunWriteBookJob", "resource_name", "", nil},
+		{"IncorrectSuffix", "RunWriteBookJob", "resource_name", ` [(google.api.resource_reference) = { type: "Book" }]`,
 			testutils.Problems{{Message: "google.api.resource_reference", Suggestion: "WriteBookJob"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "RunWriteBookJob", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

@@ -28,10 +28,10 @@ func TestRequestNameField(t *testing.T) {
 		Field       string
 		problems    testutils.Problems
 	}{
-		{"Valid", "RunWriteBookJobRequest", `string name = 1;`, nil},
+		{"Valid", "RunWriteBookJobRequest", `string resource_name = 1;`, nil},
 		{"InvalidMissing", "RunWriteBookJobRequest", "", testutils.Problems{{Message: "has no"}}},
-		{"InvalidType", "RunWriteBookJobRequest", "bytes name = 1;", testutils.Problems{{Suggestion: "string"}}},
-		{"InvalidRepeated", "RunWriteBookJobRequest", "repeated string name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidType", "RunWriteBookJobRequest", "bytes resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidRepeated", "RunWriteBookJobRequest", "repeated string resource_name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantMessage", "RemoveBookRequest", "", nil},
 	}
 

@@ -29,7 +29,7 @@ var httpNameField = &lint.MethodRule{
 	OnlyIf: isUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
-		want := fmt.Sprintf("%s.name", fieldName)
+		want := fmt.Sprintf("%s.resource_name", fieldName)
 		return utils.LintHTTPURIHasVariable(m, want)
 	},
 }

@@ -22,5 +22,5 @@ import (
 var requestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(152, "request-name-field"),
 	OnlyIf:      isRunRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

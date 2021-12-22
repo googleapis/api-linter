@@ -28,9 +28,9 @@ func TestCommitRequestNameReference(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "CommitBook", "name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
-		{"Missing", "CommitBook", "name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "CommitBook", "resource_name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
+		{"Missing", "CommitBook", "resource_name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "CommitBook", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

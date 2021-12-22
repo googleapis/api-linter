@@ -12,12 +12,12 @@ redirect_from:
 # Run requests: Resource reference
 
 This rule enforces that all `Run` methods specify a `type` that ends in "Job" 
-in the `google.api.resource_reference` annotation of their `string name` field, 
+in the `google.api.resource_reference` annotation of their `string resource_name` field, 
 as mandated in [AIP-152][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Run*JobRequest` 
+This rule looks at the `resource_name` field of any message matching `Run*JobRequest` 
 and complains if the `type` in its `google.api.resource_reference` annotation
 does not end in "Job".
 
@@ -30,7 +30,7 @@ does not end in "Job".
 message RunWriteBookJobRequest {
   // The `type` of the `google.api.resource_reference` annotation should end in 
   // "Job".
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -42,7 +42,7 @@ message RunWriteBookJobRequest {
 ```proto
 // Correct.
 message RunWriteBookJobRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/WriteBookJob"
   ];
@@ -58,7 +58,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message RunWriteBookJobRequest {
   // (-- api-linter: core::0152::request-resource-suffix=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];

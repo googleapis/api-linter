@@ -28,8 +28,8 @@ func TestRequestNameRequired(t *testing.T) {
 		FieldName   string
 		problems    testutils.Problems
 	}{
-		{"Valid", "DeleteBookRequest", "name", nil},
-		{"InvalidName", "DeleteBookRequest", "id", testutils.Problems{{Message: "name"}}},
+		{"Valid", "DeleteBookRequest", "resource_name", nil},
+		{"InvalidName", "DeleteBookRequest", "id", testutils.Problems{{Message: "resource_name"}}},
 		{"Irrelevant", "RemoveBookRequest", "id", nil},
 	}
 

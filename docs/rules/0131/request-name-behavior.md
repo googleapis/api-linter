@@ -3,7 +3,7 @@ rule:
   aip: 131
   name: [core, '0131', request-name-behavior]
   summary: |
-    Get RPCs should annotate the `name` field with `google.api.field_behavior`.
+    Get RPCs should annotate the `resource_name` field with `google.api.field_behavior`.
 permalink: /131/request-name-behavior
 redirect_from:
   - /0131/request-name-behavior
@@ -12,13 +12,13 @@ redirect_from:
 # Get methods: Field behavior
 
 This rule enforces that all `Get` standard methods have
-`google.api.field_behavior` set to `REQUIRED` on their `string name` field, as
+`google.api.field_behavior` set to `REQUIRED` on their `string resource_name` field, as
 mandated in [AIP-131][].
 
 ## Details
 
 This rule looks at any message matching `Get*Request` and complains if the
-`name` field does not have a `google.api.field_behavior` annotation with a
+`resource_name` field does not have a `google.api.field_behavior` annotation with a
 value of `REQUIRED`.
 
 ## Examples
@@ -29,7 +29,7 @@ value of `REQUIRED`.
 // Incorrect.
 message GetBookRequest {
   // The `google.api.field_behavior` annotation should also be included.
-  string name = 1 [(google.api.resource_reference) = {
+  string resource_name = 1 [(google.api.resource_reference) = {
     type: "library.googleapis.com/Book"
   }];
 }
@@ -40,7 +40,7 @@ message GetBookRequest {
 ```proto
 // Correct.
 message GetBookRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];

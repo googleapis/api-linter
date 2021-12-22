@@ -28,9 +28,9 @@ func TestListRevisionsRequestNameReference(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "ListBookRevisions", "name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
-		{"Missing", "ListBookRevisions", "name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
-		{"IrrelevantMessage", "ListBooks", "name", "", nil},
+		{"Valid", "ListBookRevisions", "resource_name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
+		{"Missing", "ListBookRevisions", "resource_name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
+		{"IrrelevantMessage", "ListBooks", "resource_name", "", nil},
 		{"IrrelevantField", "ListBookRevisions", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {

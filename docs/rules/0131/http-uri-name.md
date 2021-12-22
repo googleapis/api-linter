@@ -2,21 +2,21 @@
 rule:
   aip: 131
   name: [core, '0131', http-uri-name]
-  summary: Get methods must map the name field to the URI.
+  summary: Get methods must map the resource_name field to the URI.
 permalink: /131/http-uri-name
 redirect_from:
   - /0131/http-uri-name
 ---
 
-# Get methods: HTTP URI name field
+# Get methods: HTTP URI resource_name field
 
-This rule enforces that all `Get` RPCs map the `name` field to the HTTP URI, as
+This rule enforces that all `Get` RPCs map the `rsource_name` field to the HTTP URI, as
 mandated in [AIP-131][].
 
 ## Details
 
 This rule looks at any message matching beginning with `Get`, and complains if
-the `name` variable is not included in the URI. It _does_ check additional
+the `resource_name` variable is not included in the URI. It _does_ check additional
 bindings if they are present.
 
 ## Examples
@@ -27,7 +27,7 @@ bindings if they are present.
 // Incorrect.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/publishers/*/books/*"  // The `name` field should be extracted.
+    get: "/v1/publishers/*/books/*"  // The `resource_name` field should be extracted.
   };
 }
 ```
@@ -38,7 +38,7 @@ rpc GetBook(GetBookRequest) returns (Book) {
 // Correct.
 rpc GetBook(GetBookRequest) returns (Book) {
   option (google.api.http) = {
-    get: "/v1/{name=publishers/*/books/*}"
+    get: "/v1/{resource_name=publishers/*/books/*}"
   };
 }
 ```

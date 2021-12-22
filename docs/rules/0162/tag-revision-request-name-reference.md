@@ -3,21 +3,21 @@ rule:
   aip: 162
   name: [core, '0162', tag-revision-request-name-reference]
   summary: |
-    Tag Revision requests should annotate the `name` field with `google.api.resource_reference`.
+    Tag Revision requests should annotate the `resource_name` field with `google.api.resource_reference`.
 permalink: /162/tag-revision-request-name-reference
 redirect_from:
   - /0162/tag-revision-request-name-reference
 ---
 
-# Tag Revision requests: Name resource reference
+# Tag Revision requests: Resource Name resource reference
 
 This rule enforces that all Tag Revision requests have
-`google.api.resource_reference` on their `string name` field, as mandated in
+`google.api.resource_reference` on their `string resource_name` field, as mandated in
 [AIP-162][].
 
 ## Details
 
-This rule looks at the `name` field of any message matching `Tag*RevisionRequest`
+This rule looks at the `resource_name` field of any message matching `Tag*RevisionRequest`
 and complains if it does not have a `google.api.resource_reference` annotation.
 
 ## Examples
@@ -39,7 +39,7 @@ message TagBookRevisionRequest {
 ```proto
 // Correct.
 message TagBookRevisionRequest {
-  string name = 1 [
+  string resource_name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "library.googleapis.com/Book"
   ];
@@ -57,7 +57,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 message TagBookRevisionRequest {
   // (-- api-linter: core::0162::tag-revision-request-name-reference=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string resource_name = 1 [(google.api.field_behavior) = REQUIRED];
 
   string tag = 2 [(google.api.field_behavior) = REQUIRED];
 }

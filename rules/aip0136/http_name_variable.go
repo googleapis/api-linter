@@ -41,7 +41,7 @@ var httpNameVariable = &lint.MethodRule{
 
 			// If there is a "name" variable, the noun should be present
 			// in the RPC name.
-			if name, ok := vars["name"]; ok {
+			if name, ok := vars["resource_name"]; ok {
 				// Determine the resource.
 				name = strings.TrimSuffix(name, "/*")
 				segs := strings.Split(name, "/")

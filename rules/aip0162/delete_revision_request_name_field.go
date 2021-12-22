@@ -23,5 +23,5 @@ import (
 var deleteRevisionRequestNameField = &lint.MessageRule{
 	Name:        lint.NewRuleName(162, "delete-revision-request-name-field"),
 	OnlyIf:      isDeleteRevisionRequestMessage,
-	LintMessage: utils.LintFieldPresentAndSingularString("name"),
+	LintMessage: utils.LintFieldPresentAndSingularString("resource_name"),
 }

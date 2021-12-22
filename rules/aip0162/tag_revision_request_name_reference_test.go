@@ -28,10 +28,10 @@ func TestTagRevisionRequestNameReference(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "TagBookRevision", "name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
-		{"Missing", "TagBookRevision", "name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
-		{"IrrelevantField", "TagBookRevision", "names", "", nil},
+		{"Valid", "TagBookRevision", "resource_name", ` [(google.api.resource_reference) = { type: "foo" }]`, nil},
+		{"Missing", "TagBookRevision", "resource_name", "", testutils.Problems{{Message: "google.api.resource_reference"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
+		{"IrrelevantField", "TagBookRevision", "resource_names", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

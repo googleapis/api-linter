@@ -28,9 +28,9 @@ func TestRollbackRequestNameBehavior(t *testing.T) {
 		FieldOpts string
 		problems  testutils.Problems
 	}{
-		{"Valid", "RollbackBook", "name", " [(google.api.field_behavior) = REQUIRED]", nil},
-		{"Missing", "RollbackBook", "name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
+		{"Valid", "RollbackBook", "resource_name", " [(google.api.field_behavior) = REQUIRED]", nil},
+		{"Missing", "RollbackBook", "resource_name", "", testutils.Problems{{Message: "(google.api.field_behavior) = REQUIRED"}}},
+		{"IrrelevantMessage", "PurgeBooks", "resource_name", "", nil},
 		{"IrrelevantField", "RollbackBook", "something_else", "", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
