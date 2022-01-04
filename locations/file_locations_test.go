@@ -28,6 +28,8 @@ func TestLocations(t *testing.T) {
 		// proto3 rules!
 		syntax = "proto3";
 
+		import "google/api/resource.proto";
+
 		package google.api.linter;
 
 		option csharp_namespace = "Google.Api.Linter";
@@ -45,18 +47,54 @@ func TestLocations(t *testing.T) {
 		tests := []struct {
 			testName string
 			fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
+			idxFx    func(f *desc.FileDescriptor, i int) *dpb.SourceCodeInfo_Location
+			idx      int
 			wantSpan []int32
 		}{
-			{"Syntax", FileSyntax, []int32{1, 0, int32(len("syntax = \"proto3\";"))}},
-			{"Package", FilePackage, []int32{3, 0, int32(len("package google.api.linter;"))}},
-			{"CsharpNamespace", FileCsharpNamespace, []int32{5, 0, int32(len(`option csharp_namespace = "Google.Api.Linter";`))}},
-			{"JavaPackage", FileJavaPackage, []int32{6, 0, int32(len(`option java_package = "com.google.api.linter";`))}},
-			{"PhpNamespace", FilePhpNamespace, []int32{7, 0, int32(len(`option php_namespace = "Google\\Api\\Linter";`))}},
-			{"RubyPackage", FileRubyPackage, []int32{8, 0, int32(len(`option ruby_package = "Google::Api::Linter";`))}},
+			{
+				testName: "Syntax",
+				fx:       FileSyntax,
+				wantSpan: []int32{1, 0, int32(len("syntax = \"proto3\";"))},
+			}, {
+				testName: "Package",
+				fx:       FilePackage,
+				wantSpan: []int32{5, 0, int32(len("package google.api.linter;"))},
+			}, {
+				testName: "CsharpNamespace",
+				fx:       FileCsharpNamespace,
+				wantSpan: []int32{7, 0, int32(len(`option csharp_namespace = "Google.Api.Linter";`))},
+			},
+			{
+				testName: "JavaPackage",
+				fx:       FileJavaPackage,
+				wantSpan: []int32{8, 0, int32(len(`option java_package = "com.google.api.linter";`))},
+			},
+			{
+				testName: "PhpNamespace",
+				fx:       FilePhpNamespace,
+				wantSpan: []int32{9, 0, int32(len(`option php_namespace = "Google\\Api\\Linter";`))},
+			},
+			{
+				testName: "RubyPackage",
+				fx:       FileRubyPackage,
+				wantSpan: []int32{10, 0, int32(len(`option ruby_package = "Google::Api::Linter";`))},
+			},
+			{
+				testName: "Import",
+				idxFx:    FileImport,
+				idx:      0,
+				wantSpan: []int32{3, 0, int32(len(`import "google/api/resource.proto";`))},
+			},
 		}
 		for _, test := range tests {
 			t.Run(test.testName, func(t *testing.T) {
-				if diff := cmp.Diff(test.fx(f).Span, test.wantSpan); diff != "" {
+				var l *dpb.SourceCodeInfo_Location
+				if test.fx != nil {
+					l = test.fx(f)
+				} else {
+					l = test.idxFx(f, test.idx)
+				}
+				if diff := cmp.Diff(l.Span, test.wantSpan); diff != "" {
 					t.Errorf(diff)
 				}
 			})

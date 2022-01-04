@@ -78,3 +78,9 @@ func FileResourceDefinition(f *desc.FileDescriptor, index int) *dpb.SourceCodeIn
 	// 8 == options
 	return pathLocation(f, 8, int(apb.E_ResourceDefinition.TypeDescriptor().Number()), index)
 }
+
+// FileImport returns the location of the import on the given `index`, or `nil`
+// if no import with such `index` is found.
+func FileImport(f *desc.FileDescriptor, index int) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 3, index) // 3 == dependency
+}
