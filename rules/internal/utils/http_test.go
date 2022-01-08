@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/commure/api-linter/rules/internal/testutils"
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 

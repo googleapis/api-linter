@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestResponseMessageName(t *testing.T) {
@@ -55,7 +55,7 @@ func TestResponseMessageName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				
+
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.Response}}) {
 						option (google.api.http) = {
@@ -64,9 +64,9 @@ func TestResponseMessageName(t *testing.T) {
 						};
 					}
 				}
-				
+
 				message {{.MethodName}}Request {}
-				
+
 				message {{.Response}}{}
 				`, test)
 
@@ -105,7 +105,7 @@ func TestLongRunningResponse(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				import "google/longrunning/operations.proto";
-				
+
 				service BookService {
 					rpc BatchCreateBooks(BatchCreateBooksRequest) returns (google.longrunning.Operation) {
 						option (google.api.http) = {
@@ -117,9 +117,9 @@ func TestLongRunningResponse(t *testing.T) {
 						};
 					}
 				}
-				
+
 				message BatchCreateBooksRequest {}
-				
+
 				message BatchCreateBooksResponse{}
 				`, test)
 

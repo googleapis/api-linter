@@ -17,7 +17,7 @@ package aip4232
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestRepeatedFields(t *testing.T) {
@@ -47,7 +47,7 @@ func TestRepeatedFields(t *testing.T) {
 					string name = 1;
 
 					bool paperback_only = 2;
-					
+
 					repeated int32 editions = 3;
 				}
 				message ArchiveBookResponse {}

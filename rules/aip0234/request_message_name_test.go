@@ -17,7 +17,7 @@ package aip0234
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestRequestMessageName(t *testing.T) {
@@ -55,7 +55,7 @@ func TestRequestMessageName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				
+
 				service BookService {
 					rpc {{.MethodName}}({{.Request}}) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {

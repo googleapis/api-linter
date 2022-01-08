@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/data"
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/locations"
+	"github.com/commure/api-linter/rules/internal/data"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )

@@ -17,9 +17,9 @@ package aip0141
 import (
 	"strings"
 
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/locations"
 	pluralize "github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 

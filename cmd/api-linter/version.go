@@ -20,4 +20,4 @@ You got this from "go get", "go run", etc.; check go.mod for which
 version you have.
 
 Versioned binaries (independent of Go tooling) are distributed from:
-  https://github.com/googleapis/api-linter/releases`
+  https://github.com/commure/api-linter/releases`

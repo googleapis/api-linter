@@ -17,9 +17,9 @@ package aip0235
 import (
 	"fmt"
 
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/locations"
 	"github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )

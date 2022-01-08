@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -78,7 +78,7 @@ func TestRequestRequestsField(t *testing.T) {
 				message BatchCreateBooksRequest {
 					{{.Field}}
 				}
-				
+
 				message CreateBookRequest {}
 				`, test)
 

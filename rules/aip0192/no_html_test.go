@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestNoHTML(t *testing.T) {

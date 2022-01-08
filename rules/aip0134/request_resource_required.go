@@ -3,7 +3,7 @@ package aip0134
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/commure/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 

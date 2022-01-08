@@ -17,7 +17,7 @@ package aip0163
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestSynonyms(t *testing.T) {

@@ -19,9 +19,9 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/rules/internal/testutils"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"

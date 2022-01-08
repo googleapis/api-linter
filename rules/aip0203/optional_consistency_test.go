@@ -17,7 +17,7 @@ package aip0203
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestOptionalBehaviorConsistency(t *testing.T) {
@@ -82,7 +82,7 @@ string title = 2 [(google.api.field_behavior) = REQUIRED];
 string summary = 3 [(google.api.field_behavior) = OPTIONAL];
 
 oneof other {
-	string author = 4;	
+	string author = 4;
 }`,
 			problems: nil,
 		},

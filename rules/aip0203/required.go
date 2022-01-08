@@ -17,7 +17,7 @@ package aip0203
 import (
 	"regexp"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/commure/api-linter/lint"
 )
 
 var required = &lint.FieldRule{

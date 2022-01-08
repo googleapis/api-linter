@@ -15,8 +15,8 @@
 package aip0135
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/rules/internal/utils"
 )
 
 // Delete messages should have a properly named Request message.

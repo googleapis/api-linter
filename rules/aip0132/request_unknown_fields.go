@@ -16,7 +16,7 @@ package aip0132
 
 import (
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
+	"github.com/commure/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 

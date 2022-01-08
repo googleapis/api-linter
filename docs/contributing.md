@@ -20,7 +20,7 @@ Once you have Go installed, you can clone the repository the usual way, and
 then follow up by running the tests:
 
 ```bash
-$ git clone https://github.com/googleapis/api-linter
+$ git clone https://github.com/commure/api-linter
 $ cd api-linter
 $ go test ./...
 ```
@@ -136,9 +136,9 @@ If a proto block _begins with_ a comment that says only `Incorrect.` or
 <!-- prettier-ignore-start -->
 [aip]: https://aip.dev/
 [go]: https://golang.org/
-[`go.mod`]: https://github.com/googleapis/api-linter/blob/main/go.mod
-[`problem`]: https://godoc.org/github.com/googleapis/api-linter/lint#Problem
+[`go.mod`]: https://github.com/commure/api-linter/blob/main/go.mod
+[`problem`]: https://godoc.org/github.com/commure/api-linter/lint#Problem
 [protoreflect]: https://godoc.org/github.com/jhump/protoreflect
-[`rules.go`]: https://github.com/googleapis/api-linter/blob/main/rules/rules.go
+[`rules.go`]: https://github.com/commure/api-linter/blob/main/rules/rules.go
 [visitor pattern]: https://en.wikipedia.org/wiki/Visitor_pattern
 <!-- prettier-ignore-end -->

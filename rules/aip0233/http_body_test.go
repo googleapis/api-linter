@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestHttpBody(t *testing.T) {
@@ -45,9 +45,9 @@ func TestHttpBody(t *testing.T) {
 						};
 					}
 				}
-				
+
 				message {{.MethodName}}Request {}
-				
+
 				message {{.MethodName}}Response{}
 				`, test)
 

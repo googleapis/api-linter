@@ -15,8 +15,8 @@
 package aip0152
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/rules/internal/utils"
 )
 
 // Run methods should use "*" as the HTTP body.

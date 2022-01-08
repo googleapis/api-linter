@@ -17,7 +17,7 @@ package aip0141
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestForbiddenTypes(t *testing.T) {

@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestMethodPluralResourceName(t *testing.T) {
@@ -69,7 +69,7 @@ func TestMethodPluralResourceName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				
+
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
@@ -78,9 +78,9 @@ func TestMethodPluralResourceName(t *testing.T) {
 						};
 					}
 				}
-				
+
 				message {{.MethodName}}Request {}
-				
+
 				message {{.MethodName}}Response{}
 				`, test)
 

@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/commure/api-linter/lint"
 	"github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 

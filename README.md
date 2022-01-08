@@ -1,8 +1,14 @@
-# Google API Linter
+# Commure API Linter
 
-[![ci](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml/badge.svg)](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml)
-![latest release](https://img.shields.io/github/v/release/googleapis/api-linter)
-![go version](https://img.shields.io/github/go-mod/go-version/googleapis/api-linter)
+[![ci](https://github.com/commure/api-linter/actions/workflows/ci.yaml/badge.svg)](https://github.com/commure/api-linter/actions/workflows/ci.yaml)
+![latest release](https://img.shields.io/github/v/release/commure/api-linter)
+![go version](https://img.shields.io/github/go-mod/go-version/commure/api-linter)
+
+Note: This is a fork of the
+[Google API Linter](https://github.com/googleapis/api-linter), made to allow
+some customizations of its framework that are not possible through
+configuration. Most notably, the `name` field used for resource keys has been
+changed to `resource_name`.
 
 The API linter provides real-time checks for compliance with many of Google's
 API standards, documented using [API Improvement Proposals][]. It operates on
@@ -24,7 +30,7 @@ When able, it also offers a suggestion for the correct fix.
 
 ## Versioning
 
-The Google API linter does **not** follow semantic versioning. Semantic
+The Commure API linter does **not** follow semantic versioning. Semantic
 versioning is challenging for a tool like a linter because the addition or
 correction of virtually any rule is "breaking" (in the sense that a file that
 previously reported no problems may now do so).

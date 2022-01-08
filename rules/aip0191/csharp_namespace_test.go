@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestCsharpNamespace(t *testing.T) {

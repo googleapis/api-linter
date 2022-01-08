@@ -15,8 +15,8 @@
 package aip0162
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/rules/internal/utils"
 )
 
 // The Rollback request message should have a name field.

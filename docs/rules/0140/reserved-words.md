@@ -66,5 +66,5 @@ top of the file.
 <!-- prettier-ignore-start -->
 [aip-140]: https://aip.dev/140
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
-[the code]: https://github.com/googleapis/api-linter/blob/main/rules/aip0140/reserved_words.go
+[the code]: https://github.com/commure/api-linter/blob/main/rules/aip0140/reserved_words.go
 <!-- prettier-ignore-end -->

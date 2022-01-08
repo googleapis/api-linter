@@ -17,7 +17,7 @@ package aip0135
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/commure/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -28,7 +28,7 @@ var unknownFields = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
-			"resource_name":          {}, // AIP-135
+			"resource_name": {}, // AIP-135
 			"force":         {}, // AIP-135
 			"allow_missing": {}, // AIP-135
 			"etag":          {}, // AIP-154

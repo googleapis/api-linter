@@ -1,11 +1,17 @@
 ---
 ---
 
-# Google API Linter
+# Commure API Linter
 
-![ci](https://github.com/googleapis/api-linter/workflows/ci/badge.svg)
-![latest release](https://img.shields.io/github/v/release/googleapis/api-linter)
-![go version](https://img.shields.io/github/go-mod/go-version/googleapis/api-linter)
+[![ci](https://github.com/commure/api-linter/actions/workflows/ci.yaml/badge.svg)](https://github.com/commure/api-linter/actions/workflows/ci.yaml)
+![latest release](https://img.shields.io/github/v/release/commure/api-linter)
+![go version](https://img.shields.io/github/go-mod/go-version/commure/api-linter)
+
+Note: This is a fork of the
+[Google API Linter](https://github.com/googleapis/api-linter), made to allow
+some customizations of its framework that are not possible through
+configuration. Most notably, the `name` field used for resource keys has been
+changed to `resource_name`.
 
 The API linter provides real-time checks for compliance with many of Google's
 API standards, documented using [API Improvement Proposals][]. It operates on
@@ -36,7 +42,7 @@ Each linter rule has its own [rule documentation][], and rules can be
 To install `api-linter`, use `go get`:
 
 ```sh
-go get -u github.com/googleapis/api-linter/cmd/api-linter
+go get -u github.com/commure/api-linter/cmd/api-linter
 ```
 
 It will install `api-linter` into your local Go binary directory

@@ -19,10 +19,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/locations"
+	"github.com/commure/api-linter/rules/internal/utils"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 

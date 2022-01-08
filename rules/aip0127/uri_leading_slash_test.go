@@ -17,7 +17,7 @@ package aip0127
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/commure/api-linter/rules/internal/testutils"
 )
 
 func TestURILeadingSlash(t *testing.T) {

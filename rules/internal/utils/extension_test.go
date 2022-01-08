@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"bitbucket.org/creachadair/stringset"
+	"github.com/commure/api-linter/rules/internal/testutils"
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
 func TestGetFieldBehavior(t *testing.T) {

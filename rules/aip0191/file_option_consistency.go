@@ -19,9 +19,9 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/locations"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 

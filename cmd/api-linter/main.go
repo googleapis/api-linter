@@ -20,8 +20,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules"
+	"github.com/commure/api-linter/lint"
+	"github.com/commure/api-linter/rules"
 )
 
 var globalRules = lint.NewRuleRegistry()

@@ -23,8 +23,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/commure/api-linter/lint"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/spf13/pflag"
@@ -98,7 +98,7 @@ func newCli(args []string) *cli {
 func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Print version and exit if asked.
 	if c.VersionFlag {
-		fmt.Printf("api-linter %s\n", version)
+		fmt.Printf("commure:api-linter %s\n", version)
 		return nil
 	}
 
