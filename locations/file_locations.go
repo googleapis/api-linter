@@ -84,3 +84,8 @@ func FileResourceDefinition(f *desc.FileDescriptor, index int) *dpb.SourceCodeIn
 func FileImport(f *desc.FileDescriptor, index int) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 3, index) // 3 == dependency
 }
+
+// FileCCEnableArenas returns the location of the `cc_enable_arenas` option.
+func FileCCEnableArenas(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 8, 31) // 8 == (file) options, 31 == cc_enable_arenas
+}
