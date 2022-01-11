@@ -36,6 +36,7 @@ func TestLocations(t *testing.T) {
 		option java_package = "com.google.api.linter";
 		option php_namespace = "Google\\Api\\Linter";
 		option ruby_package = "Google::Api::Linter";
+		option cc_enable_arenas = false;
 
 		message Foo {
 			string bar = 1;
@@ -84,6 +85,11 @@ func TestLocations(t *testing.T) {
 				idxFx:    FileImport,
 				idx:      0,
 				wantSpan: []int32{3, 0, int32(len(`import "google/api/resource.proto";`))},
+			},
+			{
+				testName: "CCEnableArenas",
+				fx:       FileCCEnableArenas,
+				wantSpan: []int32{11, 0, int32(len(`option cc_enable_arenas = false;`))},
 			},
 		}
 		for _, test := range tests {
