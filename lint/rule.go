@@ -99,7 +99,7 @@ func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Iterate over each message and process rules for each message.
-	for _, message := range getAllMessages(fd) {
+	for _, message := range GetAllMessages(fd) {
 		if r.OnlyIf == nil || r.OnlyIf(message) {
 			problems = append(problems, r.LintMessage(message)...)
 		}
@@ -137,7 +137,7 @@ func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
 
 	// Iterate over each message and process rules for each field in that
 	// message.
-	for _, message := range getAllMessages(fd) {
+	for _, message := range GetAllMessages(fd) {
 		for _, field := range message.GetFields() {
 			if r.OnlyIf == nil || r.OnlyIf(field) {
 				problems = append(problems, r.LintField(field)...)
@@ -335,7 +335,7 @@ func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 	}
 
 	// Iterate over all messages, and all fields within each message.
-	for _, message := range getAllMessages(fd) {
+	for _, message := range GetAllMessages(fd) {
 		if r.OnlyIf == nil || r.OnlyIf(message) {
 			problems = append(problems, r.LintDescriptor(message)...)
 		}
@@ -379,9 +379,9 @@ func getLeadingComments(d desc.Descriptor) string {
 	return ""
 }
 
-// getAllMessages returns a slice with every message (not just top-level
+// GetAllMessages returns a slice with every message (not just top-level
 // messages) in the file.
-func getAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor) {
+func GetAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor) {
 	messages = append(messages, f.GetMessageTypes()...)
 	for _, message := range f.GetMessageTypes() {
 		messages = append(messages, getAllNestedMessages(message)...)
@@ -408,7 +408,7 @@ func getAllEnums(f *desc.FileDescriptor) (enums []*desc.EnumDescriptor) {
 	enums = append(enums, f.GetEnumTypes()...)
 
 	// Append all enums nested within messages.
-	for _, m := range getAllMessages(f) {
+	for _, m := range GetAllMessages(f) {
 		enums = append(enums, m.GetNestedEnumTypes()...)
 	}
 
