@@ -76,6 +76,8 @@ func newChangelog(gitlog string) *changelog {
 			docs = append(docs, cmt)
 		case "refactor":
 			vis = append(vis, cmt)
+		case "chore":
+			vis = append(vis, cmt)
 		default:
 			invis = append(invis, cmt)
 		}
