@@ -18,8 +18,8 @@ This rule enforces that fields do not use the suffix `_name`, as mandated in
 This rule scans all fields complains if it sees the suffix `_name` on a field.
 
 **Note:** The standard field `display_name` is exempt, as are `given_name` and
-`family_name` (used to represent the human-readable name of a person), and
-`full_resource_name`.
+`family_name` (used to represent the human-readable name of a person),
+`full_resource_name`, and `crypto_key_name`.
 
 ## Examples
 
