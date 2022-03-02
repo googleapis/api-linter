@@ -28,13 +28,13 @@ import (
 var httpURIResource = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-resource"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCreateMethod(m)
+		return isCreateMethod(m) && len(utils.GetHTTPRules(m)) > 0
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 
 		// Extract the suffix of the URI path as the collection identifier.
-		uriParts := strings.Split(getURIPath(m), "/")
+		uriParts := strings.Split(utils.GetHTTPRules(m)[0].URI, "/")
 		collectionName := uriParts[len(uriParts)-1]
 
 		// Ensure that a collection identifier is provided.
@@ -60,13 +60,4 @@ var httpURIResource = &lint.MethodRule{
 
 		return problems
 	},
-}
-
-func getURIPath(m *desc.MethodDescriptor) string {
-	for _, httpRule := range utils.GetHTTPRules(m) {
-		if httpRule.Method == "POST" {
-			return httpRule.URI
-		}
-	}
-	return ""
 }
