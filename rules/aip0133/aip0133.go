@@ -30,6 +30,7 @@ func AddRules(r lint.RuleRegistry) error {
 		133,
 		httpBody,
 		httpURIParent,
+		httpURIResource,
 		httpMethod,
 		inputName,
 		methodSignature,
