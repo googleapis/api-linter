@@ -24,7 +24,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var collectionIdentifiers = &lint.MessageRule{
+var resourceCollectionIdentifiers = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "resource-collection-identifiers"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		return utils.GetResource(m) != nil

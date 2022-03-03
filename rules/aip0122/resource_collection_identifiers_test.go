@@ -20,7 +20,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestResourceTypeName(t *testing.T) {
+func TestResourceCollectionIdentifiers(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		Pattern  string
@@ -42,7 +42,7 @@ func TestResourceTypeName(t *testing.T) {
 			}
 		`, test)
 			m := f.GetMessageTypes()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(collectionIdentifiers.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(resourceCollectionIdentifiers.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
