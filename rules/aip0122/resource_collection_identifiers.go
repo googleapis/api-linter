@@ -25,7 +25,7 @@ import (
 )
 
 var resourceCollectionIdentifiers = &lint.MessageRule{
-	Name: lint.NewRuleName(123, "resource-collection-identifiers"),
+	Name: lint.NewRuleName(122, "resource-collection-identifiers"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
 		return utils.GetResource(m) != nil
 	},
