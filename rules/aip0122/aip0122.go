@@ -24,7 +24,7 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		122,
-		collectionIdentifiers,
+		resourceCollectionIdentifiers,
 		httpURICase,
 		nameSuffix,
 		resourceReferenceType,
