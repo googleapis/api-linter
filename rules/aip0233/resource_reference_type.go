@@ -24,7 +24,7 @@ import (
 // CatchCreate methods should reference the target resource via `child_type` or
 // the parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
-	Name: lint.NewRuleName(133, "resource-reference-type"),
+	Name: lint.NewRuleName(233, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
 		p := m.GetInputType().FindFieldByName("parent")
