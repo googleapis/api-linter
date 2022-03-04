@@ -8,7 +8,7 @@ redirect_from:
   - /0122/resource-collection-identifiers
 ---
 
-# Resource type name
+# Resource pattern collection identifiers
 
 This rule enforces that messages that have a `google.api.resource` annotation
 have properly formatted collection identifiers in each `pattern`, as described
