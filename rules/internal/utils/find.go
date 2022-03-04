@@ -15,9 +15,11 @@
 package utils
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // FindMessage looks for a message in a file and all imports within the
@@ -85,4 +87,37 @@ func GetAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescript
 		}
 	}
 	return answer
+}
+
+type fieldSorter []*desc.FieldDescriptor
+
+// Len is part of sort.Interface.
+func (f fieldSorter) Len() int {
+	return len(f)
+}
+
+// Swap is part of sort.Interface.
+func (f fieldSorter) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+// Less is part of sort.Interface. Compare field number.
+func (f fieldSorter) Less(i, j int) bool {
+	return f[i].GetNumber() < f[j].GetNumber()
+}
+
+// GetRepeatedMessageFields returns all fields labeled `repeated` of type
+// Message in the given message, sorted in field number order.
+func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor {
+	var fields fieldSorter
+
+	for _, f := range m.GetFields() {
+		if f.IsRepeated() && f.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE {
+			fields = append(fields, f)
+		}
+	}
+
+	sort.Sort(fields)
+
+	return fields
 }
