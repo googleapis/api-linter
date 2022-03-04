@@ -21,8 +21,8 @@ import (
 )
 
 var requestPaginationPageToken = &lint.MessageRule{
-	Name:        lint.NewRuleName(158, "request-page-token-field"),
-	OnlyIf:      isPaginatedRequestMessage,
+	Name:   lint.NewRuleName(158, "request-page-token-field"),
+	OnlyIf: isPaginatedRequestMessage,
 	LintMessage: utils.LintFieldProperties(
 		"page_token",
 		"string",
