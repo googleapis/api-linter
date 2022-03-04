@@ -104,14 +104,11 @@ func LintFieldProperties(field, typName string, typ *builder.FieldType, wantOneo
 		}
 
 		if wantSingular {
-			if problems = lintSingularField(f, typ, typName); len(problems) > 0 {
-				return problems
-			}
+			return lintSingularField(f, typ, typName)
 		} else if !wantSingular {
-			if problems = lintRepeatedField(f, typ, typName); len(problems) > 0 {
-				return problems
-			}
+			return lintRepeatedField(f, typ, typName)
 		}
+
 		return nil
 	}
 }
