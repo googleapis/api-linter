@@ -36,6 +36,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourceNameField,
 		resourcePattern,
 		resourceReferenceType,
+		resourceTypeName,
 		resourceVariables,
 	)
 }
