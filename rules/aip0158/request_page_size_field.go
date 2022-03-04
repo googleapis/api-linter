@@ -15,37 +15,19 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var requestPaginationPageSize = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-size-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// Rule check: Establish that a page_size field is present.
-		pageSize := m.FindFieldByName("page_size")
-		if pageSize == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `page_size` field.", m.GetName()),
-				Descriptor: m,
-			}}
-		}
-
-		// Rule check: Ensure that the name page_size is the correct type.
-		if pageSize.GetType() != builder.FieldTypeInt32().GetType() || pageSize.IsRepeated() {
-			return []lint.Problem{{
-				Message:    "`page_size` field on List RPCs should be a singular int32",
-				Suggestion: "int32",
-				Descriptor: pageSize,
-				Location:   locations.FieldType(pageSize),
-			}}
-		}
-
-		return nil
-	},
+	LintMessage: utils.LintFieldProperties(
+		"page_size",
+		"int32",
+		builder.FieldTypeInt32(),
+		/* wantOneof */ false,
+		/* wantSingular */ true,
+	),
 }

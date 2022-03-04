@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestLintSingularStringField(t *testing.T) {
@@ -222,6 +223,39 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 			method := f.GetServices()[0].GetMethods()[0]
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintFieldProperties(t *testing.T) {
+	for _, test := range []struct {
+		testName     string
+		Field        string
+		typName      string
+		typ          *builder.FieldType
+		wantOneof    bool
+		wantSingular bool
+		problems     testutils.Problems
+	}{
+		{"Valid", `string foo = 1;`, "string", builder.FieldTypeString(), false, true, nil},
+		{"InvalidType", `int32 foo = 1;`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidWantSingular", `repeated string foo = 1;`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Suggestion: "string"}}},
+		{"InvalidNotSingular", `string foo = 1;`, "string", builder.FieldTypeString(), false, false, testutils.Problems{{Suggestion: "repeated string"}}},
+		{"InvalidNotOneof", `oneof foo_oneof { string foo = 1; }`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Message: "should not be a oneof"}}},
+		{"InvalidWantOneof", `string foo = 1;`, "string", builder.FieldTypeString(), true, true, testutils.Problems{{Message: "should be a oneof"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message Message {
+					{{.Field}}
+				}
+			`, test)
+			msg := f.GetMessageTypes()[0]
+			field := msg.GetFields()[0]
+			problems := LintFieldProperties(field.GetName(), test.typName, test.typ, test.wantOneof, test.wantSingular)(msg)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

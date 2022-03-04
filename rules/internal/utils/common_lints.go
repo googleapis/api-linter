@@ -52,6 +52,18 @@ func lintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want strin
 	return nil
 }
 
+func lintRepeatedField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
+	if f.GetType() != t.GetType() || !f.IsRepeated() {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("The `%s` field must be a repeated %s.", f.GetName(), want),
+			Suggestion: fmt.Sprintf("repeated %s", want),
+			Descriptor: f,
+			Location:   locations.FieldType(f),
+		}}
+	}
+	return nil
+}
+
 // LintSingularBoolField returns a problem if the field is not a singular bool.
 func LintSingularBoolField(f *desc.FieldDescriptor) []lint.Problem {
 	return lintSingularField(f, builder.FieldTypeBool(), "bool")
@@ -69,6 +81,39 @@ func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
 		}}
 	}
 	return nil
+}
+
+// LintFieldProperties returns a problem if a message does not have the given singular-string
+// field or if that field is in a oneof.
+func LintFieldProperties(field, typName string, typ *builder.FieldType, wantOneof, wantSingular bool) func(*desc.MessageDescriptor) []lint.Problem {
+	return func(m *desc.MessageDescriptor) []lint.Problem {
+		f, problems := LintFieldPresent(m, field)
+		if f == nil {
+			return problems
+		}
+		if !wantOneof && f.GetOneOf() != nil {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
+				Descriptor: f,
+			}}
+		} else if wantOneof && f.GetOneOf() == nil {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("The `%s` field should be a oneof field.", f.GetName()),
+				Descriptor: f,
+			}}
+		}
+
+		if wantSingular {
+			if problems = lintSingularField(f, typ, typName); len(problems) > 0 {
+				return problems
+			}
+		} else if !wantSingular {
+			if problems = lintRepeatedField(f, typ, typName); len(problems) > 0 {
+				return problems
+			}
+		}
+		return nil
+	}
 }
 
 // LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.
