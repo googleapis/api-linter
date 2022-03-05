@@ -17,17 +17,20 @@ package aip0158
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/jhump/protoreflect/desc"
 )
 
 var requestPaginationPageToken = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-token-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: utils.LintFieldProperties(
-		"page_token",
-		"string",
-		builder.FieldTypeString(),
-		/* wantOneof */ false,
-		/* wantSingular */ true,
-	),
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		f, problems := utils.LintFieldPresent(m, "page_token")
+		if len(problems) > 0 {
+			return problems
+		}
+		problems = append(problems, utils.LintSingularStringField(f)...)
+		problems = append(problems, utils.LintNotOneof(f)...)
+
+		return problems
+	},
 }

@@ -17,17 +17,21 @@ package aip0158
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var requestPaginationPageSize = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-size-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: utils.LintFieldProperties(
-		"page_size",
-		"int32",
-		builder.FieldTypeInt32(),
-		/* wantOneof */ false,
-		/* wantSingular */ true,
-	),
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		f, problems := utils.LintFieldPresent(m, "page_size")
+		if len(problems) > 0 {
+			return problems
+		}
+		problems = append(problems, utils.LintSingularField(f, builder.FieldTypeInt32(), "int32")...)
+		problems = append(problems, utils.LintNotOneof(f)...)
+
+		return problems
+	},
 }

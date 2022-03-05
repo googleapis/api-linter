@@ -229,22 +229,38 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 	}
 }
 
-func TestLintFieldProperties(t *testing.T) {
+func TestLintSingularField(t *testing.T) {
 	for _, test := range []struct {
-		testName     string
-		Field        string
-		typName      string
-		typ          *builder.FieldType
-		wantOneof    bool
-		wantSingular bool
-		problems     testutils.Problems
+		testName string
+		Label    string
+		problems testutils.Problems
 	}{
-		{"Valid", `string foo = 1;`, "string", builder.FieldTypeString(), false, true, nil},
-		{"InvalidType", `int32 foo = 1;`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Suggestion: "string"}}},
-		{"InvalidWantSingular", `repeated string foo = 1;`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Suggestion: "string"}}},
-		{"InvalidNotSingular", `string foo = 1;`, "string", builder.FieldTypeString(), false, false, testutils.Problems{{Suggestion: "repeated string"}}},
-		{"InvalidNotOneof", `oneof foo_oneof { string foo = 1; }`, "string", builder.FieldTypeString(), false, true, testutils.Problems{{Message: "should not be a oneof"}}},
-		{"InvalidWantOneof", `string foo = 1;`, "string", builder.FieldTypeString(), true, true, testutils.Problems{{Message: "should be a oneof"}}},
+		{"Valid", "", nil},
+		{"Invalid", "repeated", testutils.Problems{{Suggestion: "string"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message Message {
+					{{.Label}} string foo = 1;
+				}
+			`, test)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := LintSingularField(field, builder.FieldTypeString(), "string")
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintNotOneof(t *testing.T) {
+	for _, test := range []struct {
+		testName string
+		Field    string
+		problems testutils.Problems
+	}{
+		{"Valid", `string foo = 1;`, nil},
+		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -252,9 +268,8 @@ func TestLintFieldProperties(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			msg := f.GetMessageTypes()[0]
-			field := msg.GetFields()[0]
-			problems := LintFieldProperties(field.GetName(), test.typName, test.typ, test.wantOneof, test.wantSingular)(msg)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := LintNotOneof(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

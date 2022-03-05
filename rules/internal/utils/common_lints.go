@@ -37,10 +37,11 @@ func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescr
 
 // LintSingularStringField returns a problem if the field is not a singular string.
 func LintSingularStringField(f *desc.FieldDescriptor) []lint.Problem {
-	return lintSingularField(f, builder.FieldTypeString(), "string")
+	return LintSingularField(f, builder.FieldTypeString(), "string")
 }
 
-func lintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
+// LintSingularField returns a problem if the field is not singular i.e. it is repeated.
+func LintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
 	if f.GetType() != t.GetType() || f.IsRepeated() {
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("The `%s` field must be a singular %s.", f.GetName(), want),
@@ -52,21 +53,9 @@ func lintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want strin
 	return nil
 }
 
-func lintRepeatedField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
-	if f.GetType() != t.GetType() || !f.IsRepeated() {
-		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field must be a repeated %s.", f.GetName(), want),
-			Suggestion: fmt.Sprintf("repeated %s", want),
-			Descriptor: f,
-			Location:   locations.FieldType(f),
-		}}
-	}
-	return nil
-}
-
 // LintSingularBoolField returns a problem if the field is not a singular bool.
 func LintSingularBoolField(f *desc.FieldDescriptor) []lint.Problem {
-	return lintSingularField(f, builder.FieldTypeBool(), "bool")
+	return LintSingularField(f, builder.FieldTypeBool(), "bool")
 }
 
 // LintFieldMask returns a problem if the field is not a singular google.protobuf.FieldMask.
@@ -83,34 +72,15 @@ func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
 	return nil
 }
 
-// LintFieldProperties returns a problem if a message does not have the given singular-string
-// field or if that field is in a oneof.
-func LintFieldProperties(field, typName string, typ *builder.FieldType, wantOneof, wantSingular bool) func(*desc.MessageDescriptor) []lint.Problem {
-	return func(m *desc.MessageDescriptor) []lint.Problem {
-		f, problems := LintFieldPresent(m, field)
-		if f == nil {
-			return problems
-		}
-		if !wantOneof && f.GetOneOf() != nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
-				Descriptor: f,
-			}}
-		} else if wantOneof && f.GetOneOf() == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("The `%s` field should be a oneof field.", f.GetName()),
-				Descriptor: f,
-			}}
-		}
-
-		if wantSingular {
-			return lintSingularField(f, typ, typName)
-		} else if !wantSingular {
-			return lintRepeatedField(f, typ, typName)
-		}
-
-		return nil
+// LintNotOneof returns a problem if the field is a oneof.
+func LintNotOneof(f *desc.FieldDescriptor) []lint.Problem {
+	if f.GetOneOf() != nil {
+		return []lint.Problem{{
+			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
+			Descriptor: f,
+		}}
 	}
+	return nil
 }
 
 // LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.
