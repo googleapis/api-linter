@@ -30,8 +30,8 @@ func TestResourceReferenceType(t *testing.T) {
 	}{
 		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
 		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
-		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a type"}}},
-		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "child_type"}}},
+		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "`child_type`"}}},
 	}
 
 	// Run each test.
