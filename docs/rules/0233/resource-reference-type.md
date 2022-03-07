@@ -31,7 +31,7 @@ message BatchCreateBooksRequest {
   // `child_type` should be used instead of `type` when referring to the
   // created resource on a parent field.
   string parent = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
-  Book book = 2;
+  repeated CreateBooksRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -41,7 +41,7 @@ message BatchCreateBooksRequest {
 // Correct.
 message BatchCreateBooksRequest {
   string parent = 1 [(google.api.resource_reference).child_type = "library.googleapis.com/Book"];
-  Book book = 2;
+  repeated CreateBooksRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -55,7 +55,7 @@ message BatchCreateBooksRequest {
   // (-- api-linter: core::0233::resource-reference-type=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string parent = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
-  Book book = 2;
+  repeated CreateBooksRequest requests = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
