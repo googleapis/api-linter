@@ -68,7 +68,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			nil,
 		},
 		{
-			"InvalidInOneof",
+			"InvalidIsOneof",
 			"ListFooRequest",
 			[]field{{"page_token", builder.FieldTypeString()}},
 			/* isOneof */ true,

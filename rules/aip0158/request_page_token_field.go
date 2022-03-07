@@ -28,6 +28,7 @@ var requestPaginationPageToken = &lint.MessageRule{
 		if len(problems) > 0 {
 			return problems
 		}
+		// Checks that page_size is of type string and is not a oneof.
 		problems = append(problems, utils.LintSingularStringField(f)...)
 		problems = append(problems, utils.LintNotOneof(f)...)
 

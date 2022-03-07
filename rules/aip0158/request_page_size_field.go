@@ -29,6 +29,7 @@ var requestPaginationPageSize = &lint.MessageRule{
 		if len(problems) > 0 {
 			return problems
 		}
+		// Checks that page_size is of type int32 and is not a oneof.
 		problems = append(problems, utils.LintSingularField(f, builder.FieldTypeInt32(), "int32")...)
 		problems = append(problems, utils.LintNotOneof(f)...)
 

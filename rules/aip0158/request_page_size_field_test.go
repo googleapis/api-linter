@@ -67,7 +67,7 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			nil,
 		},
 		{
-			"InvalidInOneof",
+			"InvalidIsOneof",
 			"ListFooRequest",
 			[]field{{"page_size", builder.FieldTypeInt32()}},
 			/* isOneof */ true,
