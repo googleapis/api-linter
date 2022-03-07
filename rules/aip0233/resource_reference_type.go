@@ -26,9 +26,14 @@ import (
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(233, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
-		p := m.GetInputType().FindFieldByName("parent")
-		return isBatchCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && len(repeated) > 0
+		out := m.GetOutputType()
+		if out.GetName() == "Operation" {
+			info := utils.GetOperationInfo(m)
+			out = utils.FindMessage(m.GetFile(), info.GetResponseType())
+		}
+		repeated := utils.GetRepeatedMessageFields(out)
+		parent := m.GetInputType().FindFieldByName("parent")
+		return isBatchCreateMethod(m) && parent != nil && utils.GetResourceReference(parent) != nil && len(repeated) > 0
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		msg := m.GetOutputType()

@@ -26,14 +26,12 @@ func TestResourceReferenceType(t *testing.T) {
 		testName string
 		TypeName string
 		RefType  string
-		Response string
 		problems testutils.Problems
 	}{
-		{"ValidChildType", "library.googleapis.com/Book", "child_type", "Book", nil},
-		{"ValidChildTypeLRO", "library.googleapis.com/Book", "child_type", "google.longrunning.Operation", nil},
-		{"ValidType", "library.googleapis.com/Shelf", "type", "Book", nil},
-		{"InvalidType", "library.googleapis.com/Book", "type", "Book", testutils.Problems{{Message: "not a type"}}},
-		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", "Book", testutils.Problems{{Message: "child_type"}}},
+		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
+		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
+		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "`child_type`"}}},
 	}
 
 	// Run each test.
@@ -43,7 +41,51 @@ func TestResourceReferenceType(t *testing.T) {
 				import "google/api/resource.proto";
 				import "google/longrunning/operations.proto";
 				service Library {
-					rpc CreateBook(CreateBookRequest) returns ({{ .Response }}) {
+					rpc CreateBook(CreateBookRequest) returns (Book) {}
+				}
+				message CreateBookRequest {
+					string parent = 1 [(google.api.resource_reference).{{ .RefType }} = "{{ .TypeName }}"];
+				}
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "shelves/{shelf}/books/{book}"
+					};
+					string name = 1;
+				}
+			`, test)
+			field := file.GetServices()[0].GetMethods()[0].GetInputType().FindFieldByName("parent")
+			problems := resourceReferenceType.Lint(file)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestResourceReferenceTypeLRO(t *testing.T) {
+	// Set up testing permutations.
+	tests := []struct {
+		testName string
+		TypeName string
+		RefType  string
+		problems testutils.Problems
+	}{
+		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
+		{"ValidChildTypeLRO", "library.googleapis.com/Book", "child_type", nil},
+		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
+		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "`child_type`"}}},
+	}
+
+	// Run each test.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 						option (google.longrunning.operation_info) = {
 							response_type: "Book"
 							metadata_type: "Book"
