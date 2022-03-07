@@ -21,7 +21,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// CatchCreate methods should reference the target resource via `child_type` or
+// BatchCreate methods should reference the target resource via `child_type` or
 // the parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(233, "resource-reference-type"),
