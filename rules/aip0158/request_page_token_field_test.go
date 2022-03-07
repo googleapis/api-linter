@@ -15,6 +15,7 @@
 package aip0158
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
@@ -28,6 +29,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 		testName      string
 		messageName   string
 		messageFields []field
+		isOneof       bool
 		problems      testutils.Problems
 		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
 	}{
@@ -35,6 +37,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			"Valid",
 			"ListFooRequest",
 			[]field{{"page_token", builder.FieldTypeString()}},
+			false,
 			testutils.Problems{},
 			nil,
 		},
@@ -42,6 +45,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			"MissingField",
 			"ListFooRequest",
 			[]field{{"name", builder.FieldTypeString()}},
+			false,
 			testutils.Problems{{Message: "page_token"}},
 			nil,
 		},
@@ -49,6 +53,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			"InvalidType",
 			"ListFooRequest",
 			[]field{{"page_token", builder.FieldTypeDouble()}},
+			false,
 			testutils.Problems{{Suggestion: "string"}},
 			func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("page_token")
@@ -58,8 +63,19 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			"IrrelevantMessage",
 			"ListFooPageToken",
 			[]field{{"page_size", builder.FieldTypeInt32()}},
+			false,
 			nil,
 			nil,
+		},
+		{
+			"InvalidIsOneof",
+			"ListFooRequest",
+			[]field{{"page_token", builder.FieldTypeString()}},
+			/* isOneof */ true,
+			testutils.Problems{{Message: "oneof"}},
+			func(m *desc.MessageDescriptor) desc.Descriptor {
+				return m.FindFieldByName("page_token")
+			},
 		},
 	}
 
@@ -70,9 +86,12 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			messageBuilder := builder.NewMessage(test.messageName)
 
 			for _, f := range test.messageFields {
-				messageBuilder.AddField(
-					builder.NewField(f.fieldName, f.fieldType),
-				)
+				fb := builder.NewField(f.fieldName, f.fieldType)
+				if test.isOneof {
+					messageBuilder.AddOneOf(builder.NewOneOf(fmt.Sprintf("%s_oneof", f.fieldName)).AddChoice(fb))
+				} else {
+					messageBuilder.AddField(fb)
+				}
 			}
 
 			message, err := messageBuilder.Build()
