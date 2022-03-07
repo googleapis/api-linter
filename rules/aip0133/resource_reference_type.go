@@ -41,14 +41,14 @@ var resourceReferenceType = &lint.MethodRule{
 
 		if resource.GetType() == ref.GetType() {
 			return []lint.Problem{{
-				Message:    "Create should use a child_type reference to the created resource, not a type reference.",
+				Message:    "Create should use a `child_type` reference to the created resource, not a `type` reference.",
 				Descriptor: parent,
 				Location:   locations.FieldResourceReference(parent),
 			}}
 		}
 		if ref.GetChildType() != "" && resource.GetType() != ref.GetChildType() {
 			return []lint.Problem{{
-				Message:    "Create should use a child_type reference to the created resource.",
+				Message:    "Create should use a `child_type` reference to the created resource.",
 				Descriptor: parent,
 				Location:   locations.FieldResourceReference(parent),
 			}}

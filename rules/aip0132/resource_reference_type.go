@@ -40,14 +40,14 @@ var resourceReferenceType = &lint.MethodRule{
 
 		if resource.GetType() == ref.GetType() {
 			return []lint.Problem{{
-				Message:    "List should use a child_type reference to the paginated resource, not a type reference.",
+				Message:    "List should use a `child_type` reference to the paginated resource, not a `type` reference.",
 				Descriptor: parent,
 				Location:   locations.FieldResourceReference(parent),
 			}}
 		}
 		if ref.GetChildType() != "" && resource.GetType() != ref.GetChildType() {
 			return []lint.Problem{{
-				Message:    "List should use a child_type reference to the paginated resource.",
+				Message:    "List should use a `child_type` reference to the paginated resource.",
 				Descriptor: parent,
 				Location:   locations.FieldResourceReference(parent),
 			}}
