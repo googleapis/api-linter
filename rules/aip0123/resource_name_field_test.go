@@ -34,6 +34,7 @@ func TestResourceNameField(t *testing.T) {
 		{"InvalidTypeNotString", `option (google.api.resource) = { type: "foo" };`, `int32 name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidTypeRepeated", `option (google.api.resource) = { type: "foo" };`, `repeated string name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantNoAnnotation", ``, ``, nil},
+		{"ValidNameField", `option (google.api.resource) = { type: "foo" name_field: "other_name"};`, "string other_name = 1;", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
