@@ -31,6 +31,7 @@ func TestFilename(t *testing.T) {
 		{"ValidDirectory", "google/library.proto", testutils.Problems{}},
 		{"ValidFileNameWithSnakeCase", "library_test.proto", testutils.Problems{}},
 		{"InvalidFileNameNotSnakeCase", "library.test.proto", testutils.Problems{{Message: "invalid characters"}}},
+		{"InvalidCharacterUppercase", "library_Test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidCharacterDollar", "library_$test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidCharacterSpace", "library test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidCharacterHash", "library_#test.proto", testutils.Problems{{Message: "invalid characters"}}},
