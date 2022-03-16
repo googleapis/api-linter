@@ -21,6 +21,7 @@ paths), it is important not to have odd paths.
 This rule currently complains if the filename:
 
 - ...is set to the proto version.
+- ...contains invalid cahracters.
 
 ## Examples
 
@@ -28,6 +29,9 @@ This rule currently complains if the filename:
 
 - `v1.proto`
 - `v1beta1.proto`
+- `library.service.proto`
+- `library#.proto`
+- `library$.proto`
 
 **Correct** filenames for this rule:
 
