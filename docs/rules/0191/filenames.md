@@ -32,6 +32,8 @@ This rule currently complains if the filename:
 - `library.service.proto`
 - `library#.proto`
 - `library$.proto`
+- `library service.proto`
+- `library_Service.proto`
 
 **Correct** filenames for this rule:
 
