@@ -32,6 +32,7 @@ func TestFilename(t *testing.T) {
 		{"ValidFileNameWithSnakeCase", "library_test.proto", testutils.Problems{}},
 		{"InvalidFileNameNotSnakeCase", "library.test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidCharacterDollar", "library_$test.proto", testutils.Problems{{Message: "invalid characters"}}},
+		{"InvalidCharacterSpace", "library test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidCharacterHash", "library_#test.proto", testutils.Problems{{Message: "invalid characters"}}},
 		{"InvalidStable", "v1.proto", testutils.Problems{{Message: "proto version"}}},
 		{"InvalidBigStable", "v20.proto", testutils.Problems{{Message: "proto version"}}},

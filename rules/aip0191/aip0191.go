@@ -44,5 +44,5 @@ func hasPackage(f *desc.FileDescriptor) bool {
 	return f.GetPackage() != ""
 }
 
-var versionRegexp = regexp.MustCompile("^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$")
-var validCharacterRegexp = regexp.MustCompile("^[a-zA-Z 0-9\\_\\/]*$")
+var versionRegexp = regexp.MustCompile(`^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$`)
+var validCharacterRegexp = regexp.MustCompile(`^[a-zA-Z0-9\\_\\/]*$`)
