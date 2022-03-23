@@ -36,6 +36,11 @@ values are inclusive. {% endcomment -%}
     <div class="glue-expansion-panel-content" id="panel-aip-{{ pbr.name }}">
       <div class="has-rule-listing">
         <table class="glue-table--datatable glue-table--stacked api-linter-rule-listing" style="width: 100%;">
+          <tr>
+            <td>
+              <a href="/{{ pbr.name }}">[index]</a>
+            </td>
+          </tr>
           {% for p in pbr.items -%}
           <tr>
             <td style="vertical-align: top;">
