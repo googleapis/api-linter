@@ -34,6 +34,13 @@ var filename = &lint.FileRule{
 				Location:   locations.FilePackage(f),
 			}}
 		}
+		if !validCharacterRegexp.MatchString(fn) {
+			return []lint.Problem{{
+				Message:    "The filename has invalid characters.",
+				Descriptor: f,
+				Location:   locations.FilePackage(f),
+			}}
+		}
 		return nil
 	},
 }

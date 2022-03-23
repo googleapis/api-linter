@@ -15,10 +15,8 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 )
@@ -26,26 +24,16 @@ import (
 var requestPaginationPageSize = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-size-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		// Rule check: Establish that a page_size field is present.
-		pageSize := m.FindFieldByName("page_size")
-		if pageSize == nil {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `page_size` field.", m.GetName()),
-				Descriptor: m,
-			}}
+	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+		f, problems := utils.LintFieldPresent(m, "page_size")
+		if len(problems) > 0 {
+			return problems
 		}
+		// Checks that page_size is of type int32 and is not a oneof. These are
+		// noops if page_size is not a oneof and is a int32.
+		problems = append(problems, utils.LintSingularField(f, builder.FieldTypeInt32(), "int32")...)
+		problems = append(problems, utils.LintNotOneof(f)...)
 
-		// Rule check: Ensure that the name page_size is the correct type.
-		if pageSize.GetType() != builder.FieldTypeInt32().GetType() || pageSize.IsRepeated() {
-			return []lint.Problem{{
-				Message:    "`page_size` field on List RPCs should be a singular int32",
-				Suggestion: "int32",
-				Descriptor: pageSize,
-				Location:   locations.FieldType(pageSize),
-			}}
-		}
-
-		return nil
+		return problems
 	},
 }

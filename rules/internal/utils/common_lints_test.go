@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestLintSingularStringField(t *testing.T) {
@@ -222,6 +223,54 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 			method := f.GetServices()[0].GetMethods()[0]
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintSingularField(t *testing.T) {
+	for _, test := range []struct {
+		testName string
+		Label    string
+		problems testutils.Problems
+	}{
+		{"Valid", "", nil},
+		{"Invalid", "repeated", testutils.Problems{{Suggestion: "string"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message Message {
+					{{.Label}} string foo = 1;
+				}
+			`, test)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := LintSingularField(field, builder.FieldTypeString(), "string")
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintNotOneof(t *testing.T) {
+	for _, test := range []struct {
+		testName string
+		Field    string
+		problems testutils.Problems
+	}{
+		{"Valid", `string foo = 1;`, nil},
+		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				message Message {
+					{{.Field}}
+				}
+			`, test)
+			field := f.GetMessageTypes()[0].GetFields()[0]
+			problems := LintNotOneof(field)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
