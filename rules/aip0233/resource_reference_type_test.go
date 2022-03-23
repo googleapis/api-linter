@@ -23,15 +23,17 @@ import (
 func TestResourceReferenceType(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
-		testName string
-		TypeName string
-		RefType  string
-		problems testutils.Problems
+		testName        string
+		TypeName        string
+		RefType         string
+		RepeatedMessage string
+		problems        testutils.Problems
 	}{
-		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
-		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
-		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
-		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "child_type"}}},
+		{"ValidChildType", "library.googleapis.com/Book", "child_type", "Book", nil},
+		{"ValidType", "library.googleapis.com/Shelf", "type", "Book", nil},
+		{"SkipNonResource", "library.googleapis.com/Book", "child_type", "NotBook", nil},
+		{"InvalidType", "library.googleapis.com/Book", "type", "Book", testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", "Book", testutils.Problems{{Message: "child_type"}}},
 	}
 
 	// Run each test.
@@ -46,13 +48,17 @@ func TestResourceReferenceType(t *testing.T) {
 					string parent = 1 [(google.api.resource_reference).{{ .RefType }} = "{{ .TypeName }}"];
 				}
 				message BatchCreateBooksResponse {
-					repeated Book books = 1;
+					repeated {{ .RepeatedMessage}} books = 1;
 				}
 				message Book {
 					option (google.api.resource) = {
 						type: "library.googleapis.com/Book"
 						pattern: "shelves/{shelf}/books/{book}"
 					};
+					string name = 1;
+				}
+
+				message NotBook {
 					string name = 1;
 				}
 			`, test)
