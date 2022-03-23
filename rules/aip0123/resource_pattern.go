@@ -18,10 +18,12 @@ import (
 	"fmt"
 	"strings"
 
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var resourcePattern = &lint.MessageRule{
@@ -29,29 +31,33 @@ var resourcePattern = &lint.MessageRule{
 	OnlyIf: hasResourceAnnotation,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resource := utils.GetResource(m)
-		// Are any patterns declared at all? If not, complain.
-		if len(resource.GetPattern()) == 0 {
+		return lintResourcePattern(resource, m, locations.MessageResource(m))
+	},
+}
+
+func lintResourcePattern(resource *annotations.ResourceDescriptor, desc desc.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
+	// Are any patterns declared at all? If not, complain.
+	if len(resource.GetPattern()) == 0 {
+		return []lint.Problem{{
+			Message:    "Resources should declare resource name pattern(s).",
+			Descriptor: desc,
+			Location:   loc,
+		}}
+	}
+
+	// Ensure that the constant segments of the pattern uses camel case,
+	// not snake case.
+	for _, pattern := range resource.GetPattern() {
+		if strings.Contains(getPlainPattern(pattern), "_") {
 			return []lint.Problem{{
-				Message:    "Resources should declare resource name pattern(s).",
-				Descriptor: m,
-				Location:   locations.MessageResource(m),
+				Message: fmt.Sprintf(
+					"Resource patterns should use camel case (apart from the variable names), such as %q.",
+					getDesiredPattern(pattern),
+				),
+				Descriptor: desc,
+				Location:   loc,
 			}}
 		}
-
-		// Ensure that the constant segments of the pattern uses camel case,
-		// not snake case.
-		for _, pattern := range resource.GetPattern() {
-			if strings.Contains(getPlainPattern(pattern), "_") {
-				return []lint.Problem{{
-					Message: fmt.Sprintf(
-						"Resource patterns should use camel case (apart from the variable names), such as %q.",
-						getDesiredPattern(pattern),
-					),
-					Descriptor: m,
-					Location:   locations.MessageResource(m),
-				}}
-			}
-		}
-		return nil
-	},
+	}
+	return nil
 }
