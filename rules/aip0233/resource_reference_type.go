@@ -19,7 +19,6 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 // BatchCreate methods should reference the target resource via `child_type` or
@@ -35,11 +34,11 @@ var resourceReferenceType = &lint.MethodRule{
 
 		// First repeated message field must be annotated with google.api.resource.
 		repeated := utils.GetRepeatedMessageFields(out)
-		var resource *annotations.ResourceDescriptor
-		if len(repeated) > 0 {
-			resMsg := repeated[0].GetMessageType()
-			resource = utils.GetResource(resMsg)
+		if len(repeated) == 0 {
+			return false
 		}
+		resMsg := repeated[0].GetMessageType()
+		resource := utils.GetResource(resMsg)
 
 		parent := m.GetInputType().FindFieldByName("parent")
 		return isBatchCreateMethod(m) && parent != nil && utils.GetResourceReference(parent) != nil && resource != nil
