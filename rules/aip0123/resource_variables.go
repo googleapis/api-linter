@@ -18,10 +18,12 @@ import (
 	"fmt"
 	"strings"
 
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var resourceVariables = &lint.MessageRule{
@@ -29,30 +31,39 @@ var resourceVariables = &lint.MessageRule{
 	OnlyIf: hasResourceAnnotation,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resource := utils.GetResource(m)
-		for _, pattern := range resource.GetPattern() {
-			for _, variable := range getVariables(pattern) {
-				if strings.ToLower(variable) != variable {
-					return []lint.Problem{{
-						Message: fmt.Sprintf(
-							"Variable names in patterns should use snake case, such as %q.",
-							getDesiredPattern(pattern),
-						),
-						Descriptor: m,
-						Location:   locations.MessageResource(m),
-					}}
-				}
-				if strings.HasSuffix(variable, "_id") {
-					return []lint.Problem{{
-						Message: fmt.Sprintf(
-							"Variable names should omit the `_id` suffix, such as %q.",
-							getDesiredPattern(pattern),
-						),
-						Descriptor: m,
-						Location:   locations.MessageResource(m),
-					}}
-				}
+
+		return lintResourceVariables(resource, m, locations.MessageResource(m))
+	},
+}
+
+// lintResourceVariables lints the resource ID segments of the pattern(s) in the
+// give ResourceDescriptor. This is used for both the file-level annotation
+// google.api.resource_definition and the message-level annotation
+// google.api.resource.
+func lintResourceVariables(resource *annotations.ResourceDescriptor, desc desc.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
+	for _, pattern := range resource.GetPattern() {
+		for _, variable := range getVariables(pattern) {
+			if strings.ToLower(variable) != variable {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						"Variable names in patterns should use snake case, such as %q.",
+						getDesiredPattern(pattern),
+					),
+					Descriptor: desc,
+					Location:   loc,
+				}}
+			}
+			if strings.HasSuffix(variable, "_id") {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						"Variable names should omit the `_id` suffix, such as %q.",
+						getDesiredPattern(pattern),
+					),
+					Descriptor: desc,
+					Location:   loc,
+				}}
 			}
 		}
-		return nil
-	},
+	}
+	return nil
 }
