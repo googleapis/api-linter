@@ -30,8 +30,8 @@ var resourceDefinitionPatterns = &lint.FileRule{
 
 		for ndx, resource := range resources {
 			loc := locations.FileResourceDefinition(f, ndx)
-			p := lintResourcePattern(resource, f, loc)
-			problems = append(problems, p...)
+			probs := lintResourcePattern(resource, f, loc)
+			problems = append(problems, probs...)
 		}
 		return problems
 	},

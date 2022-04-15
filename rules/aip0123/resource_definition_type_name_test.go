@@ -38,7 +38,8 @@ func TestResourceDefinitionTypeName(t *testing.T) {
 				pattern: "publishers/{publisher}/books/{book}"
 			};
 		`, test)
-			if diff := test.problems.SetDescriptor(f).Diff(resourceDefinitionTypeName.Lint(f)); diff != "" {
+			got := resourceDefinitionTypeName.Lint(f)
+			if diff := test.problems.SetDescriptor(f).Diff(got); diff != "" {
 				t.Error(diff)
 			}
 		})

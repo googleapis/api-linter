@@ -42,7 +42,8 @@ func TestResourceDefinitionVariables(t *testing.T) {
 					pattern: "{{.Pattern}}"
 				};
 			`, test)
-			if diff := test.problems.SetDescriptor(f).Diff(resourceDefinitionVariables.Lint(f)); diff != "" {
+			got := resourceDefinitionVariables.Lint(f)
+			if diff := test.problems.SetDescriptor(f).Diff(got); diff != "" {
 				t.Errorf(diff)
 			}
 		})
