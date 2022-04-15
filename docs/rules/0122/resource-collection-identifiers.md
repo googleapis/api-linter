@@ -17,7 +17,7 @@ in [AIP-122][].
 ## Details
 
 This rule scans messages with a `google.api.resource` annotation, and validates
-the format of `pattern` collection identifiers, specifically that the are in
+the format of `pattern` collection identifiers, specifically that they are in
 lowerCamelCase form.
 
 ## Examples
