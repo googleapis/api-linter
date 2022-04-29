@@ -21,6 +21,32 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+type SeverityLevel int
+
+// Different levels of problem severity.
+const (
+	UnknownSeverity  SeverityLevel = 0
+	LowSeverity      SeverityLevel = 100
+	ModerateSeverity SeverityLevel = 200
+	MajorSeverity    SeverityLevel = 300
+	CriticalSeverity SeverityLevel = 400
+)
+
+func (sv SeverityLevel) String() string {
+	severity := "UNKNOWN"
+	switch sv {
+	case LowSeverity:
+		severity = "LOW"
+	case ModerateSeverity:
+		severity = "MODERATE"
+	case MajorSeverity:
+		severity = "MAJOR"
+	case CriticalSeverity:
+		severity = "CRITICAL"
+	}
+	return severity
+}
+
 // Problem contains information about a result produced by an API Linter.
 //
 // All rules return []Problem. Most lint rules return 0 or 1 problems, but
@@ -61,6 +87,12 @@ type Problem struct {
 
 	// nolint:structcheck,unused
 	noPositional struct{}
+
+	// Severity level of the problem. The higher the numeric value, the higher the severity.
+	//
+	// It can be used to categorize problems and decide which of them are
+	// "no-gos" and which are simply informational and can be tolerated.
+	Severity SeverityLevel
 }
 
 // MarshalJSON defines how to represent a Problem in JSON.
@@ -84,12 +116,13 @@ func (p Problem) marshal() interface{} {
 
 	// Return a marshal-able structure.
 	return struct {
-		Message    string       `json:"message" yaml:"message"`
-		Suggestion string       `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
-		Location   fileLocation `json:"location" yaml:"location"`
-		RuleID     RuleName     `json:"rule_id" yaml:"rule_id"`
-		RuleDocURI string       `json:"rule_doc_uri" yaml:"rule_doc_uri"`
-		Category   string       `json:"category,omitempty" yaml:"category,omitempty"`
+		Message    string        `json:"message" yaml:"message"`
+		Suggestion string        `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
+		Location   fileLocation  `json:"location" yaml:"location"`
+		RuleID     RuleName      `json:"rule_id" yaml:"rule_id"`
+		RuleDocURI string        `json:"rule_doc_uri" yaml:"rule_doc_uri"`
+		Category   string        `json:"category,omitempty" yaml:"category,omitempty"`
+		Severity   SeverityLevel `json:"severity,omitempty" yaml:"severity,omitempty"`
 	}{
 		p.Message,
 		p.Suggestion,
@@ -97,6 +130,7 @@ func (p Problem) marshal() interface{} {
 		p.RuleID,
 		getRuleURL(string(p.RuleID), ruleURLMappings),
 		p.category,
+		p.Severity,
 	}
 }
 
