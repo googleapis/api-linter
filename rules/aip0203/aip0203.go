@@ -28,6 +28,7 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		203,
+		fieldPresent,
 		inputOnly,
 		immutable,
 		optional,
