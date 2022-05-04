@@ -18,6 +18,7 @@ import "strings"
 var ruleURLMappings = []func(string) string{
 	coreRuleURL,
 	clientLibrariesRuleUrl,
+	cloudRuleUrl,
 }
 
 func coreRuleURL(ruleName string) string {
@@ -26,6 +27,10 @@ func coreRuleURL(ruleName string) string {
 
 func clientLibrariesRuleUrl(ruleName string) string {
 	return groupUrl(ruleName, "client-libraries")
+}
+
+func cloudRuleUrl(ruleName string) string {
+	return groupUrl(ruleName, "cloud")
 }
 
 func groupUrl(ruleName, groupName string) string {

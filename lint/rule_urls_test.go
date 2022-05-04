@@ -42,6 +42,25 @@ func TestClientLibrariesRuleURL(t *testing.T) {
 	}
 }
 
+func TestCloudRuleURL(t *testing.T) {
+	tests := []struct {
+		name string
+		rule string
+		url  string
+	}{
+		{"CloudRule", "cloud::2500::generic-fields", "https://linter.aip.dev/2500/generic-fields"},
+		{"NotCloudRule", "test::0122::camel-case-uri", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := cloudRuleUrl(test.rule); got != test.url {
+				t.Errorf("cloudRuleUrl(%s) got %s, but want %s", test.name, got, test.url)
+			}
+		})
+	}
+}
+
 func TestGetRuleURL(t *testing.T) {
 	var mapping1 = func(name string) string {
 		if name == "one" {

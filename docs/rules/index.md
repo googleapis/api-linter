@@ -61,6 +61,31 @@ into the "core" group of rules, and remaining blocks are grouped based on the
       </div>
     </a>
   </li>
+  <li>
+    <a class="glue-tile glue-tile--border glue-tile--hoverable"
+        aria-label="Image tile" href="rules/cloud/" tabindex="0">
+      <div class="glue-tile__header glue-tile__header--icon">
+        <svg role="img" class="glue-tile__icon">
+          <use xlink:href="#glue-color-google-logo" x="-76"></use>
+        </svg>
+      </div>
+      <div class="glue-tile__body">
+        <h4 class="glue-tile__headline">
+          Cloud rules
+        </h4>
+        <p class="glue-tile__description">
+          Cloud rules are based on Cloud-specific AIPs, and are disabled by default.
+        </p>
+        <ul class="glue-tile__links">
+          <li class="glue-tile__link">
+            <svg role="img" class="glue-tile__link glue-tile__link--arrow">
+              <use xlink:href="#mi-arrow-forward-no-bg"></use>
+            </svg>
+          </li>
+        </ul>
+      </div>
+    </a>
+  </li>
 </ul>
 
 [aip.dev]: https://aip.dev/
