@@ -12,18 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0145 contains rules defined in https://aip.dev/145.
 package aip0145
 
 import (
+	"strings"
+
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/jhump/protoreflect/desc"
 )
 
-// AddRules accepts a register function and registers each of
-// this AIP's rules to it.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		145,
-		startField,
-	)
+var startField = &lint.FieldRule{
+	Name: lint.NewRuleName(145, "start-field"),
+	OnlyIf: func(f *desc.FieldDescriptor) bool {
+		return strings.HasPrefix(f.GetName(), "start")
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		name := strings.TrimPrefix(f.GetName(), "start")
+		if !strings.HasPrefix(name, "_") || len(name) < 2 {
+			return []lint.Problem{{
+				Message:    "Fields beginning with `start` should be followed by a type using snake case e.g. start_xxx",
+				Descriptor: f,
+				Location:   locations.FieldType(f),
+			}}
+		}
+		return nil
+	},
 }
