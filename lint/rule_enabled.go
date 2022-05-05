@@ -21,6 +21,10 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+// defaultDisabledRules is the list of rules or groups that are by default
+// disabled, because they are scoped to a very specific set of AIPs.
+var defaultDisabledRules = []string{"cloud"}
+
 // Disable all rules for deprecated descriptors.
 func disableDeprecated(d desc.Descriptor) bool {
 	switch v := d.(type) {

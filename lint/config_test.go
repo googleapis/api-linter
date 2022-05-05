@@ -211,6 +211,30 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 			"testrule::a",
 			disabled,
 		},
+		{
+			"NoConfigMatched_DefaultDisabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					DisabledRules: []string{"testrule"},
+				},
+			},
+			"b.proto",
+			"cloud::25164::generic-fields",
+			disabled,
+		},
+		{
+			"ConfigMatched_DefaultDisabled_Enabled",
+			Configs{
+				{
+					IncludedPaths: []string{"a.proto"},
+					EnabledRules:  []string{"cloud"},
+				},
+			},
+			"a.proto",
+			"cloud::25164::generic-fields",
+			enabled,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
