@@ -91,7 +91,9 @@ func ReadConfigsYAML(f io.Reader) (Configs, error) {
 
 // IsRuleEnabled returns true if a rule is enabled by the configs.
 func (configs Configs) IsRuleEnabled(rule string, path string) bool {
-	enabled := true
+	// Enabled by default if the rule does not belong to one of the default
+	// disabled groups. Otherwise, needs to be explicitly enabled.
+	enabled := !matchRule(rule, defaultDisabledRules...)
 	for _, c := range configs {
 		if c.matchPath(path) {
 			if matchRule(rule, c.DisabledRules...) {

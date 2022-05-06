@@ -22,6 +22,7 @@ import "fmt"
 var aipGroups = []func(int) string{
 	aipCoreGroup,
 	aipClientLibrariesGroup,
+	aipCloudGroup,
 }
 
 func aipCoreGroup(aip int) string {
@@ -34,6 +35,13 @@ func aipCoreGroup(aip int) string {
 func aipClientLibrariesGroup(aip int) string {
 	if aip >= 4200 && aip <= 4299 {
 		return "client-libraries"
+	}
+	return ""
+}
+
+func aipCloudGroup(aip int) string {
+	if (aip >= 2500 && aip <= 2599) || (aip >= 25000 && aip <= 25999) {
+		return "cloud"
 	}
 	return ""
 }
