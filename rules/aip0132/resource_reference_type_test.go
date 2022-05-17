@@ -21,17 +21,26 @@ import (
 )
 
 func TestResourceReferenceType(t *testing.T) {
+	bookResource := `
+option (google.api.resource) = {
+	type: "library.googleapis.com/Book"
+	pattern: "shelves/{shelf}/books/{book}"
+};
+`
+
 	// Set up testing permutations.
 	tests := []struct {
-		testName string
-		TypeName string
-		RefType  string
-		problems testutils.Problems
+		testName           string
+		TypeName           string
+		RefType            string
+		ResourceAnnotation string
+		problems           testutils.Problems
 	}{
-		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
-		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
-		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
-		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "`child_type`"}}},
+		{"ValidChildType", "library.googleapis.com/Book", "child_type", bookResource, nil},
+		{"ValidType", "library.googleapis.com/Shelf", "type", bookResource, nil},
+		{"InvalidType", "library.googleapis.com/Book", "type", bookResource, testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", bookResource, testutils.Problems{{Message: "`child_type`"}}},
+		{"SkipNonResource", "library.googleapis.com/Book", "child_type", "", nil},
 	}
 
 	// Run each test.
@@ -50,10 +59,7 @@ func TestResourceReferenceType(t *testing.T) {
 					repeated Book books = 1;
 				}
 				message Book {
-					option (google.api.resource) = {
-						type: "library.googleapis.com/Book"
-						pattern: "shelves/{shelf}/books/{book}"
-					};
+					{{ .ResourceAnnotation }}
 					string name = 1;
 				}
 			`, test)
