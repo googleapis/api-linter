@@ -20,14 +20,14 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-const bookResource = `
+func TestResourceReferenceType(t *testing.T) {
+	bookResource := `
 option (google.api.resource) = {
 	type: "library.googleapis.com/Book"
 	pattern: "shelves/{shelf}/books/{book}"
 };
 `
 
-func TestResourceReferenceType(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
 		testName           string
