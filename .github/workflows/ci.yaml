@@ -7,23 +7,27 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-    container: golang:1.14
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.14
       - run: go test -p 1 ./...
   lint:
     runs-on: ubuntu-latest
-    container: golang:1.14
     steps:
       - uses: actions/checkout@v3
-      - name: Install golangci-lint
-        run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
-      - name: Run golangci-lint
-        run: golangci-lint run ./...
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.14
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
   quality-checker:
     runs-on: ubuntu-latest
-    container: golang:1.14-alpine
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.14
       - name: Run the quality checker (which catches obvious mistakes, missing docs, etc.)
         run: go run ./.github/quality-checker
