@@ -124,6 +124,84 @@ func TestGetOperationInfoNone(t *testing.T) {
 	}
 }
 
+func TestGetOperationInfoResponseType(t *testing.T) {
+	// Set up testing permutations.
+	tests := []struct {
+		testName     string
+		ResponseType string
+		invalid      bool
+	}{
+		{"Valid", "WriteBookResponse", false},
+		{"Invalid", "Foo", true},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			fd := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+						option (google.longrunning.operation_info) = {
+							response_type: "{{ .ResponseType }}"
+							metadata_type: "WriteBookMetadata"
+						};
+					}
+				}
+				message WriteBookRequest {}
+				message WriteBookResponse {}
+			`, test)
+			typ := GetResponseType(fd.GetServices()[0].GetMethods()[0])
+			if (typ == nil) != test.invalid {
+				t.Fatalf("Expected invalid(%v) response_type message", test.invalid)
+			}
+			if test.invalid {
+				return
+			}
+			if got, want := typ.GetName(), test.ResponseType; got != want {
+				t.Errorf("Response type - got %q, want %q.", got, want)
+			}
+		})
+	}
+}
+
+func TestGetOperationInfoMetadataType(t *testing.T) {
+	// Set up testing permutations.
+	tests := []struct {
+		testName     string
+		MetadataType string
+		invalid      bool
+	}{
+		{"Valid", "WriteBookMetadata", false},
+		{"Invalid", "Foo", true},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			fd := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
+						option (google.longrunning.operation_info) = {
+							response_type: "WriteBookResponse"
+							metadata_type: "{{ .MetadataType }}"
+						};
+					}
+				}
+				message WriteBookRequest {}
+				message WriteBookMetadata {}
+			`, test)
+			typ := GetMetadataType(fd.GetServices()[0].GetMethods()[0])
+			if (typ == nil) != test.invalid {
+				t.Fatalf("Expected invalid(%v) metadata_type message", test.invalid)
+			}
+			if test.invalid {
+				return
+			}
+			if got, want := typ.GetName(), test.MetadataType; got != want {
+				t.Errorf("Metadata type - got %q, want %q.", got, want)
+			}
+		})
+	}
+}
+
 func TestGetResource(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, `

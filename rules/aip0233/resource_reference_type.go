@@ -28,8 +28,7 @@ var resourceReferenceType = &lint.MethodRule{
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		out := m.GetOutputType()
 		if out.GetName() == "Operation" {
-			info := utils.GetOperationInfo(m)
-			out = utils.FindMessage(m.GetFile(), info.GetResponseType())
+			out = utils.GetResponseType(m)
 		}
 
 		// First repeated message field must be annotated with google.api.resource.
@@ -44,12 +43,11 @@ var resourceReferenceType = &lint.MethodRule{
 		return isBatchCreateMethod(m) && parent != nil && utils.GetResourceReference(parent) != nil && resource != nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		msg := m.GetOutputType()
-		if msg.GetName() == "Operation" {
-			info := utils.GetOperationInfo(m)
-			msg = utils.FindMessage(m.GetFile(), info.GetResponseType())
+		out := m.GetOutputType()
+		if out.GetName() == "Operation" {
+			out = utils.GetResponseType(m)
 		}
-		repeated := utils.GetRepeatedMessageFields(msg)
+		repeated := utils.GetRepeatedMessageFields(out)
 		resMsg := repeated[0].GetMessageType()
 
 		resource := utils.GetResource(resMsg)
