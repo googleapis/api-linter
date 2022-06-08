@@ -19,6 +19,7 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 // List methods should reference the target resource via `child_type` or the
@@ -26,9 +27,15 @@ import (
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
 		p := m.GetInputType().FindFieldByName("parent")
-		return isListMethod(m) && p != nil && utils.GetResourceReference(p) != nil && len(repeated) > 0
+
+		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
+		var resource *annotations.ResourceDescriptor
+		if len(repeated) > 0 {
+			resource = utils.GetResource(repeated[0].GetMessageType())
+		}
+
+		return isListMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// The first repeated message field must be the paginated resource.
