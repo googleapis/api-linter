@@ -111,6 +111,11 @@ func (f fieldSorter) Less(i, j int) bool {
 func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor {
 	var fields fieldSorter
 
+	// If an unresolable message is fed into this helper, return empty slice.
+	if m == nil {
+		return fields
+	}
+
 	for _, f := range m.GetFields() {
 		if f.IsRepeated() && f.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE {
 			fields = append(fields, f)

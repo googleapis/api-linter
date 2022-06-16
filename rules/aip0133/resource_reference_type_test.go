@@ -66,16 +66,18 @@ func TestResourceReferenceType(t *testing.T) {
 func TestResourceReferenceTypeLRO(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
-		testName string
-		TypeName string
-		RefType  string
-		problems testutils.Problems
+		testName     string
+		TypeName     string
+		RefType      string
+		ResponseType string
+		problems     testutils.Problems
 	}{
-		{"ValidChildType", "library.googleapis.com/Book", "child_type", nil},
-		{"ValidChildTypeLRO", "library.googleapis.com/Book", "child_type", nil},
-		{"ValidType", "library.googleapis.com/Shelf", "type", nil},
-		{"InvalidType", "library.googleapis.com/Book", "type", testutils.Problems{{Message: "not a `type`"}}},
-		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", testutils.Problems{{Message: "`child_type`"}}},
+		{"ValidChildType", "library.googleapis.com/Book", "child_type", "Book", nil},
+		{"ValidChildTypeLRO", "library.googleapis.com/Book", "child_type", "Book", nil},
+		{"ValidType", "library.googleapis.com/Shelf", "type", "Book", nil},
+		{"InvalidType", "library.googleapis.com/Book", "type", "Book", testutils.Problems{{Message: "not a `type`"}}},
+		{"InvalidChildType", "library.googleapis.com/Shelf", "child_type", "Book", testutils.Problems{{Message: "`child_type`"}}},
+		{"SkipInvalidUnresolvableResponseType", "library.googleapis.com/Shelf", "child_type", "Foo", nil},
 	}
 
 	// Run each test.
@@ -87,7 +89,7 @@ func TestResourceReferenceTypeLRO(t *testing.T) {
 				service Library {
 					rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 						option (google.longrunning.operation_info) = {
-							response_type: "Book"
+							response_type: "{{ .ResponseType }}"
 							metadata_type: "Book"
 						};
 					}

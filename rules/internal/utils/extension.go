@@ -40,11 +40,44 @@ func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
+	if m == nil {
+		return nil
+	}
 	opts := m.GetMethodOptions()
 	if x := proto.GetExtension(opts, lrpb.E_OperationInfo); x != nil {
 		return x.(*lrpb.OperationInfo)
 	}
 	return nil
+}
+
+// GetResponseType returns the message referred to by the
+// (google.longrunning.operation_info).response_type annotation.
+func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+	info := GetOperationInfo(m)
+	if info == nil {
+		return nil
+	}
+	typ := FindMessage(m.GetFile(), info.GetResponseType())
+
+	return typ
+}
+
+// GetMetadataType returns the message referred to by the
+// (google.longrunning.operation_info).metadata_type annotation.
+func GetMetadataType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+	info := GetOperationInfo(m)
+	if info == nil {
+		return nil
+	}
+	typ := FindMessage(m.GetFile(), info.GetMetadataType())
+
+	return typ
 }
 
 // GetMethodSignatures returns the `google.api.method_signature` annotations.
