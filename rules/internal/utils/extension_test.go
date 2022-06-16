@@ -152,8 +152,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 
 			typ := GetResponseType(fd.GetServices()[0].GetMethods()[0])
 
-			validType := typ != nil
-			if validType != test.valid {
+			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) response_type message", test.valid)
 			}
 
@@ -196,8 +195,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 
 			typ := GetMetadataType(fd.GetServices()[0].GetMethods()[0])
 
-			validType := typ != nil
-			if validType != test.valid {
+			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) metadata_type message", test.valid)
 			}
 
