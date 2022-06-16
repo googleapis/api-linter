@@ -129,10 +129,10 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 	tests := []struct {
 		testName     string
 		ResponseType string
-		invalid      bool
+		valid        bool
 	}{
-		{"Valid", "WriteBookResponse", false},
-		{"Invalid", "Foo", true},
+		{"Valid", "WriteBookResponse", true},
+		{"Invalid", "Foo", false},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -149,13 +149,18 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 				message WriteBookRequest {}
 				message WriteBookResponse {}
 			`, test)
+
 			typ := GetResponseType(fd.GetServices()[0].GetMethods()[0])
-			if (typ == nil) != test.invalid {
-				t.Fatalf("Expected invalid(%v) response_type message", test.invalid)
+
+			validType := typ != nil
+			if validType != test.valid {
+				t.Fatalf("Expected valid(%v) response_type message", test.valid)
 			}
-			if test.invalid {
+
+			if !test.valid {
 				return
 			}
+
 			if got, want := typ.GetName(), test.ResponseType; got != want {
 				t.Errorf("Response type - got %q, want %q.", got, want)
 			}
@@ -168,10 +173,10 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 	tests := []struct {
 		testName     string
 		MetadataType string
-		invalid      bool
+		valid        bool
 	}{
-		{"Valid", "WriteBookMetadata", false},
-		{"Invalid", "Foo", true},
+		{"Valid", "WriteBookMetadata", true},
+		{"Invalid", "Foo", false},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -188,13 +193,18 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 				message WriteBookRequest {}
 				message WriteBookMetadata {}
 			`, test)
+
 			typ := GetMetadataType(fd.GetServices()[0].GetMethods()[0])
-			if (typ == nil) != test.invalid {
-				t.Fatalf("Expected invalid(%v) metadata_type message", test.invalid)
+
+			validType := typ != nil
+			if validType != test.valid {
+				t.Fatalf("Expected valid(%v) metadata_type message", test.valid)
 			}
-			if test.invalid {
+
+			if !test.valid {
 				return
 			}
+
 			if got, want := typ.GetName(), test.MetadataType; got != want {
 				t.Errorf("Metadata type - got %q, want %q.", got, want)
 			}
