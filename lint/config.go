@@ -76,7 +76,7 @@ func ReadConfigsJSON(f io.Reader) (Configs, error) {
 	return c, nil
 }
 
-// ReadConfigsYAML reads Configs from a JSON file.
+// ReadConfigsYAML reads Configs from a YAML(.yml or .yaml) file.
 func ReadConfigsYAML(f io.Reader) (Configs, error) {
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
