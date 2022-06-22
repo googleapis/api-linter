@@ -27,41 +27,45 @@ import (
 
 var csharpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "csharp-namespace"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		fops := f.GetFileOptions()
+		return fops != nil && fops.GetCsharpNamespace() != ""
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if ns := f.GetFileOptions().GetCsharpNamespace(); ns != "" {
-			// Check for invalid characters.
-			if !csharpValidChars.MatchString(ns) {
-				return []lint.Problem{{
-					Message:    "Invalid characters: C# namespaces only allow [A-Za-z0-9.].",
-					Descriptor: f,
-					Location:   locations.FileCsharpNamespace(f),
-				}}
-			}
+		ns := f.GetFileOptions().GetCsharpNamespace()
 
-			// Check that upper camel case is used.
-			upperCamel := []string{}
-			for _, segment := range strings.Split(ns, ".") {
-				wantSegment := csharpVersionRegexp.ReplaceAllStringFunc(
-					strcase.UpperCamelCase(segment),
-					func(s string) string {
-						point := csharpVersionRegexp.FindStringSubmatch(s)[1]
-						if point != "" {
-							s = strings.ReplaceAll(s, point, strings.ToUpper(point))
-						}
-						stability := csharpVersionRegexp.FindStringSubmatch(s)[2]
-						return strings.ReplaceAll(s, stability, strings.Title(stability))
-					},
-				)
-				upperCamel = append(upperCamel, wantSegment)
-			}
-			if want := strings.Join(upperCamel, "."); ns != want {
-				return []lint.Problem{{
-					Message:    "C# namespaces use UpperCamelCase.",
-					Suggestion: fmt.Sprintf("option csharp_namespace = %q;", want),
-					Descriptor: f,
-					Location:   locations.FileCsharpNamespace(f),
-				}}
-			}
+		// Check for invalid characters.
+		if !csharpValidChars.MatchString(ns) {
+			return []lint.Problem{{
+				Message:    "Invalid characters: C# namespaces only allow [A-Za-z0-9.].",
+				Descriptor: f,
+				Location:   locations.FileCsharpNamespace(f),
+			}}
+		}
+
+		// Check that upper camel case is used.
+		upperCamel := []string{}
+		for _, segment := range strings.Split(ns, ".") {
+			wantSegment := csharpVersionRegexp.ReplaceAllStringFunc(
+				strcase.UpperCamelCase(segment),
+				func(s string) string {
+					point := csharpVersionRegexp.FindStringSubmatch(s)[1]
+					if point != "" {
+						s = strings.ReplaceAll(s, point, strings.ToUpper(point))
+					}
+					stability := csharpVersionRegexp.FindStringSubmatch(s)[2]
+					return strings.ReplaceAll(s, stability, strings.Title(stability))
+				},
+			)
+			upperCamel = append(upperCamel, wantSegment)
+		}
+		if want := strings.Join(upperCamel, "."); ns != want {
+			return []lint.Problem{{
+				Message:    "C# namespaces use UpperCamelCase.",
+				Suggestion: fmt.Sprintf("option csharp_namespace = %q;", want),
+				Descriptor: f,
+				Location:   locations.FileCsharpNamespace(f),
+			}}
 		}
 		return nil
 	},

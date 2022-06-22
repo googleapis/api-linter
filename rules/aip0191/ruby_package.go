@@ -27,30 +27,34 @@ import (
 
 var rubyPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "ruby-package"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		fops := f.GetFileOptions()
+		return fops != nil && fops.GetRubyPackage() != ""
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if ns := f.GetFileOptions().GetRubyPackage(); ns != "" {
-			// Check for invalid characters.
-			if !rubyValidChars.MatchString(ns) {
-				return []lint.Problem{{
-					Message:    "Invalid characters: Ruby packages only allow [A-Za-z0-9:].",
-					Descriptor: f,
-					Location:   locations.FileRubyPackage(f),
-				}}
-			}
+		ns := f.GetFileOptions().GetRubyPackage()
 
-			// Check that upper camel case is used.
-			upperCamel := []string{}
-			for _, segment := range strings.Split(ns, "::") {
-				upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
-			}
-			if want := strings.Join(upperCamel, "::"); ns != want {
-				return []lint.Problem{{
-					Message:    "Ruby packages use UpperCamelCase.",
-					Suggestion: fmt.Sprintf("option ruby_package = %q;", want),
-					Descriptor: f,
-					Location:   locations.FileRubyPackage(f),
-				}}
-			}
+		// Check for invalid characters.
+		if !rubyValidChars.MatchString(ns) {
+			return []lint.Problem{{
+				Message:    "Invalid characters: Ruby packages only allow [A-Za-z0-9:].",
+				Descriptor: f,
+				Location:   locations.FileRubyPackage(f),
+			}}
+		}
+
+		// Check that upper camel case is used.
+		upperCamel := []string{}
+		for _, segment := range strings.Split(ns, "::") {
+			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
+		}
+		if want := strings.Join(upperCamel, "::"); ns != want {
+			return []lint.Problem{{
+				Message:    "Ruby packages use UpperCamelCase.",
+				Suggestion: fmt.Sprintf("option ruby_package = %q;", want),
+				Descriptor: f,
+				Location:   locations.FileRubyPackage(f),
+			}}
 		}
 		return nil
 	},
