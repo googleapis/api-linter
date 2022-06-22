@@ -33,6 +33,7 @@ var rubyPackage = &lint.FileRule{
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		ns := f.GetFileOptions().GetRubyPackage()
+		delim := "::"
 
 		// Check for invalid characters.
 		if !rubyValidChars.MatchString(ns) {
@@ -45,10 +46,10 @@ var rubyPackage = &lint.FileRule{
 
 		// Check that upper camel case is used.
 		upperCamel := []string{}
-		for _, segment := range strings.Split(ns, "::") {
+		for _, segment := range strings.Split(ns, delim) {
 			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
 		}
-		if want := strings.Join(upperCamel, "::"); ns != want {
+		if want := strings.Join(upperCamel, delim); ns != want {
 			return []lint.Problem{{
 				Message:    "Ruby packages use UpperCamelCase.",
 				Suggestion: fmt.Sprintf("option ruby_package = %q;", want),
@@ -56,6 +57,19 @@ var rubyPackage = &lint.FileRule{
 				Location:   locations.FileRubyPackage(f),
 			}}
 		}
+
+		for _, s := range f.GetServices() {
+			n := s.GetName()
+			if !packagingServiceNameEquals(n, ns, delim) {
+				msg := fmt.Sprintf("Casing of Ruby package and service name %q must match.", n)
+				return []lint.Problem{{
+					Message:    msg,
+					Descriptor: f,
+					Location:   locations.FileRubyPackage(f),
+				}}
+			}
+		}
+
 		return nil
 	},
 }

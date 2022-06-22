@@ -33,6 +33,8 @@ var phpNamespace = &lint.FileRule{
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		ns := f.GetFileOptions().GetPhpNamespace()
+		delim := `\`
+
 		// Check for invalid characters.
 		if !phpValidChars.MatchString(ns) {
 			return []lint.Problem{{
@@ -44,10 +46,10 @@ var phpNamespace = &lint.FileRule{
 
 		// Check that upper camel case is used.
 		upperCamel := []string{}
-		for _, segment := range strings.Split(ns, `\`) {
+		for _, segment := range strings.Split(ns, delim) {
 			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
 		}
-		if want := strings.Join(upperCamel, `\`); ns != want {
+		if want := strings.Join(upperCamel, delim); ns != want {
 			return []lint.Problem{{
 				Message: "PHP namespaces use UpperCamelCase.",
 				Suggestion: fmt.Sprintf(
@@ -56,12 +58,25 @@ var phpNamespace = &lint.FileRule{
 					// to suggest two backslashes, because that is what should be
 					// typed into the editor. We use %s to avoid additional escaping
 					// of backslashes by Sprintf.
-					strings.ReplaceAll(want, `\`, `\\`),
+					strings.ReplaceAll(want, delim, `\\`),
 				),
 				Descriptor: f,
 				Location:   locations.FilePhpNamespace(f),
 			}}
 		}
+
+		for _, s := range f.GetServices() {
+			n := s.GetName()
+			if !packagingServiceNameEquals(n, ns, delim) {
+				msg := fmt.Sprintf("Casing of PHP namespace and service name %q must match.", n)
+				return []lint.Problem{{
+					Message:    msg,
+					Descriptor: f,
+					Location:   locations.FilePhpNamespace(f),
+				}}
+			}
+		}
+
 		return nil
 	},
 }

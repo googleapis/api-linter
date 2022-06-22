@@ -33,6 +33,7 @@ var csharpNamespace = &lint.FileRule{
 	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
 		ns := f.GetFileOptions().GetCsharpNamespace()
+		delim := "."
 
 		// Check for invalid characters.
 		if !csharpValidChars.MatchString(ns) {
@@ -45,7 +46,7 @@ var csharpNamespace = &lint.FileRule{
 
 		// Check that upper camel case is used.
 		upperCamel := []string{}
-		for _, segment := range strings.Split(ns, ".") {
+		for _, segment := range strings.Split(ns, delim) {
 			wantSegment := csharpVersionRegexp.ReplaceAllStringFunc(
 				strcase.UpperCamelCase(segment),
 				func(s string) string {
@@ -59,7 +60,7 @@ var csharpNamespace = &lint.FileRule{
 			)
 			upperCamel = append(upperCamel, wantSegment)
 		}
-		if want := strings.Join(upperCamel, "."); ns != want {
+		if want := strings.Join(upperCamel, delim); ns != want {
 			return []lint.Problem{{
 				Message:    "C# namespaces use UpperCamelCase.",
 				Suggestion: fmt.Sprintf("option csharp_namespace = %q;", want),
@@ -67,6 +68,19 @@ var csharpNamespace = &lint.FileRule{
 				Location:   locations.FileCsharpNamespace(f),
 			}}
 		}
+
+		for _, s := range f.GetServices() {
+			n := s.GetName()
+			if !packagingServiceNameEquals(n, ns, delim) {
+				msg := fmt.Sprintf("Casing of C# namespace and service name %q must match.", n)
+				return []lint.Problem{{
+					Message:    msg,
+					Descriptor: f,
+					Location:   locations.FileCsharpNamespace(f),
+				}}
+			}
+		}
+
 		return nil
 	},
 }
