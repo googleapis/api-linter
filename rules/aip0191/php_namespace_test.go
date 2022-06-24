@@ -29,7 +29,7 @@ func TestPhpNamespace(t *testing.T) {
 	}{
 		{"Valid", `Google\\Example\\V1`, testutils.Problems{}},
 		{"ValidBeta", `Google\\Example\\V1beta1`, testutils.Problems{}},
-		{"ValidServiceCasing", `Google\\FooBar\\V1`, testutils.Problems{}},
+		{"ValidServiceCase", `Google\\FooBar\\V1`, testutils.Problems{}},
 		{"InvalidBadChars", "Google:Example:V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", `google\\example\\v1`, testutils.Problems{{
 			Suggestion: fmt.Sprintf("option php_namespace = %s;", `Google\\Example\\V1`),
@@ -40,7 +40,7 @@ func TestPhpNamespace(t *testing.T) {
 		{"InvalidBeta", `Google\\Example\\V1Beta1`, testutils.Problems{{
 			Suggestion: fmt.Sprintf("option php_namespace = %s;", `Google\\Example\\V1beta1`),
 		}}},
-		{"InvalidServiceCasing", `Google\\Foobar\\V1`, testutils.Problems{{Message: "Casing"}}},
+		{"InvalidServiceCase", `Google\\Foobar\\V1`, testutils.Problems{{Message: "Case"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

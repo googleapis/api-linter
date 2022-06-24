@@ -72,7 +72,7 @@ var csharpNamespace = &lint.FileRule{
 		for _, s := range f.GetServices() {
 			n := s.GetName()
 			if !packagingServiceNameEquals(n, ns, delim) {
-				msg := fmt.Sprintf("Casing of C# namespace and service name %q must match.", n)
+				msg := fmt.Sprintf("Case of C# namespace and service name %q must match.", n)
 				return []lint.Problem{{
 					Message:    msg,
 					Descriptor: f,
