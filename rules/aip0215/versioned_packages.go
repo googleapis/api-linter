@@ -33,14 +33,16 @@ var versionedPackages = &lint.FileRule{
 		}
 
 		// Ignore this if there is no package.
-		p := strings.Split(f.GetPackage(), ".")
-		if len(p) == 1 && p[0] == "" {
+		segments := strings.Split(f.GetPackage(), ".")
+		if len(segments) == 1 && segments[0] == "" {
 			return false
 		}
 
-		// Exempt anything ending in .type, or .v1master, .v2master, .master, etc.
-		if last := p[len(p)-1]; last == "type" || strings.HasSuffix(last, "master") || strings.HasSuffix(last, "main") {
-			return false
+		// Exempt anything containing .type, or .v1master, .v2master, .master, etc.
+		for _, segment := range segments {
+			if segment == "type" || strings.HasSuffix(segment, "master") || strings.HasSuffix(segment, "main") {
+				return false
+			}
 		}
 
 		// Everything else should follow the rule.
@@ -58,4 +60,4 @@ var versionedPackages = &lint.FileRule{
 	},
 }
 
-var version = regexp.MustCompile(`\.v[\d]+(p[\d]+)?(alpha|beta|eap|test)?[\d]*$`)
+var version = regexp.MustCompile(`\.v[\d]+(p[\d]+)?(alpha|beta|eap|test)?[\d]*`)
