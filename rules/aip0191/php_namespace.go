@@ -27,38 +27,56 @@ import (
 
 var phpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "php-namespace"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		fops := f.GetFileOptions()
+		return fops != nil && fops.GetPhpNamespace() != ""
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if ns := f.GetFileOptions().GetPhpNamespace(); ns != "" {
-			// Check for invalid characters.
-			if !phpValidChars.MatchString(ns) {
-				return []lint.Problem{{
-					Message:    `Invalid characters: PHP namespaces only allow [A-Za-z0-9\].`,
-					Descriptor: f,
-					Location:   locations.FilePhpNamespace(f),
-				}}
-			}
+		ns := f.GetFileOptions().GetPhpNamespace()
+		delim := `\`
 
-			// Check that upper camel case is used.
-			upperCamel := []string{}
-			for _, segment := range strings.Split(ns, `\`) {
-				upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
-			}
-			if want := strings.Join(upperCamel, `\`); ns != want {
+		// Check for invalid characters.
+		if !phpValidChars.MatchString(ns) {
+			return []lint.Problem{{
+				Message:    `Invalid characters: PHP namespaces only allow [A-Za-z0-9\].`,
+				Descriptor: f,
+				Location:   locations.FilePhpNamespace(f),
+			}}
+		}
+
+		// Check that upper camel case is used.
+		upperCamel := []string{}
+		for _, segment := range strings.Split(ns, delim) {
+			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
+		}
+		if want := strings.Join(upperCamel, delim); ns != want {
+			return []lint.Problem{{
+				Message: "PHP namespaces use UpperCamelCase.",
+				Suggestion: fmt.Sprintf(
+					"option php_namespace = %s;",
+					// Even though the string value is a single backslash, we want
+					// to suggest two backslashes, because that is what should be
+					// typed into the editor. We use %s to avoid additional escaping
+					// of backslashes by Sprintf.
+					strings.ReplaceAll(want, delim, `\\`),
+				),
+				Descriptor: f,
+				Location:   locations.FilePhpNamespace(f),
+			}}
+		}
+
+		for _, s := range f.GetServices() {
+			n := s.GetName()
+			if !packagingServiceNameEquals(n, ns, delim) {
+				msg := fmt.Sprintf("Case of PHP namespace and service name %q must match.", n)
 				return []lint.Problem{{
-					Message: "PHP namespaces use UpperCamelCase.",
-					Suggestion: fmt.Sprintf(
-						"option php_namespace = %s;",
-						// Even though the string value is a single backslash, we want
-						// to suggest two backslashes, because that is what should be
-						// typed into the editor. We use %s to avoid additional escaping
-						// of backslashes by Sprintf.
-						strings.ReplaceAll(want, `\`, `\\`),
-					),
+					Message:    msg,
 					Descriptor: f,
 					Location:   locations.FilePhpNamespace(f),
 				}}
 			}
 		}
+
 		return nil
 	},
 }

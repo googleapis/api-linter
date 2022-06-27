@@ -31,6 +31,7 @@ func TestCsharpNamespace(t *testing.T) {
 		{"ValidBeta", "Google.Example.V1Beta1", nil},
 		{"ValidMain", "Google.Example.V1Main", nil},
 		{"ValidPointBeta", "Google.Example.V1P1Beta1", nil},
+		{"ValidServiceNamespaceCase", "Google.FooBar.V1", testutils.Problems{}},
 		{"InvalidBadChars", "Google:Example:V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google.example.v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option csharp_namespace = %q;", "Google.Example.V1"),
@@ -44,12 +45,15 @@ func TestCsharpNamespace(t *testing.T) {
 		{"InvalidPointBeta", "Google.Example.V1p1beta1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option csharp_namespace = %q;", "Google.Example.V1P1Beta1"),
 		}}},
+		{"ValidServiceNamespaceCase", "Google.Foobar.V1", testutils.Problems{{Message: "Case"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				package google.example.v1;
 
 				option csharp_namespace = "{{.CsharpNamespace}}";
+
+				service FooBar {}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(csharpNamespace.Lint(f)); diff != "" {
 				t.Errorf(diff)

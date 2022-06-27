@@ -29,7 +29,7 @@ func TestRubyPackage(t *testing.T) {
 	}{
 		{"Valid", "Google::Example::V1", testutils.Problems{}},
 		{"ValidBeta", "Google::Example::V1beta1", testutils.Problems{}},
-		{"ValidTwoWords", "Google::LibraryExample::V1", testutils.Problems{}},
+		{"ValidServiceNamespaceCase", "Google::FooBar::V1", testutils.Problems{}},
 		{"InvalidBadChars", "Google.Example.V1", testutils.Problems{{Message: "Invalid characters"}}},
 		{"Invalid", "google::example::v1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1"),
@@ -40,12 +40,15 @@ func TestRubyPackage(t *testing.T) {
 		{"InvalidBeta", "Google::Example::V1Beta1", testutils.Problems{{
 			Suggestion: fmt.Sprintf("option ruby_package = %q;", "Google::Example::V1beta1"),
 		}}},
+		{"ValidServiceNamespaceCase", "Google::Foobar::V1", testutils.Problems{{Message: "Case"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				package google.example.v1;
 
 				option ruby_package = "{{.RubyPackage}}";
+
+				service FooBar {}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(rubyPackage.Lint(f)); diff != "" {
 				t.Errorf(diff)

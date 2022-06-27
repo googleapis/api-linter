@@ -27,31 +27,49 @@ import (
 
 var rubyPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "ruby-package"),
+	OnlyIf: func(f *desc.FileDescriptor) bool {
+		fops := f.GetFileOptions()
+		return fops != nil && fops.GetRubyPackage() != ""
+	},
 	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		if ns := f.GetFileOptions().GetRubyPackage(); ns != "" {
-			// Check for invalid characters.
-			if !rubyValidChars.MatchString(ns) {
-				return []lint.Problem{{
-					Message:    "Invalid characters: Ruby packages only allow [A-Za-z0-9:].",
-					Descriptor: f,
-					Location:   locations.FileRubyPackage(f),
-				}}
-			}
+		ns := f.GetFileOptions().GetRubyPackage()
+		delim := "::"
 
-			// Check that upper camel case is used.
-			upperCamel := []string{}
-			for _, segment := range strings.Split(ns, "::") {
-				upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
-			}
-			if want := strings.Join(upperCamel, "::"); ns != want {
+		// Check for invalid characters.
+		if !rubyValidChars.MatchString(ns) {
+			return []lint.Problem{{
+				Message:    "Invalid characters: Ruby packages only allow [A-Za-z0-9:].",
+				Descriptor: f,
+				Location:   locations.FileRubyPackage(f),
+			}}
+		}
+
+		// Check that upper camel case is used.
+		upperCamel := []string{}
+		for _, segment := range strings.Split(ns, delim) {
+			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
+		}
+		if want := strings.Join(upperCamel, delim); ns != want {
+			return []lint.Problem{{
+				Message:    "Ruby packages use UpperCamelCase.",
+				Suggestion: fmt.Sprintf("option ruby_package = %q;", want),
+				Descriptor: f,
+				Location:   locations.FileRubyPackage(f),
+			}}
+		}
+
+		for _, s := range f.GetServices() {
+			n := s.GetName()
+			if !packagingServiceNameEquals(n, ns, delim) {
+				msg := fmt.Sprintf("Case of Ruby package and service name %q must match.", n)
 				return []lint.Problem{{
-					Message:    "Ruby packages use UpperCamelCase.",
-					Suggestion: fmt.Sprintf("option ruby_package = %q;", want),
+					Message:    msg,
 					Descriptor: f,
 					Location:   locations.FileRubyPackage(f),
 				}}
 			}
 		}
+
 		return nil
 	},
 }
