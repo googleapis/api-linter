@@ -39,6 +39,7 @@ func AddRules(r lint.RuleRegistry) error {
 
 var paginatedReq = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Request$")
 var paginatedRes = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Response$")
+var resPattern = regexp.MustCompile("^[A-Za-z0-9]*Response")
 
 // Return true if this is an AIP-158 List request message, false otherwise.
 func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
@@ -53,8 +54,13 @@ func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
+//
+// For the purposes of AIP-158 List rules, a List Response message is any message named
+// [List|Search][A-Za-z0-9]*Response, or a message named [A-Za-z0-9]*Response containing
+// a field named next_page_token.
 func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
-	return paginatedRes.MatchString(m.GetName()) || m.FindFieldByName("next_page_token") != nil
+	return paginatedRes.MatchString(m.GetName()) ||
+		(resPattern.MatchString(m.getName()) && m.FindFieldByName("next_page_token") != nil)
 }
 
 func isPaginatedMethod(m *desc.MethodDescriptor) bool {
