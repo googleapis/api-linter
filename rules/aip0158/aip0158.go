@@ -39,7 +39,7 @@ func AddRules(r lint.RuleRegistry) error {
 
 var paginatedReq = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Request$")
 var paginatedRes = regexp.MustCompile("^(List|Search)[A-Za-z0-9]*Response$")
-var resPattern = regexp.MustCompile("^[A-Za-z0-9]*Response")
+var resPattern = regexp.MustCompile("^[A-Za-z0-9]*Response$")
 
 // Return true if this is an AIP-158 List request message, false otherwise.
 func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
