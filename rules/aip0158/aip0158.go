@@ -60,7 +60,7 @@ func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
 // a field named next_page_token.
 func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
 	return paginatedRes.MatchString(m.GetName()) ||
-		(resPattern.MatchString(m.getName()) && m.FindFieldByName("next_page_token") != nil)
+		(resPattern.MatchString(m.GetName()) && m.FindFieldByName("next_page_token") != nil)
 }
 
 func isPaginatedMethod(m *desc.MethodDescriptor) bool {
