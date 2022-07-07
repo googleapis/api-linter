@@ -49,7 +49,7 @@ If you need to violate this rule, use a leading comment above the method.
 Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
-// (-- api-linter: core::0122::camel-case-uri=disabled
+// (-- api-linter: core::0122::camel-case-uris=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 rpc GetElectronicBook(GetElectronicBookRequest) returns (ElectronicBook) {
   option (google.api.http) = {

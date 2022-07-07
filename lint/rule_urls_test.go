@@ -10,8 +10,8 @@ func TestCoreRuleURL(t *testing.T) {
 		rule string
 		url  string
 	}{
-		{"CoreRule", "core::0122::camel-case-uri", "https://linter.aip.dev/122/camel-case-uri"},
-		{"NotCoreRule", "test::0122::camel-case-uri", ""},
+		{"CoreRule", "core::0122::camel-case-uris", "https://linter.aip.dev/122/camel-case-uris"},
+		{"NotCoreRule", "test::0122::camel-case-uris", ""},
 	}
 
 	for _, test := range tests {
@@ -30,7 +30,7 @@ func TestClientLibrariesRuleURL(t *testing.T) {
 		url  string
 	}{
 		{"ClientLibrariesRule", "client-libraries::4232::repeated-fields", "https://linter.aip.dev/4232/repeated-fields"},
-		{"NotClientLibrariesRule", "test::0122::camel-case-uri", ""},
+		{"NotClientLibrariesRule", "test::0122::camel-case-uris", ""},
 	}
 
 	for _, test := range tests {
@@ -49,7 +49,7 @@ func TestCloudRuleURL(t *testing.T) {
 		url  string
 	}{
 		{"CloudRule", "cloud::2500::generic-fields", "https://linter.aip.dev/2500/generic-fields"},
-		{"NotCloudRule", "test::0122::camel-case-uri", ""},
+		{"NotCloudRule", "test::0122::camel-case-uris", ""},
 	}
 
 	for _, test := range tests {

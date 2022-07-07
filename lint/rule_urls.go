@@ -35,7 +35,7 @@ func cloudRuleUrl(ruleName string) string {
 
 func groupUrl(ruleName, groupName string) string {
 	base := "https://linter.aip.dev/"
-	nameParts := strings.Split(ruleName, "::") // e.g., client-libraries::0122::camel-case-uri -> ["client-libraries", "0122", "camel-case-uri"]
+	nameParts := strings.Split(ruleName, "::") // e.g., client-libraries::0122::camel-case-uris -> ["client-libraries", "0122", "camel-case-uris"]
 	if len(nameParts) == 0 || nameParts[0] != groupName {
 		return ""
 	}
