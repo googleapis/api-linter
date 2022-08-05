@@ -18,7 +18,7 @@ in [AIP-122][].
 
 This rule scans messages with a `google.api.resource` annotation, and validates
 the format of `pattern` collection identifiers, specifically that they are in
-lowerCamelCase form.
+lowerCamelCase form and that it does not start with a slash.
 
 ## Examples
 
@@ -31,6 +31,18 @@ message Book {
     type: "library.googleapis.com/Book"
     // Collection identifiers must be lowerCamelCase.
     pattern: "Publishers/{publisher}/Books/{book}"
+  };
+  string name = 1;
+}
+```
+
+```proto
+// Incorrect.
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    // Collection identifiers must begin with a lower-cased letter.
+    pattern: "/publishers/{publisher}/Books/{book}"
   };
   string name = 1;
 }

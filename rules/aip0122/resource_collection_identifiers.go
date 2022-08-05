@@ -33,6 +33,14 @@ var resourceCollectionIdentifiers = &lint.MessageRule{
 		var problems []lint.Problem
 		resource := utils.GetResource(m)
 		for _, p := range resource.GetPattern() {
+			if strings.IndexRune(p, '/') == 0 {
+				return append(problems, lint.Problem{
+					Message:    "Resource patterns must not start with a slash.",
+					Descriptor: m,
+					Location:   locations.MessageResource(m),
+				})
+			}
+
 			segs := strings.Split(p, "/")
 			for _, seg := range segs {
 				// Get first rune of each pattern segment.
