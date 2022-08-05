@@ -28,6 +28,8 @@ func TestResourceCollectionIdentifiers(t *testing.T) {
 	}{
 		{"Valid", "author/{author}/books/{book}", testutils.Problems{}},
 		{"InvalidUpperCase", "author/{author}/Books/{book}", testutils.Problems{{Message: "lowerCamelCase"}}},
+		{"InvalidStartsWithSlash", "/author/{author}/Books/{book}", testutils.Problems{{Message: "lowercase letter"}}},
+		{"InvalidStartsWithCapitalLetter", "Author/{author}/Books/{book}", testutils.Problems{{Message: "lowercase letter"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

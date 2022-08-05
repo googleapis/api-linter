@@ -15,6 +15,7 @@
 package aip0122
 
 import (
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -23,6 +24,8 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
+
+var firstCharRegexp = regexp.MustCompile(`^[a-z]`)
 
 var resourceCollectionIdentifiers = &lint.MessageRule{
 	Name: lint.NewRuleName(122, "resource-collection-identifiers"),
@@ -33,6 +36,14 @@ var resourceCollectionIdentifiers = &lint.MessageRule{
 		var problems []lint.Problem
 		resource := utils.GetResource(m)
 		for _, p := range resource.GetPattern() {
+			if !firstCharRegexp.MatchString(p) {
+				return append(problems, lint.Problem{
+					Message:    "Resource patterns must start with a lowercase letter.",
+					Descriptor: m,
+					Location:   locations.MessageResource(m),
+				})
+			}
+
 			segs := strings.Split(p, "/")
 			for _, seg := range segs {
 				// Get first rune of each pattern segment.
