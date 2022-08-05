@@ -18,7 +18,7 @@ in [AIP-122][].
 
 This rule scans messages with a `google.api.resource` annotation, and validates
 the format of `pattern` collection identifiers, specifically that they are in
-lowerCamelCase form and that it does not start with a slash.
+lowerCamelCase form and must start with a lowercase letter.
 
 ## Examples
 
