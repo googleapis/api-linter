@@ -64,7 +64,7 @@ func newCli(args []string) *cli {
 	// Register flag variables.
 	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
 	fs.StringVar(&cfgFlag, "config", "", "The linter config file.")
-	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\" and \"summary\" table.\nYAML is the default.")
+	fs.StringVar(&fmtFlag, "output-format", "", "The format of the linting results.\nSupported formats include \"yaml\", \"json\",\"github\" and \"summary\" table.\nYAML is the default.")
 	fs.StringVarP(&outFlag, "output-path", "o", "", "The output file path.\nIf not given, the linting results will be printed out to STDOUT.")
 	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.BoolVar(&versionFlag, "version", false, "Print version and exit.")
@@ -252,6 +252,14 @@ var outputFormatFuncs = map[string]formatFunc{
 	"yaml": yaml.Marshal,
 	"yml":  yaml.Marshal,
 	"json": json.Marshal,
+	"github": func(i interface{}) ([]byte, error) {
+		switch v := i.(type) {
+		case []lint.Response:
+			return printGithubActions(v)
+		default:
+			return json.Marshal(v)
+		}
+	},
 	"summary": func(i interface{}) ([]byte, error) {
 		switch v := i.(type) {
 		case []lint.Response:
