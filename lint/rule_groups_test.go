@@ -53,19 +53,19 @@ func TestGetRuleGroupPanic(t *testing.T) {
 }
 
 func TestGetRuleGroup(t *testing.T) {
-	var groupOne = func(aip int) string {
+	groupOne := func(aip int) string {
 		if aip == 1 {
 			return "ONE"
 		}
 		return ""
 	}
-	var groupTwo = func(aip int) string {
+	groupTwo := func(aip int) string {
 		if aip == 2 {
 			return "TWO"
 		}
 		return ""
 	}
-	var groups = []func(int) string{
+	groups := []func(int) string{
 		groupOne,
 		groupTwo,
 	}

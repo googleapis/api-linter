@@ -92,7 +92,6 @@ func main() {
 
 		return nil
 	})
-
 	// Ensure the rollup error is nil. (It should be, since our walk function
 	// never returns an error but always appends instead.)
 	if err != nil {
@@ -120,5 +119,7 @@ func main() {
 	}
 }
 
-var ruleFile = regexp.MustCompile(`rules/aip([\d]{4})/([a-z0-9_]+).go`)
-var aipIndex = regexp.MustCompile(`rules/aip[\d]{4}/aip[\d]{4}\.go`)
+var (
+	ruleFile = regexp.MustCompile(`rules/aip([\d]{4})/([a-z0-9_]+).go`)
+	aipIndex = regexp.MustCompile(`rules/aip[\d]{4}/aip[\d]{4}\.go`)
+)

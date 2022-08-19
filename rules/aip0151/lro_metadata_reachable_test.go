@@ -58,7 +58,6 @@ func TestLROMetadataReachable(t *testing.T) {
 				if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 					t.Errorf(diff)
 				}
-
 			})
 		}
 	})

@@ -30,8 +30,10 @@ func TestRequestResourceSuffix(t *testing.T) {
 	}{
 		{"ValidPresent", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "WriteBookJob" }]`, nil},
 		{"ValidMissing", "RunWriteBookJob", "name", "", nil},
-		{"IncorrectSuffix", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "Book" }]`,
-			testutils.Problems{{Message: "google.api.resource_reference", Suggestion: "WriteBookJob"}}},
+		{
+			"IncorrectSuffix", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "Book" }]`,
+			testutils.Problems{{Message: "google.api.resource_reference", Suggestion: "WriteBookJob"}},
+		},
 		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
 		{"IrrelevantField", "RunWriteBookJob", "something_else", "", nil},
 	} {

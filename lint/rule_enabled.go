@@ -51,11 +51,11 @@ func disableDeprecated(d desc.Descriptor) bool {
 // This pattern is a hook for internal extension, by creating an additional
 // file in this package that can add an additional check:
 //
-//    func disableForInternalReason(d desc.Descriptor) bool { ... }
+//	func disableForInternalReason(d desc.Descriptor) bool { ... }
 //
-//    func init() {
-//      descriptorDisableChecks = append(descriptorDisableChecks, disableForInternalReason)
-//    }
+//	func init() {
+//	  descriptorDisableChecks = append(descriptorDisableChecks, disableForInternalReason)
+//	}
 var descriptorDisableChecks = []func(d desc.Descriptor) bool{
 	disableDeprecated,
 }

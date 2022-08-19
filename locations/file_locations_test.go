@@ -56,11 +56,13 @@ func TestLocations(t *testing.T) {
 				testName: "Syntax",
 				fx:       FileSyntax,
 				wantSpan: []int32{1, 0, int32(len("syntax = \"proto3\";"))},
-			}, {
+			},
+			{
 				testName: "Package",
 				fx:       FilePackage,
 				wantSpan: []int32{5, 0, int32(len("package google.api.linter;"))},
-			}, {
+			},
+			{
 				testName: "CsharpNamespace",
 				fx:       FileCsharpNamespace,
 				wantSpan: []int32{7, 0, int32(len(`option csharp_namespace = "Google.Api.Linter";`))},

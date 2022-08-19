@@ -62,13 +62,13 @@ func TestCloudRuleURL(t *testing.T) {
 }
 
 func TestGetRuleURL(t *testing.T) {
-	var mapping1 = func(name string) string {
+	mapping1 := func(name string) string {
 		if name == "one" {
 			return "ONE"
 		}
 		return ""
 	}
-	var mapping2 = func(name string) string {
+	mapping2 := func(name string) string {
 		if name == "two" {
 			return "TWO"
 		}

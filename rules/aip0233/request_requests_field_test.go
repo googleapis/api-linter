@@ -64,7 +64,8 @@ func TestRequestRequestsField(t *testing.T) {
 				{Message: "repeated"},
 				{
 					Suggestion: "CreateBookRequest",
-				}},
+				},
+			},
 			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
 				return m.FindFieldByName("requests")
 			},

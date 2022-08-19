@@ -20,8 +20,10 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-var titleField = "string title = 1;"
-var titleWithOptionalBehavior = "string title = 1 [(google.api.field_behavior) = OPTIONAL];"
+var (
+	titleField                = "string title = 1;"
+	titleWithOptionalBehavior = "string title = 1 [(google.api.field_behavior) = OPTIONAL];"
+)
 
 func TestOptional(t *testing.T) {
 	testCases := []struct {

@@ -44,10 +44,12 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var purgeMethodRegexp = regexp.MustCompile("^Purge(?:[A-Z]|$)")
-var purgeReqMessageRegexp = regexp.MustCompile("^Purge[A-Za-z0-9]*Request$")
-var purgeRespMessageRegexp = regexp.MustCompile("^Purge[A-Za-z0-9]*Response$")
-var purgeURINameRegexp = regexp.MustCompile(`:purge$`)
+var (
+	purgeMethodRegexp      = regexp.MustCompile("^Purge(?:[A-Z]|$)")
+	purgeReqMessageRegexp  = regexp.MustCompile("^Purge[A-Za-z0-9]*Request$")
+	purgeRespMessageRegexp = regexp.MustCompile("^Purge[A-Za-z0-9]*Response$")
+	purgeURINameRegexp     = regexp.MustCompile(`:purge$`)
+)
 
 // Returns true if this is a AIP-165 Purge method, false otherwise.
 func isPurgeMethod(m *desc.MethodDescriptor) bool {
