@@ -24,8 +24,10 @@ import (
 	"github.com/googleapis/api-linter/rules"
 )
 
-var globalRules = lint.NewRuleRegistry()
-var globalConfigs = defaultConfigs()
+var (
+	globalRules   = lint.NewRuleRegistry()
+	globalConfigs = defaultConfigs()
+)
 
 func init() {
 	if err := rules.Add(globalRules); err != nil {

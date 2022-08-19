@@ -23,7 +23,6 @@ func (a listedRulesByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 func (a listedRulesByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (r listedRules) printSummaryTable() ([]byte, error) {
-
 	var buf bytes.Buffer
 	table := tablewriter.NewWriter(&buf)
 	table.SetHeader([]string{"Rule Name"})
@@ -39,7 +38,6 @@ func (r listedRules) printSummaryTable() ([]byte, error) {
 }
 
 func outputRules(formatType string) error {
-
 	rules := listedRules{}
 	for id := range globalRules {
 		rules = append(rules, listedRule{
@@ -64,5 +62,4 @@ func outputRules(formatType string) error {
 	}
 
 	return nil
-
 }
