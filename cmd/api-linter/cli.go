@@ -255,7 +255,7 @@ var outputFormatFuncs = map[string]formatFunc{
 	"github": func(i interface{}) ([]byte, error) {
 		switch v := i.(type) {
 		case []lint.Response:
-			return printGithubActions(v)
+			return formatGitHubActionOutput(v), nil
 		default:
 			return json.Marshal(v)
 		}

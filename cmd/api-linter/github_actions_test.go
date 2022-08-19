@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-func TestGithubActions(t *testing.T) {
+func TestFormatGitHubActionOutput(t *testing.T) {
 	tests := []struct {
 		name string
 		data []lint.Response
@@ -101,12 +101,9 @@ func TestGithubActions(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		got, err := printGithubActions(test.data)
-		if err != nil {
-			t.Errorf("printGithubActions(): %v", err)
-		}
+		got := formatGitHubActionOutput(test.data)
 		if diff := cmp.Diff(string(test.want), string(got)); diff != "" {
-			t.Errorf("printGithubActions() mismatch (-want +got):\n%s", diff)
+			t.Errorf("formatGitHubActionOutput() mismatch (-want +got):\n%s", diff)
 		}
 	}
 }

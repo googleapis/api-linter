@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import (
 	"github.com/googleapis/api-linter/lint"
 )
 
-// printGithubActions returns lint errors in GitHub actions format.
-func printGithubActions(responses []lint.Response) ([]byte, error) {
+// formatGitHubActionOutput returns lint errors in GitHub actions format.
+func formatGitHubActionOutput(responses []lint.Response) []byte {
 	var buf bytes.Buffer
 	for _, response := range responses {
 		for _, problem := range response.Problems {
@@ -39,6 +39,9 @@ func printGithubActions(responses []lint.Response) ([]byte, error) {
 				fmt.Fprintf(&buf, " endColumn=%d", problem.Location.Span[3])
 			}
 
+			// GitHub uses :: as control characters (which are also used to delimit
+			// linter rules. In order to prevent confusion, replace the double colon
+			// with two Armenian full stops which are indistinguishable to my eye.
 			runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops := "։։"
 			title := strings.ReplaceAll(string(problem.RuleID), "::", runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops)
 			message := strings.ReplaceAll(problem.Message, "\n", "\\n")
@@ -46,5 +49,5 @@ func printGithubActions(responses []lint.Response) ([]byte, error) {
 		}
 	}
 
-	return buf.Bytes(), nil
+	return buf.Bytes()
 }
