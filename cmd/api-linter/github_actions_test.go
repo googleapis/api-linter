@@ -34,6 +34,49 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 			want: "",
 		},
 		{
+			name: "Example with partial location specifics",
+			data: []lint.Response{
+				{
+					FilePath: "example.proto",
+					Problems: []lint.Problem{
+						{
+							RuleID:  "line::col::endLine::endColumn",
+							Message: "line, column, endline, and endColumn",
+							Location: &descriptorpb.SourceCodeInfo_Location{
+								Span: []int32{5, 6, 7, 8},
+							},
+						},
+						{
+							RuleID:  "line::col::endLine",
+							Message: "Line, column, and endline",
+							Location: &descriptorpb.SourceCodeInfo_Location{
+								Span: []int32{5, 6, 7},
+							},
+						},
+						{
+							RuleID:  "line::col",
+							Message: "Line and column",
+							Location: &descriptorpb.SourceCodeInfo_Location{
+								Span: []int32{5, 6},
+							},
+						},
+						{
+							RuleID:  "line",
+							Message: "Line only",
+							Location: &descriptorpb.SourceCodeInfo_Location{
+								Span: []int32{5, 6, 7, 8},
+							},
+						},
+					},
+				},
+			},
+			want: `::error file=example.proto endColumn=8 endLine=7 col=6 line=5 title=line։։col։։endLine։։endColumn::line, column, endline, and endColumn
+::error file=example.proto endLine=7 col=6 line=5 title=line։։col։։endLine::Line, column, and endline
+::error file=example.proto col=6 line=5 title=line։։col::Line and column
+::error file=example.proto endColumn=8 endLine=7 col=6 line=5 title=line::Line only
+`,
+		},
+		{
 			name: "Example with location specifics",
 			data: []lint.Response{
 				{
@@ -55,8 +98,8 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 					},
 				},
 			},
-			want: `::error file=example.proto line=1 col=2 endLine=3 endColumn=4 title=core։։naming_formats։։field_names::
-::error file=example.proto line=5 col=6 endLine=7 endColumn=8 title=core։։naming_formats։։field_names::multi\nline\ncomment
+			want: `::error file=example.proto endColumn=4 endLine=3 col=2 line=1 title=core։։naming_formats։։field_names::
+::error file=example.proto endColumn=8 endLine=7 col=6 line=5 title=core։։naming_formats։։field_names::multi\nline\ncomment
 `,
 		},
 		{
@@ -101,9 +144,11 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		got := formatGitHubActionOutput(test.data)
-		if diff := cmp.Diff(string(test.want), string(got)); diff != "" {
-			t.Errorf("formatGitHubActionOutput() mismatch (-want +got):\n%s", diff)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			got := formatGitHubActionOutput(test.data)
+			if diff := cmp.Diff(string(test.want), string(got)); diff != "" {
+				t.Errorf("formatGitHubActionOutput() mismatch (-want +got):\n%s", diff)
+			}
+		})
 	}
 }
