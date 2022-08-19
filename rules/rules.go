@@ -20,7 +20,7 @@
 // should have a rule here if it is feasible to enforce in code (sometimes it
 // is infeasible, however).
 //
-// A rule is technically anything with a `GetName()`, `GetURI()``, and
+// A rule is technically anything with a `GetName()`, `GetURI()“, and
 // `Lint(*desc.FileDescriptorProto) []lint.Problem` method, but most rule
 // authors will want to use the rule structs provided in the lint package
 // (`&lint.MessageRule`, `&lint.FieldRule`, and so on). These run against
@@ -30,18 +30,18 @@
 //
 // A simple rule therefore looks like this:
 //
-//   var myRule = &lint.MessageRule{
-//     Name: lint.NewRuleName(1234, "my-rule"),
-//     LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-//       if isBad(m) {
-//         return []lint.Problem{{
-//           Message: "This message is bad.",
-//           Descriptor: m,
-//         }}
-//       }
-//       return nil
-//     },
-//   }
+//	var myRule = &lint.MessageRule{
+//	  Name: lint.NewRuleName(1234, "my-rule"),
+//	  LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+//	    if isBad(m) {
+//	      return []lint.Problem{{
+//	        Message: "This message is bad.",
+//	        Descriptor: m,
+//	      }}
+//	    }
+//	    return nil
+//	  },
+//	}
 //
 // Once a rule is written, it needs to be registered. This involves adding
 // the rule to the `AddRules` method for the appropriate AIP package.

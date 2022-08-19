@@ -43,8 +43,10 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var getMethodRegexp = regexp.MustCompile("^Get(?:[A-Z]|$)")
-var getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
+var (
+	getMethodRegexp     = regexp.MustCompile("^Get(?:[A-Z]|$)")
+	getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
+)
 
 // Returns true if this is a AIP-131 Get method, false otherwise.
 func isGetMethod(m *desc.MethodDescriptor) bool {

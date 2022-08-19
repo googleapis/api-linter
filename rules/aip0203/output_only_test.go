@@ -20,9 +20,11 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-var generatedURI = "string generated_uri = 1;"
-var generatedURIWithOutputOnlyBehavior = `string generated_uri = 1 [
+var (
+	generatedURI                       = "string generated_uri = 1;"
+	generatedURIWithOutputOnlyBehavior = `string generated_uri = 1 [
 	(google.api.field_behavior) = OUTPUT_ONLY];`
+)
 
 func TestOutput(t *testing.T) {
 	testCases := []struct {

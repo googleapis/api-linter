@@ -75,9 +75,11 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var tagRevisionMethodRegexp = regexp.MustCompile(`^Tag([A-Za-z0-9]+)Revision$`)
-var tagRevisionReqMessageRegexp = regexp.MustCompile(`^Tag(?:[A-Za-z0-9]+)RevisionRequest$`)
-var tagRevisionURINameRegexp = regexp.MustCompile(`:tagRevision$`)
+var (
+	tagRevisionMethodRegexp     = regexp.MustCompile(`^Tag([A-Za-z0-9]+)Revision$`)
+	tagRevisionReqMessageRegexp = regexp.MustCompile(`^Tag(?:[A-Za-z0-9]+)RevisionRequest$`)
+	tagRevisionURINameRegexp    = regexp.MustCompile(`:tagRevision$`)
+)
 
 // Returns true if this is an AIP-162 Tag Revision method, false otherwise.
 func isTagRevisionMethod(m *desc.MethodDescriptor) bool {
@@ -89,9 +91,11 @@ func isTagRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 	return tagRevisionReqMessageRegexp.MatchString(m.GetName())
 }
 
-var commitMethodRegexp = regexp.MustCompile(`^Commit([A-Za-z0-9]+)$`)
-var commitReqMessageRegexp = regexp.MustCompile(`^Commit(?:[A-Za-z0-9]+)Request$`)
-var commitURINameRegexp = regexp.MustCompile(`:commit$`)
+var (
+	commitMethodRegexp     = regexp.MustCompile(`^Commit([A-Za-z0-9]+)$`)
+	commitReqMessageRegexp = regexp.MustCompile(`^Commit(?:[A-Za-z0-9]+)Request$`)
+	commitURINameRegexp    = regexp.MustCompile(`:commit$`)
+)
 
 // Returns true if this is an AIP-162 Commit method, false otherwise.
 func isCommitMethod(m *desc.MethodDescriptor) bool {
@@ -103,9 +107,11 @@ func isCommitRequestMessage(m *desc.MessageDescriptor) bool {
 	return commitReqMessageRegexp.MatchString(m.GetName())
 }
 
-var rollbackMethodRegexp = regexp.MustCompile(`^Rollback([A-Za-z0-9]+)$`)
-var rollbackReqMessageRegexp = regexp.MustCompile(`^Rollback(?:[A-Za-z0-9]+)Request$`)
-var rollbackURINameRegexp = regexp.MustCompile(`:rollback$`)
+var (
+	rollbackMethodRegexp     = regexp.MustCompile(`^Rollback([A-Za-z0-9]+)$`)
+	rollbackReqMessageRegexp = regexp.MustCompile(`^Rollback(?:[A-Za-z0-9]+)Request$`)
+	rollbackURINameRegexp    = regexp.MustCompile(`:rollback$`)
+)
 
 // Returns true if this is an AIP-162 Rollback method, false otherwise.
 func isRollbackMethod(m *desc.MethodDescriptor) bool {
@@ -117,9 +123,11 @@ func isRollbackRequestMessage(m *desc.MessageDescriptor) bool {
 	return rollbackReqMessageRegexp.MatchString(m.GetName())
 }
 
-var deleteRevisionMethodRegexp = regexp.MustCompile(`^Delete(?:[A-Za-z0-9]+)Revision$`)
-var deleteRevisionReqMessageRegexp = regexp.MustCompile(`^Delete(?:[A-Za-z0-9]+)RevisionRequest$`)
-var deleteRevisionURINameRegexp = regexp.MustCompile(`:deleteRevision$`)
+var (
+	deleteRevisionMethodRegexp     = regexp.MustCompile(`^Delete(?:[A-Za-z0-9]+)Revision$`)
+	deleteRevisionReqMessageRegexp = regexp.MustCompile(`^Delete(?:[A-Za-z0-9]+)RevisionRequest$`)
+	deleteRevisionURINameRegexp    = regexp.MustCompile(`:deleteRevision$`)
+)
 
 // Returns true if this is an AIP-162 Delete Revision method, false otherwise.
 func isDeleteRevisionMethod(m *desc.MethodDescriptor) bool {
@@ -131,10 +139,12 @@ func isDeleteRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 	return deleteRevisionReqMessageRegexp.MatchString(m.GetName())
 }
 
-var listRevisionsMethodRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
-var listRevisionsReqMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
-var listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
-var listRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
+var (
+	listRevisionsMethodRegexp      = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
+	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
+	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
+	listRevisionsURINameRegexp     = regexp.MustCompile(`:listRevisions$`)
+)
 
 // Returns true if this is an AIP-162 List Revisions method, false otherwise.
 func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {

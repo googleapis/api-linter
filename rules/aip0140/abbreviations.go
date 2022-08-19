@@ -68,6 +68,5 @@ var abbreviations = &lint.DescriptorRule{
 			}
 		}
 		return
-
 	},
 }

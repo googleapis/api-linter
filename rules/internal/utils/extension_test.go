@@ -63,7 +63,8 @@ func TestGetMethodSignatures(t *testing.T) {
 	}{
 		{"Zero", [][]string{}, ""},
 		{"One", [][]string{{"name"}}, `option (google.api.method_signature) = "name";`},
-		{"Two",
+		{
+			"Two",
 			[][]string{{"name"}, {"name", "read_mask"}},
 			`option (google.api.method_signature) = "name";
 			 option (google.api.method_signature) = "name,read_mask";`,

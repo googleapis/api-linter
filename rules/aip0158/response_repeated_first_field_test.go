@@ -57,5 +57,4 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			}
 		})
 	}
-
 }

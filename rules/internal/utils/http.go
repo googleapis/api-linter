@@ -115,6 +115,8 @@ func (h *HTTPRule) GetPlainURI() string {
 		"*")
 }
 
-var plainVar = regexp.MustCompile(`\{([^}=]+)\}`)
-var varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
-var templateSegment = regexp.MustCompile(`\{\$api_version\}`)
+var (
+	plainVar        = regexp.MustCompile(`\{([^}=]+)\}`)
+	varSegment      = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+	templateSegment = regexp.MustCompile(`\{\$api_version\}`)
+)

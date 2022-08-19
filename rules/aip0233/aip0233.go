@@ -43,10 +43,12 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var batchCreateMethodRegexp = regexp.MustCompile("^BatchCreate(?:[A-Za-z0-9]|$)")
-var batchCreateReqMessageRegexp = regexp.MustCompile("^BatchCreate[A-Za-z0-9]*Request$")
-var batchCreateResMessageRegexp = regexp.MustCompile("^BatchCreate[A-Za-z0-9]*Response$")
-var batchCreateURINameRegexp = regexp.MustCompile(`:batchCreate$`)
+var (
+	batchCreateMethodRegexp     = regexp.MustCompile("^BatchCreate(?:[A-Za-z0-9]|$)")
+	batchCreateReqMessageRegexp = regexp.MustCompile("^BatchCreate[A-Za-z0-9]*Request$")
+	batchCreateResMessageRegexp = regexp.MustCompile("^BatchCreate[A-Za-z0-9]*Response$")
+	batchCreateURINameRegexp    = regexp.MustCompile(`:batchCreate$`)
+)
 
 // Returns true if this is a AIP-233 Batch Create method, false otherwise.
 func isBatchCreateMethod(m *desc.MethodDescriptor) bool {

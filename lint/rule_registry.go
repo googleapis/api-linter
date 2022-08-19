@@ -22,9 +22,11 @@ import (
 // RuleRegistry is a registry for registering and looking up rules.
 type RuleRegistry map[RuleName]ProtoRule
 
-var errInvalidRuleName = errors.New("not a valid rule name")
-var errInvalidRuleGroup = errors.New("invalid rule group")
-var errDuplicatedRuleName = errors.New("duplicate rule name")
+var (
+	errInvalidRuleName    = errors.New("not a valid rule name")
+	errInvalidRuleGroup   = errors.New("invalid rule group")
+	errDuplicatedRuleName = errors.New("duplicate rule name")
+)
 
 // Register registers the list of rules of the same AIP.
 // Return an error if any of the rules is found duplicate in the registry.

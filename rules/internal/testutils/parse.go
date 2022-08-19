@@ -73,7 +73,8 @@ func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
 		"test.proto": fmt.Sprintf(
 			"syntax = \"proto3\";\n\n%s",
 			strings.TrimSpace(dedent.Dedent(src)),
-		)})["test.proto"]
+		),
+	})["test.proto"]
 }
 
 // ParseProto3Tmpl parses a template string representing a proto file, and

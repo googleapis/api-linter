@@ -16,7 +16,8 @@
 // version tag and changelog.
 //
 // Usage (see .github/workflows/release.yaml):
-//   go run ./.github/release-tool
+//
+//	go run ./.github/release-tool
 package main
 
 import (
