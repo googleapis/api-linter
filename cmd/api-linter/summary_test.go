@@ -32,13 +32,14 @@ func TestCreateSummary(t *testing.T) {
 		wantSummary: make(map[string]map[string]int),
 	}, {
 		name: "Example with a couple of responses",
-		data: []lint.Response{{
-			FilePath: "example.proto",
-			Problems: []lint.Problem{
-				{RuleID: "core::naming_formats::field_names"},
-				{RuleID: "core::naming_formats::field_names"},
+		data: []lint.Response{
+			{
+				FilePath: "example.proto",
+				Problems: []lint.Problem{
+					{RuleID: "core::naming_formats::field_names"},
+					{RuleID: "core::naming_formats::field_names"},
+				},
 			},
-		},
 			{
 				FilePath: "example2.proto",
 				Problems: []lint.Problem{
@@ -58,14 +59,15 @@ func TestCreateSummary(t *testing.T) {
 					{RuleID: "core::naming_formats::field_names"},
 					{RuleID: "core::0132::response_message::name"},
 				},
-			}},
+			},
+		},
 		wantSummary: map[string]map[string]int{
-			"core::0131::request_message::name": map[string]int{"example2.proto": 1},
-			"core::0132::response_message::name": map[string]int{
+			"core::0131::request_message::name": {"example2.proto": 1},
+			"core::0132::response_message::name": {
 				"example2.proto": 1,
 				"example4.proto": 1,
 			},
-			"core::naming_formats::field_names": map[string]int{
+			"core::naming_formats::field_names": {
 				"example.proto":  2,
 				"example3.proto": 1,
 				"example4.proto": 1,
