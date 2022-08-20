@@ -57,6 +57,10 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 			runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops := "։։"
 			title := strings.ReplaceAll(string(problem.RuleID), "::", runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops)
 			message := strings.ReplaceAll(problem.Message, "\n", "\\n")
+			uri := problem.GetRuleURI()
+			if uri != "" {
+				message += "\\n\\n" + uri
+			}
 			fmt.Fprintf(&buf, " title=%s::%s\n", title, message)
 		}
 	}

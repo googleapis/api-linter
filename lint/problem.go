@@ -95,9 +95,14 @@ func (p Problem) marshal() interface{} {
 		p.Suggestion,
 		fileLocationFromPBLocation(loc),
 		p.RuleID,
-		getRuleURL(string(p.RuleID), ruleURLMappings),
+		p.GetRuleURI(),
 		p.category,
 	}
+}
+
+// GetRuleURI returns a URI to learn more about the problem.
+func (p Problem) GetRuleURI() string {
+	return getRuleURL(string(p.RuleID), ruleURLMappings)
 }
 
 // position describes a one-based position in a source code file.
