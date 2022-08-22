@@ -38,16 +38,16 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 				// the location indicators are included.
 				switch len(problem.Location.Span) {
 				case 4:
-					fmt.Fprintf(&buf, " endColumn=%d", problem.Location.Span[3])
+					fmt.Fprintf(&buf, ",endColumn=%d", problem.Location.Span[3])
 					fallthrough
 				case 3:
-					fmt.Fprintf(&buf, " endLine=%d", problem.Location.Span[2])
+					fmt.Fprintf(&buf, ",endLine=%d", problem.Location.Span[2])
 					fallthrough
 				case 2:
-					fmt.Fprintf(&buf, " col=%d", problem.Location.Span[1])
+					fmt.Fprintf(&buf, ",col=%d", problem.Location.Span[1])
 					fallthrough
 				case 1:
-					fmt.Fprintf(&buf, " line=%d", problem.Location.Span[0])
+					fmt.Fprintf(&buf, ",line=%d", problem.Location.Span[0])
 				}
 			}
 
@@ -61,7 +61,7 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 			if uri != "" {
 				message += "\\n\\n" + uri
 			}
-			fmt.Fprintf(&buf, " title=%s::%s\n", title, message)
+			fmt.Fprintf(&buf, ",title=%s::%s\n", title, message)
 		}
 	}
 
