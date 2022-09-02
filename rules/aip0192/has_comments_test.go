@@ -20,17 +20,52 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestHasComments(t *testing.T) {
-	file := testutils.ParseProto3String(t, `
+func TestFieldHasComments(t *testing.T) {
+	for _, tst := range []struct {
+		testName string
+		Comment  string
+		problems testutils.Problems
+	}{
+		{"Valid", "This is the title.", nil},
+		{"Invalid", "", testutils.Problems{{Message: `Missing comment over`}}},
+		{"InvalidInternal", "(-- Internal only comment --)", testutils.Problems{{Message: `Missing comment over`}}},
+	} {
+		file := testutils.ParseProto3Tmpl(t, `
 		// This is a book.
 		message Book {
 			// The resource name.
 			string name = 1;
+			// {{ .Comment }}
 			string title = 2;
 		}
-	`)
-	wantProblems := testutils.Problems{{Descriptor: file.GetMessageTypes()[0].GetFields()[1]}}
-	if diff := wantProblems.Diff(hasComments.Lint(file)); diff != "" {
-		t.Errorf(diff)
+	`, tst)
+		problems := tst.problems.SetDescriptor(file.GetMessageTypes()[0].GetFields()[1])
+		if diff := problems.Diff(hasComments.Lint(file)); diff != "" {
+			t.Errorf("%s: got(+),want(-):\n%s", tst.testName, diff)
+		}
+	}
+}
+
+func TestMessageHasComments(t *testing.T) {
+	for _, tst := range []struct {
+		testName string
+		Comment  string
+		problems testutils.Problems
+	}{
+		{"Valid", "This is a book.", nil},
+		{"Invalid", "", testutils.Problems{{Message: `Missing comment over`}}},
+		{"InvalidInternal", "(-- Internal only comment --)", testutils.Problems{{Message: `Missing comment over`}}},
+	} {
+		file := testutils.ParseProto3Tmpl(t, `
+		// {{ .Comment }}
+		message Book {
+			// The resource name.
+			string name = 1;
+		}
+	`, tst)
+		problems := tst.problems.SetDescriptor(file.GetMessageTypes()[0])
+		if diff := problems.Diff(hasComments.Lint(file)); diff != "" {
+			t.Errorf("%s: got(+),want(-):\n%s", tst.testName, diff)
+		}
 	}
 }
