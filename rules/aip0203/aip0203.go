@@ -25,7 +25,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var excludeFields = stringset.New("etag")
+var standardFields = stringset.New("etag")
 
 // AddRules adds all of the AIP-203 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
@@ -64,5 +64,5 @@ func checkLeadingComments(pattern *regexp.Regexp, annotation string, unless ...*
 }
 
 func withoutFieldBehavior(f *desc.FieldDescriptor) bool {
-	return utils.GetFieldBehavior(f).Len() == 0 && !excludeFields.Contains(f.GetName())
+	return utils.GetFieldBehavior(f).Len() == 0 && !standardFields.Contains(f.GetName())
 }

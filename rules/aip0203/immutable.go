@@ -31,5 +31,5 @@ var immutable = &lint.FieldRule{
 var immutableRegexp = regexp.MustCompile("(?i).*immutable.*")
 
 func withoutImmutableFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("IMMUTABLE") && !excludeFields.Contains(f.GetName())
+	return !utils.GetFieldBehavior(f).Contains("IMMUTABLE") && !standardFields.Contains(f.GetName())
 }
