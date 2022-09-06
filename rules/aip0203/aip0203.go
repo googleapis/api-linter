@@ -25,11 +25,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var excludeFields stringset.Set
-
-func init() {
-	excludeFields = stringset.New("etag")
-}
+var excludeFields = stringset.New("etag")
 
 // AddRules adds all of the AIP-203 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
