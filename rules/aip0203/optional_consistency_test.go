@@ -86,6 +86,20 @@ oneof other {
 }`,
 			problems: nil,
 		},
+		{
+			name: "Valid-IgnoreEtag",
+			field: `
+string name = 1 [
+	(google.api.field_behavior) = IMMUTABLE,
+	(google.api.field_behavior) = OUTPUT_ONLY];
+
+string title = 2 [(google.api.field_behavior) = REQUIRED];
+
+string summary = 3 [(google.api.field_behavior) = OPTIONAL];
+
+string etag = 4;`,
+			problems: nil,
+		},
 	}
 
 	for _, test := range testCases {

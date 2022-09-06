@@ -31,5 +31,5 @@ var outputOnly = &lint.FieldRule{
 var outputOnlyRegexp = regexp.MustCompile("(?i).*output.?only.*")
 
 func withoutOutputOnlyFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("OUTPUT_ONLY")
+	return !utils.GetFieldBehavior(f).Contains("OUTPUT_ONLY") && !excludeFields.Contains(f.GetName())
 }

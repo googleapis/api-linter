@@ -31,5 +31,5 @@ var inputOnly = &lint.FieldRule{
 var inputOnlyRegexp = regexp.MustCompile("(?i).*input.?only.*")
 
 func withoutInputOnlyFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("INPUT_ONLY")
+	return !utils.GetFieldBehavior(f).Contains("INPUT_ONLY") && !excludeFields.Contains(f.GetName())
 }
