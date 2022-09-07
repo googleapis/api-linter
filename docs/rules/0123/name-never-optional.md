@@ -10,7 +10,7 @@ redirect_from:
 
 # Resource name field never optional
 
-This rule enforces that the name field of resource messages is not labeled with
+This rule enforces that the name field of a resource message is not labeled with
 proto3_optional.
 
 ## Details
