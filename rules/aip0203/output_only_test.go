@@ -46,6 +46,12 @@ func TestOutput(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "Valid-exclude-etag",
+			comment:  "Output Only.",
+			field:    "string etag = 1;",
+			problems: nil,
+		},
+		{
 			name:    "Invalid-Output Only",
 			comment: "Output Only",
 			field:   generatedURI,

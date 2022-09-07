@@ -27,7 +27,7 @@ var optionalBehaviorConsistency = &lint.MessageRule{
 	OnlyIf: messageHasOptionalFieldBehavior,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		for _, f := range m.GetFields() {
-			if utils.GetFieldBehavior(f).Len() == 0 && f.GetOneOf() == nil {
+			if utils.GetFieldBehavior(f).Len() == 0 && !standardFields.Contains(f.GetName()) && f.GetOneOf() == nil {
 				problems = append(problems, lint.Problem{
 					Message:    "Within a single message, either all optional fields should be indicated, or none of them should be.",
 					Descriptor: f,

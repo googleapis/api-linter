@@ -45,6 +45,12 @@ func TestImmutable(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "Valid-exclude-etag",
+			comment:  "Immutable.",
+			field:    "string etag = 1;",
+			problems: nil,
+		},
+		{
 			name:    "Invalid-immutable",
 			comment: "immutable",
 			field:   fieldPart,

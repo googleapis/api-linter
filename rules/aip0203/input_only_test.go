@@ -34,6 +34,12 @@ func TestInputOnly(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "valid_exclude_etag",
+			comment:  "Input only.",
+			field:    "string etag = 1;",
+			problems: nil,
+		},
+		{
 			name:    "input_only",
 			comment: "input_only",
 			field:   "string secret = 1;",

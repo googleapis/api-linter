@@ -45,6 +45,12 @@ func TestOptional(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "Valid-exclude-etag",
+			comment:  "Optional.",
+			field:    "string etag = 1;",
+			problems: nil,
+		},
+		{
 			name:    "Invalid-optional",
 			comment: "optional",
 			field:   titleField,

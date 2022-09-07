@@ -86,6 +86,12 @@ func TestRequired(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "Valid-exclude-etag",
+			comment:  "Required",
+			field:    "string etag = 1;",
+			problems: nil,
+		},
+		{
 			name:    "Invalid-required",
 			comment: "required",
 			field:   title,
