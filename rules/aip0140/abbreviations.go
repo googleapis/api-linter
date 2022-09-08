@@ -22,6 +22,8 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var expectedAbbreviations = map[string]string{
@@ -41,7 +43,7 @@ var abbreviations = &lint.DescriptorRule{
 		//
 		// We do not need to worry about word separators though, since
 		// we are checking for single words only.
-		var caseFunc func(string) string = strings.Title
+		var caseFunc func(string) string = cases.Title(language.AmericanEnglish).String
 		switch d.(type) {
 		case *desc.FieldDescriptor:
 			caseFunc = strings.ToLower
