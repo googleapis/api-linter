@@ -312,3 +312,56 @@ func TestGetResourceReference(t *testing.T) {
 		}
 	})
 }
+
+func TestFindResource(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+				
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name, reference string
+	}{
+		{"local_reference", "library.googleapis.com/Shelf"},
+		{"imported_reference", "library.googleapis.com/Book"},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			if got := FindResource(tst.reference, files["shelf.proto"]); got == nil {
+				t.Errorf("Got nil, expected %q", tst.reference)
+			} else if got.GetType() != tst.reference {
+				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
+			}
+		})
+	}
+}

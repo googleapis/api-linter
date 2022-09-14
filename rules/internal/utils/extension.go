@@ -147,3 +147,22 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 	}
 	return nil
 }
+
+// FindResource attempts to find the google.api.resource(_definition) given the
+// resource Type name being referenced. It looks within a given file and its
+// depenedncies, it cannot search within the entire protobuf package.
+// This is especially useful for resolving google.api.resource_reference
+// annotations.
+func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
+	files := append(file.GetDependencies(), file)
+	for _, f := range files {
+		for _, m := range f.GetMessageTypes() {
+			if r := GetResource(m); r != nil {
+				if r.GetType() == reference {
+					return r
+				}
+			}
+		}
+	}
+	return nil
+}

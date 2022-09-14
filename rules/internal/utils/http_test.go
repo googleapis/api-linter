@@ -148,3 +148,33 @@ func TestGetVariables(t *testing.T) {
 		})
 	}
 }
+
+func TestHasHTTPRules(t *testing.T) {
+	for _, tst := range []struct {
+		name       string
+		Annotation string
+	}{
+		{"has_rule", `option (google.api.http) = {get: "/v1/foos"};`},
+		{"no_rule", ""},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+					
+				service Foo {
+					rpc ListFoos (ListFoosRequest) returns (ListFoosResponse) {
+						{{ .Annotation }}
+					}
+				}
+
+				message ListFoosRequest {}
+				message ListFoosResponse {}
+			`, tst)
+
+			want := tst.Annotation != ""
+			if got := HasHTTPRules(file.GetServices()[0].GetMethods()[0]); got != want {
+				t.Errorf("Got %v, expected %v", got, want)
+			}
+		})
+	}
+}
