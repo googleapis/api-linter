@@ -62,13 +62,15 @@ jobs:
       # The API linter does not use these,  but we need them to build the
       # binaries.
       #
-      # Mousetrap is installed individually because it is needed for the
-      # Windows build. Since we are building on Linux, it is not installed
-      # automatically as a dependency.
+      # gox is a cross-compiler binary and needs to be install with `go install`.
+      #
+      # Mousetrap is a build dependency installed individually because it is
+      # only needed for the Windows build. Since we are building on Linux, it is
+      # not installed automatically as a dependency.
       - name: Install the cross-platform build tool.
         run: |
           go install github.com/mitchellh/gox@latest
-          go install github.com/inconshreveable/mousetrap@latest
+          go get github.com/inconshreveable/mousetrap
       - name: Set the version number in the binary (for `api-linter --version`).
         run: |
           cat > cmd/api-linter/version.go <<EOF
