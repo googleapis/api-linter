@@ -67,8 +67,8 @@ jobs:
       # automatically as a dependency.
       - name: Install the cross-platform build tool.
         run: |
-          go get github.com/mitchellh/gox
-          go get github.com/inconshreveable/mousetrap
+          go install github.com/mitchellh/gox@latest
+          go install github.com/inconshreveable/mousetrap@latest
       - name: Set the version number in the binary (for `api-linter --version`).
         run: |
           cat > cmd/api-linter/version.go <<EOF
