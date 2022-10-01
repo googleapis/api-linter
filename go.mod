@@ -14,14 +14,14 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
 	golang.org/x/text v0.3.7
-	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf
+	google.golang.org/genproto v0.0.0-20220930163606-c98284e70a91
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
-	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
-	google.golang.org/grpc v1.48.0 // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	google.golang.org/grpc v1.49.0 // indirect
 )
