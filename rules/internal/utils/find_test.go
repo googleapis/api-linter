@@ -78,7 +78,10 @@ func TestFindFieldDotNotation(t *testing.T) {
 		t.Run(tst.name, func(t *testing.T) {
 			split := strings.Split(tst.path, ".")
 			want := split[len(split)-1]
-			if f := FindFieldDotNotation(msg, tst.path); f == nil {
+
+			f := FindFieldDotNotation(msg, tst.path)
+
+			if f == nil {
 				t.Errorf("Got nil, expected %q field", want)
 			} else if got := f.GetName(); got != want {
 				t.Errorf("Got %q, expected %q", got, want)

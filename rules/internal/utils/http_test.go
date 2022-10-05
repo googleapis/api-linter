@@ -170,9 +170,11 @@ func TestHasHTTPRules(t *testing.T) {
 				message ListFoosRequest {}
 				message ListFoosResponse {}
 			`, tst)
-
 			want := tst.Annotation != ""
-			if got := HasHTTPRules(file.GetServices()[0].GetMethods()[0]); got != want {
+
+			got := HasHTTPRules(file.GetServices()[0].GetMethods()[0])
+
+			if got != want {
 				t.Errorf("Got %v, expected %v", got, want)
 			}
 		})
