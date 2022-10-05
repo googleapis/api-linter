@@ -352,14 +352,22 @@ func TestFindResource(t *testing.T) {
 
 	for _, tst := range []struct {
 		name, reference string
+		notFound        bool
 	}{
-		{"local_reference", "library.googleapis.com/Shelf"},
-		{"imported_reference", "library.googleapis.com/Book"},
+		{"local_reference", "library.googleapis.com/Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", true},
 	} {
 		t.Run(tst.name, func(t *testing.T) {
-			if got := FindResource(tst.reference, files["shelf.proto"]); got == nil {
+			got := FindResource(tst.reference, files["shelf.proto"])
+
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
+			}
+
+			if !tst.notFound && got == nil {
 				t.Errorf("Got nil, expected %q", tst.reference)
-			} else if got.GetType() != tst.reference {
+			} else if !tst.notFound && got.GetType() != tst.reference {
 				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
 			}
 		})

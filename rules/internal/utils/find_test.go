@@ -71,7 +71,7 @@ func TestFindFieldDotNotation(t *testing.T) {
 	for _, tst := range []struct {
 		name, path string
 	}{
-		{"simple", "parent"},
+		{"top_level", "parent"},
 		{"nested", "book.name"},
 		{"double_nested", "book.publishing_info.publisher"},
 	} {

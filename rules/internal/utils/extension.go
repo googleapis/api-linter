@@ -148,7 +148,7 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 	return nil
 }
 
-// FindResource attempts to find the google.api.resource(_definition) given the
+// FindResource returns first resource of type matching the reference param.
 // resource Type name being referenced. It looks within a given file and its
 // depenedncies, it cannot search within the entire protobuf package.
 // This is especially useful for resolving google.api.resource_reference
