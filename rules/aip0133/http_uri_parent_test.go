@@ -60,6 +60,34 @@ func TestHTTPURIParent(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+		t.Run(test.testName+"/Operation", func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns (google.longrunning.Operation) {
+						option (google.api.http) = {
+							post: "{{.URI}}"
+						};
+						option (google.longrunning.operation_info) = {
+							response_type: "Book"
+							metadata_type: "Book"
+						};
+					}
+				}
+				message {{.MethodName}}Request {}
+				message Book {
+					option (google.api.resource) = {
+						pattern: "{{.Pattern}}"
+					};
+				}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
+				t.Error(diff)
+			}
+		})
 	}
 
 	t.Run("AdditionalBinding", func(t *testing.T) {

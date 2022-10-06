@@ -25,7 +25,22 @@ import (
 var httpURIParent = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-parent"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCreateMethod(m) && !hasNoParent(m.GetOutputType())
+		// The response type of a Standard Create method must be the resource
+		// itself, unless it is an LRO, in which case, the operation_info field
+		// response_type must be the resource.
+		res := m.GetOutputType()
+
+		if info := utils.GetOperationInfo(m); info != nil {
+			res = utils.FindMessage(m.GetFile(), info.GetResponseType())
+			// If we cannot resolve the response_type, then skip this check.
+			// There is nothing we can do, and must let the check specific to
+			// unresolvable operation_info types do its thing.
+			if res == nil {
+				return false
+			}
+		}
+
+		return isCreateMethod(m) && !hasNoParent(res)
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if problems := utils.LintHTTPURIHasParentVariable(m); problems != nil {
