@@ -126,3 +126,27 @@ func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor
 
 	return fields
 }
+
+// FindFieldDotNotation returns a field descriptor from a given message that
+// corresponds to the dot separated path e.g. "book.name". If the path is
+// unresolable the method returns nil. This is especially useful for resolving
+// path variables in google.api.http and nested fields in
+// google.api.method_signature annotations.
+func FindFieldDotNotation(msg *desc.MessageDescriptor, ref string) *desc.FieldDescriptor {
+	path := strings.Split(ref, ".")
+	for _, seg := range path {
+		field := msg.FindFieldByName(seg)
+		if field == nil {
+			return nil
+		}
+
+		if m := field.GetMessageType(); m != nil {
+			msg = m
+			continue
+		}
+
+		return field
+	}
+
+	return nil
+}

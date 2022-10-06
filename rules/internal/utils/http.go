@@ -22,6 +22,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// HasHTTPRules returns true when the given method descriptor is annotated with
+// a google.api.http option.
+func HasHTTPRules(m *desc.MethodDescriptor) bool {
+	got := proto.GetExtension(m.GetMethodOptions(), apb.E_Http).(*apb.HttpRule)
+	return got != nil
+}
+
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
 //
 // Note: This returns a slice -- it takes the google.api.http annotation,
