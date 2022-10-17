@@ -1,6 +1,7 @@
 {
   extends: ["config:base"],
   commitMessagePrefix: "chore: ",
+  labels: ["automerge"],
   packageRules: [
     {
       // The genproto package is updated every time that any API published by
