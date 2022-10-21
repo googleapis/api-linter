@@ -16,10 +16,11 @@ mandated in [AIP-191][].
 ## Details
 
 This rule checks for common file layout mistakes, but does not currently check
-the exhaustive file layout in AIP-191. This rule currently complains if:
+the exhaustive file layout in AIP-191. This rule currently complains if within a
+file:
 
-- Services appear below messages.
-- Top-level enums appear above messages.
+- ...services appear below messages.
+- ...top-level enums appear above messages.
 
 ## Examples
 
