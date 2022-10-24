@@ -20,8 +20,10 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-var fieldPart = "string title = 1;"
-var fieldPartWithImmtutableBehavior = "string title = 1 [(google.api.field_behavior) = IMMUTABLE];"
+var (
+	fieldPart                       = "string title = 1;"
+	fieldPartWithImmtutableBehavior = "string title = 1 [(google.api.field_behavior) = IMMUTABLE];"
+)
 
 func TestImmutable(t *testing.T) {
 	testCases := []struct {
@@ -40,6 +42,12 @@ func TestImmutable(t *testing.T) {
 			name:     "Valid",
 			comment:  "@immutable",
 			field:    fieldPartWithImmtutableBehavior,
+			problems: nil,
+		},
+		{
+			name:     "Valid-exclude-etag",
+			comment:  "Immutable.",
+			field:    "string etag = 1;",
 			problems: nil,
 		},
 		{

@@ -23,6 +23,8 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var csharpNamespace = &lint.FileRule{
@@ -55,7 +57,8 @@ var csharpNamespace = &lint.FileRule{
 						s = strings.ReplaceAll(s, point, strings.ToUpper(point))
 					}
 					stability := csharpVersionRegexp.FindStringSubmatch(s)[2]
-					return strings.ReplaceAll(s, stability, strings.Title(stability))
+					title := cases.Title(language.AmericanEnglish)
+					return strings.ReplaceAll(s, stability, title.String(stability))
 				},
 			)
 			upperCamel = append(upperCamel, wantSegment)
@@ -85,5 +88,7 @@ var csharpNamespace = &lint.FileRule{
 	},
 }
 
-var csharpValidChars = regexp.MustCompile("^[A-Za-z0-9.]+$")
-var csharpVersionRegexp = regexp.MustCompile("[0-9]+(p[0-9]+)?(alpha|beta|main)")
+var (
+	csharpValidChars    = regexp.MustCompile("^[A-Za-z0-9.]+$")
+	csharpVersionRegexp = regexp.MustCompile("[0-9]+(p[0-9]+)?(alpha|beta|main)")
+)

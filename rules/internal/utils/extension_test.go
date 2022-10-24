@@ -63,7 +63,8 @@ func TestGetMethodSignatures(t *testing.T) {
 	}{
 		{"Zero", [][]string{}, ""},
 		{"One", [][]string{{"name"}}, `option (google.api.method_signature) = "name";`},
-		{"Two",
+		{
+			"Two",
 			[][]string{{"name"}, {"name", "read_mask"}},
 			`option (google.api.method_signature) = "name";
 			 option (google.api.method_signature) = "name,read_mask";`,
@@ -310,4 +311,65 @@ func TestGetResourceReference(t *testing.T) {
 			t.Errorf(`Got "%v", expected nil`, got)
 		}
 	})
+}
+
+func TestFindResource(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+				
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name, reference string
+		notFound        bool
+	}{
+		{"local_reference", "library.googleapis.com/Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", true},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResource(tst.reference, files["shelf.proto"])
+
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
+			}
+
+			if !tst.notFound && got == nil {
+				t.Errorf("Got nil, expected %q", tst.reference)
+			} else if !tst.notFound && got.GetType() != tst.reference {
+				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
+			}
+		})
+	}
 }

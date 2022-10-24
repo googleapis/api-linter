@@ -39,7 +39,8 @@ func TestRequestPaginationPageSize(t *testing.T) {
 			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
 			false,
 			testutils.Problems{},
-			nil},
+			nil,
+		},
 		{
 			"MissingField",
 			"ListFooRequest",

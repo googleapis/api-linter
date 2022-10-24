@@ -39,9 +39,11 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var runMethodRegexp = regexp.MustCompile(`^Run[A-Za-z0-9]+Job$`)
-var runReqMessageRegexp = regexp.MustCompile(`^Run[A-Za-z0-9]+JobRequest$`)
-var runURIRegexp = regexp.MustCompile(`:run$`)
+var (
+	runMethodRegexp     = regexp.MustCompile(`^Run[A-Za-z0-9]+Job$`)
+	runReqMessageRegexp = regexp.MustCompile(`^Run[A-Za-z0-9]+JobRequest$`)
+	runURIRegexp        = regexp.MustCompile(`:run$`)
+)
 
 // Returns true if this is an AIP-152 Run method, false otherwise.
 func isRunMethod(m *desc.MethodDescriptor) bool {

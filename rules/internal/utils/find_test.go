@@ -15,6 +15,7 @@
 package utils
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
@@ -42,4 +43,50 @@ func TestFindMessage(t *testing.T) {
 	if scroll := FindMessage(files["c.proto"], "Scroll"); scroll != nil {
 		t.Errorf("Got Sctoll message, expected nil.")
 	}
+}
+
+func TestFindFieldDotNotation(t *testing.T) {
+	file := testutils.ParseProto3String(t, `
+		package test;
+		
+		message CreateBookRequest {
+			string parent = 1;
+
+			Book book = 2;
+		}
+
+		message Book {
+			string name = 1;
+
+			message PublishingInfo {
+				string publisher = 1;
+				int32 edition = 2;
+			}
+
+			PublishingInfo publishing_info = 2;
+		}
+	`)
+	msg := file.GetMessageTypes()[0]
+
+	for _, tst := range []struct {
+		name, path string
+	}{
+		{"top_level", "parent"},
+		{"nested", "book.name"},
+		{"double_nested", "book.publishing_info.publisher"},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			split := strings.Split(tst.path, ".")
+			want := split[len(split)-1]
+
+			f := FindFieldDotNotation(msg, tst.path)
+
+			if f == nil {
+				t.Errorf("Got nil, expected %q field", want)
+			} else if got := f.GetName(); got != want {
+				t.Errorf("Got %q, expected %q", got, want)
+			}
+		})
+	}
+
 }

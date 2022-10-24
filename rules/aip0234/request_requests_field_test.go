@@ -57,7 +57,8 @@ func TestRequestRequestsField(t *testing.T) {
 				{Message: `The "requests" field should be repeated`},
 				{
 					Suggestion: "UpdateBookRequest",
-				}},
+				},
+			},
 		},
 	}
 

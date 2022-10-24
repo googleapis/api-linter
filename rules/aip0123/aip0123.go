@@ -41,6 +41,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourceDefinitionVariables,
 		resourceDefinitionPatterns,
 		resourceDefinitionTypeName,
+		nameNeverOptional,
 	)
 }
 

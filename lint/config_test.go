@@ -244,7 +244,6 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 				t.Errorf("IsRuleEnabled: got %t, but want %t", got, test.want)
 			}
 		})
-
 	}
 }
 
@@ -452,7 +451,7 @@ func createTempFile(t *testing.T, name, content string) string {
 		t.Fatal(err)
 	}
 	filePath := filepath.Join(dir, name)
-	if err := ioutil.WriteFile(filePath, []byte(content), 0644); err != nil {
+	if err := ioutil.WriteFile(filePath, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return filePath

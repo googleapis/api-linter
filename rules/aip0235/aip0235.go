@@ -44,10 +44,12 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var batchDeleteMethodRegexp = regexp.MustCompile("^BatchDelete(?:[A-Z]|$)")
-var batchDeleteReqMessageRegexp = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Request$")
-var batchDeleteResponseMessageRegexp = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Response$")
-var batchDeleteURIRegexp = regexp.MustCompile(`:batchDelete$`)
+var (
+	batchDeleteMethodRegexp          = regexp.MustCompile("^BatchDelete(?:[A-Z]|$)")
+	batchDeleteReqMessageRegexp      = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Request$")
+	batchDeleteResponseMessageRegexp = regexp.MustCompile("^BatchDelete[A-Za-z0-9]*Response$")
+	batchDeleteURIRegexp             = regexp.MustCompile(`:batchDelete$`)
+)
 
 // Returns true if this is a AIP-235 Batch Delete method, false otherwise.
 func isBatchDeleteMethod(m *desc.MethodDescriptor) bool {

@@ -20,8 +20,10 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-var title = "string title = 1;"
-var titleWithRequiredBehavior = "string title = 1 [(google.api.field_behavior) = REQUIRED];"
+var (
+	title                     = "string title = 1;"
+	titleWithRequiredBehavior = "string title = 1 [(google.api.field_behavior) = REQUIRED];"
+)
 
 func TestRequired(t *testing.T) {
 	testCases := []struct {
@@ -81,6 +83,12 @@ func TestRequired(t *testing.T) {
 			comment: `This field is only required
 		            // if condition is true`,
 			field:    title,
+			problems: nil,
+		},
+		{
+			name:     "Valid-exclude-etag",
+			comment:  "Required",
+			field:    "string etag = 1;",
 			problems: nil,
 		},
 		{

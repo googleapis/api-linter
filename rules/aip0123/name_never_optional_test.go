@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0152
+package aip0123
 
 import (
 	"testing"
@@ -20,32 +20,34 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequestResourceSuffix(t *testing.T) {
+func TestNameNeverOptional(t *testing.T) {
 	for _, test := range []struct {
 		name      string
-		RPC       string
-		Field     string
-		FieldOpts string
+		FieldName string
+		NameField string
+		Label     string
 		problems  testutils.Problems
 	}{
-		{"ValidPresent", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "WriteBookJob" }]`, nil},
-		{"ValidMissing", "RunWriteBookJob", "name", "", nil},
-		{
-			"IncorrectSuffix", "RunWriteBookJob", "name", ` [(google.api.resource_reference) = { type: "Book" }]`,
-			testutils.Problems{{Message: "google.api.resource_reference", Suggestion: "WriteBookJob"}},
-		},
-		{"IrrelevantMessage", "PurgeBooks", "name", "", nil},
-		{"IrrelevantField", "RunWriteBookJob", "something_else", "", nil},
+		{"Valid", "name", "", "", testutils.Problems{}},
+		{"ValidAlternativeName", "resource", "resource", "", testutils.Problems{}},
+		{"InvalidProto3Optional", "name", "", "optional", testutils.Problems{{Message: "never be labeled"}}},
+		{"SkipNameFieldDNE", "name", "does_not_exist", "", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
-				message {{.RPC}}Request {
-					string {{.Field}} = 1{{.FieldOpts}};
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "publishers/{publisher}/books/{book}"
+						name_field: "{{.NameField}}"
+					};
+
+					{{.Label}} string {{.FieldName}} = 1;
 				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(requestResourceSuffix.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(field).Diff(nameNeverOptional.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

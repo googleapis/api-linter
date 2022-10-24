@@ -19,10 +19,13 @@ import (
 	"fmt"
 	"regexp"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
+
+var standardFields = stringset.New("etag")
 
 // AddRules adds all of the AIP-203 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
@@ -61,5 +64,5 @@ func checkLeadingComments(pattern *regexp.Regexp, annotation string, unless ...*
 }
 
 func withoutFieldBehavior(f *desc.FieldDescriptor) bool {
-	return utils.GetFieldBehavior(f).Len() == 0
+	return utils.GetFieldBehavior(f).Len() == 0 && !standardFields.Contains(f.GetName())
 }

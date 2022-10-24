@@ -56,7 +56,8 @@ var fileLayout = &lint.FileRule{
 // isBefore returns true if `d` is known to precede `anchor` in the file.
 //
 // NOTE: A false value here may indicate that there is no source info at all;
-//       use `isAfter` if the goal is to know that `d` comes after `anchor`.
+//
+//	use `isAfter` if the goal is to know that `d` comes after `anchor`.
 func isBefore(anchor desc.Descriptor, d desc.Descriptor) bool {
 	return d.GetSourceInfo().GetSpan()[0] < anchor.GetSourceInfo().GetSpan()[0]
 }
@@ -64,7 +65,8 @@ func isBefore(anchor desc.Descriptor, d desc.Descriptor) bool {
 // isBefore returns true if `d` is known to follow `anchor` in the file.
 //
 // NOTE: A false value here may indicate that there is no source info at all;
-//       use `isBefore` if the goal is to know that `d` comes before `anchor`.
+//
+//	use `isBefore` if the goal is to know that `d` comes before `anchor`.
 func isAfter(anchor desc.Descriptor, d desc.Descriptor) bool {
 	return d.GetSourceInfo().GetSpan()[0] > anchor.GetSourceInfo().GetSpan()[0]
 }

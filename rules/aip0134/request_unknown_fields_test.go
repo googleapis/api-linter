@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+//	https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,16 +38,31 @@ func TestUnknownFields(t *testing.T) {
 		problems    testutils.Problems
 	}{
 		// Use BigBook instead of Book to test correct casing logic
-		{"UpdateMask", "UpdateBigBookRequest", "update_mask",
-			builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
-		{"ValidateOnly", "UpdateBigBookRequest", "validate_only",
-			builder.FieldTypeBool(), testutils.Problems{}},
-		{"Invalid", "UpdateBigBookRequest", "application_id",
-			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
-		{"InvalidCasing", "UpdateBigBookRequest", "bigbook",
-			builder.FieldTypeString(), testutils.Problems{{Message: "Unexpected field"}}},
-		{"Irrelevant", "AcquireBigBookRequest", "application_id",
-			builder.FieldTypeString(), testutils.Problems{}},
+		{
+			"UpdateMask", "UpdateBigBookRequest", "update_mask",
+			builder.FieldTypeImportedMessage(fieldMask),
+			testutils.Problems{},
+		},
+		{
+			"ValidateOnly", "UpdateBigBookRequest", "validate_only",
+			builder.FieldTypeBool(),
+			testutils.Problems{},
+		},
+		{
+			"Invalid", "UpdateBigBookRequest", "application_id",
+			builder.FieldTypeString(),
+			testutils.Problems{{Message: "Unexpected field"}},
+		},
+		{
+			"InvalidCasing", "UpdateBigBookRequest", "bigbook",
+			builder.FieldTypeString(),
+			testutils.Problems{{Message: "Unexpected field"}},
+		},
+		{
+			"Irrelevant", "AcquireBigBookRequest", "application_id",
+			builder.FieldTypeString(),
+			testutils.Problems{},
+		},
 	}
 
 	// Run each test individually.

@@ -253,5 +253,5 @@ func writeFile(path, content string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(path, []byte(content), 0644)
+	return ioutil.WriteFile(path, []byte(content), 0o644)
 }

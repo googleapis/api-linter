@@ -29,10 +29,12 @@ func TestInputName(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "CreateBook", "CreateBookRequest", nil},
-		{"Invalid", "CreateBook", "Book",
+		{
+			"Invalid", "CreateBook", "Book",
 			testutils.Problems{{
 				Suggestion: "CreateBookRequest",
-			}}},
+			}},
+		},
 		{"Irrelevant_OutputWrong", "CreateIamPolicy", "CreateIamPolicyRequest", nil},
 		{"Irrelevant_NotCreate", "BuildBook", "Book", nil},
 	}

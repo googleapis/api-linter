@@ -41,9 +41,11 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-var undeleteMethodRegexp = regexp.MustCompile("^Undelete(?:[A-Z]|$)")
-var undeleteReqMessageRegexp = regexp.MustCompile("^Undelete[A-Za-z0-9]*Request$")
-var undeleteURINameRegexp = regexp.MustCompile(`{name=[a-zA-Z/*]+}:undelete$`)
+var (
+	undeleteMethodRegexp     = regexp.MustCompile("^Undelete(?:[A-Z]|$)")
+	undeleteReqMessageRegexp = regexp.MustCompile("^Undelete[A-Za-z0-9]*Request$")
+	undeleteURINameRegexp    = regexp.MustCompile(`{name=[a-zA-Z/*]+}:undelete$`)
+)
 
 // Returns true if this is a AIP-164 Undelete method, false otherwise.
 func isUndeleteMethod(m *desc.MethodDescriptor) bool {

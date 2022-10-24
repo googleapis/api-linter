@@ -8,13 +8,14 @@ import "strings"
 // At Google, we inject additional rule URL mappings into this list.
 // Example: google_rule_url_mappings.go
 // package lint
-// func init() {
-//   ruleURLMappings = append(ruleURLMappings, internalRuleURLMapping)
-// }
 //
-// func internalRuleURLMapping(ruleName string) string {
-//   ...
-// }
+//	func init() {
+//	  ruleURLMappings = append(ruleURLMappings, internalRuleURLMapping)
+//	}
+//
+//	func internalRuleURLMapping(ruleName string) string {
+//	  ...
+//	}
 var ruleURLMappings = []func(string) string{
 	coreRuleURL,
 	clientLibrariesRuleUrl,
