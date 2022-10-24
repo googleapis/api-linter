@@ -9,3 +9,6 @@ docs/.jekyll-metadata
 # Vim
 *.sw*
 *.vim
+
+# Ruby
+.ruby-version
