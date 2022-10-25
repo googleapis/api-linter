@@ -47,6 +47,13 @@ func aipCloudGroup(aip int) string {
 	return ""
 }
 
+func aipGURPGroup(aip int) string {
+	if (aip >= 2400 && aip <= 2499) || (aip >= 24000 && aip <= 24999) {
+		return "gurp"
+	}
+	return ""
+}
+
 // getRuleGroup takes an AIP number and returns the appropriate group.
 // It panics if no group is found.
 func getRuleGroup(aip int, groups []func(int) string) string {
