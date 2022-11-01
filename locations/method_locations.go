@@ -15,10 +15,10 @@
 package locations
 
 import (
+	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	lrpb "google.golang.org/genproto/googleapis/longrunning"
 )
 
 // MethodRequestType returns the precise location of the method's input type.
