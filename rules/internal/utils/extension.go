@@ -18,9 +18,9 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
+	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	lrpb "google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/protobuf/proto"
 )
 
