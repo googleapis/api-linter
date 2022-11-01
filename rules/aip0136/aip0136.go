@@ -30,12 +30,14 @@ func AddRules(r lint.RuleRegistry) error {
 		136,
 		httpBody,
 		httpMethod,
-		httpNameVariable,
-		httpParentVariable,
 		noPrepositions,
 		standardMethodsOnly,
 		uriSuffix,
 		verbNoun,
+		// These rules are disabled as they have no matching AIP guidance.
+		// See https://github.com/aip-dev/google.aip.dev/issues/955 for details.
+		// httpNameVariable,
+		// httpParentVariable,
 	)
 }
 
