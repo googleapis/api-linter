@@ -9,6 +9,9 @@ redirect_from:
   - /0136/http-name-variable
 ---
 
+**Important:** This rule has been temporarily disabled as it does not match any
+AIP guidance. See discussion [here][https://github.com/aip-dev/google.aip.dev/issues/955].
+
 # Custom methods: HTTP name variable
 
 This rule enforces that custom methods only use the `name` variable if the RPC
