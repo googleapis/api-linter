@@ -5,7 +5,7 @@ go 1.18
 require (
 	bitbucket.org/creachadair/stringset v0.0.10
 	cloud.google.com/go/longrunning v0.3.0
-	github.com/bmatcuk/doublestar/v4 v4.3.0
+	github.com/bmatcuk/doublestar/v4 v4.4.0
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.9
