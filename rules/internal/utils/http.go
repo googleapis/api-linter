@@ -99,14 +99,22 @@ type HTTPRule struct {
 }
 
 // GetVariables returns the variable segments in a URI as a map.
+//
+// For a given variable, the key is the variable's field path. The value is the
+// variable's template, which will match segment(s) of the URL.
+//
+// For more details on the path template syntax, see
+// https://github.com/googleapis/googleapis/blob/6e1a5a066659794f26091674e3668229e7750052/google/api/http.proto#L224.
 func (h *HTTPRule) GetVariables() map[string]string {
 	vars := map[string]string{}
 
 	// Replace the version template variable with "v".
 	uri := templateSegment.ReplaceAllString(h.URI, "v")
+	// NOTE TO SELF: Just the field path! (doesn't have a '=')
 	for _, match := range plainVar.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = "*"
 	}
+	// NOTE TO SELF: Matches `{FieldPath = Segments}`
 	for _, match := range varSegment.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = match[2]
 	}
