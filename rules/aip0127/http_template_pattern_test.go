@@ -30,8 +30,7 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 		// HTTP variable uses literals
 		{"LiteralMatchesSameLiteralInPattern", "/v1/{name=shelves}", "shelves", nil},
 		{"LiteralDoesNotMatchDifferentLiteral", "/v1/{name=shelves}", "books", testutils.Problems{{Message: "does not match"}}},
-		// TODO: Fix this test!!
-		// {"SingleWildcardMatchesAnyLiteralSegment", "/v1/{name=*}", "shelves", nil},
+		{"SingleWildcardMatchesAnyLiteralSegment", "/v1/{name=*}", "shelves", nil},
 		{"SuffixAfterHttpVariableIgnoredForMatch", "/v1/{name=shelves}/books", "shelves", nil},
 
 		// HTTP variable uses single wildcard
@@ -51,9 +50,6 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 		{"DoubleWildcardPrecededByLiteralMatches", "/v1/{name=shelves/**}", "shelves/{shelf}", nil},
 		{"DoubleWildcardFollowedByLiteralMatches", "/v1/{name=**/shelves/*}", "my/shelves/{shelf}", nil},
 		{"DoubleWildcardMissingLiteralDoesNotMatch", "/v1/{name=shelves/**}", "{shelf}", testutils.Problems{{Message: "does not match"}}},
-
-		// TODO: Fix this next test!!
-		// {"MissingPathTemplate", "/v1/", "shelves/{shelf}", testutils.Problems{{Message: "does not match any of the patterns"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

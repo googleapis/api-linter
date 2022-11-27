@@ -22,12 +22,12 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var (
-	resourcePatternVariable = regexp.MustCompile(`\{[^}]+\}`)
-	pathTemplateToRegex     = strings.NewReplacer("**/", `([a-z_/\*]+/)*`, "**", `([a-z_/\*]+(/[a-z_/\*]+)*)?`, "*", `\*`)
+	resourcePatternSegment     = `[^/]+`
+	resourcePatternAnySegments = fmt.Sprintf("((%s/)*%s)?", resourcePatternSegment, resourcePatternSegment)
+	pathTemplateToRegex        = strings.NewReplacer("**", resourcePatternAnySegments, "*", resourcePatternSegment)
 )
 
 type resourceReference struct {
@@ -83,17 +83,6 @@ func compilePathTemplateRegex(pathTemplate string) (*regexp.Regexp, error) {
 	return regexp.Compile(pattern)
 }
 
-// Normalizes all the patterns in a ResourceDescriptor for matching against HTTP
-// path templates. This replaces all variables in the pattern with a single '*'
-// wildcard character.
-func normalizeResourcePatterns(annotation *annotations.ResourceDescriptor) []string {
-	output := []string{}
-	for _, pattern := range annotation.GetPattern() {
-		output = append(output, resourcePatternVariable.ReplaceAllString(pattern, "*"))
-	}
-	return output
-}
-
 func anyStringsMatchRegex(regex *regexp.Regexp, strs []string) bool {
 	for _, str := range strs {
 		if regex.MatchString(str) {
@@ -119,9 +108,8 @@ func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 	}
 	fmt.Printf("Path regex: %+v\n", pathRegex)
 
-	normalizedPatterns := normalizeResourcePatterns(annotation)
-	fmt.Printf("Normalized patterns: %+v\n", normalizedPatterns)
-	if !anyStringsMatchRegex(pathRegex, normalizedPatterns) {
+	fmt.Printf("Resource patterns: %+v\n", annotation.GetPattern())
+	if !anyStringsMatchRegex(pathRegex, annotation.GetPattern()) {
 		message := fmt.Sprintf("The HTTP pattern %q does not match any of the patterns for resource %q", resourceRef.pathTemplate, resourceRef.resourceRefName)
 		return []lint.Problem{{Message: message, Descriptor: m}}
 	}
