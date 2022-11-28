@@ -37,6 +37,8 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 		{"SingleWildcardMatchesAnyVariableSegment", "/v1/{name=*}", "{shelf}", nil},
 		{"SingleWildcardDoesNotMatchMultipleUrlSegments", "/v1/{name=*}", "shelves/{shelf}", testutils.Problems{{Message: "does not match"}}},
 		{"LiteralAndWildcardMatch", "/v1/{name=shelves/*}", "shelves/{shelf}", nil},
+		// This case is only theoretical, as "{shelf}" represents a resource ID,
+		// rather than a resource name. It should not be observed in practice.
 		{"ImplicitWildcardMatches", "/v1/{name}/books", "{shelf}", nil},
 		{"MulitpleWildcardsMatches", "/v1/{name=shelves/*/books/*}", "shelves/{shelf}/books/{book}", nil},
 
@@ -72,6 +74,7 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 						type: "library.googleapis.com/Book"
 						pattern: "{{.ResourcePattern}}"
 					};
+					string name = 1;
 				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
@@ -115,6 +118,7 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 						pattern: "{{.ResourcePattern1}}"
 						pattern: "{{.ResourcePattern2}}"
 					};
+					string name = 1;
 				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
@@ -122,33 +126,6 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 				t.Errorf(diff)
 			}
 		})
-	}
-}
-
-func TestHttpTemplatePattern_WrongResourceType(t *testing.T) {
-	f := testutils.ParseProto3String(t, `
-			import "google/api/annotations.proto";
-			import "google/api/resource.proto";
-			service Library {
-				rpc GetBook(GetBookRequest) returns (Book) {
-					option (google.api.http) = {
-						get: "/v1/{name=shelves}"
-					};
-				}
-			}
-			message GetBookRequest {
-				string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
-			}
-			message Book {
-				option (google.api.resource) = {
-					type: "library.googleapis.com/Magazine"
-				};
-			}
-		`)
-	m := f.GetServices()[0].GetMethods()[0].GetInputType()
-	want := testutils.Problems{{Message: "Unable to find resource"}}
-	if diff := want.SetDescriptor(m).Diff(httpTemplatePattern.Lint(f)); diff != "" {
-		t.Errorf(diff)
 	}
 }
 
@@ -166,6 +143,7 @@ func TestHttpTemplatePattern_SkipCheckIfNoHTTPRules(t *testing.T) {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
+				string name = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {
@@ -191,6 +169,7 @@ func TestHttpTemplatePattern_SkipCheckIfHTTPRuleHasNoVariables(t *testing.T) {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
+				string name = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {
@@ -216,6 +195,7 @@ func TestHttpTemplatePattern_SkipCheckIfFieldPathMissingResourceAnnotation(t *te
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
 				};
+				string name = 1;
 			}
 		`)
 	if problems := httpTemplatePattern.Lint(f); len(problems) > 0 {

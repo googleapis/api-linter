@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -96,19 +97,17 @@ func anyStringsMatchRegex(regex *regexp.Regexp, strs []string) bool {
 func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resourceReference) []lint.Problem {
 	annotation := utils.FindResource(resourceRef.resourceRefName, m.GetFile())
 	if annotation == nil {
-		message := fmt.Sprintf("Unable to find resource with name %q", resourceRef.resourceRefName)
-		return []lint.Problem{{Message: message, Descriptor: m.GetInputType()}}
+		return []lint.Problem{}
 	}
 
 	pathRegex, err := compilePathTemplateRegex(resourceRef.pathTemplate)
 	if err != nil {
-		message := fmt.Sprintf("HTTP annotation includes an invalid path template %q", resourceRef.pathTemplate)
-		return []lint.Problem{{Message: message, Descriptor: m}}
+		return []lint.Problem{}
 	}
 
 	if !anyStringsMatchRegex(pathRegex, annotation.GetPattern()) {
 		message := fmt.Sprintf("The HTTP pattern %q does not match any of the patterns for resource %q", resourceRef.pathTemplate, resourceRef.resourceRefName)
-		return []lint.Problem{{Message: message, Descriptor: m}}
+		return []lint.Problem{{Message: message, Descriptor: m, Location: locations.MethodHTTPRule(m)}}
 	}
 
 	return []lint.Problem{}

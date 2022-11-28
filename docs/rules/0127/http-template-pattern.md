@@ -3,7 +3,7 @@ rule:
   aip: 127
   name: [core, '0127', http-template-pattern]
   summary: |
-    HTTP annotations should match the patterns defined by their resources.
+    HTTP template variable patterns should match the patterns defined by their resources.
 permalink: /127/http-template-pattern
 redirect_from:
   - /127/http-template-pattern
@@ -17,16 +17,9 @@ match one of the pattern strings defined by that resource, as mandated in
 
 ## Details
 
-This rule checks methods for the `google.api.http` annotation. If one is present
-and if it includes a variable, this rule will check that the variable's template
-matches a pattern for the corresponding resource.
-
-This rule first finds the field or sub-field in the method's request message
-that matches the variable name. It then identifies the name of the resource by
-reading that field's `google.api.resource_reference` annotation, and uses this
-to find the resource message. Finally, it reads the list of patterns in the
-resource message's `google.api.resource` annotation, and it confirms that the
-variable's template matches one of those patterns.
+This rule ensures that `google.api.http` path template variables that represent
+a resource name match one of the resource name patterns of the resource that the
+field being referenced represents.
 
 ## Examples
 
@@ -51,6 +44,9 @@ message Book {
         type: "library.googleapis.com/Book"
         pattern: "shelves/{shelf}/books/{book}"
     };
+
+    // Book resource name.
+    string name = 1;
 }
 ```
 
@@ -73,6 +69,9 @@ message Book {
         type: "library.googleapis.com/Book"
         pattern: "shelves/{shelf}/books/{book}"
     };
+
+    // Book resource name.
+    string name = 1;
 }
 ```
 
