@@ -110,11 +110,9 @@ func (h *HTTPRule) GetVariables() map[string]string {
 
 	// Replace the version template variable with "v".
 	uri := templateSegment.ReplaceAllString(h.URI, "v")
-	// NOTE TO SELF: Just the field path! (doesn't have a '=')
 	for _, match := range plainVar.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = "*"
 	}
-	// NOTE TO SELF: Matches `{FieldPath = Segments}`
 	for _, match := range varSegment.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = match[2]
 	}

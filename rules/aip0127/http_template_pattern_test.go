@@ -30,10 +30,10 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 		// HTTP variable uses literals
 		{"LiteralMatchesSameLiteralInPattern", "/v1/{name=shelves}", "shelves", nil},
 		{"LiteralDoesNotMatchDifferentLiteral", "/v1/{name=shelves}", "books", testutils.Problems{{Message: "does not match"}}},
-		{"SingleWildcardMatchesAnyLiteralSegment", "/v1/{name=*}", "shelves", nil},
 		{"SuffixAfterHttpVariableIgnoredForMatch", "/v1/{name=shelves}/books", "shelves", nil},
 
 		// HTTP variable uses single wildcard
+		{"SingleWildcardMatchesAnyLiteralSegment", "/v1/{name=*}", "shelves", nil},
 		{"SingleWildcardMatchesAnyVariableSegment", "/v1/{name=*}", "{shelf}", nil},
 		{"SingleWildcardDoesNotMatchMultipleUrlSegments", "/v1/{name=*}", "shelves/{shelf}", testutils.Problems{{Message: "does not match"}}},
 		{"LiteralAndWildcardMatch", "/v1/{name=shelves/*}", "shelves/{shelf}", nil},

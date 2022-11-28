@@ -79,7 +79,6 @@ func resourceRefsForHttpRule(httpRule *utils.HTTPRule, msg *desc.MessageDescript
 // patterns that it will match against.
 func compilePathTemplateRegex(pathTemplate string) (*regexp.Regexp, error) {
 	pattern := fmt.Sprintf("^%s$", pathTemplateToRegex.Replace(pathTemplate))
-	fmt.Println("Path template regex:", pattern)
 	return regexp.Compile(pattern)
 }
 
@@ -106,9 +105,7 @@ func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 		message := fmt.Sprintf("HTTP annotation includes an invalid path template %q", resourceRef.pathTemplate)
 		return []lint.Problem{{Message: message, Descriptor: m}}
 	}
-	fmt.Printf("Path regex: %+v\n", pathRegex)
 
-	fmt.Printf("Resource patterns: %+v\n", annotation.GetPattern())
 	if !anyStringsMatchRegex(pathRegex, annotation.GetPattern()) {
 		message := fmt.Sprintf("The HTTP pattern %q does not match any of the patterns for resource %q", resourceRef.pathTemplate, resourceRef.resourceRefName)
 		return []lint.Problem{{Message: message, Descriptor: m}}
@@ -120,23 +117,12 @@ func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 var httpTemplatePattern = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "http-template-pattern"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return len(resourceRefsForMethod(m)) != 0
+		return len(resourceRefsForMethod(m)) > 0
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		httpRules := utils.GetHTTPRules(m)
-		fmt.Println("First HTTPRule:", httpRules[0])
-		for _, httpRule := range httpRules {
-			variables := httpRule.GetVariables()
-			fmt.Println("Variables:", variables)
-			plainURI := httpRule.GetPlainURI()
-			fmt.Println("Plain URI:", plainURI)
-		}
-
 		problems := []lint.Problem{}
 
 		resourceRefs := resourceRefsForMethod(m)
-		fmt.Printf("Resource refs:, %+v\n", resourceRefs)
-
 		for _, resourceRef := range resourceRefs {
 			problems = append(problems, checkHttpPatternMatchesResource(m, resourceRef)...)
 		}
