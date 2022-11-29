@@ -39,9 +39,10 @@ type Problem struct {
 	// precise.
 	Suggestion string
 
-	// Descriptor provides the descriptor related to the problem.
+	// Descriptor provides the descriptor related to the problem. This must be
+	// set on every Problem.
 	//
-	// If present and `Location` is not specified, then the starting location of
+	// If `Location` is not specified, then the starting location of
 	// the descriptor is used as the location of the problem.
 	Descriptor desc.Descriptor
 
@@ -75,7 +76,7 @@ func (p Problem) MarshalYAML() (interface{}, error) {
 
 // Marshal defines how to represent a serialized Problem.
 func (p Problem) marshal() interface{} {
-	// Either descriptor or location may be set.
+	// The descriptor is always set, and location may be set.
 	// If they are both set, prefer the location.
 	loc := p.Location
 	if loc == nil && p.Descriptor != nil {
