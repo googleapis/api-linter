@@ -45,33 +45,38 @@ type resourceReference struct {
 
 // Returns a list of resourceReferences for each variable in all the method's
 // HTTPRule's.
-func resourceRefsForMethod(m *desc.MethodDescriptor) []resourceReference {
+func methodResourceReferences(m *desc.MethodDescriptor) []resourceReference {
 	resourceRefs := []resourceReference{}
 	for _, httpRule := range utils.GetHTTPRules(m) {
-		resourceRefs = append(resourceRefs, resourceRefsForHttpRule(httpRule, m.GetInputType())...)
+		resourceRefs = append(resourceRefs, httpResourceReferences(httpRule, m.GetInputType())...)
 	}
 	return resourceRefs
 }
 
 // Returns a resourceReference for every variable in the given HTTPRule.
-func resourceRefsForHttpRule(httpRule *utils.HTTPRule, msg *desc.MessageDescriptor) []resourceReference {
+func httpResourceReferences(httpRule *utils.HTTPRule, msg *desc.MessageDescriptor) []resourceReference {
 	resourceRefs := []resourceReference{}
 	for fieldPath, template := range httpRule.GetVariables() {
 		// Find the (sub-)field in the message corresponding to the variable's
 		// field path.
-		if resourceRefField := utils.FindFieldDotNotation(msg, fieldPath); resourceRefField != nil {
-			// Extract the name of the resource referenced by this field.
-			if resourceRef := utils.GetResourceReference(resourceRefField); resourceRef != nil {
-				// TODO(acamadeo): Support the case where a resource has
-				// multiple parent resources.
-				if resourceRef.GetChildType() != "" {
-					continue
-				}
-
-				res := resourceReference{fieldPath: fieldPath, pathTemplate: template, resourceRefName: resourceRef.GetType()}
-				resourceRefs = append(resourceRefs, res)
-			}
+		field := utils.FindFieldDotNotation(msg, fieldPath)
+		if field == nil {
+			continue
 		}
+
+		// Extract the name of the resource referenced by this field.
+		ref := utils.GetResourceReference(field)
+		if ref == nil || ref.GetChildType() != "" {
+			// TODO(#1047): Support the case where a resource has
+			// multiple parent resources.
+			continue
+		}
+
+		resourceRefs = append(resourceRefs, resourceReference{
+			fieldPath:       fieldPath,
+			pathTemplate:    template,
+			resourceRefName: ref.GetType(),
+		})
 	}
 	return resourceRefs
 }
@@ -83,7 +88,7 @@ func compilePathTemplateRegex(pathTemplate string) (*regexp.Regexp, error) {
 	return regexp.Compile(pattern)
 }
 
-func anyStringsMatchRegex(regex *regexp.Regexp, strs []string) bool {
+func anyMatch(regex *regexp.Regexp, strs []string) bool {
 	for _, str := range strs {
 		if regex.MatchString(str) {
 			return true
@@ -105,7 +110,7 @@ func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 		return []lint.Problem{}
 	}
 
-	if !anyStringsMatchRegex(pathRegex, annotation.GetPattern()) {
+	if !anyMatch(pathRegex, annotation.GetPattern()) {
 		message := fmt.Sprintf("The HTTP pattern %q does not match any of the patterns for resource %q", resourceRef.pathTemplate, resourceRef.resourceRefName)
 		return []lint.Problem{{Message: message, Descriptor: m, Location: locations.MethodHTTPRule(m)}}
 	}
@@ -116,12 +121,12 @@ func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 var httpTemplatePattern = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "http-template-pattern"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return len(resourceRefsForMethod(m)) > 0
+		return len(methodResourceReferences(m)) > 0
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 
-		resourceRefs := resourceRefsForMethod(m)
+		resourceRefs := methodResourceReferences(m)
 		for _, resourceRef := range resourceRefs {
 			problems = append(problems, checkHttpPatternMatchesResource(m, resourceRef)...)
 		}
