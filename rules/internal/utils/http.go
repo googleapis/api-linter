@@ -99,6 +99,12 @@ type HTTPRule struct {
 }
 
 // GetVariables returns the variable segments in a URI as a map.
+//
+// For a given variable, the key is the variable's field path. The value is the
+// variable's template, which will match segment(s) of the URL.
+//
+// For more details on the path template syntax, see
+// https://github.com/googleapis/googleapis/blob/6e1a5a066659794f26091674e3668229e7750052/google/api/http.proto#L224.
 func (h *HTTPRule) GetVariables() map[string]string {
 	vars := map[string]string{}
 

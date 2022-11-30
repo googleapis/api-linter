@@ -24,6 +24,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		127,
 		hasAnnotation,
+		httpTemplatePattern,
 		leadingSlash,
 		resourceNameExtraction,
 	)
