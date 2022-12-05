@@ -99,7 +99,7 @@ func anyMatch(regex *regexp.Regexp, strs []string) bool {
 
 // Checks whether the HTTP pattern specified in `resourceRef` matches any of the
 // patterns defined for that resource.
-func checkHttpPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resourceReference) []lint.Problem {
+func checkHTTPPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resourceReference) []lint.Problem {
 	annotation := utils.FindResource(resourceRef.resourceRefName, m.GetFile())
 	if annotation == nil {
 		return []lint.Problem{}
@@ -128,7 +128,7 @@ var httpTemplatePattern = &lint.MethodRule{
 
 		resourceRefs := methodResourceReferences(m)
 		for _, resourceRef := range resourceRefs {
-			problems = append(problems, checkHttpPatternMatchesResource(m, resourceRef)...)
+			problems = append(problems, checkHTTPPatternMatchesResource(m, resourceRef)...)
 		}
 
 		return problems
