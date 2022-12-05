@@ -23,7 +23,7 @@ import (
 func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 	tests := []struct {
 		name            string
-		HttpAnnotation  string
+		HTTPAnnotation  string
 		ResourcePattern string
 		problems        testutils.Problems
 	}{
@@ -61,7 +61,7 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
 						option (google.api.http) = {
-							get: "{{.HttpAnnotation}}"
+							get: "{{.HTTPAnnotation}}"
 						};
 					}
 				}
@@ -88,7 +88,7 @@ func TestHttpTemplatePattern_PatternMatching(t *testing.T) {
 func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 	tests := []struct {
 		name             string
-		HttpAnnotation   string
+		HTTPAnnotation   string
 		ResourcePattern1 string
 		ResourcePattern2 string
 		problems         testutils.Problems
@@ -105,7 +105,7 @@ func TestHttpTemplatePattern_MultiplePatterns(t *testing.T) {
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
 						option (google.api.http) = {
-							get: "{{.HttpAnnotation}}"
+							get: "{{.HTTPAnnotation}}"
 						};
 					}
 				}
