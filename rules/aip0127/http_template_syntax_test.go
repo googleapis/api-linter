@@ -54,10 +54,11 @@ func TestHttpTemplateSyntax(t *testing.T) {
 		{"VariableWithDoubleWildcardFollowedByLiteral", "/v1/{field=**/books}", true},
 		{"VariableWithLiteralFollowedBySingleWildcard", "/v1/{field=books/*}", true},
 		{"VariableWithLiteralFollowedByDoubleWildcard", "/v1/{field=books/**}", true},
-		{"VariableFollowedByLiteralSegment", "/v1/{field}/books", true},
-		{"VariableFollowedByVariableSegment", "/v1/{field}/{otherField}", true},
-		{"VariableWithTemplateFollowedByLiteralSegment", "/v1/{field=books/*}/shelves", true},
-		{"VariableFollowedByVariableWithTemplateSegment", "/v1/{field}/{otherField=books/*}", true},
+		{"VariableFollowedByLiteral", "/v1/{field}/books", true},
+		{"VariableFollowedByVariable", "/v1/{field}/{otherField}", true},
+		{"VariableWithTemplateFollowedByLiteral", "/v1/{field=books/*}/shelves", true},
+		{"VariableFollowedByVariableWithTemplate", "/v1/{field}/{otherField=books/*}", true},
+		{"VariableWithTemplateFollowedByVariableWithTemplate", "/v1/{field=books/*}/{otherField=shelves/*}", true},
 
 		// Invalid cases
 		{"LiteralWithoutLeadingSlash", "v1", false},
