@@ -6,7 +6,7 @@ rule:
     HTTP patterns should follow the HTTP path template syntax.
 permalink: /127/http-template-syntax
 redirect_from:
-  - /127/http-template-syntax
+  - /0127/http-template-syntax
 ---
 
 # HTTP Pattern Variables

@@ -109,7 +109,7 @@ func (h *HTTPRule) GetVariables() map[string]string {
 	vars := map[string]string{}
 
 	// Replace the version template variable with "v".
-	uri := templateSegment.ReplaceAllString(h.URI, "v")
+	uri := VersionedSegment.ReplaceAllString(h.URI, "v")
 	for _, match := range plainVar.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = "*"
 	}
@@ -123,13 +123,13 @@ func (h *HTTPRule) GetVariables() map[string]string {
 func (h *HTTPRule) GetPlainURI() string {
 	return plainVar.ReplaceAllString(
 		varSegment.ReplaceAllString(
-			templateSegment.ReplaceAllString(h.URI, "v"),
+			VersionedSegment.ReplaceAllString(h.URI, "v"),
 			"$2"),
 		"*")
 }
 
 var (
-	plainVar        = regexp.MustCompile(`\{([^}=]+)\}`)
-	varSegment      = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
-	templateSegment = regexp.MustCompile(`\{\$api_version\}`)
+	plainVar         = regexp.MustCompile(`\{([^}=]+)\}`)
+	varSegment       = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+	VersionedSegment = regexp.MustCompile(`\{\$api_version\}`)
 )
