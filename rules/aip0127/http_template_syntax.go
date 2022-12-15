@@ -46,7 +46,10 @@ var httpTemplateSyntax = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 		for _, httpRule := range utils.GetHTTPRules(m) {
-			if !templateRegex.MatchString(httpRule.URI) {
+			// Replace the API Versioning template if it matches exactly so as
+			// to not emit false positives.
+			uri := utils.VersionedSegment.ReplaceAllString(httpRule.URI, "v")
+			if !templateRegex.MatchString(uri) {
 				message := fmt.Sprintf("The HTTP pattern %q does not follow proper HTTP path template syntax", httpRule.URI)
 				problems = append(problems, lint.Problem{
 					Message:    message,

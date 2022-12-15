@@ -32,6 +32,7 @@ func TestHttpTemplateSyntax(t *testing.T) {
 
 		// Valid cases
 		{"SingleLiteral", "/v1", true},
+		{"VersionedTemplate", "/{$api_version}/books", true},
 		{"TwoLiterals", "/v1/books", true},
 		{"ThreeLiterals", "/v1/books/shelves", true},
 		{"SingleLiteralWithVerb", "/v1:verb", true},

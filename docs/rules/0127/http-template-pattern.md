@@ -6,7 +6,7 @@ rule:
     HTTP template variable patterns should match the patterns defined by their resources.
 permalink: /127/http-template-pattern
 redirect_from:
-  - /127/http-template-pattern
+  - /0127/http-template-pattern
 ---
 
 # HTTP Pattern Variables
