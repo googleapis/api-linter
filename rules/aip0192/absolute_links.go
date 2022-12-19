@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -42,6 +43,7 @@ var absoluteLinks = &lint.DescriptorRule{
 				return []lint.Problem{{
 					Message:    "Links in comments should be absolute and begin with https://",
 					Descriptor: d,
+					Location:   locations.DescriptorName(d),
 				}}
 			}
 		}
