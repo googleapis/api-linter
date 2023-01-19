@@ -31,6 +31,7 @@ var valueSynonyms = &lint.EnumValueRule{
 	LintEnumValue: func(v *desc.EnumValueDescriptor) []lint.Problem {
 		for bad, good := range map[string]string{
 			"CANCELED":   "CANCELLED",
+			"CANCELING":  "CANCELLING",
 			"FAIL":       "FAILED",
 			"FAILURE":    "FAILED",
 			"READY":      "ACTIVE",
