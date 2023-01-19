@@ -32,6 +32,7 @@ func TestValueSynonyms(t *testing.T) {
 		{"InvalidSuccess", "State", "SUCCESS", testutils.Problems{{Suggestion: "SUCCEEDED"}}},
 		{"InvalidSuccessful", "State", "SUCCESSFUL", testutils.Problems{{Suggestion: "SUCCEEDED"}}},
 		{"InvalidCanceled", "State", "CANCELED", testutils.Problems{{Suggestion: "CANCELLED"}}},
+		{"InvalidCanceling", "State", "CANCELING", testutils.Problems{{Suggestion: "CANCELLING"}}},
 		{"InvalidFail", "State", "FAIL", testutils.Problems{{Suggestion: "FAILED"}}},
 		{"InvalidFailure", "State", "FAILURE", testutils.Problems{{Suggestion: "FAILED"}}},
 		{"Irrelevant", "Foo", "SUCCESSFUL", nil},
