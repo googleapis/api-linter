@@ -24,7 +24,7 @@ func TestHttpVerb(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		HttpVerb   string
+		HTTPVerb   string
 		MethodName string
 		problems   testutils.Problems
 	}{
@@ -42,7 +42,7 @@ func TestHttpVerb(t *testing.T) {
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
-							{{.HttpVerb}}: "/v1/{parent=publishers/*}/books:batchCreate"
+							{{.HTTPVerb}}: "/v1/{parent=publishers/*}/books:batchCreate"
 							body: "*"
 						};
 					}

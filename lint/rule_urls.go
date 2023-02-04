@@ -18,23 +18,23 @@ import "strings"
 //	}
 var ruleURLMappings = []func(string) string{
 	coreRuleURL,
-	clientLibrariesRuleUrl,
-	cloudRuleUrl,
+	clientLibrariesRuleURL,
+	cloudRuleURL,
 }
 
 func coreRuleURL(ruleName string) string {
-	return groupUrl(ruleName, "core")
+	return groupURL(ruleName, "core")
 }
 
-func clientLibrariesRuleUrl(ruleName string) string {
-	return groupUrl(ruleName, "client-libraries")
+func clientLibrariesRuleURL(ruleName string) string {
+	return groupURL(ruleName, "client-libraries")
 }
 
-func cloudRuleUrl(ruleName string) string {
-	return groupUrl(ruleName, "cloud")
+func cloudRuleURL(ruleName string) string {
+	return groupURL(ruleName, "cloud")
 }
 
-func groupUrl(ruleName, groupName string) string {
+func groupURL(ruleName, groupName string) string {
 	base := "https://linter.aip.dev/"
 	nameParts := strings.Split(ruleName, "::") // e.g., client-libraries::0122::camel-case-uris -> ["client-libraries", "0122", "camel-case-uris"]
 	if len(nameParts) == 0 || nameParts[0] != groupName {

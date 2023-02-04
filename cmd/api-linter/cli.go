@@ -46,7 +46,9 @@ type cli struct {
 	ListRulesFlag           bool
 }
 
-var ExitForLintFailure = errors.New("found problems during linting")
+// ErrExitForLintFailure is an error to indicate that an error
+// was found during linting.
+var ErrExitForLintFailure = errors.New("found problems during linting")
 
 func newCli(args []string) *cli {
 	// Define flag variables.
@@ -209,7 +211,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Return error on lint failure which subsequently
 	// exits with a non-zero status code
 	if c.ExitStatusOnLintFailure && anyProblems(results) {
-		return ExitForLintFailure
+		return ErrExitForLintFailure
 	}
 
 	return nil
