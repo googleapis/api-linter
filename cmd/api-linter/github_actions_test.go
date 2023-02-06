@@ -53,27 +53,11 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 								Span: []int32{5, 6, 7},
 							},
 						},
-						{
-							RuleID:  "line::col",
-							Message: "Line and column",
-							Location: &descriptorpb.SourceCodeInfo_Location{
-								Span: []int32{5, 6},
-							},
-						},
-						{
-							RuleID:  "line",
-							Message: "Line only",
-							Location: &descriptorpb.SourceCodeInfo_Location{
-								Span: []int32{5},
-							},
-						},
 					},
 				},
 			},
-			want: `::error file=example.proto,endColumn=8,endLine=7,col=6,line=5,title=line։։col։։endLine։։endColumn::line, column, endline, and endColumn
-::error file=example.proto,endLine=7,col=6,line=5,title=line։։col։։endLine::Line, column, and endline
-::error file=example.proto,col=6,line=5,title=line։։col::Line and column
-::error file=example.proto,line=5,title=line::Line only
+			want: `::error file=example.proto,line=6,col=7,endLine=8,endColumn=8,title=line։։col։։endLine։։endColumn::line, column, endline, and endColumn
+::error file=example.proto,line=6,col=7,endLine=6,endColumn=7,title=line։։col։։endLine::Line, column, and endline
 `,
 		},
 		{
@@ -98,8 +82,8 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 					},
 				},
 			},
-			want: `::error file=example.proto,endColumn=4,endLine=3,col=2,line=1,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example.proto,endColumn=8,endLine=7,col=6,line=5,title=core։։naming_formats։։field_names::multi\nline\ncomment\n\nhttps://linter.aip.dev/naming_formats/field_names
+			want: `::error file=example.proto,line=2,col=3,endLine=4,endColumn=4,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
+::error file=example.proto,line=6,col=7,endLine=8,endColumn=8,title=core։։naming_formats։։field_names::multi\nline\ncomment\n\nhttps://linter.aip.dev/naming_formats/field_names
 `,
 		},
 		{

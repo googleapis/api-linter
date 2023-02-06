@@ -33,22 +33,8 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 
 			fmt.Fprintf(&buf, "::error file=%s", response.FilePath)
 			if problem.Location != nil {
-				// Some findings are *line level* and only have start positions but no
-				// starting column. Construct a switch fallthrough to emit as many of
-				// the location indicators are included.
-				switch len(problem.Location.Span) {
-				case 4:
-					fmt.Fprintf(&buf, ",endColumn=%d", problem.Location.Span[3])
-					fallthrough
-				case 3:
-					fmt.Fprintf(&buf, ",endLine=%d", problem.Location.Span[2])
-					fallthrough
-				case 2:
-					fmt.Fprintf(&buf, ",col=%d", problem.Location.Span[1])
-					fallthrough
-				case 1:
-					fmt.Fprintf(&buf, ",line=%d", problem.Location.Span[0])
-				}
+				location := lint.FileLocationFromPBLocation(problem.Location)
+				fmt.Fprintf(&buf, ",line=%d,col=%d,endLine=%d,endColumn=%d", location.Start.Line, location.Start.Column, location.End.Line, location.End.Column)
 			}
 
 			// GitHub uses :: as control characters (which are also used to delimit
