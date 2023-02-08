@@ -23,7 +23,9 @@ import (
 var resourceExpiry = &lint.FieldRule{
 	Name: lint.NewRuleName(214, "resource-expiry"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "expire_time"
+		isResource := utils.IsResource(f.GetParent().(*desc.MessageDescriptor))
+		isExpireTime := f.GetName() == "expire_time"
+		return isResource && isExpireTime
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// If this field is output only, then there is no user input permitted
