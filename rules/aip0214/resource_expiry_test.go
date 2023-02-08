@@ -22,22 +22,28 @@ import (
 
 func TestResourceExpiry(t *testing.T) {
 	for _, test := range []struct {
-		name          string
-		FieldBehavior string
-		AddtlField    string
-		problems      testutils.Problems
+		name                  string
+		FieldBehavior         string
+		AddtlField            string
+		problems              testutils.Problems
+		AddResourceDefinition bool
 	}{
-		{"ValidTtl", "", "google.protobuf.Duration ttl = 3;", testutils.Problems{}},
-		{"ValidOutputOnly", "[(google.api.field_behavior) = OUTPUT_ONLY]", "", testutils.Problems{}},
-		{"Invalid", "", "", testutils.Problems{{Message: "ttl"}}},
+		{"ValidTtl", "", "google.protobuf.Duration ttl = 3;", testutils.Problems{}, true},
+		{"ValidOutputOnly", "[(google.api.field_behavior) = OUTPUT_ONLY]", "", testutils.Problems{}, true},
+		{"Invalid", "", "", testutils.Problems{{Message: "ttl"}}, true},
+		{"SkipANonResource", "", "", testutils.Problems{}, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/field_behavior.proto";
+				import "google/api/resource.proto";
 				import "google/protobuf/timestamp.proto";
 				import "google/protobuf/duration.proto";
 
 				message Book {
+					{{if .AddResourceDefinition}}
+					option (google.api.resource) = { type: "library.googleapis.com/Book" };
+					{{end}}
 					string name = 1;
 					google.protobuf.Timestamp expire_time = 2 {{.FieldBehavior}};
 					{{.AddtlField}}
