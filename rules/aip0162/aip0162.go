@@ -146,17 +146,20 @@ var (
 	listRevisionsURINameRegexp     = regexp.MustCompile(`:listRevisions$`)
 )
 
-// Returns true if this is an AIP-162 List Revisions method, false otherwise.
+// IsListRevisionsMethod returns true if this is an AIP-162 List Revisions method,
+// false otherwise.
 func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
 	return listRevisionsMethodRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-162 List Revisions request message, false otherwise.
+// IsListRevisionsRequestMessage returns true if this is an AIP-162 List
+// Revisions request message, false otherwise.
 func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
 	return listRevisionsReqMessageRegexp.MatchString(m.GetName())
 }
 
-// Returns true if this is an AIP-162 List Revisions response message, false otherwise.
+// IsListRevisionsResponseMessage returns true if this is an AIP-162 List
+// Revisions response message, false otherwise.
 func IsListRevisionsResponseMessage(m *desc.MessageDescriptor) bool {
 	return listRevisionsRespMessageRegexp.MatchString(m.GetName())
 }

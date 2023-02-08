@@ -24,7 +24,7 @@ func TestHttpMethod(t *testing.T) {
 	// Set up testing permutations.
 	tests := []struct {
 		testName   string
-		HttpVerb   string
+		HTTPVerb   string
 		MethodName string
 		problems   testutils.Problems
 	}{
@@ -38,11 +38,11 @@ func TestHttpMethod(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				
+
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
-							{{.HttpVerb}}: "/v1/{parent=publishers/*}/books:batchUpdate"
+							{{.HTTPVerb}}: "/v1/{parent=publishers/*}/books:batchUpdate"
 							body: "*"
 						};
 					}

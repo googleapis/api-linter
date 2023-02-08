@@ -22,7 +22,7 @@ import (
 )
 
 // Batch Delete methods should have a proper HTTP pattern.
-var httpUriSuffix = &lint.MethodRule{
+var httpURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(235, "http-uri-suffix"),
 	OnlyIf: isBatchDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
