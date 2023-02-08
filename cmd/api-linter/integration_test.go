@@ -234,7 +234,7 @@ func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string
 	args = append(args, appendArgs...)
 
 	lintErr := runCLI(args)
-	if lintErr != nil && !errors.Is(lintErr, ErrExitForLintFailure) {
+	if lintErr != nil && !errors.Is(lintErr, ExitForLintFailure) {
 		t.Fatal(lintErr)
 	}
 
@@ -242,7 +242,7 @@ func runLinterWithFailureStatus(t *testing.T, protoContent, configContent string
 	if err != nil {
 		t.Fatal(err)
 	}
-	return errors.Is(lintErr, ErrExitForLintFailure), string(out)
+	return errors.Is(lintErr, ExitForLintFailure), string(out)
 }
 
 func writeFile(path, content string) error {
