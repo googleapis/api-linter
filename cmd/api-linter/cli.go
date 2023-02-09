@@ -46,6 +46,8 @@ type cli struct {
 	ListRulesFlag           bool
 }
 
+// ExitForLintFailure indicates that a problem was found during linting.
+//lint:ignore ST1012 modifying this variable name is a breaking change.
 var ExitForLintFailure = errors.New("found problems during linting")
 
 func newCli(args []string) *cli {

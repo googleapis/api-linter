@@ -129,7 +129,9 @@ func (h *HTTPRule) GetPlainURI() string {
 }
 
 var (
-	plainVar         = regexp.MustCompile(`\{([^}=]+)\}`)
-	varSegment       = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+	plainVar   = regexp.MustCompile(`\{([^}=]+)\}`)
+	varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+	// VersionedSegment is a regex to extract the API version from
+	// an HTTP path.
 	VersionedSegment = regexp.MustCompile(`\{\$api_version\}`)
 )

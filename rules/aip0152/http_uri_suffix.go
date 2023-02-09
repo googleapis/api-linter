@@ -22,7 +22,7 @@ import (
 )
 
 // Run methods should have a proper HTTP pattern.
-var httpUriSuffix = &lint.MethodRule{
+var httpURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(152, "http-uri-suffix"),
 	OnlyIf: isRunMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
