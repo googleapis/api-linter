@@ -19,6 +19,7 @@ package lint
 import (
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/jhump/protoreflect/desc"
@@ -28,10 +29,21 @@ import (
 type Linter struct {
 	rules   RuleRegistry
 	configs Configs
+	debug   bool
+}
+
+// LinterOption prvoides the ability to configure the Linter.
+type LinterOption func(l *Linter)
+
+// Debug is a LinterOption for setting if debug mode is on.
+func Debug(debug bool) LinterOption {
+	return func(l *Linter) {
+		l.debug = debug
+	}
 }
 
 // New creates and returns a linter with the given rules and configs.
-func New(rules RuleRegistry, configs Configs) *Linter {
+func New(rules RuleRegistry, configs Configs, opts ...LinterOption) *Linter {
 	l := &Linter{
 		rules:   rules,
 		configs: configs,
@@ -96,6 +108,9 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
+			if l.debug {
+				debug.PrintStack()
+			}
 			if rerr, ok := r.(error); ok {
 				err = rerr
 			} else {

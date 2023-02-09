@@ -44,6 +44,7 @@ type cli struct {
 	EnabledRules            []string
 	DisabledRules           []string
 	ListRulesFlag           bool
+	DebugFlag               bool
 }
 
 // ExitForLintFailure indicates that a problem was found during linting.
@@ -62,6 +63,7 @@ func newCli(args []string) *cli {
 	var ruleEnableFlag []string
 	var ruleDisableFlag []string
 	var listRulesFlag bool
+	var debugFlag bool
 
 	// Register flag variables.
 	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
@@ -75,6 +77,7 @@ func newCli(args []string) *cli {
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit.  Honors the output-format flag.")
+	fs.BoolVar(&debugFlag, "debug", false, "Run in deubug mode. Panics will print stack.")
 
 	// Parse flags.
 	err := fs.Parse(args)
@@ -94,6 +97,7 @@ func newCli(args []string) *cli {
 		ProtoFiles:              fs.Args(),
 		VersionFlag:             versionFlag,
 		ListRulesFlag:           listRulesFlag,
+		DebugFlag:               debugFlag,
 	}
 }
 
@@ -177,7 +181,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 
 	// Create a linter to lint the file descriptors.
-	l := lint.New(rules, configs)
+	l := lint.New(rules, configs, lint.Debug(c.DebugFlag))
 	results, err := l.LintProtos(fd...)
 	if err != nil {
 		return err
