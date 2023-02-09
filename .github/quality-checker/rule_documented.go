@@ -16,13 +16,13 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 func checkRuleDocumented(aip int, name string) []error {
 	// Ensure that the expected documentation file exists.
 	wantFile := fmt.Sprintf("docs/rules/%04d/%s.md", aip, name)
-	if _, err := ioutil.ReadFile(wantFile); err != nil {
+	if _, err := os.ReadFile(wantFile); err != nil {
 		return []error{fmt.Errorf("missing rule documentation: %s", wantFile)}
 	}
 	return nil
