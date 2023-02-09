@@ -16,7 +16,6 @@ package lint
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -446,12 +445,12 @@ func TestReadConfigsFromFile(t *testing.T) {
 }
 
 func createTempFile(t *testing.T, name, content string) string {
-	dir, err := ioutil.TempDir("", "config_tests")
+	dir, err := os.MkdirTemp("", "config_tests")
 	if err != nil {
 		t.Fatal(err)
 	}
 	filePath := filepath.Join(dir, name)
-	if err := ioutil.WriteFile(filePath, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(filePath, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return filePath

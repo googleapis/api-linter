@@ -16,7 +16,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -27,7 +27,7 @@ func checkRuleRegistered(aip int, name string) []error {
 	path := fmt.Sprintf("rules/aip%04d/%s.go", aip, strcase.SnakeCase(name))
 
 	// Read in the file.
-	contents, err := ioutil.ReadFile(path)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		return []error{err}
 	}
@@ -43,7 +43,7 @@ func checkRuleRegistered(aip int, name string) []error {
 
 	// Ensure this rule is registered within its AIP module file.
 	ruleVar := ruleMatch[1]
-	contents, err = ioutil.ReadFile(fmt.Sprintf("rules/aip%04d/aip%04d.go", aip, aip))
+	contents, err = os.ReadFile(fmt.Sprintf("rules/aip%04d/aip%04d.go", aip, aip))
 	if err != nil {
 		return []error{err}
 	}
@@ -52,7 +52,7 @@ func checkRuleRegistered(aip int, name string) []error {
 	}
 
 	// Ensure that the AIP itself is registered in `rules/rules.go`.
-	contents, err = ioutil.ReadFile("rules/rules.go")
+	contents, err = os.ReadFile("rules/rules.go")
 	if err != nil {
 		errata = append(errata, err)
 		return errata
