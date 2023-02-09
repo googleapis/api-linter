@@ -48,6 +48,11 @@ func New(rules RuleRegistry, configs Configs, opts ...LinterOption) *Linter {
 		rules:   rules,
 		configs: configs,
 	}
+
+	for _, opt := range opts {
+		opt(l)
+	}
+
 	return l
 }
 

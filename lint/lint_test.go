@@ -152,3 +152,29 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 		})
 	}
 }
+
+func TestLinter_debug(t *testing.T) {
+	tests := []struct {
+		name  string
+		debug bool
+	}{
+		{
+			name:  "debug",
+			debug: true,
+		},
+		{
+			name:  "do not debug",
+			debug: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			l := New(NewRuleRegistry(), nil, Debug(test.debug))
+
+			if a, e := l.debug, test.debug; a != e {
+				t.Errorf("got debug %v wanted debug %v", a, e)
+			}
+		})
+	}
+}
