@@ -77,7 +77,7 @@ func TestRules_EnabledByDefault(t *testing.T) {
 			proto := test.proto
 			result := runLinter(t, proto, "")
 			if !strings.Contains(result, test.rule) {
-				t.Errorf("Rule %q should be enabled by default", test.rule)
+				t.Errorf("rule %q should be enabled by default", test.rule)
 			}
 		})
 	}
@@ -90,22 +90,47 @@ func TestRules_DisabledByFileComments(t *testing.T) {
 			proto := disableInFile + "\n" + test.proto
 			result := runLinter(t, proto, "")
 			if strings.Contains(result, test.rule) {
-				t.Errorf("Rule %q should be disabled by file comments", test.rule)
+				t.Errorf("rule %q should be disabled by file comments", test.rule)
 			}
 		})
 	}
 }
 
 func TestRules_DisabledByInlineComments(t *testing.T) {
+	testConfigurations := []struct {
+		suffix       string
+		appendArgs   []string
+		wantDisabled bool
+	}{
+		{
+			suffix:       "WithIgnoreCommentDisablesTrue",
+			appendArgs:   []string{"--ignore-comment-disables=true"},
+			wantDisabled: false,
+		},
+		{
+			suffix:       "WithIgnoreCommentDisablesFalse",
+			appendArgs:   []string{"--ignore-comment-disables=false"},
+			wantDisabled: true,
+		},
+		{
+			suffix:       "WithNoFlags",
+			appendArgs:   []string{},
+			wantDisabled: true,
+		},
+	}
+
 	for _, test := range testCases {
-		t.Run(test.testName, func(t *testing.T) {
-			disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
-			proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
-			result := runLinter(t, proto, "")
-			if strings.Contains(result, test.rule) {
-				t.Errorf("Rule %q should be disabled by in-line comments", test.rule)
-			}
-		})
+		for _, testConfig := range testConfigurations {
+			t.Run(test.testName+testConfig.suffix, func(t *testing.T) {
+				disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
+				proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+				_, result := runLinterWithFailureStatus(t, proto, "", testConfig.appendArgs)
+				isDisabled := !strings.Contains(result, test.rule)
+				if isDisabled != testConfig.wantDisabled {
+					t.Errorf("want %q disabled by in-line comments to be %v with flags %v, got %v", test.rule, testConfig.wantDisabled, testConfig.appendArgs, isDisabled)
+				}
+			})
+		}
 	}
 }
 
@@ -123,7 +148,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 			c := strings.Replace(config, "replace-me-here", test.rule, -1)
 			result := runLinter(t, test.proto, c)
 			if strings.Contains(result, test.rule) {
-				t.Errorf("Rule %q should be disabled by the user config: %q", test.rule, c)
+				t.Errorf("rule %q should be disabled by the user config: %q", test.rule, c)
 			}
 		})
 	}

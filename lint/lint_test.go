@@ -178,3 +178,29 @@ func TestLinter_debug(t *testing.T) {
 		})
 	}
 }
+
+func TestLinter_IgnoreCommentDisables(t *testing.T) {
+	tests := []struct {
+		name                  string
+		ignoreCommentDisables bool
+	}{
+		{
+			name:                  "ignoreCommentDisables",
+			ignoreCommentDisables: true,
+		},
+		{
+			name:                  "do not ignoreCommentDisables",
+			ignoreCommentDisables: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			l := New(NewRuleRegistry(), nil, IgnoreCommentDisables(test.ignoreCommentDisables))
+
+			if a, e := l.ignoreCommentDisables, test.ignoreCommentDisables; a != e {
+				t.Errorf("got ignoreCommentDisables %v wanted ignoreCommentDisables %v", a, e)
+			}
+		})
+	}
+}

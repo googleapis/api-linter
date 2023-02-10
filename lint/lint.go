@@ -27,9 +27,10 @@ import (
 
 // Linter checks API files and returns a list of detected problems.
 type Linter struct {
-	rules   RuleRegistry
-	configs Configs
-	debug   bool
+	rules                 RuleRegistry
+	configs               Configs
+	debug                 bool
+	ignoreCommentDisables bool
 }
 
 // LinterOption prvoides the ability to configure the Linter.
@@ -39,6 +40,13 @@ type LinterOption func(l *Linter)
 func Debug(debug bool) LinterOption {
 	return func(l *Linter) {
 		l.debug = debug
+	}
+}
+
+// IgnoreCommentDisables sets the flag for ignoring comments which disable rules.
+func IgnoreCommentDisables(ignoreCommentDisables bool) LinterOption {
+	return func(l *Linter) {
+		l.ignoreCommentDisables = ignoreCommentDisables
 	}
 }
 
@@ -91,7 +99,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 						errMessages = append(errMessages, fmt.Sprintf("rule %q missing required Descriptor in returned Problem", rule.GetName()))
 						continue
 					}
-					if ruleIsEnabled(rule, p.Descriptor, p.Location, aliasMap) {
+					if ruleIsEnabled(rule, p.Descriptor, p.Location, aliasMap, l.ignoreCommentDisables) {
 						p.RuleID = rule.GetName()
 						resp.Problems = append(resp.Problems, p)
 					}
