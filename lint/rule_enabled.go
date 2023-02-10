@@ -65,7 +65,8 @@ var descriptorDisableChecks = []func(d desc.Descriptor) bool{
 //
 // Note, if the given source code location is not nil, it will be used to
 // augment the set of commentLines.
-func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
+func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location,
+	aliasMap map[string]string, ignoreCommentDisables bool) bool {
 	// If the rule is disabled because of something on the descriptor itself
 	// (e.g. a deprecated annotation), address that.
 	for _, mustDisable := range descriptorDisableChecks {
@@ -76,6 +77,27 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Loca
 		}
 	}
 
+	if !ignoreCommentDisables {
+		if ruleIsDisabledByComments(rule, d, l, aliasMap) {
+			return false
+		}
+	}
+
+	// The rule may have been disabled on a parent. (For example, a field rule
+	// may be disabled at the message level to cover all fields in the message).
+	//
+	// Do not pass the source code location here, the source location in relation
+	// to the parent is not helpful.
+	if parent := d.GetParent(); parent != nil {
+		return ruleIsEnabled(rule, parent, nil, aliasMap, ignoreCommentDisables)
+	}
+
+	return true
+}
+
+// ruleIsDisabledByComments returns true if the rule has been disabled
+// by comments in the file or leading the element.
+func ruleIsDisabledByComments(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
@@ -99,18 +121,9 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Loca
 
 	for _, name := range names {
 		if matchRule(name, disabledRules...) {
-			return false
+			return true
 		}
 	}
 
-	// The rule may have been disabled on a parent. (For example, a field rule
-	// may be disabled at the message level to cover all fields in the message).
-	//
-	// Do not pass the source code location here, the source location in relation
-	// to the parent is not helpful.
-	if parent := d.GetParent(); parent != nil {
-		return ruleIsEnabled(rule, parent, nil, aliasMap)
-	}
-
-	return true
+	return false
 }
