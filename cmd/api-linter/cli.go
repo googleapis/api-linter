@@ -32,21 +32,23 @@ import (
 )
 
 type cli struct {
-	ConfigPath              string
-	FormatType              string
-	OutputPath              string
-	ExitStatusOnLintFailure bool
-	VersionFlag             bool
-	ProtoImportPaths        []string
-	ProtoFiles              []string
-	ProtoDescPath           []string
-	EnabledRules            []string
-	DisabledRules           []string
-	ListRulesFlag           bool
-	DebugFlag               bool
+	ConfigPath                string
+	FormatType                string
+	OutputPath                string
+	ExitStatusOnLintFailure   bool
+	VersionFlag               bool
+	ProtoImportPaths          []string
+	ProtoFiles                []string
+	ProtoDescPath             []string
+	EnabledRules              []string
+	DisabledRules             []string
+	ListRulesFlag             bool
+	DebugFlag                 bool
+	IgnoreCommentDisablesFlag bool
 }
 
 // ExitForLintFailure indicates that a problem was found during linting.
+//
 //lint:ignore ST1012 modifying this variable name is a breaking change.
 var ExitForLintFailure = errors.New("found problems during linting")
 
@@ -63,6 +65,7 @@ func newCli(args []string) *cli {
 	var ruleDisableFlag []string
 	var listRulesFlag bool
 	var debugFlag bool
+	var ignoreCommentDisablesFlag bool
 
 	// Register flag variables.
 	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
@@ -76,7 +79,8 @@ func newCli(args []string) *cli {
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit.  Honors the output-format flag.")
-	fs.BoolVar(&debugFlag, "debug", false, "Run in deubug mode. Panics will print stack.")
+	fs.BoolVar(&debugFlag, "debug", false, "Run in debug mode. Panics will print stack.")
+	fs.BoolVar(&ignoreCommentDisablesFlag, "ignore-comment-disables", false, "If set to true, disable comments will be ignored.\nThis is helpful when strict enforcement of AIPs are necessary and\nproto definitions should not be able to disable checks.")
 
 	// Parse flags.
 	err := fs.Parse(args)
@@ -85,18 +89,19 @@ func newCli(args []string) *cli {
 	}
 
 	return &cli{
-		ConfigPath:              cfgFlag,
-		FormatType:              fmtFlag,
-		OutputPath:              outFlag,
-		ExitStatusOnLintFailure: setExitStatusOnLintFailure,
-		ProtoImportPaths:        append(protoImportFlag, "."),
-		ProtoDescPath:           protoDescFlag,
-		EnabledRules:            ruleEnableFlag,
-		DisabledRules:           ruleDisableFlag,
-		ProtoFiles:              fs.Args(),
-		VersionFlag:             versionFlag,
-		ListRulesFlag:           listRulesFlag,
-		DebugFlag:               debugFlag,
+		ConfigPath:                cfgFlag,
+		FormatType:                fmtFlag,
+		OutputPath:                outFlag,
+		ExitStatusOnLintFailure:   setExitStatusOnLintFailure,
+		ProtoImportPaths:          append(protoImportFlag, "."),
+		ProtoDescPath:             protoDescFlag,
+		EnabledRules:              ruleEnableFlag,
+		DisabledRules:             ruleDisableFlag,
+		ProtoFiles:                fs.Args(),
+		VersionFlag:               versionFlag,
+		ListRulesFlag:             listRulesFlag,
+		DebugFlag:                 debugFlag,
+		IgnoreCommentDisablesFlag: ignoreCommentDisablesFlag,
 	}
 }
 
@@ -180,7 +185,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 
 	// Create a linter to lint the file descriptors.
-	l := lint.New(rules, configs, lint.Debug(c.DebugFlag))
+	l := lint.New(rules, configs, lint.Debug(c.DebugFlag), lint.IgnoreCommentDisables(c.IgnoreCommentDisablesFlag))
 	results, err := l.LintProtos(fd...)
 	if err != nil {
 		return err
