@@ -32,6 +32,7 @@ var nameSuffix = &lint.FieldRule{
 			"given_name",
 			"full_resource_name",
 			"crypto_key_name",
+			"cmek_key_name",
 			"name",
 		).Contains(f.GetName())
 	},
