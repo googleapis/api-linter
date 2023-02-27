@@ -17,8 +17,7 @@ rules, as mandated in [AIP-127][].
 ## Details
 
 This rule ensures that `google.api.http` patterns adhere to the following
-[syntax rules]
-(https://github.com/googleapis/googleapis/blob/83c3605afb5a39952bf0a0809875d41cf2a558ca/google/api/http.proto#L224).
+[syntax rules](https://github.com/googleapis/googleapis/blob/83c3605afb5a39952bf0a0809875d41cf2a558ca/google/api/http.proto#L224).
 
 ## Examples
 
