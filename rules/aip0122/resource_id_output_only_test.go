@@ -31,7 +31,7 @@ func TestResourceIdOutputOnly(t *testing.T) {
 		{"ValidUID", "uid", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
 		{"InvalidWithSuffix", "book_id", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
 		{"InvalidUID", "uid", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
-		{"SkipField", "book", "", testutils.Problems{}},
+		{"SkipDifferentIdField", "foo_id", "", testutils.Problems{}},
 	} {
 		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";

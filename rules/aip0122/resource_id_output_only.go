@@ -15,19 +15,34 @@
 package aip0122
 
 import (
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var resourceIdOutputOnly = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "resource-id-output-only"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		isRes := utils.IsResource(f.GetParent().(*desc.MessageDescriptor))
-		isId := f.GetName() == "uid" || strings.HasSuffix(f.GetName(), "_id")
+		var idName string
+		p := f.GetParent().(*desc.MessageDescriptor)
+
+		// Build an expected ID field name based on the Resource `singular`
+		// field or by parsing the `type`.
+		isRes := utils.IsResource(p)
+		if isRes {
+			res := utils.GetResource(p)
+			idName = res.GetSingular()
+			if idName == "" {
+				if _, t, ok := utils.SplitResourceTypeName(res.GetType()); ok {
+					idName = strcase.SnakeCase(t)
+				}
+			}
+			idName += "_id"
+		}
+
+		isId := f.GetName() == "uid" || f.GetName() == idName
 		return isRes && isId
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {

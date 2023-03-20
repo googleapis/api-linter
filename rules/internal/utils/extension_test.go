@@ -373,3 +373,28 @@ func TestFindResource(t *testing.T) {
 		})
 	}
 }
+
+func TestSplitResourceTypeName(t *testing.T) {
+	for _, tst := range []struct {
+		name, input, service, typeName string
+		ok                             bool
+	}{
+		{"Valid", "foo.googleapis.com/Foo", "foo.googleapis.com", "Foo", true},
+		{"InvalidExtraSlashes", "foo.googleapis.com/Foo/Bar", "", "", false},
+		{"InvalidNoService", "/Foo", "", "", false},
+		{"InvalidNoTypeName", "foo.googleapis.com/", "", "", false},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			s, typ, ok := SplitResourceTypeName(tst.input)
+			if ok != tst.ok {
+				t.Fatalf("Expected %v for ok, but got %v", tst.ok, ok)
+			}
+			if diff := cmp.Diff(s, tst.service); diff != "" {
+				t.Errorf("service: got(-),want(+):\n%s", diff)
+			}
+			if diff := cmp.Diff(typ, tst.typeName); diff != "" {
+				t.Errorf("type name: got(-),want(+):\n%s", diff)
+			}
+		})
+	}
+}

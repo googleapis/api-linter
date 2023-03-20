@@ -166,3 +166,18 @@ func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDesc
 	}
 	return nil
 }
+
+// SplitResourceTypeName splits the `Resource.type` field into the service name
+// and the resource type name.
+func SplitResourceTypeName(typ string) (service string, typeName string, ok bool) {
+	split := strings.Split(typ, "/")
+	if len(split) != 2 || split[0] == "" || split[1] == "" {
+		return
+	}
+
+	service = split[0]
+	typeName = split[1]
+	ok = true
+
+	return
+}

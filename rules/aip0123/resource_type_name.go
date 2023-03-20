@@ -17,7 +17,6 @@ package aip0123
 import (
 	"fmt"
 	"regexp"
-	"strings"
 	"unicode"
 
 	"github.com/googleapis/api-linter/lint"
@@ -37,15 +36,14 @@ var resourceTypeName = &lint.MessageRule{
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resource := utils.GetResource(m)
-		resourceType := resource.GetType()
-		if strings.Count(resourceType, "/") != 1 {
+		_, typeName, ok := utils.SplitResourceTypeName(resource.GetType())
+		if !ok {
 			return []lint.Problem{{
 				Message:    "Resource type names must be of the form {Service Name}/{Type}.",
 				Descriptor: m,
 				Location:   locations.MessageResource(m),
 			}}
 		}
-		typeName := strings.Split(resourceType, "/")[1]
 		if !unicode.IsUpper(rune(typeName[0])) {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Type %q must be UpperCamelCase", typeName),
