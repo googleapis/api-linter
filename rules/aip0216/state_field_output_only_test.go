@@ -22,7 +22,7 @@ import (
 
 func TestStateFieldOutputOnly(t *testing.T) {
 	tests := []struct {
-		Name          string
+		name          string
 		FieldName     string
 		FieldType     string
 		FieldBehavior string
@@ -43,7 +43,7 @@ func TestStateFieldOutputOnly(t *testing.T) {
 		{"NotAnEnum", "state", "StateOfState", "", testutils.Problems{}},
 	}
 	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_behavior.proto";
 
@@ -61,7 +61,6 @@ func TestStateFieldOutputOnly(t *testing.T) {
 				enum WritersBlockState {
 					WRITERS_BLOCK_STATE_UNSPECIFIED = 0;
 					BLOCKED = 1;
-
 				}
 
 				// not a state enum
