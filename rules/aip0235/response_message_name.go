@@ -30,7 +30,7 @@ var responseMessageName = &lint.MethodRule{
 	OnlyIf: isBatchDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		got := m.GetOutputType().GetFullyQualifiedName()
-		if got == "google.longrunning.Operation" {
+		if utils.IsOperation(m.GetOutputType()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		} else if got != "google.protobuf.Empty" {
 			got = m.GetOutputType().GetName()
