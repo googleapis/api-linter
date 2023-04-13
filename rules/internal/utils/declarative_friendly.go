@@ -83,7 +83,7 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 
 		// If the method is an LRO, then get the response type from the
 		// operation_info annotation.
-		if response.GetFullyQualifiedName() == "google.longrunning.Operation" {
+		if IsOperation(response) {
 			if opInfo := GetOperationInfo(m); opInfo != nil {
 				response = FindMessage(m.GetFile(), opInfo.GetResponseType())
 

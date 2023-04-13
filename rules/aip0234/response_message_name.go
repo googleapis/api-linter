@@ -35,7 +35,7 @@ var responseMessageName = &lint.MethodRule{
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.
 		got := m.GetOutputType().GetName()
-		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+		if utils.IsOperation(m.GetOutputType()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		}
 
