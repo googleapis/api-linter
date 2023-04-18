@@ -31,6 +31,7 @@ func TestLROResponse(t *testing.T) {
 		{"InvalidEmptyString", "WriteBook", "", testutils.Problems{{Message: "must set the response type"}}},
 		{"InvalidGPEmpty", "WriteBook", "google.protobuf.Empty", testutils.Problems{{Message: "Empty"}}},
 		{"ValidGPEmptyDelete", "DeleteBook", "google.protobuf.Empty", testutils.Problems{}},
+		{"ValidGPEmptyDelete", "BatchDeleteBooks", "google.protobuf.Empty", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
