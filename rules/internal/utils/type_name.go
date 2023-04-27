@@ -35,3 +35,8 @@ func GetTypeName(f *desc.FieldDescriptor) string {
 	}
 	return strings.ToLower(f.GetType().String()[len("TYPE_"):])
 }
+
+// IsOperation returns if the message is a longrunning Operation or not.
+func IsOperation(m *desc.MessageDescriptor) bool {
+	return m.GetFullyQualifiedName() == "google.longrunning.Operation"
+}
