@@ -27,6 +27,7 @@ func TestUseUid(t *testing.T) {
 	}{
 		{"uid", nil},
 		{"id", testutils.Problems{{Suggestion: "uid"}}},
+		{"foo_id", nil},
 	} {
 		t.Run(test.FieldName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

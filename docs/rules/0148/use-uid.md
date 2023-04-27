@@ -15,9 +15,8 @@ mandated in [AIP-148][].
 
 ## Details
 
-This rule looks for fields named `first_name` and `last_name`, and complains if
-it finds them, suggesting the use of `given_name` and `family_name`
-(respectively) instead.
+This rule looks on resource messages for a field named `id`, complains if it
+finds it, and suggests the use of `uid` instead.
 
 ## Examples
 
@@ -25,9 +24,14 @@ it finds them, suggesting the use of `given_name` and `family_name`
 
 ```proto
 // Incorrect.
-message Human {
-  string first_name = 1;  // Should be `given_name`.
-  string last_name = 2;   // Should be `family_name`
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
+  };
+
+  string name = 1;
+  string id = 2; // Should be `uid`
 }
 ```
 
@@ -35,9 +39,14 @@ message Human {
 
 ```proto
 // Correct.
-message Human {
-  string given_name = 1;
-  string family_name = 2;
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
+  };
+
+  string name = 1;
+  string uid = 2;
 }
 ```
 
@@ -48,11 +57,16 @@ enclosing message. Remember to also include an [aip.dev/not-precedent][]
 comment explaining why.
 
 ```proto
-// (-- api-linter: core::0148::human-names=disabled
+// (-- api-linter: core::0148::use-uid=disabled
 //     aip.dev/not-precedent: We need to do this because reasons. --)
-message Human {
-  string first_name = 1;
-  string last_name = 2;
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
+  };
+
+  string name = 1;
+  string id = 2;
 }
 ```
 
