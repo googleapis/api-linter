@@ -23,20 +23,23 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+const (
+	idStr  = "id"
+	uidStr = "uid"
+)
+
 var useUid = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "use-uid"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		return utils.IsResource(f.GetOwner())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		want := "uid"
-		target := "id"
-		if f.GetName() == target {
+		if f.GetName() == idStr {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Use %s instead of %s.", want, target),
+				Message:    fmt.Sprintf("Use %s instead of %s.", uidStr, idStr),
 				Descriptor: f,
 				Location:   locations.DescriptorName(f),
-				Suggestion: want,
+				Suggestion: uidStr,
 			}}
 		}
 		return nil
