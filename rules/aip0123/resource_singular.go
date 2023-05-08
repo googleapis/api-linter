@@ -46,8 +46,8 @@ var resourceSingular = &lint.MessageRule{
 		if !ok || lowerTypeName != s {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
-					"Resource singular should be lower camel case of type: %q, not %q.",
-					lowerTypeName, s,
+					"Resource singular should be lower camel case of type: %q",
+					lowerTypeName,
 				),
 				Descriptor: m,
 				Location:   l,

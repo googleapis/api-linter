@@ -35,6 +35,13 @@ var resourcePlural = &lint.MessageRule{
 				Location:   l,
 			}}
 		}
+		if !utils.IsLowerCamelCase(p) {
+			return []lint.Problem{{
+				Message:    "Resource plural should be lowerCamelCase",
+				Descriptor: m,
+				Location:   l,
+			}}
+		}
 		return nil
 	},
 }

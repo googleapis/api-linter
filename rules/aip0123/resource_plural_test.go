@@ -27,7 +27,7 @@ func TestResourcePlural(t *testing.T) {
 	}{
 		{
 			"Valid",
-			`plural: "books"`,
+			`plural: "bookShelves"`,
 			nil,
 		},
 		{
@@ -35,15 +35,30 @@ func TestResourcePlural(t *testing.T) {
 			``,
 			testutils.Problems{{
 				Message: "Resources should declare plural",
-			}}},
+			}},
+		},
+		{
+			"InvalidUpperCamel",
+			`plural: "BookShelves"`,
+			testutils.Problems{{
+				Message: "Resource plural should be lowerCamelCase",
+			}},
+		},
+		{
+			"InvalidDash",
+			`plural: "Book-Shelves"`,
+			testutils.Problems{{
+				Message: "Resource plural should be lowerCamelCase",
+			}},
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			message Book {
 				option (google.api.resource) = {
-					type: "library.googleapis.com/Book"
-					pattern: "publishers/{publisher}/books/{book}"
+					type: "library.googleapis.com/BookShelf"
+					pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
 					{{.Plural}}
 				};
 				string name = 1;

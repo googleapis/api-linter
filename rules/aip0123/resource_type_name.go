@@ -16,17 +16,11 @@ package aip0123
 
 import (
 	"fmt"
-	"regexp"
-	"unicode"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-)
-
-var (
-	resourceNameRegex = regexp.MustCompile(`^[\p{L}A-Za-z0-9]+$`)
 )
 
 var resourceTypeName = &lint.MessageRule{
@@ -44,18 +38,9 @@ var resourceTypeName = &lint.MessageRule{
 				Location:   locations.MessageResource(m),
 			}}
 		}
-		if !unicode.IsUpper(rune(typeName[0])) {
+		if !utils.IsUpperCamelCase(typeName) {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Type %q must be UpperCamelCase", typeName),
-				Descriptor: m,
-				Location:   locations.MessageResource(m),
-			}}
-		}
-		if !resourceNameRegex.MatchString(typeName) {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"Type %q must only contain alphanumeric characters", typeName,
-				),
 				Descriptor: m,
 				Location:   locations.MessageResource(m),
 			}}
