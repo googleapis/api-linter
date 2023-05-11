@@ -16,79 +16,123 @@ package utils
 
 import "testing"
 
-func TestIsLowerCamelCase(t *testing.T) {
+func TestToLowerCamelCase(t *testing.T) {
 	for _, test := range []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		input string
+		want  string
 	}{
 		{
-			name: "Valid",
-			s:    "bookShelf123",
-			want: true,
+			name:  "OneWord",
+			input: "Foo",
+			want:  "foo",
 		},
 		{
-			name: "InvalidUpperCamelCase",
-			s:    "BookShelf",
-			want: false,
+			name:  "OneWordNoop",
+			input: "foo",
+			want:  "foo",
 		},
 		{
-			name: "InvalidDash",
-			s:    "book-Shelf",
-			want: false,
+			name:  "TwoWords",
+			input: "bookShelf",
+			want:  "bookShelf",
 		},
 		{
-			name: "InvalidUnderscore",
-			s:    "book_Shelf",
-			want: false,
+			name:  "WithDash",
+			input: "book-shelf",
+			want:  "bookShelf",
+		},
+		{
+			name:  "WithNumbers",
+			input: "universe42love",
+			want:  "universe42love",
+		},
+		{
+			name:  "WithUnderscore",
+			input: "book_shelf",
+			want:  "bookShelf",
+		},
+		{
+			name:  "WithUnderscore",
+			input: "book_shelf",
+			want:  "bookShelf",
+		},
+		{
+			name:  "WithSpaces",
+			input: "book shelf",
+			want:  "bookShelf",
+		},
+		{
+			name:  "WithPeriods",
+			input: "book.shelf",
+			want:  "bookShelf",
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			got := IsLowerCamelCase(test.s)
+			got := ToLowerCamelCase(test.input)
 			if got != test.want {
-				t.Errorf(
-					"IsLowerCamelCase(%q) = %v, want %v",
-					test.s, got, test.want,
-				)
+				t.Errorf("ToLowerCamelCase(%q) = %q, got %q", test.input, test.want, got)
 			}
 		})
 	}
 }
 
-func TestIsUpperCamelCase(t *testing.T) {
+func TestToUpperCamelCase(t *testing.T) {
 	for _, test := range []struct {
-		name string
-		s    string
-		want bool
+		name  string
+		input string
+		want  string
 	}{
 		{
-			name: "Valid",
-			s:    "BookShelf123",
-			want: true,
+			name:  "OneWord",
+			input: "foo",
+			want:  "Foo",
 		},
 		{
-			name: "InvalidLowerCamelCase",
-			s:    "bookShelf",
-			want: false,
+			name:  "OneWordNoop",
+			input: "Foo",
+			want:  "Foo",
 		},
 		{
-			name: "InvalidDash",
-			s:    "Book-Shelf",
-			want: false,
+			name:  "TwoWords",
+			input: "bookShelf",
+			want:  "BookShelf",
 		},
 		{
-			name: "InvalidUnderscore",
-			s:    "Book_Shelf",
-			want: false,
+			name:  "WithDash",
+			input: "book-shelf",
+			want:  "BookShelf",
+		},
+		{
+			name:  "WithNumbers",
+			input: "universe42love",
+			want:  "Universe42love",
+		},
+		{
+			name:  "WithUnderscore",
+			input: "Book_shelf",
+			want:  "BookShelf",
+		},
+		{
+			name:  "WithUnderscore",
+			input: "Book_shelf",
+			want:  "BookShelf",
+		},
+		{
+			name:  "WithSpaces",
+			input: "Book shelf",
+			want:  "BookShelf",
+		},
+		{
+			name:  "WithPeriods",
+			input: "book.shelf",
+			want:  "BookShelf",
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			got := IsUpperCamelCase(test.s)
+			got := ToUpperCamelCase(test.input)
 			if got != test.want {
-				t.Errorf(
-					"IsLowerCamelCase(%q) = %v, want %v",
-					test.s, got, test.want,
-				)
+				t.Errorf("ToLowerCamelCase(%q) = %q, got %q", test.input, test.want, got)
 			}
 		})
 	}

@@ -31,6 +31,7 @@ var resourceTypeName = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resource := utils.GetResource(m)
 		_, typeName, ok := utils.SplitResourceTypeName(resource.GetType())
+		upperTypeName := utils.ToUpperCamelCase(typeName)
 		if !ok {
 			return []lint.Problem{{
 				Message:    "Resource type names must be of the form {Service Name}/{Type}.",
@@ -38,9 +39,9 @@ var resourceTypeName = &lint.MessageRule{
 				Location:   locations.MessageResource(m),
 			}}
 		}
-		if !utils.IsUpperCamelCase(typeName) {
+		if upperTypeName != typeName {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Type %q must be UpperCamelCase", typeName),
+				Message:    fmt.Sprintf("Type must be UpperCamelCase with alphanumeric characters: %q", upperTypeName),
 				Descriptor: m,
 				Location:   locations.MessageResource(m),
 			}}

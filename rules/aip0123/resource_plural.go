@@ -15,6 +15,8 @@
 package aip0123
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -28,6 +30,7 @@ var resourcePlural = &lint.MessageRule{
 		r := utils.GetResource(m)
 		l := locations.MessageResource(m)
 		p := r.GetPlural()
+		pLower := utils.ToLowerCamelCase(p)
 		if p == "" {
 			return []lint.Problem{{
 				Message:    "Resources should declare plural.",
@@ -35,9 +38,11 @@ var resourcePlural = &lint.MessageRule{
 				Location:   l,
 			}}
 		}
-		if !utils.IsLowerCamelCase(p) {
+		if pLower != p {
 			return []lint.Problem{{
-				Message:    "Resource plural should be lowerCamelCase",
+				Message: fmt.Sprintf(
+					"Resource plural should be lowerCamelCase: %q", pLower,
+				),
 				Descriptor: m,
 				Location:   l,
 			}}

@@ -34,7 +34,7 @@ func TestResourceSingular(t *testing.T) {
 			"InvalidDoesntMatchType",
 			`singular: "shelf"`,
 			testutils.Problems{{
-				Message: "shelf",
+				Message: "book",
 			}},
 		},
 		{
@@ -42,7 +42,8 @@ func TestResourceSingular(t *testing.T) {
 			``,
 			testutils.Problems{{
 				Message: "Resources should declare singular",
-			}}},
+			}},
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

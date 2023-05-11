@@ -21,28 +21,24 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
 var resourceSingular = &lint.MessageRule{
-	Name: lint.NewRuleName(123, "resource-singular"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		r := utils.GetResource(m)
-		return r != nil || r.GetType() == ""
-	},
+	Name:   lint.NewRuleName(123, "resource-singular"),
+	OnlyIf: hasResourceAnnotation,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		r := utils.GetResource(m)
 		l := locations.MessageResource(m)
 		s := r.GetSingular()
+		_, typeName, ok := utils.SplitResourceTypeName(r.GetType())
+		lowerTypeName := utils.ToLowerCamelCase(typeName)
 		if s == "" {
 			return []lint.Problem{{
-				Message:    "Resources should declare singular.",
+				Message:    fmt.Sprintf("Resources should declare singular: %q", lowerTypeName),
 				Descriptor: m,
 				Location:   l,
 			}}
 		}
-		_, typeName, ok := utils.SplitResourceTypeName(r.GetType())
-		lowerTypeName := strcase.LowerCamelCase(typeName)
 		if !ok || lowerTypeName != s {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
