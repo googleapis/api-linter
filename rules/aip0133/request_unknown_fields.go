@@ -39,13 +39,12 @@ var unknownFields = &lint.MessageRule{
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				allowedFields[fieldDesc.GetName()] = nil // AIP-133
-			}
-		}
-
 		for _, field := range m.GetFields() {
+			// Skip the check with the field that is the body.
+			if t := field.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+				continue
+			}
+			// Check the remaining fields.
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(

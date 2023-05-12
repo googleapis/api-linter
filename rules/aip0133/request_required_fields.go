@@ -38,16 +38,16 @@ var requestRequiredFields = &lint.MessageRule{
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				allowedRequiredFields[fieldDesc.GetName()] = nil // AIP-133
-			}
-		}
-
 		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
+			// Skip the check with the field that is the body.
+			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+				continue
+			}
+			// Iterate remaining fields. If they're not in the allowed list,
+			// add a problem.
 			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
