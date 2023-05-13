@@ -22,6 +22,6 @@ import (
 // List Revisions methods should use the HTTP GET method.
 var listRevisionsHTTPMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "list-revisions-http-method"),
-	OnlyIf:     IsListRevisionsMethod,
+	OnlyIf:     utils.IsListRevisionsMethod,
 	LintMethod: utils.LintHTTPMethod("GET"),
 }

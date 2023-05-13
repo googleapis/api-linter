@@ -35,7 +35,7 @@ var resourceReferenceType = &lint.MethodRule{
 		// Unresolvable response_type for an Operation results in nil here.
 		resource := utils.GetResource(ot)
 		p := m.GetInputType().FindFieldByName("parent")
-		return isCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
+		return utils.IsCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.

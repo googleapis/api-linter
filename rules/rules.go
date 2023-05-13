@@ -51,6 +51,7 @@ package rules
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/aip0121"
 	"github.com/googleapis/api-linter/rules/aip0122"
 	"github.com/googleapis/api-linter/rules/aip0123"
 	"github.com/googleapis/api-linter/rules/aip0124"
@@ -98,6 +99,7 @@ import (
 type addRulesFuncType func(lint.RuleRegistry) error
 
 var aipAddRulesFuncs = []addRulesFuncType{
+	aip0121.AddRules,
 	aip0122.AddRules,
 	aip0123.AddRules,
 	aip0124.AddRules,

@@ -47,15 +47,8 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 var (
-	updateMethodRegexp     = regexp.MustCompile("^Update(?:[A-Z]|$)")
 	updateReqMessageRegexp = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
 )
-
-// Returns true if this is a AIP-134 Update method, false otherwise.
-func isUpdateMethod(m *desc.MethodDescriptor) bool {
-	methodName := m.GetName()
-	return updateMethodRegexp.MatchString(methodName)
-}
 
 // Returns true if this is an AIP-134 Update request message, false otherwise.
 func isUpdateRequestMessage(m *desc.MessageDescriptor) bool {

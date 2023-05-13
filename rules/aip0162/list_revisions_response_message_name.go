@@ -21,6 +21,6 @@ import (
 
 var listRevisionsResponseMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "list-revisions-response-message-name"),
-	OnlyIf:     IsListRevisionsMethod,
+	OnlyIf:     utils.IsListRevisionsMethod,
 	LintMethod: utils.LintMethodHasMatchingResponseName,
 }

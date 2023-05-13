@@ -140,17 +140,10 @@ func isDeleteRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 }
 
 var (
-	listRevisionsMethodRegexp      = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
 	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
 	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
 	listRevisionsURINameRegexp     = regexp.MustCompile(`:listRevisions$`)
 )
-
-// IsListRevisionsMethod returns true if this is an AIP-162 List Revisions method,
-// false otherwise.
-func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
-	return listRevisionsMethodRegexp.MatchString(m.GetName())
-}
 
 // IsListRevisionsRequestMessage returns true if this is an AIP-162 List
 // Revisions request message, false otherwise.

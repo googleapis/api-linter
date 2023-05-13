@@ -24,7 +24,7 @@ import (
 // List Revisions methods should have a proper HTTP pattern.
 var listRevisionsHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "list-revisions-http-uri-suffix"),
-	OnlyIf: IsListRevisionsMethod,
+	OnlyIf: utils.IsListRevisionsMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !listRevisionsURINameRegexp.MatchString(httpRule.URI) {

@@ -342,7 +342,7 @@ func TestFindResource(t *testing.T) {
 					type: "library.googleapis.com/Shelf"
 					pattern: "shelves/{shelf}"
 				};
-				
+
 				string name = 1;
 
 				repeated Book books = 2;
@@ -394,6 +394,72 @@ func TestSplitResourceTypeName(t *testing.T) {
 			}
 			if diff := cmp.Diff(typ, tst.typeName); diff != "" {
 				t.Errorf("type name: got(-),want(+):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestGetOutputOrLROResponseMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPCs string
+		want string
+	}{
+		{"BookOutputType", `
+			rpc CreateBook(CreateBookRequest) returns (Book) {};
+		`, "Book"},
+		{"LROBookResponse", `
+			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+				option (google.longrunning.operation_info) = {
+					response_type: "Book"
+				};
+		};
+		`, "Book"},
+		{"LROMissingResponse", `
+			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+		};
+		`, ""},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+				import "google/protobuf/field_mask.proto";
+				service Foo {
+					{{.RPCs}}
+				}
+
+				// This is at the top to make it retrievable
+				// by the test code.
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "books/{book}"
+						singular: "book"
+						plural: "books"
+					};
+				}
+
+				message CreateBookRequest {
+					// The parent resource where this book will be created.
+					// Format: publishers/{publisher}
+					string parent = 1;
+
+					// The book to create.
+					Book book = 2;
+				}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			resp := GetOutputOrLROResponseMessage(method)
+			got := ""
+			if resp != nil {
+				got = resp.GetName()
+			}
+			if got != test.want {
+				t.Errorf(
+					"GetOutputOrLROResponseMessage got %q, want %q",
+					got, test.want,
+				)
 			}
 		})
 	}

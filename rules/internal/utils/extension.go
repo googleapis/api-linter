@@ -65,6 +65,26 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	return typ
 }
 
+// GetOutputOrLROResponseMessage returns the OutputType if the response is
+// not an LRO, or the ResponseType otherwise.
+func GetOutputOrLROResponseMessage(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetOutputType().GetName() != "Operation" {
+		return m.GetOutputType()
+	}
+
+	info := GetOperationInfo(m)
+	if info == nil {
+		return nil
+	}
+	typ := FindMessage(m.GetFile(), info.GetResponseType())
+
+	return typ
+}
+
 // GetMetadataType returns the message referred to by the
 // (google.longrunning.operation_info).metadata_type annotation.
 func GetMetadataType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
@@ -150,7 +170,7 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 
 // FindResource returns first resource of type matching the reference param.
 // resource Type name being referenced. It looks within a given file and its
-// depenedncies, it cannot search within the entire protobuf package.
+// depenedencies, it cannot search within the entire protobuf package.
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {

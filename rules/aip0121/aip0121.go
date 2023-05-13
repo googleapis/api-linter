@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0132
+// Package aip0121 contains rules defined in https://aip.dev/121.
+package aip0121
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
 )
 
-// List methods should use the HTTP GET verb.
-var httpMethod = &lint.MethodRule{
-	Name:       lint.NewRuleName(132, "http-method"),
-	OnlyIf:     utils.IsListMethod,
-	LintMethod: utils.LintHTTPMethod("GET"),
+// AddRules accepts a register function and registers each of
+// this AIP's rules to it.
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
+		121,
+		resourceMustSupportGet,
+	)
 }
