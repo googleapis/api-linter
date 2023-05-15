@@ -50,9 +50,9 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	return nil
 }
 
-// GetResponseType returns the message referred to by the
+// GetOperationResponseType returns the message referred to by the
 // (google.longrunning.operation_info).response_type annotation.
-func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -65,9 +65,9 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	return typ
 }
 
-// GetOutputOrLROResponseMessage returns the OutputType if the response is
+// GetResponseType returns the OutputType if the response is
 // not an LRO, or the ResponseType otherwise.
-func GetOutputOrLROResponseMessage(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -76,13 +76,7 @@ func GetOutputOrLROResponseMessage(m *desc.MethodDescriptor) *desc.MessageDescri
 		return m.GetOutputType()
 	}
 
-	info := GetOperationInfo(m)
-	if info == nil {
-		return nil
-	}
-	typ := FindMessage(m.GetFile(), info.GetResponseType())
-
-	return typ
+	return GetOperationResponseType(m)
 }
 
 // GetMetadataType returns the message referred to by the

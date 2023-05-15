@@ -29,7 +29,7 @@ var resourceReferenceType = &lint.MethodRule{
 		// Return type of the RPC.
 		ot := m.GetOutputType()
 		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
+			ot = utils.GetOperationResponseType(m)
 		}
 
 		// Unresolvable response_type for an Operation results in nil here.
@@ -41,7 +41,7 @@ var resourceReferenceType = &lint.MethodRule{
 		// Return type of the RPC.
 		ot := m.GetOutputType()
 		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
+			ot = utils.GetOperationResponseType(m)
 		}
 		resource := utils.GetResource(ot)
 		parent := m.GetInputType().FindFieldByName("parent")

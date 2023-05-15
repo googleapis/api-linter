@@ -30,9 +30,10 @@ service Foo {
 }
 
 message Book {
-	option (google.api.resource) = {
-		type: "library.googleapis.com/Book"
-	};
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
+  };
 }
 ```
 
@@ -42,13 +43,13 @@ message Book {
 // Correct.
 service Foo {
   rpc CreateBook(CreateBookRequest) returns (Book) {};
-	rpc GetBook(GetBookRequest) returns (Book) {};
+  rpc GetBook(GetBookRequest) returns (Book) {};
 }
 
 message Book {
-	option (google.api.resource) = {
-		type: "library.googleapis.com/Book"
-	};
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+  };
 }
 ```
 
@@ -66,9 +67,9 @@ service Foo {
 }
 
 message Book {
-	option (google.api.resource) = {
-		type: "library.googleapis.com/Book"
-	};
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+  };
 }
 ```
 

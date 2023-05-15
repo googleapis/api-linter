@@ -40,7 +40,7 @@ var resourceMustSupportGet = &lint.ServiceRule{
 				t := utils.GetResource(m.GetOutputType()).GetType()
 				resourcesWithGet.Add(t)
 			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) {
-				message := utils.GetOutputOrLROResponseMessage(m)
+				message := utils.GetResponseType(m)
 				if message != nil {
 					t := utils.GetResource(message).GetType()
 					resourcesWithOtherMethods[t] = message
@@ -58,7 +58,7 @@ var resourceMustSupportGet = &lint.ServiceRule{
 			if !resourcesWithGet.Contains(t) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"resource %q must support Get method", t,
+						"Missing Standard Get method for resource %q", t,
 					),
 					Descriptor: m,
 					Location:   locations.MessageResource(m),

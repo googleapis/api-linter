@@ -151,7 +151,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 				message WriteBookResponse {}
 			`, test)
 
-			typ := GetResponseType(fd.GetServices()[0].GetMethods()[0])
+			typ := GetOperationResponseType(fd.GetServices()[0].GetMethods()[0])
 
 			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) response_type message", test.valid)
@@ -450,7 +450,7 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 				}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]
-			resp := GetOutputOrLROResponseMessage(method)
+			resp := GetResponseType(method)
 			got := ""
 			if resp != nil {
 				got = resp.GetName()

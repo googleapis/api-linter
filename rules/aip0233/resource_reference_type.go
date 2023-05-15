@@ -29,7 +29,7 @@ var resourceReferenceType = &lint.MethodRule{
 		// Return type of the RPC.
 		ot := m.GetOutputType()
 		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
+			ot = utils.GetOperationResponseType(m)
 		}
 
 		// First repeated message field must be annotated with google.api.resource.
@@ -47,7 +47,7 @@ var resourceReferenceType = &lint.MethodRule{
 		// Return type of the RPC.
 		ot := m.GetOutputType()
 		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
+			ot = utils.GetOperationResponseType(m)
 		}
 		repeated := utils.GetRepeatedMessageFields(ot)
 		resMsg := repeated[0].GetMessageType()
