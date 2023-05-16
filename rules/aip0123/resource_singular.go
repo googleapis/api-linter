@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,27 +23,30 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var resourceTypeName = &lint.MessageRule{
-	Name: lint.NewRuleName(123, "resource-type-name"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.GetResource(m) != nil
-	},
+var resourceSingular = &lint.MessageRule{
+	Name:   lint.NewRuleName(123, "resource-singular"),
+	OnlyIf: hasResourceAnnotation,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resource := utils.GetResource(m)
-		_, typeName, ok := utils.SplitResourceTypeName(resource.GetType())
-		upperTypeName := utils.ToUpperCamelCase(typeName)
-		if !ok {
+		r := utils.GetResource(m)
+		l := locations.MessageResource(m)
+		s := r.GetSingular()
+		_, typeName, ok := utils.SplitResourceTypeName(r.GetType())
+		lowerTypeName := utils.ToLowerCamelCase(typeName)
+		if s == "" {
 			return []lint.Problem{{
-				Message:    "Resource type names must be of the form {Service Name}/{Type}.",
+				Message:    fmt.Sprintf("Resources should declare singular: %q", lowerTypeName),
 				Descriptor: m,
-				Location:   locations.MessageResource(m),
+				Location:   l,
 			}}
 		}
-		if upperTypeName != typeName {
+		if !ok || lowerTypeName != s {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Type must be UpperCamelCase with alphanumeric characters: %q", upperTypeName),
+				Message: fmt.Sprintf(
+					"Resource singular should be lower camel case of type: %q",
+					lowerTypeName,
+				),
 				Descriptor: m,
-				Location:   locations.MessageResource(m),
+				Location:   l,
 			}}
 		}
 		return nil

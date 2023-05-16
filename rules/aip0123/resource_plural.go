@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,27 +23,28 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var resourceTypeName = &lint.MessageRule{
-	Name: lint.NewRuleName(123, "resource-type-name"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.GetResource(m) != nil
-	},
+var resourcePlural = &lint.MessageRule{
+	Name:   lint.NewRuleName(123, "resource-plural"),
+	OnlyIf: hasResourceAnnotation,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resource := utils.GetResource(m)
-		_, typeName, ok := utils.SplitResourceTypeName(resource.GetType())
-		upperTypeName := utils.ToUpperCamelCase(typeName)
-		if !ok {
+		r := utils.GetResource(m)
+		l := locations.MessageResource(m)
+		p := r.GetPlural()
+		pLower := utils.ToLowerCamelCase(p)
+		if p == "" {
 			return []lint.Problem{{
-				Message:    "Resource type names must be of the form {Service Name}/{Type}.",
+				Message:    "Resources should declare plural.",
 				Descriptor: m,
-				Location:   locations.MessageResource(m),
+				Location:   l,
 			}}
 		}
-		if upperTypeName != typeName {
+		if pLower != p {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Type must be UpperCamelCase with alphanumeric characters: %q", upperTypeName),
+				Message: fmt.Sprintf(
+					"Resource plural should be lowerCamelCase: %q", pLower,
+				),
 				Descriptor: m,
-				Location:   locations.MessageResource(m),
+				Location:   l,
 			}}
 		}
 		return nil
