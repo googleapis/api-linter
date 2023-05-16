@@ -50,10 +50,7 @@ var requestRequiredFields = &lint.MessageRule{
 			// add a problem.
 			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
-					Message: fmt.Sprintf(
-						"Create RPCs must only require fields explicitly described in AIPs, not %q.",
-						f.GetName(),
-					),
+					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}
