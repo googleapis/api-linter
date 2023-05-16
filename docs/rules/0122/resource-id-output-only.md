@@ -8,7 +8,7 @@ redirect_from:
   - /0122/resource-id-output-only
 ---
 
-# Name field suffix
+# Output Only Resource ID fields
 
 This rule enforces that resource ID fields are classified as `OUTPUT_ONLY`, as
 mandated in [AIP-122][].
