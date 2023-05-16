@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0122
+package aip0123
 
 import (
 	"testing"
@@ -37,7 +37,6 @@ func TestResourceNameComponentsAlternate(t *testing.T) {
 			message Book {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
-					pattern: "publishers/{publisher}/books/{book}"
 					pattern: "{{ .Pattern }}"
 				};
 				string name = 1;

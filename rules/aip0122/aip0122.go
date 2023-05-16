@@ -25,7 +25,6 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		122,
 		resourceCollectionIdentifiers,
-		resourceNameComponentsAlternate,
 		httpURICase,
 		nameSuffix,
 		resourceReferenceType,

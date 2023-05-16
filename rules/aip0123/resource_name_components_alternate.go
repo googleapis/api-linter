@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0122
+package aip0123
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -24,28 +25,26 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+var identifierRegexp = regexp.MustCompile("^{[a-z][_a-z0-9]*[a-z0-9]}$")
+
 var resourceNameComponentsAlternate = &lint.MessageRule{
-	Name:   lint.NewRuleName(122, "resource-name-components-alternate"),
+	Name:   lint.NewRuleName(123, "resource-name-components-alternate"),
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		resource := utils.GetResource(m)
 		for _, p := range resource.GetPattern() {
-			expectIdentifier := false
 			components := strings.Split(p, "/")
-			for _, c := range components {
-				if expectIdentifier != isIdentifier(c) {
+			for i, c := range components {
+				identifierExpected := i%2 == 1
+				if identifierExpected != isIdentifier(c) {
 					problems = append(problems, lint.Problem{
-						Message: fmt.Sprintf(
-							"Resource pattern %q must alternate between collection and identifier.",
-							p,
-						),
+						Message:    fmt.Sprintf("Resource pattern %q must alternate between collection and identifier. %q is not an identifier", p, c),
 						Descriptor: m,
 						Location:   locations.MessageResource(m),
 					})
 					break
 				}
-				expectIdentifier = !expectIdentifier
 			}
 		}
 		return problems
@@ -53,5 +52,5 @@ var resourceNameComponentsAlternate = &lint.MessageRule{
 }
 
 func isIdentifier(s string) bool {
-	return s[0] == '{'
+	return identifierRegexp.MatchString(s)
 }
