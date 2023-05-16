@@ -40,7 +40,7 @@ var lroResponse = &lint.MethodRule{
 		}
 
 		// Unless this is a Delete method, the response type should not be Empty.
-		if strings.HasPrefix(m.GetName(), "Delete") {
+		if strings.HasPrefix(m.GetName(), "Delete") || strings.HasPrefix(m.GetName(), "BatchDelete") {
 			return nil
 		}
 		if t := lro.GetResponseType(); t == "Empty" || t == "google.protobuf.Empty" {

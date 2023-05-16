@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,43 +19,43 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
 
 // The create request message should not have unrecognized fields.
-var unknownFields = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-unknown-fields"),
+var requestRequiredFields = &lint.MessageRule{
+	Name:   lint.NewRuleName(133, "request-required-fields"),
 	OnlyIf: isCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// Rule check: Establish that there are no unexpected fields.
-		allowedFields := map[string]*builder.FieldType{
-			"parent":        nil, // AIP-133
-			"request_id":    nil, // AIP-155
-			"validate_only": nil, // AIP-163
+		allowedRequiredFields := map[string]*builder.FieldType{
+			"parent": nil, // AIP-133
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
-		for _, field := range m.GetFields() {
-			// Skip the check with the field that is the body.
-			if t := field.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+		for _, f := range m.GetFields() {
+			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
-			// Check the remaining fields.
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+			// Skip the check with the field that is the body.
+			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+				continue
+			}
+			// Iterate remaining fields. If they're not in the allowed list,
+			// add a problem.
+			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
-					Message: fmt.Sprintf(
-						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",
-						field.GetName(),
-					),
-					Descriptor: field,
+					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Descriptor: f,
 				})
 			}
 		}
 
-		return
+		return problems
 	},
 }

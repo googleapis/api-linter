@@ -48,7 +48,7 @@ var responseMessageName = &lint.MethodRule{
 
 		// If the return type is an Operation, use the annotated response type.
 		lro := false
-		if got == "google.longrunning.Operation" {
+		if utils.IsOperation(m.GetOutputType()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 			lro = true
 		}

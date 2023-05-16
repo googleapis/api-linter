@@ -16,9 +16,11 @@ package aip0162
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -30,6 +32,15 @@ var rollbackResponseMessageName = &lint.MethodRule{
 		// message is `Book`.
 		want := rollbackMethodRegexp.FindStringSubmatch(m.GetName())[1]
 		got := m.GetOutputType().GetName()
+		loc := locations.MethodResponseType(m)
+
+		// If LRO, check the response_type short name.
+		if utils.IsOperation(m.GetOutputType()) {
+			t := utils.GetOperationInfo(m).GetResponseType()
+			ndx := strings.LastIndex(t, ".")
+			got = t[ndx+1:]
+			loc = locations.MethodOperationInfo(m)
+		}
 
 		// Return a problem if we did not get the expected return name.
 		if got != want {
@@ -41,7 +52,7 @@ var rollbackResponseMessageName = &lint.MethodRule{
 				),
 				Suggestion: want,
 				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
+				Location:   loc,
 			}}
 		}
 		return nil
