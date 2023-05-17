@@ -26,12 +26,7 @@ import (
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetOperationResponseType(m)
-		}
-
+		ot := utils.GetResponseType(m)
 		// Unresolvable response_type for an Operation results in nil here.
 		resource := utils.GetResource(ot)
 		p := m.GetInputType().FindFieldByName("parent")

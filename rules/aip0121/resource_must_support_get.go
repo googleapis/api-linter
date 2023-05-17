@@ -57,7 +57,6 @@ var resourceMustSupportGet = &lint.ServiceRule{
 						"Missing Standard Get method for resource %q", t,
 					),
 					Descriptor: s,
-					Location:   s.GetSourceInfo(),
 				})
 			}
 		}

@@ -49,6 +49,7 @@ service Foo {
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
   };
 }
 ```
@@ -69,6 +70,7 @@ service Foo {
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
+    pattern: "books/{book}"
   };
 }
 ```

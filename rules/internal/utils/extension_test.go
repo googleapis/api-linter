@@ -408,6 +408,9 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 		{"BookOutputType", `
 			rpc CreateBook(CreateBookRequest) returns (Book) {};
 		`, "Book"},
+		{"BespokeOperationResource", `
+			rpc CreateBook(CreateBookRequest) returns (Operation) {};
+		`, "Operation"},
 		{"LROBookResponse", `
 			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 				option (google.longrunning.operation_info) = {
@@ -447,6 +450,10 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 
 					// The book to create.
 					Book book = 2;
+				}
+
+				// bespoke operation message (not an LRO)
+				message Operation {
 				}
 			`, test)
 			method := file.GetServices()[0].GetMethods()[0]

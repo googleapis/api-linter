@@ -72,11 +72,16 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 		return nil
 	}
 
-	if m.GetOutputType().GetName() != "Operation" {
-		return m.GetOutputType()
+	ot := m.GetOutputType()
+	if !isLongRunningOperation(ot) {
+		return ot
 	}
 
 	return GetOperationResponseType(m)
+}
+
+func isLongRunningOperation(m *desc.MessageDescriptor) bool {
+	return m.GetFile().GetPackage() == "google.longrunning" && m.GetName() == "Operation"
 }
 
 // GetMetadataType returns the message referred to by the
