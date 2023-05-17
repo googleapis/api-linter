@@ -19,12 +19,10 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// TODO: test against LROs
 var resourceMustSupportGet = &lint.ServiceRule{
 	Name: lint.NewRuleName(121, "resource-must-support-get"),
 	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
@@ -40,28 +38,26 @@ var resourceMustSupportGet = &lint.ServiceRule{
 				t := utils.GetResource(m.GetOutputType()).GetType()
 				resourcesWithGet.Add(t)
 			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) {
-				message := utils.GetResponseType(m)
-				if message != nil {
-					t := utils.GetResource(message).GetType()
-					resourcesWithOtherMethods[t] = message
+				if msg := utils.GetResponseType(m); msg != nil {
+					t := utils.GetResource(msg).GetType()
+					resourcesWithOtherMethods[t] = msg
 				}
 			} else if utils.IsListMethod(m) {
-				message := utils.GetListResourceMessage(m)
-				if message != nil {
-					t := utils.GetResource(message).GetType()
-					resourcesWithOtherMethods[t] = message
+				if msg := utils.GetListResourceMessage(m); msg != nil {
+					t := utils.GetResource(msg).GetType()
+					resourcesWithOtherMethods[t] = msg
 				}
 			}
 		}
 
-		for t, m := range resourcesWithOtherMethods {
+		for t := range resourcesWithOtherMethods {
 			if !resourcesWithGet.Contains(t) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Missing Standard Get method for resource %q", t,
 					),
-					Descriptor: m,
-					Location:   locations.MessageResource(m),
+					Descriptor: s,
+					Location:   s.GetSourceInfo(),
 				})
 			}
 		}

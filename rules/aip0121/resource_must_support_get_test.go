@@ -125,9 +125,9 @@ func TestResourceMustSupportGet(t *testing.T) {
 					string next_page_token = 2;
 				 }
 			`, test)
-			message := file.GetMessageTypes()[0]
+			s := file.GetServices()[0]
 			got := resourceMustSupportGet.Lint(file)
-			if diff := test.problems.SetDescriptor(message).Diff(got); diff != "" {
+			if diff := test.problems.SetDescriptor(s).Diff(got); diff != "" {
 				t.Error(diff)
 			}
 		})
