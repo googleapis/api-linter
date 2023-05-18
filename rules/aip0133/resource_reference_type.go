@@ -34,10 +34,7 @@ var resourceReferenceType = &lint.MethodRule{
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetOperationResponseType(m)
-		}
+		ot := utils.GetResponseType(m)
 		resource := utils.GetResource(ot)
 		parent := m.GetInputType().FindFieldByName("parent")
 		ref := utils.GetResourceReference(parent)

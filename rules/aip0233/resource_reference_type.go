@@ -27,10 +27,7 @@ var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(233, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetOperationResponseType(m)
-		}
+		ot := utils.GetResponseType(m)
 
 		// First repeated message field must be annotated with google.api.resource.
 		repeated := utils.GetRepeatedMessageFields(ot)
@@ -45,10 +42,7 @@ var resourceReferenceType = &lint.MethodRule{
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetOperationResponseType(m)
-		}
+		ot := utils.GetResponseType(m)
 		repeated := utils.GetRepeatedMessageFields(ot)
 		resMsg := repeated[0].GetMessageType()
 
