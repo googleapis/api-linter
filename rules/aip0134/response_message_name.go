@@ -27,7 +27,7 @@ import (
 // Update methods should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "response-message-name"),
-	OnlyIf: isUpdateMethod,
+	OnlyIf: utils.IsUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.

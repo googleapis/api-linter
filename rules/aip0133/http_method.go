@@ -22,6 +22,6 @@ import (
 // Create methods should use the HTTP POST verb.
 var httpMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(133, "http-method"),
-	OnlyIf:     isCreateMethod,
+	OnlyIf:     utils.IsCreateMethod,
 	LintMethod: utils.LintHTTPMethod("POST"),
 }

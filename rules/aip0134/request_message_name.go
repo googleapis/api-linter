@@ -22,6 +22,6 @@ import (
 // Update methods should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(134, "request-message-name"),
-	OnlyIf:     isUpdateMethod,
+	OnlyIf:     utils.IsUpdateMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }
