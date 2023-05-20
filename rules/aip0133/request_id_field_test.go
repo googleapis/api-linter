@@ -31,7 +31,6 @@ func TestRequestIDField(t *testing.T) {
 		{"InvalidMissing", "", problems},
 		{"InvalidType", "bytes book_id = 2;", problems},
 		{"InvalidRepeated", "repeated string book_id = 2;", problems},
-		{"InvalidRepeated", "repeated string book_id = 2;", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
