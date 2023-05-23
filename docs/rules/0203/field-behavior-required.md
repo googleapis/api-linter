@@ -12,14 +12,14 @@ redirect_from:
 # Field Behavior Required
 
 This rule enforces that each field has a `google.api.field_behavior` annotation
-with valid values, as mandated by[AIP-203][]
+with valid values, as mandated by [AIP-203][]
 
 ## Details
 
 This rule looks at all fields and ensures they have a
 `google.api.field_behavior` annotation. It also verifies that they have at least
 one of the options `OUTPUT_ONLY`, `REQUIRED`, or `OPTIONAL`: all fields must
-fall into of these categories.
+fall into one of these categories.
 
 ## Examples
 

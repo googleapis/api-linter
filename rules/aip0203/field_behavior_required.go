@@ -22,7 +22,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requiredOneOfFieldBehavior = stringset.New(
+var minimumRequiredFieldBehavior = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY",
 )
 
@@ -37,11 +37,11 @@ var fieldBehaviorRequired = &lint.FieldRule{
 			}}
 		}
 		// check for at least one valid annotation
-		if !requiredOneOfFieldBehavior.Intersects(fieldBehavior) {
+		if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"google.api.field_behavior must have at least one of the following behaviors set: %v",
-					requiredOneOfFieldBehavior,
+					minimumRequiredFieldBehavior,
 				),
 				Descriptor: f,
 			}}
