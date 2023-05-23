@@ -22,6 +22,6 @@ import (
 // List Revisions methods should have no HTTP body.
 var listRevisionsHTTPBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "list-revisions-http-body"),
-	OnlyIf:     IsListRevisionsMethod,
+	OnlyIf:     utils.IsListRevisionsMethod,
 	LintMethod: utils.LintNoHTTPBody,
 }

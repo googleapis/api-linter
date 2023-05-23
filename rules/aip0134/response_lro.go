@@ -24,7 +24,7 @@ import (
 var responseLRO = &lint.MethodRule{
 	Name: lint.NewRuleName(134, "response-lro"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isUpdateMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
+		return utils.IsUpdateMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if m.GetOutputType().GetFullyQualifiedName() != "google.longrunning.Operation" {

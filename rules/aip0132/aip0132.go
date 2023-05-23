@@ -47,15 +47,9 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 var (
-	listMethodRegexp      = regexp.MustCompile("^List(?:[A-Z]|$)")
 	listReqMessageRegexp  = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
 	listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
 )
-
-// Return true if this is an AIP-132 List method, false otherwise.
-func isListMethod(m *desc.MethodDescriptor) bool {
-	return listMethodRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsMethod(m)
-}
 
 // Return true if this is an AIP-132 List request message, false otherwise.
 func isListRequestMessage(m *desc.MessageDescriptor) bool {
