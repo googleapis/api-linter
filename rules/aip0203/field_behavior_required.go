@@ -26,26 +26,50 @@ var minimumRequiredFieldBehavior = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY",
 )
 
-var fieldBehaviorRequired = &lint.FieldRule{
+var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		fieldBehavior := utils.GetFieldBehavior(f)
-		if len(fieldBehavior) == 0 {
-			return []lint.Problem{{
-				Message:    "google.api.field_behavior annotation must be set",
-				Descriptor: f,
-			}}
-		}
-		// check for at least one valid annotation
-		if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					"google.api.field_behavior must have at least one of the following behaviors set: %v",
-					minimumRequiredFieldBehavior,
-				),
-				Descriptor: f,
-			}}
-		}
-		return nil
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		// we only check requests, as OutputTypes are always
+		// OUTPUT_ONLY
+		it := m.GetInputType()
+		return checkFields(it)
 	},
+}
+
+func checkFields(m *desc.MessageDescriptor) []lint.Problem {
+	problems := []lint.Problem{}
+	for _, f := range m.GetFields() {
+		asMessage := f.GetMessageType()
+		if asMessage != nil {
+			problems = append(problems, checkFields(asMessage)...)
+		}
+		p := checkFieldBehavior(f)
+		if p != nil {
+			problems = append(problems, *p)
+		}
+	}
+	return problems
+}
+
+func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+	fieldBehavior := utils.GetFieldBehavior(f)
+	if len(fieldBehavior) == 0 {
+		return &lint.Problem{
+			Message: fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v",
+				minimumRequiredFieldBehavior,
+			),
+			Descriptor: f,
+		}
+	}
+	// check for at least one valid annotation
+	if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
+		return &lint.Problem{
+			Message: fmt.Sprintf(
+				"google.api.field_behavior must have at least one of the following behaviors set: %v",
+				minimumRequiredFieldBehavior,
+			),
+			Descriptor: f,
+		}
+	}
+	return nil
 }
