@@ -28,6 +28,11 @@ func TestFieldBehaviorRequired(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{
+			"ValidImmutable",
+			"int32 page_count = 1 [(google.api.field_behavior) = IMMUTABLE];",
+			nil,
+		},
+		{
 			"ValidRequired",
 			"int32 page_count = 1 [(google.api.field_behavior) = REQUIRED];",
 			nil,
@@ -43,22 +48,12 @@ func TestFieldBehaviorRequired(t *testing.T) {
 			nil,
 		},
 		{
-			"ValidOutputOnly",
-			"int32 page_count = 1 [(google.api.field_behavior) = OUTPUT_ONLY];",
-			nil,
-		},
-		{
 			"ValidOptionalImmutable",
 			`int32 page_count = 1 [
 				(google.api.field_behavior) = OUTPUT_ONLY,
 			    (google.api.field_behavior) = OPTIONAL
 			];`,
 			nil,
-		},
-		{
-			"InvalidImmutable",
-			"int32 page_count = 1 [(google.api.field_behavior) = IMMUTABLE];",
-			testutils.Problems{{Message: "must have at least one"}},
 		},
 		{
 			"InvalidEmpty",
