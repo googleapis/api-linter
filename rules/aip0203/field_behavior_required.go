@@ -23,7 +23,7 @@ import (
 )
 
 var minimumRequiredFieldBehavior = stringset.New(
-	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY",
+	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY", "IMMUTABLE",
 )
 
 var fieldBehaviorRequired = &lint.MethodRule{
