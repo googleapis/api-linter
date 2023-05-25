@@ -41,12 +41,10 @@ func TestRequiredFieldTests(t *testing.T) {
 			nil,
 		},
 		{
-			"InvalidRequiredValidateOnly",
+			"ValidRequiredUpdateMask",
 			"google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];",
 			"update_mask",
-			testutils.Problems{
-				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "update_mask"`},
-			},
+			nil,
 		},
 		{
 			"InvalidRequiredUnknownField",

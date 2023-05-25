@@ -32,7 +32,9 @@ var requestRequiredFields = &lint.MessageRule{
 
 		// Rule check: Establish that there are no unexpected fields.
 		// this exists although empty to make it easy to add new fields later.
-		allowedRequiredFields := map[string]*builder.FieldType{}
+		allowedRequiredFields := map[string]*builder.FieldType{
+			"update_mask": nil, // can be required.
+		}
 
 		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
