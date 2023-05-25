@@ -1,22 +1,26 @@
 ---
 rule:
   aip: 203
-  name: [core, '0203', required-and-optional]
-  summary: Required fields must not use the optional keyword.
-permalink: /203/required-and-optional
+  name: [core, '0203', field-behavior-required]
+  summary: Field behavior is required, and must have one of OUTPUT_ONLY,
+  REQUIRED, or OPTIONAL.
+permalink: /203/field-behavior-required
 redirect_from:
-  - /0203/required-and-optional
+  - /0203/field-behavior-required
 ---
 
-# Required fields
+# Field Behavior Required
 
-This rule enforces that fields that are annotated as required do not use the
-`optional` syntax, as mandated by [AIP-203][].
+This rule enforces that each field in a message used in a request has a
+`google.api.field_behavior` annotation with valid values, as mandated by
+[AIP-203][].
 
 ## Details
 
-This rule looks for fields with a `google.api.field_behavior` annotation set to
-`REQUIRED`, and complains if the field also uses the proto3 `optional` syntax.
+This rule looks at all fields and ensures they have a
+`google.api.field_behavior` annotation. It also verifies that they have at least
+one of the options `OUTPUT_ONLY`, `REQUIRED`, or `OPTIONAL`: all fields must
+fall into one of these categories.
 
 ## Examples
 
@@ -27,8 +31,8 @@ This rule looks for fields with a `google.api.field_behavior` annotation set to
 message Book {
   string name = 1;
 
-  // Fields must not be optional and required.
-  optional string title = 2 [(google.api.field_behavior) = REQUIRED];
+  // No field behavior
+  optional string title = 2;
 }
 ```
 
@@ -53,9 +57,9 @@ message Book {
   string name = 1;
 
   // Required. The title of the book.
-  // (-- api-linter: core::0203::required-and-optional=disabled
+  // (-- api-linter: core::0203::field-behavior-required=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
-  optional string title = 2 [(google.api.field_behavior) = REQUIRED];
+  optional string title = 2;
 }
 ```
 
