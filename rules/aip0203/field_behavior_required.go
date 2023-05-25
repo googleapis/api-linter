@@ -43,33 +43,26 @@ func checkFields(m *desc.MessageDescriptor) []lint.Problem {
 		if asMessage != nil {
 			problems = append(problems, checkFields(asMessage)...)
 		}
-		p := checkFieldBehavior(f)
-		if p != nil {
-			problems = append(problems, *p)
-		}
+		problems = append(problems, checkFieldBehavior(f)...)
 	}
 	return problems
 }
 
-func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+func checkFieldBehavior(f *desc.FieldDescriptor) []lint.Problem {
+	problems := []lint.Problem{}
 	fieldBehavior := utils.GetFieldBehavior(f)
 	if len(fieldBehavior) == 0 {
-		return &lint.Problem{
-			Message: fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v",
-				minimumRequiredFieldBehavior,
-			),
+		problems = append(problems, lint.Problem{
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v", minimumRequiredFieldBehavior),
 			Descriptor: f,
-		}
-	}
-	// check for at least one valid annotation
-	if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
-		return &lint.Problem{
+		})
+		// check for at least one valid annotation
+	} else if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
+		problems = append(problems, lint.Problem{
 			Message: fmt.Sprintf(
-				"google.api.field_behavior must have at least one of the following behaviors set: %v",
-				minimumRequiredFieldBehavior,
-			),
+				"google.api.field_behavior must have at least one of the following behaviors set: %v", minimumRequiredFieldBehavior),
 			Descriptor: f,
-		}
+		})
 	}
-	return nil
+	return problems
 }
