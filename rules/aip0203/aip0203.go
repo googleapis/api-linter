@@ -31,11 +31,11 @@ var standardFields = stringset.New("etag")
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		203,
+		fieldBehaviorRequired,
 		inputOnly,
 		immutable,
 		optional,
 		optionalBehaviorConflict,
-		optionalBehaviorConsistency,
 		outputOnly,
 		required,
 		requiredAndOptional,
