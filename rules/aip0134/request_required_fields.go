@@ -12,36 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0134
 
 import (
 	"fmt"
-	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
-// The create request message should not have unrecognized fields.
-var requestRequiredFields = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "request-required-fields"),
-	OnlyIf: utils.IsCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		ot := utils.GetResponseType(m)
-		r := utils.GetResource(ot)
-		resourceMsgName := utils.GetResourceSingular(r)
+// The update request message should not have unrecognized fields.
+var requestRequiredFields = &lint.MessageRule{
+	Name:   lint.NewRuleName(134, "request-required-fields"),
+	OnlyIf: isUpdateRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+		resourceMsgName := extractResource(m.GetName())
 
-		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := stringset.New(
-			"parent",
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
-		)
+		allowedRequiredFields := stringset.New("update_mask")
 
-		problems := []lint.Problem{}
-		for _, f := range m.GetInputType().GetFields() {
+		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
@@ -49,15 +40,15 @@ var requestRequiredFields = &lint.MethodRule{
 			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
 				continue
 			}
-			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
 			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Update RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}
 		}
+
 		return problems
 	},
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0135
 
 import (
 	"testing"
@@ -35,25 +35,25 @@ func TestRequiredFieldTests(t *testing.T) {
 			nil,
 		},
 		{
-			"ValidOptionalValidateOnly",
-			"string validate_only = 3 [(google.api.field_behavior) = OPTIONAL];",
-			"validate_only",
+			"ValidOptionalAllowMissing",
+			"bool allow_missing = 2 [(google.api.field_behavior) = OPTIONAL];",
+			"allow_missing",
 			nil,
 		},
 		{
-			"InvalidRequiredValidateOnly",
-			"bool validate_only = 3 [(google.api.field_behavior) = REQUIRED];",
-			"validate_only",
+			"InvalidRequiredAllowMissing",
+			"bool allow_missing = 2 [(google.api.field_behavior) = REQUIRED];",
+			"allow_missing",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
+				{Message: `Delete RPCs must only require fields explicitly described in AIPs, not "allow_missing"`},
 			},
 		},
 		{
 			"InvalidRequiredUnknownField",
-			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
+			"bool create_iam = 2 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Delete RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
 			},
 		},
 	} {
@@ -62,36 +62,30 @@ func TestRequiredFieldTests(t *testing.T) {
 				import "google/api/annotations.proto";
 				import "google/api/field_behavior.proto";
 				import "google/api/resource.proto";
+			    import "google/longrunning/operations.proto";
 
 				service Library {
-					rpc CreateBookShelf(CreateBookShelfRequest) returns (BookShelf) {
+					rpc DeleteBook(DeleteBookRequest) returns (google.longrunning.Operation) {
 						option (google.api.http) = {
-							delete: "/v1/{name=publishers/*/bookShelves/*}"
+						    delete: "/v1/{name=publishers/*/books/*}"
+						};
+						option (google.longrunning.operation_info) = {
+							response_type: "google.protobuf.Empty"
+							metadata_type: "OperationMetadata"
 						};
 					}
 				}
 
-				message BookShelf {
-					option (google.api.resource) = {
-						type: "library.googleapis.com/BookShelf"
-						pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
-					};
-					string name = 1;
-				}
-
-				message CreateBookShelfRequest {
-					string parent = 1 [
-						(google.api.field_behavior) = REQUIRED
-					];
-					BookShelf book_shelf = 2 [
+				message DeleteBookRequest {
+					string name = 1 [
 						(google.api.field_behavior) = REQUIRED
 					];
 					{{.Fields}}
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("CreateBookShelfRequest")
+			var dbr desc.Descriptor = f.FindMessage("DeleteBookRequest")
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("CreateBookShelfRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.FindMessage("DeleteBookRequest").FindFieldByName(test.problematicFieldName)
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Errorf(diff)

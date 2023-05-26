@@ -12,52 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0133
+package aip0132
 
 import (
 	"fmt"
-	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
-// The create request message should not have unrecognized fields.
-var requestRequiredFields = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "request-required-fields"),
-	OnlyIf: utils.IsCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		ot := utils.GetResponseType(m)
-		r := utils.GetResource(ot)
-		resourceMsgName := utils.GetResourceSingular(r)
-
+// The list request message should not have unrecognized fields.
+var requestRequiredFields = &lint.MessageRule{
+	Name:   lint.NewRuleName(132, "request-required-fields"),
+	OnlyIf: isListRequestMessage,
+	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := stringset.New(
-			"parent",
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
-		)
+		allowedRequiredFields := stringset.New("parent")
 
-		problems := []lint.Problem{}
-		for _, f := range m.GetInputType().GetFields() {
+		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
-			// Skip the check with the field that is the body.
-			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
-				continue
-			}
-			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
 			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("List RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}
 		}
+
 		return problems
 	},
 }
