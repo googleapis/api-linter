@@ -50,9 +50,9 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	return nil
 }
 
-// GetResponseType returns the message referred to by the
+// GetOperationResponseType returns the message referred to by the
 // (google.longrunning.operation_info).response_type annotation.
-func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -63,6 +63,25 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	typ := FindMessage(m.GetFile(), info.GetResponseType())
 
 	return typ
+}
+
+// GetResponseType returns the OutputType if the response is
+// not an LRO, or the ResponseType otherwise.
+func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+
+	ot := m.GetOutputType()
+	if !isLongRunningOperation(ot) {
+		return ot
+	}
+
+	return GetOperationResponseType(m)
+}
+
+func isLongRunningOperation(m *desc.MessageDescriptor) bool {
+	return m.GetFile().GetPackage() == "google.longrunning" && m.GetName() == "Operation"
 }
 
 // GetMetadataType returns the message referred to by the
@@ -150,7 +169,7 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 
 // FindResource returns first resource of type matching the reference param.
 // resource Type name being referenced. It looks within a given file and its
-// depenedncies, it cannot search within the entire protobuf package.
+// depenedencies, it cannot search within the entire protobuf package.
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {

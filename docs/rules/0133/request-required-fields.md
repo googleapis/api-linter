@@ -71,5 +71,4 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 [aip-133]: https://aip.dev/133
-[aip-155]: https://aip.dev/155
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

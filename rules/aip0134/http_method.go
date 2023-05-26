@@ -22,6 +22,6 @@ import (
 // Update methods should use the HTTP PATCH verb.
 var httpMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(134, "http-method"),
-	OnlyIf:     isUpdateMethod,
+	OnlyIf:     utils.IsUpdateMethod,
 	LintMethod: utils.LintHTTPMethod("PATCH"),
 }

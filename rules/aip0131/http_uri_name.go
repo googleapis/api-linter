@@ -22,6 +22,6 @@ import (
 // Get methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
 	Name:       lint.NewRuleName(131, "http-uri-name"),
-	OnlyIf:     isGetMethod,
+	OnlyIf:     utils.IsGetMethod,
 	LintMethod: utils.LintHTTPURIHasNameVariable,
 }

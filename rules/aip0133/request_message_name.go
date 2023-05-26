@@ -22,6 +22,6 @@ import (
 // Create method should have a properly named input message.
 var inputName = &lint.MethodRule{
 	Name:       lint.NewRuleName(133, "request-message-name"),
-	OnlyIf:     isCreateMethod,
+	OnlyIf:     utils.IsCreateMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

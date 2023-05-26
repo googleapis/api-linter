@@ -18,27 +18,30 @@ import (
 	"fmt"
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
 
 // The create request message should not have unrecognized fields.
-var requestRequiredFields = &lint.MessageRule{
+var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "request-required-fields"),
-	OnlyIf: isCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		resourceMsgName := getResourceMsgNameFromReq(m)
+	OnlyIf: utils.IsCreateMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		ot := utils.GetResponseType(m)
+		r := utils.GetResource(ot)
+		resourceMsgName := utils.GetResourceSingular(r)
 
 		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := map[string]*builder.FieldType{
-			"parent": nil, // AIP-133
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
-		}
+		allowedRequiredFields := stringset.New(
+			"parent",
+			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
+		)
 
-		for _, f := range m.GetFields() {
+		problems := []lint.Problem{}
+		for _, f := range m.GetInputType().GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
@@ -48,14 +51,13 @@ var requestRequiredFields = &lint.MessageRule{
 			}
 			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
-			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
+			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}
 		}
-
 		return problems
 	},
 }

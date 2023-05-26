@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,28 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0134
 
 import (
+	"fmt"
+
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-// If a message has a field which is described as optional, ensure that every
-// optional field on the message has this indicator. Oneof fields do not count.
-var optionalBehaviorConsistency = &lint.MessageRule{
-	Name:   lint.NewRuleName(203, "optional-consistency"),
-	OnlyIf: messageHasOptionalFieldBehavior,
+// The update request message should not have unrecognized fields.
+var requestRequiredFields = &lint.MessageRule{
+	Name:   lint.NewRuleName(134, "request-required-fields"),
+	OnlyIf: isUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+		resourceMsgName := extractResource(m.GetName())
+
+		allowedRequiredFields := stringset.New("update_mask")
+
 		for _, f := range m.GetFields() {
-			if utils.GetFieldBehavior(f).Len() == 0 && !standardFields.Contains(f.GetName()) && f.GetOneOf() == nil {
+			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
+				continue
+			}
+			// Skip the check with the field that is the body.
+			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+				continue
+			}
+			// add a problem.
+			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
-					Message:    "Within a single message, either all optional fields should be indicated, or none of them should be.",
+					Message:    fmt.Sprintf("Update RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,
 				})
 			}
 		}
-		return
+
+		return problems
 	},
 }
