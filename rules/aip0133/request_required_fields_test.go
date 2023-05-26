@@ -64,34 +64,34 @@ func TestRequiredFieldTests(t *testing.T) {
 				import "google/api/resource.proto";
 
 				service Library {
-					rpc CreateBook(CreateBookRequest) returns (Book) {
+					rpc CreateBookShelf(CreateBookShelfRequest) returns (BookShelf) {
 						option (google.api.http) = {
-							delete: "/v1/{name=publishers/*/books/*}"
+							delete: "/v1/{name=publishers/*/bookShelves/*}"
 						};
 					}
 				}
 
-				message Book {
+				message BookShelf {
 					option (google.api.resource) = {
-						type: "library.googleapis.com/Book"
-						pattern: "publishers/{publisher}/books/{book}"
+						type: "library.googleapis.com/BookShelf"
+						pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
 					};
 					string name = 1;
 				}
 
-				message CreateBookRequest {
+				message CreateBookShelfRequest {
 					string parent = 1 [
 						(google.api.field_behavior) = REQUIRED
 					];
-					Book book = 2 [
+					BookShelf book_shelf = 2 [
 						(google.api.field_behavior) = REQUIRED
 					];
 					{{.Fields}}
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("CreateBookRequest")
+			var dbr desc.Descriptor = f.FindMessage("CreateBookShelfRequest")
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("CreateBookRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.FindMessage("CreateBookShelfRequest").FindFieldByName(test.problematicFieldName)
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Errorf(diff)

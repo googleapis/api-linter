@@ -77,32 +77,32 @@ func TestRequiredFieldTests(t *testing.T) {
 				import "google/protobuf/field_mask.proto";
 
 				service Library {
-					rpc UpdateBook(UpdateBookRequest) returns (Book) {
+					rpc UpdateBookShelf(UpdateBookShelfRequest) returns (BookShelf) {
 						option (google.api.http) = {
-							patch: "/v1/{name=publishers/*/books/*}"
+							patch: "/v1/{name=publishers/*/bookShelves/*}"
 							body: "book"
 						};
 					}
 				}
 
-				message Book {
+				message BookShelf {
 					option (google.api.resource) = {
-						type: "library.googleapis.com/Book"
-						pattern: "publishers/{publisher}/books/{book}"
+						type: "library.googleapis.com/BookShelf"
+						pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
 					};
 					string name = 1;
 				}
 
-				message UpdateBookRequest {
-					Book book = 1 [
+				message UpdateBookShelfRequest {
+					BookShelf book_shelf = 1 [
 						(google.api.field_behavior) = REQUIRED
 					];
 					{{.Fields}}
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("UpdateBookRequest")
+			var dbr desc.Descriptor = f.FindMessage("UpdateBookShelfRequest")
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("UpdateBookRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.FindMessage("UpdateBookShelfRequest").FindFieldByName(test.problematicFieldName)
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Errorf(diff)

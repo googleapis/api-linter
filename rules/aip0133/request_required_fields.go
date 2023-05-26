@@ -26,11 +26,16 @@ import (
 )
 
 // The create request message should not have unrecognized fields.
-var requestRequiredFields = &lint.MessageRule{
+var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "request-required-fields"),
-	OnlyIf: isCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		resourceMsgName := getResourceMsgNameFromReq(m)
+	OnlyIf: utils.IsCreateMethod,
+	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		ot := utils.GetResponseType(m)
+		r := utils.GetResource(ot)
+		resourceMsgName := ""
+		if r != nil {
+			resourceMsgName = utils.GetResourceSingular(r)
+		}
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New(
@@ -38,7 +43,8 @@ var requestRequiredFields = &lint.MessageRule{
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
 		)
 
-		for _, f := range m.GetFields() {
+		problems := []lint.Problem{}
+		for _, f := range m.GetInputType().GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
@@ -55,7 +61,6 @@ var requestRequiredFields = &lint.MessageRule{
 				})
 			}
 		}
-
 		return problems
 	},
 }
