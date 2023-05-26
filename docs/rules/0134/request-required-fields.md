@@ -29,7 +29,7 @@ comes across any required fields other than:
 message UpdateBookRequest {
   Book book = 1 [(google.api.field_behavior) = REQUIRED];
   // Non-standard required field.
-  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+  bool allow_missing = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 
@@ -39,7 +39,7 @@ message UpdateBookRequest {
 // Correct.
 message UpdateBookRequest {
   Book book = 1 [(google.api.field_behavior) = REQUIRED];
-  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+  bool allow_missing = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 ```
 
@@ -54,7 +54,7 @@ message UpdateBookRequest {
   // (-- api-linter: core::0134::request-required-fields=disabled
   //     aip.dev/not-precedent: We really need this field to be required because
   // reasons. --)
-  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+  bool allow_missing = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```
 

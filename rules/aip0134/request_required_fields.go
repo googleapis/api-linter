@@ -17,10 +17,10 @@ package aip0134
 import (
 	"fmt"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The update request message should not have unrecognized fields.
@@ -30,11 +30,7 @@ var requestRequiredFields = &lint.MessageRule{
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := extractResource(m.GetName())
 
-		// Rule check: Establish that there are no unexpected fields.
-		// this exists although empty to make it easy to add new fields later.
-		allowedRequiredFields := map[string]*builder.FieldType{
-			"update_mask": nil, // can be required.
-		}
+		allowedRequiredFields := stringset.New("update_mask")
 
 		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
@@ -45,7 +41,7 @@ var requestRequiredFields = &lint.MessageRule{
 				continue
 			}
 			// add a problem.
-			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
+			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Update RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,

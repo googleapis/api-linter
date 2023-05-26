@@ -74,7 +74,7 @@ message GetBookRequest {
 
   // (-- api-linter: core::0131::request-required-fields=disabled
   //     aip.dev/not-precedent: We really need this field to be required because
-  // reasons. --)
+  //     reasons. --)
    google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 ```

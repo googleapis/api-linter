@@ -17,10 +17,10 @@ package aip0132
 import (
 	"fmt"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The list request message should not have unrecognized fields.
@@ -29,16 +29,14 @@ var requestRequiredFields = &lint.MessageRule{
 	OnlyIf: isListRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := map[string]*builder.FieldType{
-			"parent": nil,
-		}
+		allowedRequiredFields := stringset.New("parent")
 
 		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// add a problem.
-			if _, ok := allowedRequiredFields[string(f.GetName())]; !ok {
+			if !allowedRequiredFields.Contains(string(f.GetName())) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("List RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
 					Descriptor: f,

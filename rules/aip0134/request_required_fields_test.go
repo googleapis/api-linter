@@ -47,6 +47,20 @@ func TestRequiredFieldTests(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidOptionalValidateOnly",
+			"bool validate_only = 3 [(google.api.field_behavior) = OPTIONAL];",
+			"validate_only",
+			nil,
+		},
+		{
+			"InvalidRequiredValidateOnly",
+			"bool validate_only = 3 [(google.api.field_behavior) = REQUIRED];",
+			"validate_only",
+			testutils.Problems{
+				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
+			},
+		},
+		{
 			"InvalidRequiredUnknownField",
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
