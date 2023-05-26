@@ -23,6 +23,9 @@ import apb "google.golang.org/genproto/googleapis/api/annotations"
 // 1. the singular annotation
 // 2. the type definition
 func GetResourceSingular(r *apb.ResourceDescriptor) string {
+	if r == nil {
+		return ""
+	}
 	if r.Singular != "" {
 		return r.Singular
 	}

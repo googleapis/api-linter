@@ -23,19 +23,19 @@ import (
 func TestMatches(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		resource apb.ResourceDescriptor
+		resource *apb.ResourceDescriptor
 		want     string
 	}{
 		{
 			name: "SingularSpecified",
-			resource: apb.ResourceDescriptor{
+			resource: &apb.ResourceDescriptor{
 				Singular: "bookShelf",
 			},
 			want: "bookShelf",
 		},
 		{
 			name: "SingularAndTypeSpecified",
-			resource: apb.ResourceDescriptor{
+			resource: &apb.ResourceDescriptor{
 				Singular: "bookShelf",
 				// NOTE: this is not a correct resource annotation.
 				// it must match singular.
@@ -45,19 +45,24 @@ func TestMatches(t *testing.T) {
 		},
 		{
 			name: "TypeSpecified",
-			resource: apb.ResourceDescriptor{
+			resource: &apb.ResourceDescriptor{
 				Type: "library.googleapis.com/bookShelf",
 			},
 			want: "bookShelf",
 		},
 		{
 			name:     "NothingSpecified",
-			resource: apb.ResourceDescriptor{},
+			resource: &apb.ResourceDescriptor{},
+			want:     "",
+		},
+		{
+			name:     "Nil",
+			resource: nil,
 			want:     "",
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			got := GetResourceSingular(&test.resource)
+			got := GetResourceSingular(test.resource)
 			if got != test.want {
 				t.Errorf("GetResourceSingular: expected %v, got %v", test.want, got)
 			}

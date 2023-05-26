@@ -32,10 +32,7 @@ var requestRequiredFields = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
 		r := utils.GetResource(ot)
-		resourceMsgName := ""
-		if r != nil {
-			resourceMsgName = utils.GetResourceSingular(r)
-		}
+		resourceMsgName := utils.GetResourceSingular(r)
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New(
