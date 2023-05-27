@@ -34,9 +34,9 @@ var responsePluralFirstField = &lint.MessageRule{
 
 		// If the field is a resource, use the `plural` annotation to decide the
 		// appropriate plural field name.
-		var want string
-		if res := utils.GetResource(firstField.GetMessageType()); res != nil && res.GetPlural() != "" {
-			want = strcase.SnakeCase(res.GetPlural())
+		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
+		if want != "" {
+			want = strcase.SnakeCase(want)
 		} else {
 			want = utils.ToPlural(firstField.GetName())
 		}
