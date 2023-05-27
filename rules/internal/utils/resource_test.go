@@ -20,7 +20,7 @@ import (
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
-func TestMatches(t *testing.T) {
+func TestGetResourceSingular(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		resource *apb.ResourceDescriptor
@@ -65,6 +65,39 @@ func TestMatches(t *testing.T) {
 			got := GetResourceSingular(test.resource)
 			if got != test.want {
 				t.Errorf("GetResourceSingular: expected %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestGetResourcePlural(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		resource *apb.ResourceDescriptor
+		want     string
+	}{
+		{
+			name: "PluralSpecified",
+			resource: &apb.ResourceDescriptor{
+				Plural: "bookShelves",
+			},
+			want: "bookShelves",
+		},
+		{
+			name:     "NothingSpecified",
+			resource: &apb.ResourceDescriptor{},
+			want:     "",
+		},
+		{
+			name:     "Nil",
+			resource: nil,
+			want:     "",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got := GetResourcePlural(test.resource)
+			if got != test.want {
+				t.Errorf("GetResourcePlural: expected %v, got %v", test.want, got)
 			}
 		})
 	}
