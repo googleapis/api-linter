@@ -2,8 +2,9 @@
 rule:
   aip: 203
   name: [core, '0203', field-behavior-required]
-  summary: Field behavior is required, and must have one of OUTPUT_ONLY,
-  REQUIRED, or OPTIONAL.
+  summary: |
+    Field behavior is required, and must have one of OUTPUT_ONLY, REQUIRED, or
+    OPTIONAL.
 permalink: /203/field-behavior-required
 redirect_from:
   - /0203/field-behavior-required

@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 134
-  name: [core, '0134', request-unknown-fields]
+  name: [core, '0134', request-required-fields]
   summary: Update RPCs must not have unexpected required fields in the request.
 permalink: /134/request-required-fields
 redirect_from:

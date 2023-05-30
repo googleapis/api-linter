@@ -2,8 +2,9 @@
 rule:
   aip: 123
   name: [core, '0123', resource-name-components-alternate]
-  summary: Resource name components should alternate between collection and
-  identifiers.
+  summary: |
+    Resource name components should alternate between collection and
+    identifiers.
 permalink: /123/resource-name-components-alternate
 redirect_from:
   - /0123/resource-name-components-alternate

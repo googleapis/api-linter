@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 132
-  name: [core, '0132', request-unknown-fields]
+  name: [core, '0132', request-required-fields]
   summary: List RPCs must not have unexpected required fields in the request.
 permalink: /132/request-required-fields
 redirect_from:

@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', request-unknown-fields]
+  name: [core, '0133', request-required-fields]
   summary: Create RPCs must not have unexpected required fields in the request.
 permalink: /133/request-required-fields
 redirect_from:
