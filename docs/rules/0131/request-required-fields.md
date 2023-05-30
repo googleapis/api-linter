@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 131
-  name: [core, '0131', request-unknown-fields]
+  name: [core, '0131', request-required-fields]
   summary: Get RPCs must not have unexpected required fields in the request.
 permalink: /131/request-required-fields
 redirect_from:
