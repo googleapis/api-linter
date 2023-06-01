@@ -90,7 +90,7 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 						pattern: "books/{book}"
 					};
 
-					string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+					string name = 1;
 				}
 			`, tc)
 
