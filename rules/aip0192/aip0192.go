@@ -16,8 +16,6 @@
 package aip0192
 
 import (
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 )
@@ -47,41 +45,4 @@ func isDeprecated(d desc.Descriptor) bool {
 	default:
 		return false
 	}
-}
-
-func separateInternalComments(comments ...string) struct {
-	Internal []string
-	External []string
-} {
-	answer := struct {
-		Internal []string
-		External []string
-	}{}
-	for _, c := range comments {
-		for len(c) > 0 {
-			// Anything before the `(--` is external string.
-			open := strings.SplitN(c, "(--", 2)
-			if ex := strings.TrimSpace(open[0]); ex != "" {
-				answer.External = append(answer.External, ex)
-			}
-			if len(open) > 1 {
-				c = strings.TrimSpace(open[1])
-			} else {
-				break
-			}
-
-			// Now that the opening component is tokenized, anything before
-			// the `--)` is internal string.
-			close := strings.SplitN(c, "--)", 2)
-			if in := strings.TrimSpace(close[0]); in != "" {
-				answer.Internal = append(answer.Internal, in)
-			}
-			if len(close) > 1 {
-				c = strings.TrimSpace(close[1])
-			} else {
-				break
-			}
-		}
-	}
-	return answer
 }

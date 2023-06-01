@@ -68,6 +68,14 @@ func TestRequiredFieldTests(t *testing.T) {
 				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
 			},
 		},
+		{
+			"InvalidRequiredUnknownMessageField",
+			"Foo foo = 3 [(google.api.field_behavior) = REQUIRED];",
+			"foo",
+			testutils.Problems{
+				{Message: `Update RPCs must only require fields explicitly described in AIPs, not "foo"`},
+			},
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -99,6 +107,8 @@ func TestRequiredFieldTests(t *testing.T) {
 					];
 					{{.Fields}}
 				}
+
+				message Foo {}
 			`, test)
 			var dbr desc.Descriptor = f.FindMessage("UpdateBookShelfRequest")
 			if test.problematicFieldName != "" {

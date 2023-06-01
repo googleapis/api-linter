@@ -34,6 +34,12 @@ func TestInputOnly(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "ValidInternal",
+			comment:  "Hello, World! (-- inputonly --)",
+			field:    "string secret = 1;",
+			problems: nil,
+		},
+		{
 			name:     "valid_exclude_etag",
 			comment:  "Input only.",
 			field:    "string etag = 1;",

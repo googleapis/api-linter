@@ -24,20 +24,22 @@ import (
 )
 
 // The update request message should not have unrecognized fields.
-var requestRequiredFields = &lint.MessageRule{
+var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "request-required-fields"),
-	OnlyIf: isUpdateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		resourceMsgName := extractResource(m.GetName())
+	OnlyIf: utils.IsUpdateMethod,
+	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+		ot := utils.GetResponseType(m)
+		it := m.GetInputType()
 
 		allowedRequiredFields := stringset.New("update_mask")
 
-		for _, f := range m.GetFields() {
+		for _, f := range it.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
-			// Skip the check with the field that is the body.
-			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+			// Skip the check with the field that is the resource, which for
+			// Standard Update, is the output type.
+			if t := f.GetMessageType(); t != nil && t.GetName() == ot.GetName() {
 				continue
 			}
 			// add a problem.
