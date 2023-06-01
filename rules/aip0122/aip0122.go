@@ -29,5 +29,6 @@ func AddRules(r lint.RuleRegistry) error {
 		nameSuffix,
 		resourceReferenceType,
 		resourceIdOutputOnly,
+		resourceNamesAlternatingComponents,
 	)
 }
