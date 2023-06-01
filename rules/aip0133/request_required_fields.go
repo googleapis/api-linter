@@ -32,7 +32,9 @@ var requestRequiredFields = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
 		r := utils.GetResource(ot)
-		resourceMsgName := utils.GetResourceSingular(r)
+		// The `singular` will be lowerCamelCase, while the Type Name will be
+		// UpperCamelCase. For simplicity, upper-case it always.
+		resourceMsgName := strcase.UpperCamelCase(utils.GetResourceSingular(r))
 
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New(
