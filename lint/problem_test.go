@@ -84,7 +84,10 @@ func TestProblemYAML(t *testing.T) {
 }
 
 func TestProblemDescriptor(t *testing.T) {
-	m, err := builder.NewMessage("Foo").Build()
+	mb := builder.NewMessage("Foo")
+	builder.NewFile("foo.proto").AddMessage(mb)
+
+	m, err := mb.Build()
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -107,6 +110,7 @@ func TestProblemDescriptor(t *testing.T) {
 		{"ColumnNumberStart", `column_number: 1`},
 		{"ColumnNumberEnd", `column_number: 79`},
 		{"RuleID", `rule_id: core::0131`},
+		{"Path", `path: foo.proto`},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
