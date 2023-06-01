@@ -23,47 +23,88 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var minimumRequiredFieldBehavior = stringset.New(
+var fbs = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY", "IMMUTABLE",
 )
 
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// we only check requests, as OutputTypes are always
-		// OUTPUT_ONLY
-		it := m.GetInputType()
-		return checkFields(it)
+		var ps []lint.Problem
+
+		req := m.GetInputType()
+		resp := m.GetOutputType()
+
+		reqProblems := problems(req, 0, 0)
+
+		var respProblems map[string][]lint.Problem
+		if r := utils.GetResource(resp); r != nil {
+			respProblems = problems(resp, 0, 0)
+		} else {
+			respProblems = problems(resp, 1, 0)
+		}
+
+		for _, p := range reqProblems {
+			ps = append(ps, p...)
+		}
+
+		for msgType, p := range respProblems {
+			// Avoid dups
+			if _, ok := reqProblems[msgType]; !ok {
+				ps = append(ps, p...)
+			}
+		}
+
+		if len(ps) == 0 {
+			return nil
+		}
+
+		return ps
 	},
 }
 
-func checkFields(m *desc.MessageDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
+func problems(m *desc.MessageDescriptor, minDepth, currDepth int) map[string][]lint.Problem {
+	ps := make(map[string][]lint.Problem)
+
 	for _, f := range m.GetFields() {
-		asMessage := f.GetMessageType()
-		if asMessage != nil {
-			problems = append(problems, checkFields(asMessage)...)
+		mt := f.GetMessageType()
+
+		if minDepth <= currDepth {
+			p := checkFieldBehavior(f)
+			if p != nil {
+				name := m.GetFullyQualifiedName()
+				ps[name] = append(ps[name], *p)
+			}
 		}
-		problems = append(problems, checkFieldBehavior(f)...)
+
+		if mt != nil {
+			for name, p := range problems(mt, minDepth, currDepth+1) {
+				ps[name] = append(ps[name], p...)
+			}
+		}
 	}
-	return problems
+
+	return ps
 }
 
-func checkFieldBehavior(f *desc.FieldDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
-	fieldBehavior := utils.GetFieldBehavior(f)
-	if len(fieldBehavior) == 0 {
-		problems = append(problems, lint.Problem{
-			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v", minimumRequiredFieldBehavior),
+func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+	fb := utils.GetFieldBehavior(f)
+
+	if len(fb) == 0 {
+		return &lint.Problem{
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), fbs),
 			Descriptor: f,
-		})
-		// check for at least one valid annotation
-	} else if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
-		problems = append(problems, lint.Problem{
-			Message: fmt.Sprintf(
-				"google.api.field_behavior must have at least one of the following behaviors set: %v", minimumRequiredFieldBehavior),
-			Descriptor: f,
-		})
+		}
 	}
-	return problems
+
+	if !fbs.Intersects(fb) {
+		// check for at least one valid annotation
+		return &lint.Problem{
+			Message: fmt.Sprintf(
+				"google.api.field_behavior must contain at least one, \"%v\"", fbs),
+			Descriptor: f,
+		}
+	}
+
+	return nil
 }
