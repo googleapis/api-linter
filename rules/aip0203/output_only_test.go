@@ -40,6 +40,12 @@ func TestOutput(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "ValidInternal",
+			comment:  "Hello, World! (-- Output only --)",
+			field:    generatedURI,
+			problems: nil,
+		},
+		{
 			name:     "Valid",
 			comment:  "@OutputOnly",
 			field:    generatedURIWithOutputOnlyBehavior,
