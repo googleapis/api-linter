@@ -18,6 +18,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -27,7 +28,7 @@ var noHTML = &lint.DescriptorRule{
 		return d.GetSourceInfo() != nil
 	},
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
-		for _, comment := range separateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
+		for _, comment := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
 			if htmlTag.MatchString(comment) {
 				return []lint.Problem{{
 					Message:    "Comments must not include raw HTML.",

@@ -39,6 +39,12 @@ func TestOptional(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "ValidInternal",
+			comment:  "Hello, World! (-- Optional --)",
+			field:    titleField,
+			problems: nil,
+		},
+		{
 			name:     "Valid",
 			comment:  "@optional",
 			field:    titleWithOptionalBehavior,
