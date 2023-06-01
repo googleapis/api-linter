@@ -44,6 +44,13 @@ func TestRequiredFieldTests(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidWithSingularAndIdField",
+			"string book_shelf_id = 3 [(google.api.field_behavior) = OPTIONAL];",
+			"",
+			"bookShelf",
+			nil,
+		},
+		{
 			"ValidOptionalValidateOnly",
 			"string validate_only = 3 [(google.api.field_behavior) = OPTIONAL];",
 			"validate_only",
@@ -66,6 +73,15 @@ func TestRequiredFieldTests(t *testing.T) {
 			"",
 			testutils.Problems{
 				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+			},
+		},
+		{
+			"InvalidRequiredUnknownMessageField",
+			"Foo foo = 3 [(google.api.field_behavior) = REQUIRED];",
+			"foo",
+			"",
+			testutils.Problems{
+				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "foo"`},
 			},
 		},
 	} {
@@ -91,6 +107,8 @@ func TestRequiredFieldTests(t *testing.T) {
 					};
 					string name = 1;
 				}
+
+				message Foo {}
 
 				message CreateBookShelfRequest {
 					string parent = 1 [
