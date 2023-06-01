@@ -30,31 +30,8 @@ var fbs = stringset.New(
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		var ps []lint.Problem
-
 		req := m.GetInputType()
-		resp := m.GetOutputType()
-
-		reqProblems := problems(req, 0, 0)
-
-		var respProblems map[string][]lint.Problem
-		if r := utils.GetResource(resp); r != nil {
-			respProblems = problems(resp, 0, 0)
-		} else {
-			respProblems = problems(resp, 1, 0)
-		}
-
-		for _, p := range reqProblems {
-			ps = append(ps, p...)
-		}
-
-		for msgType, p := range respProblems {
-			// Avoid dups
-			if _, ok := reqProblems[msgType]; !ok {
-				ps = append(ps, p...)
-			}
-		}
-
+		ps := problems(req)
 		if len(ps) == 0 {
 			return nil
 		}
@@ -63,24 +40,21 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	},
 }
 
-func problems(m *desc.MessageDescriptor, minDepth, currDepth int) map[string][]lint.Problem {
-	ps := make(map[string][]lint.Problem)
+func problems(m *desc.MessageDescriptor) []lint.Problem {
+	var ps []lint.Problem
 
 	for _, f := range m.GetFields() {
-		mt := f.GetMessageType()
-
-		if minDepth <= currDepth {
-			p := checkFieldBehavior(f)
-			if p != nil {
-				name := m.GetFullyQualifiedName()
-				ps[name] = append(ps[name], *p)
-			}
+		if r := utils.GetResource(m); r != nil && f.GetName() == "name" {
+			continue
 		}
 
-		if mt != nil {
-			for name, p := range problems(mt, minDepth, currDepth+1) {
-				ps[name] = append(ps[name], p...)
-			}
+		p := checkFieldBehavior(f)
+		if p != nil {
+			ps = append(ps, *p)
+		}
+
+		if mt := f.GetMessageType(); mt != nil {
+			ps = append(ps, problems(mt)...)
 		}
 	}
 

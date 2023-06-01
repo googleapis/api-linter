@@ -90,7 +90,7 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 						pattern: "books/{book}"
 					};
 
-					string name = 1;
+					string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 				}
 			`, tc)
 
@@ -110,14 +110,14 @@ func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
 		problems      testutils.Problems
 	}{
 		{
-			name:          "valid",
+			name:          "valid with field behavior",
 			FieldBehavior: "[(google.api.field_behavior) = OUTPUT_ONLY]",
 			problems:      nil,
 		},
 		{
-			name:          "invalid",
+			name:          "valid without field behavior",
 			FieldBehavior: "",
-			problems:      testutils.Problems{{Message: "annotation must be set"}},
+			problems:      nil,
 		},
 	}
 	for _, tc := range testCases {
@@ -141,11 +141,13 @@ func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
 						pattern: "books/{book}"
 					};
 
-					string name = 1 {{.FieldBehavior}};
+					string name = 1;
+
+					string title = 2 {{.FieldBehavior}};
 				}
 			`, tc)
 
-			field := f.GetMessageTypes()[1].GetFields()[0]
+			field := f.GetMessageTypes()[1].GetFields()[1]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Errorf(diff)
