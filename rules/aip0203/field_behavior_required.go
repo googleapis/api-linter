@@ -44,7 +44,7 @@ func problems(m *desc.MessageDescriptor) []lint.Problem {
 	var ps []lint.Problem
 
 	for _, f := range m.GetFields() {
-		if r := utils.GetResource(m); r != nil && f.GetName() == "name" {
+		if utils.IsResource(m) && f.GetName() == "name" {
 			continue
 		}
 
