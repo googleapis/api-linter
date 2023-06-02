@@ -75,7 +75,7 @@ func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
 		// check for at least one valid annotation
 		return &lint.Problem{
 			Message: fmt.Sprintf(
-				"google.api.field_behavior must contain at least one, \"%v\"", fbs),
+				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), fbs),
 			Descriptor: f,
 		}
 	}
