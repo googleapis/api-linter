@@ -30,40 +30,55 @@ var minimumRequiredFieldBehavior = stringset.New(
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// we only check requests, as OutputTypes are always
-		// OUTPUT_ONLY
-		it := m.GetInputType()
-		return checkFields(it)
+		req := m.GetInputType()
+		ps := problems(req)
+		if len(ps) == 0 {
+			return nil
+		}
+
+		return ps
 	},
 }
 
-func checkFields(m *desc.MessageDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
+func problems(m *desc.MessageDescriptor) []lint.Problem {
+	var ps []lint.Problem
+
 	for _, f := range m.GetFields() {
-		asMessage := f.GetMessageType()
-		if asMessage != nil {
-			problems = append(problems, checkFields(asMessage)...)
+		if utils.IsResource(m) && f.GetName() == "name" {
+			continue
 		}
-		problems = append(problems, checkFieldBehavior(f)...)
+
+		p := checkFieldBehavior(f)
+		if p != nil {
+			ps = append(ps, *p)
+		}
+
+		if mt := f.GetMessageType(); mt != nil {
+			ps = append(ps, problems(mt)...)
+		}
 	}
-	return problems
+
+	return ps
 }
 
-func checkFieldBehavior(f *desc.FieldDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
-	fieldBehavior := utils.GetFieldBehavior(f)
-	if len(fieldBehavior) == 0 {
-		problems = append(problems, lint.Problem{
-			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v", minimumRequiredFieldBehavior),
+func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+	fb := utils.GetFieldBehavior(f)
+
+	if len(fb) == 0 {
+		return &lint.Problem{
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
 			Descriptor: f,
-		})
-		// check for at least one valid annotation
-	} else if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
-		problems = append(problems, lint.Problem{
-			Message: fmt.Sprintf(
-				"google.api.field_behavior must have at least one of the following behaviors set: %v", minimumRequiredFieldBehavior),
-			Descriptor: f,
-		})
+		}
 	}
-	return problems
+
+	if !minimumRequiredFieldBehavior.Intersects(fb) {
+		// check for at least one valid annotation
+		return &lint.Problem{
+			Message: fmt.Sprintf(
+				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
+			Descriptor: f,
+		}
+	}
+
+	return nil
 }
