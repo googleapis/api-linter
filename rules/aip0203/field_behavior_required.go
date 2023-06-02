@@ -23,7 +23,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var fbs = stringset.New(
+var minimumRequiredFieldBehavior = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY", "IMMUTABLE",
 )
 
@@ -66,16 +66,16 @@ func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
 
 	if len(fb) == 0 {
 		return &lint.Problem{
-			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), fbs),
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
 			Descriptor: f,
 		}
 	}
 
-	if !fbs.Intersects(fb) {
+	if !minimumRequiredFieldBehavior.Intersects(fb) {
 		// check for at least one valid annotation
 		return &lint.Problem{
 			Message: fmt.Sprintf(
-				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), fbs),
+				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
 			Descriptor: f,
 		}
 	}
