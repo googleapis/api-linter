@@ -45,7 +45,7 @@ func TestUnknownFields(t *testing.T) {
 		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
 		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), testutils.Problems{}},
 		{"ReadMask", "ListBooksRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
-		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View")), testutils.Problems{}},
+		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View").AddValue(builder.NewEnumValue("BASIC"))), testutils.Problems{}},
 		{"Invalid", "ListBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{Message: "explicitly described"}}},
 		{"Irrelevant", "EnumerteBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
 		{"IrrelevantAIP162", "ListBookRevisionsRequest", "name", builder.FieldTypeString(), testutils.Problems{}},
@@ -61,7 +61,7 @@ func TestUnknownFields(t *testing.T) {
 				builder.NewField(test.fieldName, test.fieldType),
 			).Build()
 			if err != nil {
-				t.Fatalf("Could not build GetBookRequest message.")
+				t.Fatalf("Could not build GetBookRequest message: %s", err)
 			}
 
 			// Run the lint rule, and establish that it returns the correct
