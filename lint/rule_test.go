@@ -213,12 +213,12 @@ func TestMethodRule(t *testing.T) {
 func TestEnumRule(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := builder.NewFile("test.proto").AddEnum(
-		builder.NewEnum("Format"),
+		builder.NewEnum("Format").AddValue(builder.NewEnumValue("PDF")),
 	).AddEnum(
-		builder.NewEnum("Edition"),
+		builder.NewEnum("Edition").AddValue(builder.NewEnumValue("PUBLISHER_ONLY")),
 	).Build()
 	if err != nil {
-		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+		t.Fatalf("Error building test proto:%s ", err)
 	}
 
 	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[1]) {
@@ -246,7 +246,7 @@ func TestEnumValueRule(t *testing.T) {
 		builder.NewEnum("Format").AddValue(builder.NewEnumValue("YAML")).AddValue(builder.NewEnumValue("JSON")),
 	).Build()
 	if err != nil {
-		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+		t.Fatalf("Error building test proto:%s ", err)
 	}
 
 	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[0].GetValues()[1]) {
@@ -272,13 +272,13 @@ func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := builder.NewFile("test.proto").AddMessage(
 		builder.NewMessage("Book").AddNestedEnum(
-			builder.NewEnum("Format"),
+			builder.NewEnum("Format").AddValue(builder.NewEnumValue("PDF")),
 		).AddNestedEnum(
-			builder.NewEnum("Edition"),
+			builder.NewEnum("Edition").AddValue(builder.NewEnumValue("PUBLISHER_ONLY")),
 		),
 	).Build()
 	if err != nil {
-		t.Fatalf("Catastrophic failure, could not build proto. BOOMZ!")
+		t.Fatalf("Error building test proto:%s ", err)
 	}
 
 	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedEnumTypes()[1]) {
@@ -317,7 +317,7 @@ func TestDescriptorRule(t *testing.T) {
 				builder.RpcTypeMessage(book, false),
 			),
 		),
-	).AddEnum(builder.NewEnum("State")).Build()
+	).AddEnum(builder.NewEnum("State").AddValue(builder.NewEnumValue("AVAILABLE"))).Build()
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -342,7 +342,7 @@ func TestDescriptorRule(t *testing.T) {
 	// We do not care what order they were visited in.
 	wantDescriptors := []string{
 		"Author", "Book", "ConjureBook", "Format", "PAPERBACK",
-		"name", "Library", "State",
+		"name", "Library", "State", "AVAILABLE",
 	}
 	if got, want := rule.GetName(), "test"; string(got) != want {
 		t.Errorf("Got name %q, wanted %q", got, want)
