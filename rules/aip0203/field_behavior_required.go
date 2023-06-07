@@ -31,7 +31,8 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		req := m.GetInputType()
-		ps := problems(req)
+		p := m.GetFile().GetPackage()
+		ps := problems(req, p)
 		if len(ps) == 0 {
 			return nil
 		}
@@ -40,7 +41,7 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	},
 }
 
-func problems(m *desc.MessageDescriptor) []lint.Problem {
+func problems(m *desc.MessageDescriptor, pkg string) []lint.Problem {
 	var ps []lint.Problem
 
 	for _, f := range m.GetFields() {
@@ -53,8 +54,8 @@ func problems(m *desc.MessageDescriptor) []lint.Problem {
 			ps = append(ps, *p)
 		}
 
-		if mt := f.GetMessageType(); mt != nil {
-			ps = append(ps, problems(mt)...)
+		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
+			ps = append(ps, problems(mt, pkg)...)
 		}
 	}
 
