@@ -42,6 +42,13 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 			"int32 page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
 			nil,
 		},
+		// Maps should not be recursed to MapEntries, as they have no field
+		// behavior.
+		{
+			"ValidMap",
+			"map<string, string> page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
+			nil,
+		},
 		{
 			"ValidOutputOnly",
 			"int32 page_count = 1 [(google.api.field_behavior) = OUTPUT_ONLY];",
@@ -64,6 +71,8 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				package apilinter.test.field_behavior_required;
+
 				import "google/api/field_behavior.proto";
 				import "google/api/resource.proto";
 
@@ -93,7 +102,6 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 					string name = 1;
 				}
 			`, tc)
-
 			field := f.GetMessageTypes()[0].GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
@@ -227,6 +235,12 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidAnnotatedAndChildInOtherPackageUnannotated",
+			"unannotated.NonAnnotated",
+			"non_annotated",
+			nil,
+		},
+		{
 			"InvalidChildNotAnnotated",
 			"NonAnnotated",
 			"non_annotated",
@@ -236,8 +250,11 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f1 := `
+				package apilinter.test.field_behavior_required;
+
 				import "google/api/field_behavior.proto";
 				import "resource.proto";
+				import "unannotated.proto";
 
 				service Library {
 					rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
@@ -256,6 +273,8 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 			`
 
 			f2 := `
+				package apilinter.test.field_behavior_required;
+
 				import "google/api/field_behavior.proto";
 
 				message NonAnnotated {
@@ -267,9 +286,18 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				}
 			`
 
+			f3 := `
+				package apilinter.test.unannotated;
+
+				message NonAnnotated {
+					string nested = 1;
+				}
+			`
+
 			srcs := map[string]string{
-				"service.proto":  f1,
-				"resource.proto": f2,
+				"service.proto":     f1,
+				"resource.proto":    f2,
+				"unannotated.proto": f3,
 			}
 
 			ds := testutils.ParseProto3Tmpls(t, srcs, tc)
@@ -281,9 +309,11 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				t.Errorf(diff)
 			}
 
-			want := "resource.proto"
-			if got := fd.GetFile().GetName(); got != want {
-				t.Fatalf("got file name %q for location of field but wanted %q", got, want)
+			if tc.problems != nil {
+				want := "resource.proto"
+				if got := fd.GetFile().GetName(); got != want {
+					t.Fatalf("got file name %q for location of field but wanted %q", got, want)
+				}
 			}
 		})
 	}

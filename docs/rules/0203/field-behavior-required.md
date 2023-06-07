@@ -23,6 +23,10 @@ This rule looks at all fields and ensures they have a
 one of the options `OUTPUT_ONLY`, `REQUIRED`, or `OPTIONAL`: all fields must
 fall into one of these categories.
 
+Although all request messages **must** be annotated, this linter only verifies
+messages that are in the same package as some upstream protos (e.g. common
+protos) may be difficult to modify.
+
 ## Examples
 
 **Incorrect** code for this rule:
