@@ -33,7 +33,7 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 
 			fmt.Fprintf(&buf, "::error file=%s", response.FilePath)
 			if problem.Location != nil {
-				location := lint.FileLocationFromPBLocation(problem.Location)
+				location := lint.FileLocationFromPBLocation(problem.Location, nil)
 				fmt.Fprintf(&buf, ",line=%d,col=%d,endLine=%d,endColumn=%d", location.Start.Line, location.Start.Column, location.End.Line, location.End.Column)
 			}
 
