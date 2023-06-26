@@ -36,7 +36,6 @@ func AddRules(r lint.RuleRegistry) error {
 		inputOnly,
 		immutable,
 		optional,
-		optionalBehaviorConflict,
 		outputOnly,
 		required,
 		unorderedListRepeated,
