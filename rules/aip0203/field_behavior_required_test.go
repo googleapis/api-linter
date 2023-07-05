@@ -49,6 +49,16 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 			"map<string, string> page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
 			nil,
 		},
+		// OneOfs are not required to have an annotation, as they
+		// are implicitly optional.
+		{
+			"ValidOneOfNoAnnotation",
+			`oneof candy_bar {
+				bool snickers = 1;
+				bool chocolate = 3;
+			}`,
+			nil,
+		},
 		{
 			"ValidOutputOnly",
 			"int32 page_count = 1 [(google.api.field_behavior) = OUTPUT_ONLY];",
@@ -179,6 +189,14 @@ func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
 		{
 			"InvalidChildNotAnnotated",
 			"NonAnnotated non_annotated = 1 [(google.api.field_behavior) = REQUIRED];",
+			testutils.Problems{{Message: "must be set"}},
+		},
+		// Children of OneOfs should still be validated.
+		{
+			"InvalidOneOfChildNotAnnotated",
+			`oneof candy_bar {
+				NonAnnotated non_annotated = 1;
+			}`,
 			testutils.Problems{{Message: "must be set"}},
 		},
 	}

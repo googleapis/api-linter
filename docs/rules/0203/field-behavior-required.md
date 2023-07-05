@@ -18,10 +18,10 @@ This rule enforces that each field in a message used in a request has a
 
 ## Details
 
-This rule looks at all fields and ensures they have a
-`google.api.field_behavior` annotation. It also verifies that they have at least
-one of the options `OUTPUT_ONLY`, `REQUIRED`, or `OPTIONAL`: all fields must
-fall into one of these categories.
+This rule looks at all fields except those nested inside a OneOf and ensures
+they have a `google.api.field_behavior` annotation. It also verifies that they
+have at least one of the options `OUTPUT_ONLY`, `REQUIRED`, or `OPTIONAL`: all
+fields must fall into one of these categories.
 
 Although all request messages **must** be annotated, this linter only verifies
 messages that are in the same package as some upstream protos (e.g. common
