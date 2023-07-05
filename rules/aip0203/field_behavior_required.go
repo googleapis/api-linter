@@ -49,9 +49,12 @@ func problems(m *desc.MessageDescriptor, pkg string) []lint.Problem {
 			continue
 		}
 
-		p := checkFieldBehavior(f)
-		if p != nil {
-			ps = append(ps, *p)
+		// Ignore a field if it is a OneOf (do not ignore children)
+		if f.AsFieldDescriptorProto().OneofIndex == nil {
+			p := checkFieldBehavior(f)
+			if p != nil {
+				ps = append(ps, *p)
+			}
 		}
 
 		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
