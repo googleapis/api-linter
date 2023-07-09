@@ -46,7 +46,7 @@ var responsePluralFirstField = &lint.MessageRule{
 				Message:    "First field of Paginated RPCs' response should be plural.",
 				Suggestion: want,
 				Descriptor: firstField,
-				Location:   locations.DescriptorName(m),
+				Location:   locations.DescriptorName(firstField),
 			}}
 		}
 
