@@ -1,0 +1,27 @@
+ls:
+  .dir: kebab-case
+  .go: snake_case
+  .proto: snake_case
+  .md: SCREAMING_SNAKE_CASE
+
+  docs:
+    .dir: regex:_?[a-z\-]+
+    .md: kebab-case
+    .js: kebab-case
+    .html: kebab-case
+    .css: kebab-case
+    .sh: kebab-case
+    .png: kebab-case
+
+    rules/*:
+      .dir: regex:[0-9]{4}
+      .md: kebab-case
+
+  rules/aip-*:
+    .dir: regex:aip[0-9]{4}
+    .go: snake_case
+
+ignore:
+  - .git
+  - .idea
+  - .github

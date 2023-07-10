@@ -22,6 +22,8 @@ jobs:
           go-version: 1.14
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+      - name: ls-lint
+        uses: ls-lint/action@v2.0.1
   quality-checker:
     runs-on: ubuntu-latest
     steps:
