@@ -18,6 +18,7 @@ package aip0203
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
@@ -31,14 +32,12 @@ var standardFields = stringset.New("etag")
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		203,
+		fieldBehaviorRequired,
 		inputOnly,
 		immutable,
 		optional,
-		optionalBehaviorConflict,
-		optionalBehaviorConsistency,
 		outputOnly,
 		required,
-		requiredAndOptional,
 		unorderedListRepeated,
 	)
 }
@@ -48,6 +47,7 @@ func AddRules(r lint.RuleRegistry) error {
 func checkLeadingComments(pattern *regexp.Regexp, annotation string, unless ...*regexp.Regexp) func(*desc.FieldDescriptor) []lint.Problem {
 	return func(f *desc.FieldDescriptor) []lint.Problem {
 		leadingComments := f.GetSourceInfo().GetLeadingComments()
+		leadingComments = strings.Join(utils.SeparateInternalComments(leadingComments).External, "\n")
 		for _, ul := range unless {
 			if ul.MatchString(leadingComments) {
 				return nil

@@ -39,6 +39,12 @@ func TestImmutable(t *testing.T) {
 			problems: nil,
 		},
 		{
+			name:     "ValidInternal",
+			comment:  "Hello, World! (-- Immutable --)",
+			field:    fieldPart,
+			problems: nil,
+		},
+		{
 			name:     "Valid",
 			comment:  "@immutable",
 			field:    fieldPartWithImmtutableBehavior,

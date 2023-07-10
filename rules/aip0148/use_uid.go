@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0148
 
 import (
+	"fmt"
+
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var requiredAndOptional = &lint.FieldRule{
-	Name: lint.NewRuleName(203, "required-and-optional"),
+const (
+	idStr  = "id"
+	uidStr = "uid"
+)
+
+var useUid = &lint.FieldRule{
+	Name: lint.NewRuleName(148, "use-uid"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.GetFieldBehavior(f).Contains("REQUIRED")
+		return utils.IsResource(f.GetOwner())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.IsProto3Optional() {
+		if f.GetName() == idStr {
 			return []lint.Problem{{
-				Message:    "Required fields must not use the optional keyword.",
+				Message:    fmt.Sprintf("Use %s instead of %s.", uidStr, idStr),
 				Descriptor: f,
-				Location:   locations.FieldLabel(f),
-				Suggestion: "",
+				Location:   locations.DescriptorName(f),
+				Suggestion: uidStr,
 			}}
 		}
 		return nil

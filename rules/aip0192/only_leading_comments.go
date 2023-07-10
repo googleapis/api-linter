@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -28,7 +29,7 @@ var onlyLeadingComments = &lint.DescriptorRule{
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
 		problems := []lint.Problem{}
 		c := d.GetSourceInfo()
-		if len(separateInternalComments(c.GetTrailingComments()).External) > 0 {
+		if len(utils.SeparateInternalComments(c.GetTrailingComments()).External) > 0 {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
 					"%q should have only leading (not trailing) public comments.",
@@ -37,7 +38,7 @@ var onlyLeadingComments = &lint.DescriptorRule{
 				Descriptor: d,
 			})
 		}
-		if len(separateInternalComments(c.GetLeadingDetachedComments()...).External) > 0 {
+		if len(utils.SeparateInternalComments(c.GetLeadingDetachedComments()...).External) > 0 {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
 					"%q has comments with empty lines between the comment and %q.",

@@ -18,9 +18,9 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
+	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	lrpb "google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -50,9 +50,9 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	return nil
 }
 
-// GetResponseType returns the message referred to by the
+// GetOperationResponseType returns the message referred to by the
 // (google.longrunning.operation_info).response_type annotation.
-func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -63,6 +63,25 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	typ := FindMessage(m.GetFile(), info.GetResponseType())
 
 	return typ
+}
+
+// GetResponseType returns the OutputType if the response is
+// not an LRO, or the ResponseType otherwise.
+func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+
+	ot := m.GetOutputType()
+	if !isLongRunningOperation(ot) {
+		return ot
+	}
+
+	return GetOperationResponseType(m)
+}
+
+func isLongRunningOperation(m *desc.MessageDescriptor) bool {
+	return m.GetFile().GetPackage() == "google.longrunning" && m.GetName() == "Operation"
 }
 
 // GetMetadataType returns the message referred to by the
@@ -146,4 +165,38 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 		return x.(*apb.ResourceReference)
 	}
 	return nil
+}
+
+// FindResource returns first resource of type matching the reference param.
+// resource Type name being referenced. It looks within a given file and its
+// depenedencies, it cannot search within the entire protobuf package.
+// This is especially useful for resolving google.api.resource_reference
+// annotations.
+func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
+	files := append(file.GetDependencies(), file)
+	for _, f := range files {
+		for _, m := range f.GetMessageTypes() {
+			if r := GetResource(m); r != nil {
+				if r.GetType() == reference {
+					return r
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// SplitResourceTypeName splits the `Resource.type` field into the service name
+// and the resource type name.
+func SplitResourceTypeName(typ string) (service string, typeName string, ok bool) {
+	split := strings.Split(typ, "/")
+	if len(split) != 2 || split[0] == "" || split[1] == "" {
+		return
+	}
+
+	service = split[0]
+	typeName = split[1]
+	ok = true
+
+	return
 }

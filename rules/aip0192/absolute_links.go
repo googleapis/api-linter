@@ -19,6 +19,8 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -27,7 +29,7 @@ var absoluteLinks = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "absolute-links"),
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
 		comment := strings.Join(
-			separateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
+			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
 			"\n",
 		)
 
@@ -42,6 +44,7 @@ var absoluteLinks = &lint.DescriptorRule{
 				return []lint.Problem{{
 					Message:    "Links in comments should be absolute and begin with https://",
 					Descriptor: d,
+					Location:   locations.DescriptorName(d),
 				}}
 			}
 		}

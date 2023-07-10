@@ -151,7 +151,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 				message WriteBookResponse {}
 			`, test)
 
-			typ := GetResponseType(fd.GetServices()[0].GetMethods()[0])
+			typ := GetOperationResponseType(fd.GetServices()[0].GetMethods()[0])
 
 			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) response_type message", test.valid)
@@ -311,4 +311,163 @@ func TestGetResourceReference(t *testing.T) {
 			t.Errorf(`Got "%v", expected nil`, got)
 		}
 	})
+}
+
+func TestFindResource(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name, reference string
+		notFound        bool
+	}{
+		{"local_reference", "library.googleapis.com/Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", true},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResource(tst.reference, files["shelf.proto"])
+
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
+			}
+
+			if !tst.notFound && got == nil {
+				t.Errorf("Got nil, expected %q", tst.reference)
+			} else if !tst.notFound && got.GetType() != tst.reference {
+				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
+			}
+		})
+	}
+}
+
+func TestSplitResourceTypeName(t *testing.T) {
+	for _, tst := range []struct {
+		name, input, service, typeName string
+		ok                             bool
+	}{
+		{"Valid", "foo.googleapis.com/Foo", "foo.googleapis.com", "Foo", true},
+		{"InvalidExtraSlashes", "foo.googleapis.com/Foo/Bar", "", "", false},
+		{"InvalidNoService", "/Foo", "", "", false},
+		{"InvalidNoTypeName", "foo.googleapis.com/", "", "", false},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			s, typ, ok := SplitResourceTypeName(tst.input)
+			if ok != tst.ok {
+				t.Fatalf("Expected %v for ok, but got %v", tst.ok, ok)
+			}
+			if diff := cmp.Diff(s, tst.service); diff != "" {
+				t.Errorf("service: got(-),want(+):\n%s", diff)
+			}
+			if diff := cmp.Diff(typ, tst.typeName); diff != "" {
+				t.Errorf("type name: got(-),want(+):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestGetOutputOrLROResponseMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPCs string
+		want string
+	}{
+		{"BookOutputType", `
+			rpc CreateBook(CreateBookRequest) returns (Book) {};
+		`, "Book"},
+		{"BespokeOperationResource", `
+			rpc CreateBook(CreateBookRequest) returns (Operation) {};
+		`, "Operation"},
+		{"LROBookResponse", `
+			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+				option (google.longrunning.operation_info) = {
+					response_type: "Book"
+				};
+		};
+		`, "Book"},
+		{"LROMissingResponse", `
+			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+		};
+		`, ""},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+				import "google/protobuf/field_mask.proto";
+				service Foo {
+					{{.RPCs}}
+				}
+
+				// This is at the top to make it retrievable
+				// by the test code.
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "books/{book}"
+						singular: "book"
+						plural: "books"
+					};
+				}
+
+				message CreateBookRequest {
+					// The parent resource where this book will be created.
+					// Format: publishers/{publisher}
+					string parent = 1;
+
+					// The book to create.
+					Book book = 2;
+				}
+
+				// bespoke operation message (not an LRO)
+				message Operation {
+				}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			resp := GetResponseType(method)
+			got := ""
+			if resp != nil {
+				got = resp.GetName()
+			}
+			if got != test.want {
+				t.Errorf(
+					"GetOutputOrLROResponseMessage got %q, want %q",
+					got, test.want,
+				)
+			}
+		})
+	}
 }

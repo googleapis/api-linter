@@ -23,7 +23,7 @@ import (
 func TestHttpUriSuffix(t *testing.T) {
 	tests := []struct {
 		testName   string
-		HttpUri    string
+		HTTPURI    string
 		MethodName string
 		problems   testutils.Problems
 	}{
@@ -40,7 +40,7 @@ func TestHttpUriSuffix(t *testing.T) {
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
 						option (google.api.http) = {
-							post: "{{.HttpUri}}"
+							post: "{{.HTTPURI}}"
 							body: "*"
 						};
 					}

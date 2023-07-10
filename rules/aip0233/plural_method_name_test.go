@@ -25,25 +25,25 @@ func TestMethodPluralResourceName(t *testing.T) {
 	tests := []struct {
 		testName   string
 		MethodName string
-		UriSuffix  string
+		URISuffix  string
 		problems   testutils.Problems
 	}{
 		{
 			testName:   "Valid-BatchCreateBooks",
 			MethodName: "BatchCreateBooks",
-			UriSuffix:  "books:batchCreate",
+			URISuffix:  "books:batchCreate",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Valid-BatchCreateMen",
 			MethodName: "BatchCreateMen",
-			UriSuffix:  "men:batchCreate",
+			URISuffix:  "men:batchCreate",
 			problems:   testutils.Problems{},
 		},
 		{
 			testName:   "Invalid-SingularBus",
 			MethodName: "BatchCreateBus",
-			UriSuffix:  "bus:batchCreate",
+			URISuffix:  "bus:batchCreate",
 			problems: testutils.Problems{{
 				Suggestion: "BatchCreateBuses",
 			}},
@@ -51,7 +51,7 @@ func TestMethodPluralResourceName(t *testing.T) {
 		{
 			testName:   "Invalid-SingularCorpPerson",
 			MethodName: "BatchCreateCorpPerson",
-			UriSuffix:  "corpPerson:batchCreate",
+			URISuffix:  "corpPerson:batchCreate",
 			problems: testutils.Problems{{
 				Suggestion: "BatchCreateCorpPeople",
 			}},
@@ -59,7 +59,7 @@ func TestMethodPluralResourceName(t *testing.T) {
 		{
 			testName:   "Invalid-Irrelevant",
 			MethodName: "AcquireBook",
-			UriSuffix:  "book",
+			URISuffix:  "book",
 			problems:   testutils.Problems{},
 		},
 	}
@@ -69,18 +69,18 @@ func TestMethodPluralResourceName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-				
+
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
 						option (google.api.http) = {
-							post: "/v1/{parent=publishers/*}/{{.UriSuffix}}"
+							post: "/v1/{parent=publishers/*}/{{.URISuffix}}"
 							body: "*"
 						};
 					}
 				}
-				
+
 				message {{.MethodName}}Request {}
-				
+
 				message {{.MethodName}}Response{}
 				`, test)
 

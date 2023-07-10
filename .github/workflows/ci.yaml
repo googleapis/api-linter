@@ -9,27 +9,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.14
+          go-version: 1.18
       - run: go test -p 1 ./...
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.14
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+          go-version: 1.18
+      - name: staticcheck
+        uses: dominikh/staticcheck-action@v1.3.0
+        with:
+          version: "2022.1.1"
       - name: ls-lint
         uses: ls-lint/action@v2.0.1
   quality-checker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.14
+          go-version: 1.18
       - name: Run the quality checker (which catches obvious mistakes, missing docs, etc.)
         run: go run ./.github/quality-checker

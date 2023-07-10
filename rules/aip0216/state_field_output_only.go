@@ -12,33 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0216
 
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/genproto/googleapis/api/annotations"
+	"strings"
 )
 
-var optionalBehaviorConflict = &lint.FieldRule{
-	Name: lint.NewRuleName(203, "optional-conflict"),
+var stateFieldOutputOnly = &lint.FieldRule{
+	Name: lint.NewRuleName(216, "state-field-output-only"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return !withoutOptionalFieldBehavior(f)
+		// We care about the name of the State enum type.
+		// AIP 0216 makes no mention of the state field name.
+		et := f.GetEnumType()
+		if et == nil {
+			return false
+		}
+
+		if !strings.HasSuffix(et.GetName(), "State") {
+			return false
+		}
+
+		return true
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		// APIs may use the OPTIONAL value to describe a field which doesn't use
-		// REQUIRED, IMMUTABLE, INPUT_ONLY or OUTPUT_ONLY. If a field is described
-		// as optional, it can't be others.
-		if len(utils.GetFieldBehavior(f)) > 1 {
-			return []lint.Problem{{
-				Message:    "Field behavior `(google.api.field_behavior) = OPTIONAL` shouldn't be used together with other field behaviors.",
-				Descriptor: f,
-			}}
+		behaviors := utils.GetFieldBehavior(f)
+		if !behaviors.Contains(annotations.FieldBehavior_OUTPUT_ONLY.String()) {
+			return []lint.Problem{
+				{
+					Message:    "state fields must have field_behavior OUTPUT_ONLY",
+					Descriptor: f,
+				},
+			}
 		}
 		return nil
 	},
-}
-
-func withoutOptionalFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("OPTIONAL")
 }

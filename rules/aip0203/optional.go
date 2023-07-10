@@ -18,8 +18,6 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 var optional = &lint.FieldRule{
@@ -29,12 +27,3 @@ var optional = &lint.FieldRule{
 }
 
 var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
-
-func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
-	for _, f := range m.GetFields() {
-		if utils.GetFieldBehavior(f).Contains("OPTIONAL") {
-			return true
-		}
-	}
-	return false
-}

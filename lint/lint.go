@@ -19,6 +19,7 @@ package lint
 import (
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/jhump/protoreflect/desc"
@@ -26,16 +27,40 @@ import (
 
 // Linter checks API files and returns a list of detected problems.
 type Linter struct {
-	rules   RuleRegistry
-	configs Configs
+	rules                 RuleRegistry
+	configs               Configs
+	debug                 bool
+	ignoreCommentDisables bool
+}
+
+// LinterOption prvoides the ability to configure the Linter.
+type LinterOption func(l *Linter)
+
+// Debug is a LinterOption for setting if debug mode is on.
+func Debug(debug bool) LinterOption {
+	return func(l *Linter) {
+		l.debug = debug
+	}
+}
+
+// IgnoreCommentDisables sets the flag for ignoring comments which disable rules.
+func IgnoreCommentDisables(ignoreCommentDisables bool) LinterOption {
+	return func(l *Linter) {
+		l.ignoreCommentDisables = ignoreCommentDisables
+	}
 }
 
 // New creates and returns a linter with the given rules and configs.
-func New(rules RuleRegistry, configs Configs) *Linter {
+func New(rules RuleRegistry, configs Configs, opts ...LinterOption) *Linter {
 	l := &Linter{
 		rules:   rules,
 		configs: configs,
 	}
+
+	for _, opt := range opts {
+		opt(l)
+	}
+
 	return l
 }
 
@@ -70,7 +95,11 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 		if l.configs.IsRuleEnabled(string(name), fd.GetName()) {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
-					if ruleIsEnabled(rule, p.Descriptor, p.Location, aliasMap) {
+					if p.Descriptor == nil {
+						errMessages = append(errMessages, fmt.Sprintf("rule %q missing required Descriptor in returned Problem", rule.GetName()))
+						continue
+					}
+					if ruleIsEnabled(rule, p.Descriptor, p.Location, aliasMap, l.ignoreCommentDisables) {
 						p.RuleID = rule.GetName()
 						resp.Problems = append(resp.Problems, p)
 					}
@@ -92,6 +121,9 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
+			if l.debug {
+				debug.PrintStack()
+			}
 			if rerr, ok := r.(error); ok {
 				err = rerr
 			} else {

@@ -22,6 +22,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// HasHTTPRules returns true when the given method descriptor is annotated with
+// a google.api.http option.
+func HasHTTPRules(m *desc.MethodDescriptor) bool {
+	got := proto.GetExtension(m.GetMethodOptions(), apb.E_Http).(*apb.HttpRule)
+	return got != nil
+}
+
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
 //
 // Note: This returns a slice -- it takes the google.api.http annotation,
@@ -92,11 +99,17 @@ type HTTPRule struct {
 }
 
 // GetVariables returns the variable segments in a URI as a map.
+//
+// For a given variable, the key is the variable's field path. The value is the
+// variable's template, which will match segment(s) of the URL.
+//
+// For more details on the path template syntax, see
+// https://github.com/googleapis/googleapis/blob/6e1a5a066659794f26091674e3668229e7750052/google/api/http.proto#L224.
 func (h *HTTPRule) GetVariables() map[string]string {
 	vars := map[string]string{}
 
 	// Replace the version template variable with "v".
-	uri := templateSegment.ReplaceAllString(h.URI, "v")
+	uri := VersionedSegment.ReplaceAllString(h.URI, "v")
 	for _, match := range plainVar.FindAllStringSubmatch(uri, -1) {
 		vars[match[1]] = "*"
 	}
@@ -110,13 +123,15 @@ func (h *HTTPRule) GetVariables() map[string]string {
 func (h *HTTPRule) GetPlainURI() string {
 	return plainVar.ReplaceAllString(
 		varSegment.ReplaceAllString(
-			templateSegment.ReplaceAllString(h.URI, "v"),
+			VersionedSegment.ReplaceAllString(h.URI, "v"),
 			"$2"),
 		"*")
 }
 
 var (
-	plainVar        = regexp.MustCompile(`\{([^}=]+)\}`)
-	varSegment      = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
-	templateSegment = regexp.MustCompile(`\{\$api_version\}`)
+	plainVar   = regexp.MustCompile(`\{([^}=]+)\}`)
+	varSegment = regexp.MustCompile(`\{([^}=]+)=([^}]+)\}`)
+	// VersionedSegment is a regex to extract the API version from
+	// an HTTP path.
+	VersionedSegment = regexp.MustCompile(`\{\$api_version\}`)
 )

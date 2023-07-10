@@ -40,6 +40,12 @@ func TestRequired(t *testing.T) {
 		},
 		{
 			name:     "Valid",
+			comment:  "Hello world! (-- Required --)",
+			field:    title,
+			problems: nil,
+		},
+		{
+			name:     "Valid",
 			comment:  "@required",
 			field:    titleWithRequiredBehavior,
 			problems: nil,

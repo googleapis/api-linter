@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0148
 
 import (
 	"testing"
@@ -20,29 +20,31 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequiredAndOptional(t *testing.T) {
-	req := " [(google.api.field_behavior) = REQUIRED]"
+func TestUseUid(t *testing.T) {
 	for _, test := range []struct {
-		name     string
-		Optional string
-		Required string
-		problems testutils.Problems
+		FieldName string
+		problems  testutils.Problems
 	}{
-		{"Neither", "", "", nil},
-		{"OptionalOnly", "optional ", "", nil},
-		{"RequiredOnly", "", req, nil},
-		{"Both", "optional ", req, testutils.Problems{{Suggestion: ""}}},
+		{"uid", nil},
+		{"id", testutils.Problems{{Suggestion: "uid"}}},
+		{"foo_id", nil},
 	} {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.FieldName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				import "google/api/field_behavior.proto";
+				import "google/api/resource.proto";
 
-				message Book {
-					{{.Optional}}int32 page_count = 1{{.Required}};
+				message Person {
+					option (google.api.resource) = {
+						type: "foo.googleapis.com/Person"
+						pattern: "people/{person}"
+					};
+					string name = 1;
+
+					string {{.FieldName}} = 2;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(requiredAndOptional.Lint(f)); diff != "" {
+			field := f.GetMessageTypes()[0].GetFields()[1]
+			if diff := test.problems.SetDescriptor(field).Diff(useUid.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

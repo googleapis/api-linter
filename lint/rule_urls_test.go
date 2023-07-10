@@ -35,7 +35,7 @@ func TestClientLibrariesRuleURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got := clientLibrariesRuleUrl(test.rule); got != test.url {
+			if got := clientLibrariesRuleURL(test.rule); got != test.url {
 				t.Errorf("clientLibrariesRuleUrl(%s) got %s, but want %s", test.name, got, test.url)
 			}
 		})
@@ -54,7 +54,7 @@ func TestCloudRuleURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got := cloudRuleUrl(test.rule); got != test.url {
+			if got := cloudRuleURL(test.rule); got != test.url {
 				t.Errorf("cloudRuleUrl(%s) got %s, but want %s", test.name, got, test.url)
 			}
 		})
