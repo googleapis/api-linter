@@ -32,14 +32,14 @@ var methodSignature = &lint.MethodRule{
 		signatures := utils.GetMethodSignatures(m)
 		in := m.GetInputType()
 
-		fields := stringset.New("name")
+		fields := []string{"name"}
 		if etag := in.FindFieldByName("etag"); etag != nil {
-			fields.Add(etag.GetName())
+			fields = append(fields, etag.GetName())
 		}
 		if force := in.FindFieldByName("force"); force != nil {
-			fields.Add(force.GetName())
+			fields = append(fields, force.GetName())
 		}
-		want := strings.Join(fields.Unordered(), ",")
+		want := strings.Join(fields, ",")
 
 		// Check if the signature is missing.
 		if len(signatures) == 0 {
@@ -55,7 +55,8 @@ var methodSignature = &lint.MethodRule{
 		// Check if the signature contains a disallowed field or doesn't contain
 		// "name".
 		first := signatures[0]
-		if !fields.Contains(first...) || !stringset.New(first...).Contains("name") {
+		fieldSet := stringset.New(fields...)
+		if !fieldSet.Contains(first...) || !stringset.New(first...).Contains("name") {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The method signature for Delete methods should be %q.", want),
 				Suggestion: fmt.Sprintf("option (google.api.method_signature) = %q;", want),
