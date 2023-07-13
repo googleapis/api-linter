@@ -13,7 +13,8 @@ func TestResourceExpireTimeField(t *testing.T) {
 		ResourceField string
 		problems      testutils.Problems
 	}{
-		{"Valid", `UndeleteBook`, `google.protobuf.Timestamp expire_time = 1;`, nil},
+		{"Valid", `UndeleteBook`, `google.protobuf.Timestamp purge_time = 1;`, nil},
+		{"Valid", `UndeleteBookLegacyExpireTime`, `google.protobuf.Timestamp expire_time = 1;`, nil},
 		{"Invalid", `UndeleteBook`, ``, testutils.Problems{{Message: "Resources supporting soft delete"}}},
 		{"IrrelevantNoSoftDelete", `GetBook`, ``, nil},
 	} {

@@ -32,6 +32,7 @@ var fieldNames = &lint.FieldRule{
 			"expired":  "expire_time",
 			"modified": "update_time",
 			"updated":  "update_time",
+			"purged":   "purged_time",
 		}
 		for got, want := range mistakes {
 			if strings.Contains(f.GetName(), got) {
