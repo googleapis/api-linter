@@ -73,6 +73,13 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidRecursiveMessage",
+			`message Foo { Foo foo = 1 [(google.api.field_behavior) = OPTIONAL]; }
+			 Foo foo = 1 [(google.api.field_behavior) = OPTIONAL];
+			`,
+			nil,
+		},
+		{
 			"InvalidEmpty",
 			"int32 page_count = 1;",
 			testutils.Problems{{Message: "annotation must be set"}},

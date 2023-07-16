@@ -32,7 +32,7 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		req := m.GetInputType()
 		p := m.GetFile().GetPackage()
-		ps := problems(req, p)
+		ps := problems(req, p, map[desc.Descriptor]bool{})
 		if len(ps) == 0 {
 			return nil
 		}
@@ -41,10 +41,16 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	},
 }
 
-func problems(m *desc.MessageDescriptor, pkg string) []lint.Problem {
+func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor]bool) []lint.Problem {
 	var ps []lint.Problem
 
 	for _, f := range m.GetFields() {
+		// ignore the field if it was already visited
+		if ok := visited[f]; ok {
+			continue
+		}
+		visited[f] = true
+
 		if utils.IsResource(m) && f.GetName() == "name" {
 			continue
 		}
@@ -58,7 +64,7 @@ func problems(m *desc.MessageDescriptor, pkg string) []lint.Problem {
 		}
 
 		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
-			ps = append(ps, problems(mt, pkg)...)
+			ps = append(ps, problems(mt, pkg, visited)...)
 		}
 	}
 
