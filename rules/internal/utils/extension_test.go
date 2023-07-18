@@ -20,6 +20,8 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
@@ -467,6 +469,94 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 					"GetOutputOrLROResponseMessage got %q, want %q",
 					got, test.want,
 				)
+			}
+		})
+	}
+}
+
+func TestFindResourceChildren(t *testing.T) {
+	publisher := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Publisher",
+		Pattern: []string{
+			"publishers/{publisher}",
+		},
+	}
+	shelf := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Shelf",
+		Pattern: []string{
+			"shelves/{shelf}",
+		},
+	}
+	book := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Book",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}",
+		},
+	}
+	edition := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Edition",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}/editions/{edition}",
+		},
+	}
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+
+			message Edition {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Edition"
+					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name   string
+		parent *apb.ResourceDescriptor
+		want   []*apb.ResourceDescriptor
+	}{
+		{"has_child_same_file", book, []*apb.ResourceDescriptor{edition}},
+		{"has_child_other_file", publisher, []*apb.ResourceDescriptor{book, edition}},
+		{"no_children", shelf, nil},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResourceChildren(tst.parent, files["shelf.proto"])
+			if diff := cmp.Diff(tst.want, got, cmp.Comparer(proto.Equal)); diff != "" {
+				t.Errorf("got(-),want(+):\n%s", diff)
 			}
 		})
 	}
