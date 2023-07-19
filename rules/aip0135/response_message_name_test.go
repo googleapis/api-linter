@@ -87,9 +87,10 @@ func TestResponseMessageName(t *testing.T) {
 		problems     map[string]testutils.Problems
 	}{
 		{"ValidEmpty", "DeleteBook", "google.protobuf.Empty", "", problems["none"]},
+		// the declarative friendly style is no longer deviated for delete.
+		{"ValidEmptyDF", "DeleteBook", "google.protobuf.Empty", "style: DECLARATIVE_FRIENDLY", problems["none"]},
 		{"ValidResource", "DeleteBook", "Book", "", problems["none"]},
 		{"Invalid", "DeleteBook", "DeleteBookResponse", "", problems["empty"]},
-		{"InvalidEmptyDF", "DeleteBook", "google.protobuf.Empty", "style: DECLARATIVE_FRIENDLY", problems["book"]},
 		{"Irrelevant", "DestroyBook", "DestroyBookResponse", "", problems["none"]},
 	}
 
