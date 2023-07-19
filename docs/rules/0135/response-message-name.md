@@ -21,9 +21,6 @@ if the name of the corresponding output message is not one of:
 - `google.protobuf.Empty`
 - The name of the RPC with the prefix `Delete` removed.
 
-**Important:** For declarative-friendly resources, only the resource is
-permitted as a return type.
-
 It also permits a response of `google.longrunning.Operation`; in this case, it
 checks the `response_type` in the `google.longrunning.operation_info`
 annotation and ensures that _it_ corresponds to either `google.protobuf.Empty`
