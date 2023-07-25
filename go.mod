@@ -16,7 +16,7 @@ require (
 	github.com/stoewer/go-strcase v1.3.0
 	golang.org/x/text v0.11.0
 	google.golang.org/genproto v0.0.0-20230706204954-ccb25ca9f130
-	google.golang.org/genproto/googleapis/api v0.0.0-20230724170836-66ad5b6ff146
+	google.golang.org/genproto/googleapis/api v0.0.0-20230725213213-b022f6e96895
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v2 v2.4.0
 )
