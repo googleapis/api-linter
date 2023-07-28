@@ -16,11 +16,9 @@
 package aip0134
 
 import (
-	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -45,15 +43,6 @@ func AddRules(r lint.RuleRegistry) error {
 		synonyms,
 		unknownFields,
 	)
-}
-
-var (
-	updateReqMessageRegexp = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
-)
-
-// Returns true if this is an AIP-134 Update request message, false otherwise.
-func isUpdateRequestMessage(m *desc.MessageDescriptor) bool {
-	return updateReqMessageRegexp.MatchString(m.GetName())
 }
 
 func extractResource(reqName string) string {

@@ -19,6 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 )
@@ -28,7 +29,7 @@ var requestResourceField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-resource-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		message := f.GetOwner()
-		return isUpdateRequestMessage(message) &&
+		return utils.IsUpdateRequestMessage(message) &&
 			f.GetMessageType() != nil &&
 			f.GetMessageType().GetName() == extractResource(message.GetName())
 	},
