@@ -22,6 +22,6 @@ import (
 // Delete methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
 	Name:       lint.NewRuleName(135, "http-uri-name"),
-	OnlyIf:     isDeleteMethod,
+	OnlyIf:     utils.IsDeleteMethod,
 	LintMethod: utils.LintHTTPURIHasNameVariable,
 }

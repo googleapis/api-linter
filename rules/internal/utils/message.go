@@ -21,16 +21,14 @@ import (
 )
 
 var (
-	getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
-
+	getReqMessageRegexp            = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
 	listReqMessageRegexp           = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
 	listRespMessageRegexp          = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
 	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
 	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
-
-	createReqMessageRegexp = regexp.MustCompile("^Create[A-Za-z0-9]*Request$")
-
-	updateReqMessageRegexp = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
+	createReqMessageRegexp         = regexp.MustCompile("^Create[A-Za-z0-9]*Request$")
+	updateReqMessageRegexp         = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
+	deleteReqMessageRegexp         = regexp.MustCompile("^Delete[A-Za-z0-9]*Request$")
 )
 
 // Returns true if this is an AIP-131 Get request message, false otherwise.
@@ -68,4 +66,9 @@ func IsCreateRequestMessage(m *desc.MessageDescriptor) bool {
 // Returns true if this is an AIP-134 Update request message, false otherwise.
 func IsUpdateRequestMessage(m *desc.MessageDescriptor) bool {
 	return updateReqMessageRegexp.MatchString(m.GetName())
+}
+
+// Returns true if this is an AIP-135 Delete request message, false otherwise.
+func IsDeleteRequestMessage(m *desc.MessageDescriptor) bool {
+	return deleteReqMessageRegexp.MatchString(m.GetName())
 }
