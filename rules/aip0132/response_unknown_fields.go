@@ -15,6 +15,7 @@
 package aip0132
 
 import (
+	"regexp"
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
@@ -33,10 +34,15 @@ var respAllowedFields = stringset.New(
 	"unreachable_locations", // Wrong, but a separate AIP-217 rule catches it.
 )
 
+// TODO: Refactor the use of this regexp in this rule to a more robust solution.
+//
+// Deprecated: Do not use this.
+var listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
+
 var responseUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "response-unknown-fields"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListResponseMessage(f.GetOwner())
+		return utils.IsListResponseMessage(f.GetOwner())
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// A repeated variant of the resource should be permitted.

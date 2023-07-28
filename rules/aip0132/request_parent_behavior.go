@@ -23,7 +23,7 @@ import (
 var requestParentBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-behavior"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
 	LintField: utils.LintRequiredField,
 }
