@@ -26,7 +26,7 @@ import (
 // The get request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(131, "request-required-fields"),
-	OnlyIf: isGetRequestMessage,
+	OnlyIf: utils.IsGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New("name")

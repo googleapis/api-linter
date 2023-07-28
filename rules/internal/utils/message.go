@@ -21,6 +21,8 @@ import (
 )
 
 var (
+	getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
+
 	listReqMessageRegexp           = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
 	listRespMessageRegexp          = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
 	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
@@ -28,6 +30,11 @@ var (
 
 	createReqMessageRegexp = regexp.MustCompile("^Create[A-Za-z0-9]*Request$")
 )
+
+// Returns true if this is an AIP-131 Get request message, false otherwise.
+func IsGetRequestMessage(m *desc.MessageDescriptor) bool {
+	return getReqMessageRegexp.MatchString(m.GetName())
+}
 
 // Return true if this is an AIP-132 List request message, false otherwise.
 func IsListRequestMessage(m *desc.MessageDescriptor) bool {
