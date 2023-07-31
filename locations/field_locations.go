@@ -21,8 +21,10 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
-// FieldOption returns the precise location for the given extension on the
-// given field. This is useful for those writing rules for their own extensions.
+// FieldOption returns the precise location for the given extension defintion on
+// the given field. This is useful for writing rules against custom extensions.
+//
+// Example: locations.FieldOption(field, fieldbehaviorpb.E_FieldBehavior)
 func FieldOption(f *desc.FieldDescriptor, e *protoimpl.ExtensionInfo) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, int(e.TypeDescriptor().Number()))
 }
