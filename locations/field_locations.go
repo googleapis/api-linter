@@ -26,7 +26,7 @@ import (
 //
 // Example: locations.FieldOption(field, fieldbehaviorpb.E_FieldBehavior)
 func FieldOption(f *desc.FieldDescriptor, e *protoimpl.ExtensionInfo) *dpb.SourceCodeInfo_Location {
-	return pathLocation(f, 8, int(e.TypeDescriptor().Number()))
+	return pathLocation(f, 8, int(e.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
 // FieldResourceReference returns the precise location for a field's

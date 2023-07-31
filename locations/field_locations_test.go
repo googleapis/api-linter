@@ -82,6 +82,7 @@ func TestFieldResourceReference(t *testing.T) {
 		}
 	`)
 	loc := FieldResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+	// resource_reference annotation location is roughly line 4, column 19.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
 		t.Errorf(diff)
 	}
