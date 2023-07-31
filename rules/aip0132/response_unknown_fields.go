@@ -15,14 +15,12 @@
 package aip0132
 
 import (
-	"regexp"
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/stoewer/go-strcase"
 )
 
 // The resource itself is not included here, but also permitted.
@@ -34,11 +32,6 @@ var respAllowedFields = stringset.New(
 	"unreachable_locations", // Wrong, but a separate AIP-217 rule catches it.
 )
 
-// TODO: Refactor the use of this regexp in this rule to a more robust solution.
-//
-// Deprecated: Do not use this.
-var listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
-
 var responseUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "response-unknown-fields"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
@@ -46,8 +39,7 @@ var responseUnknownFields = &lint.FieldRule{
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// A repeated variant of the resource should be permitted.
-		msgName := f.GetOwner().GetName()
-		resource := strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(msgName)[1])
+		resource := utils.ListResponseResourceName(f.GetOwner())
 		if strings.HasSuffix(resource, "_revisions") {
 			// This is an AIP-162 ListFooRevisions response, which is subtly
 			// different from an AIP-132 List response. We need to modify the RPC

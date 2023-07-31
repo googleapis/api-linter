@@ -18,6 +18,7 @@ import (
 	"regexp"
 
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 var (
@@ -44,6 +45,17 @@ func IsListRequestMessage(m *desc.MessageDescriptor) bool {
 // Return true if this is an AIP-132 List response message, false otherwise.
 func IsListResponseMessage(m *desc.MessageDescriptor) bool {
 	return listRespMessageRegexp.MatchString(m.GetName()) && !IsListRevisionsResponseMessage(m)
+}
+
+// Returns the name of the resource type from the response message name based on
+// Standard List response message naming convention. If the message is not a
+// Standard List response message, empty string is returned.
+func ListResponseResourceName(m *desc.MessageDescriptor) string {
+	if !IsListResponseMessage(m) {
+		return ""
+	}
+
+	return strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(m.GetName())[1])
 }
 
 // IsListRevisionsRequestMessage returns true if this is an AIP-162 List
