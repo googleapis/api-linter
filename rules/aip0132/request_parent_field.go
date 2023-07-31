@@ -25,7 +25,7 @@ import (
 var requestParentField = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
 	},
 	LintField: utils.LintSingularStringField,
 }

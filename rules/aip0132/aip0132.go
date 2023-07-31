@@ -16,11 +16,7 @@
 package aip0132
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/aip0162"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules adds all of the AIP-132 rules to the provided registry.
@@ -45,19 +41,4 @@ func AddRules(r lint.RuleRegistry) error {
 		responseUnknownFields,
 		unknownFields,
 	)
-}
-
-var (
-	listReqMessageRegexp  = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
-	listRespMessageRegexp = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
-)
-
-// Return true if this is an AIP-132 List request message, false otherwise.
-func isListRequestMessage(m *desc.MessageDescriptor) bool {
-	return listReqMessageRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsRequestMessage(m)
-}
-
-// Return true if this is an AIP-132 List response message, false otherwise.
-func isListResponseMessage(m *desc.MessageDescriptor) bool {
-	return listRespMessageRegexp.MatchString(m.GetName()) && !aip0162.IsListRevisionsResponseMessage(m)
 }

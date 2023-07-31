@@ -21,11 +21,13 @@ import (
 )
 
 var (
-	createMethodRegexp        = regexp.MustCompile("^Create(?:[A-Z]|$)")
-	getMethodRegexp           = regexp.MustCompile("^Get(?:[A-Z]|$)")
-	listMethodRegexp          = regexp.MustCompile("^List(?:[A-Z]|$)")
-	listRevisionsMethodRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
-	updateMethodRegexp        = regexp.MustCompile("^Update(?:[A-Z]|$)")
+	createMethodRegexp         = regexp.MustCompile("^Create(?:[A-Z]|$)")
+	getMethodRegexp            = regexp.MustCompile("^Get(?:[A-Z]|$)")
+	listMethodRegexp           = regexp.MustCompile("^List(?:[A-Z]|$)")
+	listRevisionsMethodRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
+	updateMethodRegexp         = regexp.MustCompile("^Update(?:[A-Z]|$)")
+	deleteMethodRegexp         = regexp.MustCompile("^Delete(?:[A-Z]|$)")
+	deleteRevisionMethodRegexp = regexp.MustCompile("^Delete[A-Za-z0-9]*Revision$")
 )
 
 // IsCreateMethod returns true if this is a AIP-133 Create method.
@@ -57,6 +59,11 @@ func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
 func IsUpdateMethod(m *desc.MethodDescriptor) bool {
 	methodName := m.GetName()
 	return updateMethodRegexp.MatchString(methodName)
+}
+
+// Returns true if this is a AIP-135 Delete method, false otherwise.
+func IsDeleteMethod(m *desc.MethodDescriptor) bool {
+	return deleteMethodRegexp.MatchString(m.GetName()) && !deleteRevisionMethodRegexp.MatchString(m.GetName())
 }
 
 // GetListResourceMessage returns the resource for a list method,

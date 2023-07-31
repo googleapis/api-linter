@@ -27,7 +27,7 @@ import (
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "method-signature"),
-	OnlyIf: isDeleteMethod,
+	OnlyIf: utils.IsDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 		in := m.GetInputType()

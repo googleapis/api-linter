@@ -30,7 +30,7 @@ import (
 // message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "response-message-name"),
-	OnlyIf: isDeleteMethod,
+	OnlyIf: utils.IsDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		resource := strings.Replace(m.GetName(), "Delete", "", 1)
 

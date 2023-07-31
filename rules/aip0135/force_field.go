@@ -28,7 +28,7 @@ var forceField = &lint.MessageRule{
 		ref := utils.GetResourceReference(name)
 		validRef := ref != nil && ref.GetType() != "" && utils.FindResource(ref.GetType(), m.GetFile()) != nil
 
-		return isDeleteRequestMessage(m) && validRef
+		return utils.IsDeleteRequestMessage(m) && validRef
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		force := m.FindFieldByName("force")
