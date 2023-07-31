@@ -26,7 +26,7 @@ import (
 
 var requestIDField = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-id-field"),
-	OnlyIf: isCreateRequestMessage,
+	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "Create")) + "_id"
 		if field := m.FindFieldByName(idField); field == nil || utils.GetTypeName(field) != "string" || field.IsRepeated() {

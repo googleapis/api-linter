@@ -21,8 +21,8 @@ import (
 
 const ()
 
-func TestFieldBehaviorRequired(t *testing.T) {
-	for _, test := range []struct {
+func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
+	testCases := []struct {
 		name     string
 		Fields   string
 		problems testutils.Problems
@@ -42,6 +42,23 @@ func TestFieldBehaviorRequired(t *testing.T) {
 			"int32 page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
 			nil,
 		},
+		// Maps should not be recursed to MapEntries, as they have no field
+		// behavior.
+		{
+			"ValidMap",
+			"map<string, string> page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
+			nil,
+		},
+		// OneOfs are not required to have an annotation, as they
+		// are implicitly optional.
+		{
+			"ValidOneOfNoAnnotation",
+			`oneof candy_bar {
+				bool snickers = 1;
+				bool chocolate = 3;
+			}`,
+			nil,
+		},
 		{
 			"ValidOutputOnly",
 			"int32 page_count = 1 [(google.api.field_behavior) = OUTPUT_ONLY];",
@@ -51,8 +68,15 @@ func TestFieldBehaviorRequired(t *testing.T) {
 			"ValidOptionalImmutable",
 			`int32 page_count = 1 [
 				(google.api.field_behavior) = OUTPUT_ONLY,
-			    (google.api.field_behavior) = OPTIONAL
+				(google.api.field_behavior) = OPTIONAL
 			];`,
+			nil,
+		},
+		{
+			"ValidRecursiveMessage",
+			`message Foo { Foo foo = 1 [(google.api.field_behavior) = OPTIONAL]; }
+			 Foo foo = 1 [(google.api.field_behavior) = OPTIONAL];
+			`,
 			nil,
 		},
 		{
@@ -60,10 +84,14 @@ func TestFieldBehaviorRequired(t *testing.T) {
 			"int32 page_count = 1;",
 			testutils.Problems{{Message: "annotation must be set"}},
 		},
-	} {
-		t.Run(test.name, func(t *testing.T) {
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				package apilinter.test.field_behavior_required;
+
 				import "google/api/field_behavior.proto";
+				import "google/api/resource.proto";
 
 				service Library {
 					rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
@@ -72,6 +100,8 @@ func TestFieldBehaviorRequired(t *testing.T) {
 
 				message UpdateBookRequest {
 					{{.Fields}}
+
+					Book book = 2 [(google.api.field_behavior) = REQUIRED];
 				}
 
 				message UpdateBookResponse {
@@ -79,17 +109,81 @@ func TestFieldBehaviorRequired(t *testing.T) {
 					// of field behavior in the response.
 					string name = 1;
 				}
-			`, test)
+
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "books/{book}"
+					};
+
+					string name = 1;
+				}
+			`, tc)
 			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
+
+			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
 	}
 }
 
-func TestFieldBehaviorRequiredNested(t *testing.T) {
-	for _, test := range []struct {
+func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
+	testCases := []struct {
+		name          string
+		FieldBehavior string
+		problems      testutils.Problems
+	}{
+		{
+			name:          "valid with field behavior",
+			FieldBehavior: "[(google.api.field_behavior) = OUTPUT_ONLY]",
+			problems:      nil,
+		},
+		{
+			name:          "valid without field behavior",
+			FieldBehavior: "",
+			problems:      nil,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/field_behavior.proto";
+				import "google/api/resource.proto";
+
+				service Library {
+					rpc GetBook(GetBookRequest) returns (Book) {
+					}
+				}
+
+				message GetBookRequest {
+					string name = 1 [(google.api.field_behavior) = REQUIRED];
+				}
+
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "books/{book}"
+					};
+
+					string name = 1;
+
+					string title = 2 {{.FieldBehavior}};
+				}
+			`, tc)
+
+			field := f.GetMessageTypes()[1].GetFields()[1]
+
+			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+
+}
+
+func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
+	testCases := []struct {
 		name     string
 		Fields   string
 		problems testutils.Problems
@@ -104,8 +198,17 @@ func TestFieldBehaviorRequiredNested(t *testing.T) {
 			"NonAnnotated non_annotated = 1 [(google.api.field_behavior) = REQUIRED];",
 			testutils.Problems{{Message: "must be set"}},
 		},
-	} {
-		t.Run(test.name, func(t *testing.T) {
+		// Children of OneOfs should still be validated.
+		{
+			"InvalidOneOfChildNotAnnotated",
+			`oneof candy_bar {
+				NonAnnotated non_annotated = 1;
+			}`,
+			testutils.Problems{{Message: "must be set"}},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/field_behavior.proto";
 
@@ -131,11 +234,111 @@ func TestFieldBehaviorRequiredNested(t *testing.T) {
 					// of field behavior in the response.
 					string name = 1;
 				}
-			`, test)
+			`, tc)
+
 			it := f.GetServices()[0].GetMethods()[0].GetInputType()
 			nestedField := it.GetFields()[0].GetMessageType().GetFields()[0]
-			if diff := test.problems.SetDescriptor(nestedField).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
+
+			if diff := tc.problems.SetDescriptor(nestedField).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Errorf(diff)
+			}
+		})
+	}
+}
+
+func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
+	testCases := []struct {
+		name             string
+		MessageType      string
+		MessageFieldName string
+		problems         testutils.Problems
+	}{
+		{
+			"ValidAnnotatedAndChildAnnotated",
+			"Annotated",
+			"annotated",
+			nil,
+		},
+		{
+			"ValidAnnotatedAndChildInOtherPackageUnannotated",
+			"unannotated.NonAnnotated",
+			"non_annotated",
+			nil,
+		},
+		{
+			"InvalidChildNotAnnotated",
+			"NonAnnotated",
+			"non_annotated",
+			testutils.Problems{{Message: "must be set"}},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			f1 := `
+				package apilinter.test.field_behavior_required;
+
+				import "google/api/field_behavior.proto";
+				import "resource.proto";
+				import "unannotated.proto";
+
+				service Library {
+					rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
+					}
+				}
+
+				message UpdateBookRequest {
+					{{.MessageType}} {{.MessageFieldName}} = 1 [(google.api.field_behavior) = REQUIRED];
+				}
+
+				message UpdateBookResponse {
+					// verifies that no error was raised on lack
+					// of field behavior in the response.
+					string name = 1;
+				}
+			`
+
+			f2 := `
+				package apilinter.test.field_behavior_required;
+
+				import "google/api/field_behavior.proto";
+
+				message NonAnnotated {
+					string nested = 1;
+				}
+
+				message Annotated {
+					string nested = 1 [(google.api.field_behavior) = REQUIRED];
+				}
+			`
+
+			f3 := `
+				package apilinter.test.unannotated;
+
+				message NonAnnotated {
+					string nested = 1;
+				}
+			`
+
+			srcs := map[string]string{
+				"service.proto":     f1,
+				"resource.proto":    f2,
+				"unannotated.proto": f3,
+			}
+
+			ds := testutils.ParseProto3Tmpls(t, srcs, tc)
+			f := ds["service.proto"]
+			it := f.GetServices()[0].GetMethods()[0].GetInputType()
+			fd := it.GetFields()[0].GetMessageType().GetFields()[0]
+
+			if diff := tc.problems.SetDescriptor(fd).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
+				t.Errorf(diff)
+			}
+
+			if tc.problems != nil {
+				want := "resource.proto"
+				if got := fd.GetFile().GetName(); got != want {
+					t.Fatalf("got file name %q for location of field but wanted %q", got, want)
+				}
 			}
 		})
 	}

@@ -17,6 +17,7 @@ package aip0132
 import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -36,7 +37,7 @@ var allowedFields = stringset.New(
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-unknown-fields"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner())
+		return utils.IsListRequestMessage(f.GetOwner())
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		if !allowedFields.Contains(field.GetName()) {

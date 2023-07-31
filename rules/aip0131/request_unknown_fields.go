@@ -20,6 +20,7 @@ import (
 	"bitbucket.org/creachadair/stringset"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -27,7 +28,7 @@ import (
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(131, "request-unknown-fields"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isGetRequestMessage(f.GetOwner())
+		return utils.IsGetRequestMessage(f.GetOwner())
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New("name", "read_mask", "view")

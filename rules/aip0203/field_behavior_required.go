@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package aip0203
 
 import (
@@ -29,40 +30,65 @@ var minimumRequiredFieldBehavior = stringset.New(
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// we only check requests, as OutputTypes are always
-		// OUTPUT_ONLY
-		it := m.GetInputType()
-		return checkFields(it)
+		req := m.GetInputType()
+		p := m.GetFile().GetPackage()
+		ps := problems(req, p, map[desc.Descriptor]bool{})
+		if len(ps) == 0 {
+			return nil
+		}
+
+		return ps
 	},
 }
 
-func checkFields(m *desc.MessageDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
+func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor]bool) []lint.Problem {
+	var ps []lint.Problem
+
 	for _, f := range m.GetFields() {
-		asMessage := f.GetMessageType()
-		if asMessage != nil {
-			problems = append(problems, checkFields(asMessage)...)
+		// ignore the field if it was already visited
+		if ok := visited[f]; ok {
+			continue
 		}
-		problems = append(problems, checkFieldBehavior(f)...)
+		visited[f] = true
+
+		if utils.IsResource(m) && f.GetName() == "name" {
+			continue
+		}
+
+		// Ignore a field if it is a OneOf (do not ignore children)
+		if f.AsFieldDescriptorProto().OneofIndex == nil {
+			p := checkFieldBehavior(f)
+			if p != nil {
+				ps = append(ps, *p)
+			}
+		}
+
+		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
+			ps = append(ps, problems(mt, pkg, visited)...)
+		}
 	}
-	return problems
+
+	return ps
 }
 
-func checkFieldBehavior(f *desc.FieldDescriptor) []lint.Problem {
-	problems := []lint.Problem{}
-	fieldBehavior := utils.GetFieldBehavior(f)
-	if len(fieldBehavior) == 0 {
-		problems = append(problems, lint.Problem{
-			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set, and have one of %v", minimumRequiredFieldBehavior),
+func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+	fb := utils.GetFieldBehavior(f)
+
+	if len(fb) == 0 {
+		return &lint.Problem{
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
 			Descriptor: f,
-		})
-		// check for at least one valid annotation
-	} else if !minimumRequiredFieldBehavior.Intersects(fieldBehavior) {
-		problems = append(problems, lint.Problem{
-			Message: fmt.Sprintf(
-				"google.api.field_behavior must have at least one of the following behaviors set: %v", minimumRequiredFieldBehavior),
-			Descriptor: f,
-		})
+		}
 	}
-	return problems
+
+	if !minimumRequiredFieldBehavior.Intersects(fb) {
+		// check for at least one valid annotation
+		return &lint.Problem{
+			Message: fmt.Sprintf(
+				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
+			Descriptor: f,
+		}
+	}
+
+	return nil
 }

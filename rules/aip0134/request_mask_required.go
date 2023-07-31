@@ -16,12 +16,13 @@ package aip0134
 
 import (
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var requestMaskRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-mask-required"),
-	OnlyIf: isUpdateRequestMessage,
+	OnlyIf: utils.IsUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		updateMask := m.FindFieldByName("update_mask")
 		if updateMask == nil {

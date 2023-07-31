@@ -160,6 +160,9 @@ func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
 
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+	if f == nil {
+		return nil
+	}
 	opts := f.GetFieldOptions()
 	if x := proto.GetExtension(opts, apb.E_ResourceReference); x != nil {
 		return x.(*apb.ResourceReference)
@@ -199,4 +202,34 @@ func SplitResourceTypeName(typ string) (service string, typeName string, ok bool
 	ok = true
 
 	return
+}
+
+// FindResourceChildren attempts to search for other resources defined in the
+// package that are parented by the given resource.
+func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescriptor) []*apb.ResourceDescriptor {
+	pats := parent.GetPattern()
+	if len(pats) == 0 {
+		return nil
+	}
+	// Use the first pattern in the resource because:
+	// 1. Patterns cannot be rearranged, so this is the true first pattern
+	// 2. The true first pattern is the one most likely to be used as a parent.
+	first := pats[0]
+
+	var children []*apb.ResourceDescriptor
+	files := append(file.GetDependencies(), file)
+	for _, f := range files {
+		for _, m := range f.GetMessageTypes() {
+			if r := GetResource(m); r != nil && r.GetType() != parent.GetType() {
+				for _, p := range r.GetPattern() {
+					if strings.HasPrefix(p, first) {
+						children = append(children, r)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return children
 }

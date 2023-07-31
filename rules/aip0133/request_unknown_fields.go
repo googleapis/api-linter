@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
@@ -27,7 +28,7 @@ import (
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-unknown-fields"),
-	OnlyIf: isCreateRequestMessage,
+	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 

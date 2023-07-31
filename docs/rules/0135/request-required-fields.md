@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 135
-  name: [core, '0135', request-unknown-fields]
+  name: [core, '0135', request-required-fields]
   summary: Delete RPCs must not have unexpected required fields in the request.
 permalink: /135/request-required-fields
 redirect_from:

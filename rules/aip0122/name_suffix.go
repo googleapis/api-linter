@@ -26,18 +26,20 @@ import (
 var nameSuffix = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "name-suffix"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return !stringset.New(
+		n := f.GetName()
+		// Ignore `{prefix}_display_name` fields as this seems like a reasonable suffix.
+		return strings.HasSuffix(n, "_name") && !strings.HasSuffix(n, "_display_name")
+	},
+	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+		allowedNameFields := stringset.New(
 			"display_name",
 			"family_name",
 			"given_name",
 			"full_resource_name",
 			"crypto_key_name",
 			"cmek_key_name",
-			"name",
-		).Contains(f.GetName())
-	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if n := f.GetName(); strings.HasSuffix(n, "_name") {
+		)
+		if n := f.GetName(); !allowedNameFields.Contains(n) {
 			return []lint.Problem{{
 				Message:    "Fields should not use the `_name` suffix.",
 				Suggestion: strings.TrimSuffix(n, "_name"),

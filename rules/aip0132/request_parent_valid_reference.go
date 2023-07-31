@@ -28,7 +28,7 @@ var requestParentValidReference = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-valid-reference"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
 		ref := utils.GetResourceReference(f)
-		return isListRequestMessage(f.GetOwner()) && f.GetName() == "parent" && ref != nil && ref.GetType() != ""
+		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent" && ref != nil && ref.GetType() != ""
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		p := f.GetParent()

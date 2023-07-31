@@ -45,8 +45,9 @@ var requestRequiredFields = &lint.MethodRule{
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
-			// Skip the check with the field that is the body.
-			if t := f.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+			// Skip the check with the field that is the resource, which for
+			// Standard Create, is the output type.
+			if t := f.GetMessageType(); t != nil && t.GetName() == ot.GetName() {
 				continue
 			}
 			// Iterate remaining fields. If they're not in the allowed list,

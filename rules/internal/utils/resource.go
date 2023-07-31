@@ -14,7 +14,9 @@
 
 package utils
 
-import apb "google.golang.org/genproto/googleapis/api/annotations"
+import (
+	apb "google.golang.org/genproto/googleapis/api/annotations"
+)
 
 // GetResourceSingular returns the resource singular. The
 // empty string is returned if the singular cannot be found.
@@ -36,4 +38,14 @@ func GetResourceSingular(r *apb.ResourceDescriptor) string {
 		}
 	}
 	return ""
+}
+
+// GetResourcePlural is a convenience method for getting the `plural` field of a
+// resource.
+func GetResourcePlural(r *apb.ResourceDescriptor) string {
+	if r == nil {
+		return ""
+	}
+
+	return r.Plural
 }
