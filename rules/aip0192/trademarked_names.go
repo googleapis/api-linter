@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -64,7 +65,7 @@ var trademarkedNames = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "trademarked-names"),
 	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
 		c := strings.Join(
-			separateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
+			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
 			"\n",
 		)
 		for want, badThings := range tmRegexes {

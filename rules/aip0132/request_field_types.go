@@ -30,7 +30,7 @@ var knownFields = map[string]func(*desc.FieldDescriptor) []lint.Problem{
 var requestFieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner()) && knownFields[f.GetName()] != nil
+		return utils.IsListRequestMessage(f.GetOwner()) && knownFields[f.GetName()] != nil
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		return knownFields[f.GetName()](f)

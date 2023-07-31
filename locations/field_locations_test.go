@@ -19,6 +19,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/jhump/protoreflect/desc"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestFieldLocations(t *testing.T) {
@@ -81,6 +82,22 @@ func TestFieldResourceReference(t *testing.T) {
 		}
 	`)
 	loc := FieldResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+	// resource_reference annotation location is roughly line 4, column 19.
+	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
+		t.Errorf(diff)
+	}
+}
+
+func TestFieldOption(t *testing.T) {
+	f := parse(t, `
+		import "google/api/resource.proto";
+		message GetBookRequest {
+		  string name = 1 [(google.api.resource_reference) = {
+		    type: "library.googleapis.com/Book"
+		  }];
+		}
+	`)
+	loc := FieldOption(f.GetMessageTypes()[0].GetFields()[0], apb.E_ResourceReference)
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
 		t.Errorf(diff)
 	}

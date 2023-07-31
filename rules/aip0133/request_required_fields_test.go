@@ -26,24 +26,42 @@ func TestRequiredFieldTests(t *testing.T) {
 		name                 string
 		Fields               string
 		problematicFieldName string
+		Singular             string
 		problems             testutils.Problems
 	}{
 		{
 			"ValidNoExtraFields",
 			"",
 			"",
+			"",
+			nil,
+		},
+		{
+			"ValidWithSingularNoExtraFields",
+			"",
+			"",
+			"bookShelf",
+			nil,
+		},
+		{
+			"ValidWithSingularAndIdField",
+			"string book_shelf_id = 3 [(google.api.field_behavior) = OPTIONAL];",
+			"",
+			"bookShelf",
 			nil,
 		},
 		{
 			"ValidOptionalValidateOnly",
 			"string validate_only = 3 [(google.api.field_behavior) = OPTIONAL];",
 			"validate_only",
+			"",
 			nil,
 		},
 		{
 			"InvalidRequiredValidateOnly",
 			"bool validate_only = 3 [(google.api.field_behavior) = REQUIRED];",
 			"validate_only",
+			"",
 			testutils.Problems{
 				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
 			},
@@ -52,8 +70,18 @@ func TestRequiredFieldTests(t *testing.T) {
 			"InvalidRequiredUnknownField",
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
+			"",
 			testutils.Problems{
 				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+			},
+		},
+		{
+			"InvalidRequiredUnknownMessageField",
+			"Foo foo = 3 [(google.api.field_behavior) = REQUIRED];",
+			"foo",
+			"",
+			testutils.Problems{
+				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "foo"`},
 			},
 		},
 	} {
@@ -64,34 +92,37 @@ func TestRequiredFieldTests(t *testing.T) {
 				import "google/api/resource.proto";
 
 				service Library {
-					rpc CreateBook(CreateBookRequest) returns (Book) {
+					rpc CreateBookShelf(CreateBookShelfRequest) returns (BookShelf) {
 						option (google.api.http) = {
-							delete: "/v1/{name=publishers/*/books/*}"
+							delete: "/v1/{name=publishers/*/bookShelves/*}"
 						};
 					}
 				}
 
-				message Book {
+				message BookShelf {
 					option (google.api.resource) = {
-						type: "library.googleapis.com/Book"
-						pattern: "publishers/{publisher}/books/{book}"
+						type: "library.googleapis.com/BookShelf"
+						pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
+						singular: "{{.Singular}}"
 					};
 					string name = 1;
 				}
 
-				message CreateBookRequest {
+				message Foo {}
+
+				message CreateBookShelfRequest {
 					string parent = 1 [
 						(google.api.field_behavior) = REQUIRED
 					];
-					Book book = 2 [
+					BookShelf book_shelf = 2 [
 						(google.api.field_behavior) = REQUIRED
 					];
 					{{.Fields}}
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("CreateBookRequest")
+			var dbr desc.Descriptor = f.FindMessage("CreateBookShelfRequest")
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("CreateBookRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.FindMessage("CreateBookShelfRequest").FindFieldByName(test.problematicFieldName)
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Errorf(diff)

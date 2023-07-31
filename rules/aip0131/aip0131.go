@@ -16,10 +16,7 @@
 package aip0131
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules accepts a register function and registers each of
@@ -38,26 +35,8 @@ func AddRules(r lint.RuleRegistry) error {
 		requestNameReference,
 		requestNameReferenceType,
 		requestNameRequired,
+		requestRequiredFields,
 		synonyms,
 		unknownFields,
 	)
-}
-
-var (
-	getMethodRegexp     = regexp.MustCompile("^Get(?:[A-Z]|$)")
-	getReqMessageRegexp = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
-)
-
-// Returns true if this is a AIP-131 Get method, false otherwise.
-func isGetMethod(m *desc.MethodDescriptor) bool {
-	methodName := m.GetName()
-	if methodName == "GetIamPolicy" {
-		return false
-	}
-	return getMethodRegexp.MatchString(methodName)
-}
-
-// Returns true if this is an AIP-131 Get request message, false otherwise.
-func isGetRequestMessage(m *desc.MessageDescriptor) bool {
-	return getReqMessageRegexp.MatchString(m.GetName())
 }

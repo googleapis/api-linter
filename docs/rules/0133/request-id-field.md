@@ -2,9 +2,7 @@
 rule:
   aip: 133
   name: [core, '0133', request-id-field]
-  summary: |
-    Declarative-friendly create methods should have a client-specified
-    ID field.
+  summary: create methods should have a client-specified ID field.
 permalink: /133/request-id-field
 redirect_from:
   - /0133/request-id-field
@@ -17,9 +15,8 @@ client-specified ID field, as mandated in [AIP-133][].
 
 ## Details
 
-This rule looks at any `Create` method connected to a resource with a
-`google.api.resource` annotation that includes `style: DECLARATIVE_FRIENDLY`,
-and complains if it lacks a client-specified ID (e.g. `string book_id`) field.
+This rule looks at any `Create` method connected to a resource and complains if
+it lacks a client-specified ID (e.g. `string book_id`) field.
 
 ## Examples
 
@@ -27,7 +24,6 @@ and complains if it lacks a client-specified ID (e.g. `string book_id`) field.
 
 ```proto
 // Incorrect.
-// Assuming that Book is styled declarative-friendly...
 message CreateBookRequest {
   string parent = 1 [(google.api.resource_reference) = {
     child_type: "library.googleapis.com/Book"
@@ -43,15 +39,15 @@ message CreateBookRequest {
 
 ```proto
 // Correct.
-// Assuming that Book is styled declarative-friendly...
 message CreateBookRequest {
   string parent = 1 [(google.api.resource_reference) = {
     child_type: "library.googleapis.com/Book"
   }];
 
-  Book book = 2;
+  string book_id = 2;
 
-  string book_id = 3;
+  Book book = 3;
+
 }
 ```
 
@@ -71,9 +67,6 @@ message CreateBookRequest {
   Book book = 2;
 }
 ```
-
-**Note:** Violations of declarative-friendly rules should be rare, as tools are
-likely to expect strong consistency.
 
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.

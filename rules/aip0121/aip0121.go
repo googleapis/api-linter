@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+// Package aip0121 contains rules defined in https://aip.dev/121.
+package aip0121
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-var optional = &lint.FieldRule{
-	Name:      lint.NewRuleName(203, "optional"),
-	OnlyIf:    withoutFieldBehavior,
-	LintField: checkLeadingComments(optionalRegexp, "OPTIONAL", requiredRegexp),
-}
-
-var optionalRegexp = regexp.MustCompile("(?i).*optional.*")
-
-func messageHasOptionalFieldBehavior(m *desc.MessageDescriptor) bool {
-	for _, f := range m.GetFields() {
-		if utils.GetFieldBehavior(f).Contains("OPTIONAL") {
-			return true
-		}
-	}
-	return false
+// AddRules accepts a register function and registers each of
+// this AIP's rules to it.
+func AddRules(r lint.RuleRegistry) error {
+	return r.Register(
+		121,
+		resourceMustSupportGet,
+	)
 }

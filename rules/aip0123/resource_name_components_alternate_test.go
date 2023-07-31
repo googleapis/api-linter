@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0123
 
 import (
 	"testing"
@@ -20,29 +20,30 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestRequiredAndOptional(t *testing.T) {
-	req := " [(google.api.field_behavior) = REQUIRED]"
+func TestResourceNameComponentsAlternate(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		Optional string
-		Required string
+		Pattern  string
 		problems testutils.Problems
 	}{
-		{"Neither", "", "", nil},
-		{"OptionalOnly", "optional ", "", nil},
-		{"RequiredOnly", "", req, nil},
-		{"Both", "optional ", req, testutils.Problems{{Suggestion: ""}}},
+		{"Valid", "author/{author}/books/{book}", testutils.Problems{}},
+		{"ValidSingleton", "user/{user}/config", testutils.Problems{}},
+		{"InvalidDoubleCollection", "author/books/{book}", testutils.Problems{{Message: "must alternate"}}},
+		{"InvalidDoubleIdentifier", "books/{author}/{book}", testutils.Problems{{Message: "must alternate"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				import "google/api/field_behavior.proto";
-
-				message Book {
-					{{.Optional}}int32 page_count = 1{{.Required}};
-				}
-			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			if diff := test.problems.SetDescriptor(field).Diff(requiredAndOptional.Lint(f)); diff != "" {
+			import "google/api/resource.proto";
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "{{ .Pattern }}"
+				};
+				string name = 1;
+			}
+		`, test)
+			m := f.GetMessageTypes()[0]
+			if diff := test.problems.SetDescriptor(m).Diff(resourceNameComponentsAlternate.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})

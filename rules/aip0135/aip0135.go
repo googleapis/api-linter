@@ -16,10 +16,7 @@
 package aip0135
 
 import (
-	"regexp"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules accepts a register function and registers each of
@@ -27,6 +24,7 @@ import (
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		135,
+		forceField,
 		httpBody,
 		httpMethod,
 		httpNameField,
@@ -38,23 +36,8 @@ func AddRules(r lint.RuleRegistry) error {
 		requestNameField,
 		requestNameReference,
 		requestNameRequired,
+		requestRequiredFields,
 		responseLRO,
 		unknownFields,
 	)
-}
-
-var (
-	deleteMethodRegexp         = regexp.MustCompile("^Delete(?:[A-Z]|$)")
-	deleteReqMessageRegexp     = regexp.MustCompile("^Delete[A-Za-z0-9]*Request$")
-	deleteRevisionMethodRegexp = regexp.MustCompile("^Delete[A-Za-z0-9]*Revision$")
-)
-
-// Returns true if this is a AIP-135 Delete method, false otherwise.
-func isDeleteMethod(m *desc.MethodDescriptor) bool {
-	return deleteMethodRegexp.MatchString(m.GetName()) && !deleteRevisionMethodRegexp.MatchString(m.GetName())
-}
-
-// Returns true if this is an AIP-135 Delete request message, false otherwise.
-func isDeleteRequestMessage(m *desc.MessageDescriptor) bool {
-	return deleteReqMessageRegexp.MatchString(m.GetName())
 }

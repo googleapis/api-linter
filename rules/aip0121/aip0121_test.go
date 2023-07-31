@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+// Package aip0121 contains rules defined in https://aip.dev/121.
+package aip0121
 
 import (
-	"regexp"
+	"testing"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
-var immutable = &lint.FieldRule{
-	Name:      lint.NewRuleName(203, "immutable"),
-	OnlyIf:    withoutImmutableFieldBehavior,
-	LintField: checkLeadingComments(immutableRegexp, "IMMUTABLE"),
-}
-
-var immutableRegexp = regexp.MustCompile("(?i).*immutable.*")
-
-func withoutImmutableFieldBehavior(f *desc.FieldDescriptor) bool {
-	return !utils.GetFieldBehavior(f).Contains("IMMUTABLE") && !standardFields.Contains(f.GetName())
+func TestAddRules(t *testing.T) {
+	if err := AddRules(lint.NewRuleRegistry()); err != nil {
+		t.Errorf("AddRules got an error: %v", err)
+	}
 }

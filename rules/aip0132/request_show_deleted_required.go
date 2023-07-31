@@ -15,7 +15,7 @@ import (
 var requestShowDeletedRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(132, "request-show-deleted-required"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		if !isListRequestMessage(m) {
+		if !utils.IsListRequestMessage(m) {
 			return false
 		}
 		// Check for soft-delete support by getting the resource name
