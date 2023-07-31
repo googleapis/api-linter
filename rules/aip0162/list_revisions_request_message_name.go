@@ -22,6 +22,6 @@ import (
 // List Revisions messages should have a properly named request message.
 var listRevisionsRequestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "list-revisions-request-message-name"),
-	OnlyIf:     IsListRevisionsMethod,
+	OnlyIf:     utils.IsListRevisionsMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

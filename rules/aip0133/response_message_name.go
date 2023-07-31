@@ -26,14 +26,14 @@ import (
 // Create method should use the resource as the output message
 var outputName = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "response-message-name"),
-	OnlyIf: isCreateMethod,
+	OnlyIf: utils.IsCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		want := getResourceMsgName(m)
 
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.
 		got := m.GetOutputType().GetName()
-		if m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation" {
+		if utils.IsOperation(m.GetOutputType()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		}
 

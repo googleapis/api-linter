@@ -76,8 +76,12 @@ func TestOnlyLeadingComments(t *testing.T) {
 				{{.Detached}}
 
 				// The book.
-				message Book {}
-				{{.Trailing}}
+				message Book {
+					{{.Trailing}}
+
+					string name = 1;
+				}
+				
 			`, test)
 			problems := onlyLeadingComments.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetMessageTypes()[0]).Diff(problems); diff != "" {

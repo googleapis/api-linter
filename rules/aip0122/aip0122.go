@@ -28,5 +28,6 @@ func AddRules(r lint.RuleRegistry) error {
 		httpURICase,
 		nameSuffix,
 		resourceReferenceType,
+		resourceIdOutputOnly,
 	)
 }

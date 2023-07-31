@@ -19,6 +19,7 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/stoewer/go-strcase"
 )
 
 var responsePluralFirstField = &lint.MessageRule{
@@ -30,13 +31,22 @@ var responsePluralFirstField = &lint.MessageRule{
 		// Throw a linter warning if, the first field in the message is not named
 		// according to plural(message_name.to_snake().split('_')[1:-1]).
 		firstField := m.GetFields()[0]
-		want := utils.ToPlural(firstField.GetName())
+
+		// If the field is a resource, use the `plural` annotation to decide the
+		// appropriate plural field name.
+		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
+		if want != "" {
+			want = strcase.SnakeCase(want)
+		} else {
+			want = utils.ToPlural(firstField.GetName())
+		}
+
 		if want != firstField.GetName() {
 			return []lint.Problem{{
 				Message:    "First field of Paginated RPCs' response should be plural.",
 				Suggestion: want,
 				Descriptor: firstField,
-				Location:   locations.DescriptorName(m),
+				Location:   locations.DescriptorName(firstField),
 			}}
 		}
 

@@ -60,7 +60,7 @@ type Problem struct {
 	// The category for this problem, based on user configuration.
 	category string
 
-	// nolint:structcheck,unused
+	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
 }
 
@@ -94,7 +94,7 @@ func (p Problem) marshal() interface{} {
 	}{
 		p.Message,
 		p.Suggestion,
-		fileLocationFromPBLocation(loc),
+		fileLocationFromPBLocation(loc, p.Descriptor),
 		p.RuleID,
 		p.GetRuleURI(),
 		p.category,
@@ -120,15 +120,21 @@ type position struct {
 type fileLocation struct {
 	Start position `json:"start_position" yaml:"start_position"`
 	End   position `json:"end_position" yaml:"end_position"`
+	Path  string   `json:"path" yaml:"path"`
 }
 
 // fileLocationFromPBLocation returns a new fileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
-func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descriptor) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
 	if l != nil {
 		span = l.Span
+	}
+
+	var fl fileLocation
+	if d != nil {
+		fl = fileLocation{Path: d.GetFile().GetName()}
 	}
 
 	// If `span` has four ints; they correspond to
@@ -137,16 +143,15 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
 	if len(span) == 4 {
-		return fileLocation{
-			Start: position{
-				Line:   int(span[0]) + 1,
-				Column: int(span[1]) + 1,
-			},
-			End: position{
-				Line:   int(span[2]) + 1,
-				Column: int(span[3]),
-			},
+		fl.Start = position{
+			Line:   int(span[0]) + 1,
+			Column: int(span[1]) + 1,
 		}
+		fl.End = position{
+			Line:   int(span[2]) + 1,
+			Column: int(span[3]),
+		}
+		return fl
 	}
 
 	// Okay, `span` has three ints; they correspond to
@@ -154,14 +159,13 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) fileLocation {
 	//
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
-	return fileLocation{
-		Start: position{
-			Line:   int(span[0]) + 1,
-			Column: int(span[1]) + 1,
-		},
-		End: position{
-			Line:   int(span[0]) + 1,
-			Column: int(span[2]),
-		},
+	fl.Start = position{
+		Line:   int(span[0]) + 1,
+		Column: int(span[1]) + 1,
 	}
+	fl.End = position{
+		Line:   int(span[0]) + 1,
+		Column: int(span[2]),
+	}
+	return fl
 }

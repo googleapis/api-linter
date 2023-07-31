@@ -19,6 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -140,23 +141,21 @@ func isDeleteRevisionRequestMessage(m *desc.MessageDescriptor) bool {
 }
 
 var (
-	listRevisionsMethodRegexp      = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
-	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
-	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
-	listRevisionsURINameRegexp     = regexp.MustCompile(`:listRevisions$`)
+	listRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
 )
 
-// Returns true if this is an AIP-162 List Revisions method, false otherwise.
-func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
-	return listRevisionsMethodRegexp.MatchString(m.GetName())
-}
-
-// Returns true if this is an AIP-162 List Revisions request message, false otherwise.
+// IsListRevisionsRequestMessage returns true if this is an AIP-162 List
+// Revisions request message, false otherwise.
+//
+// Deprecated: Use the same method from the utils package instead.
 func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
-	return listRevisionsReqMessageRegexp.MatchString(m.GetName())
+	return utils.IsListRevisionsRequestMessage(m)
 }
 
-// Returns true if this is an AIP-162 List Revisions response message, false otherwise.
+// IsListRevisionsResponseMessage returns true if this is an AIP-162 List
+// Revisions response message, false otherwise.
+//
+// Deprecated: Use the same method from the utils package instead.
 func IsListRevisionsResponseMessage(m *desc.MessageDescriptor) bool {
-	return listRevisionsRespMessageRegexp.MatchString(m.GetName())
+	return utils.IsListRevisionsResponseMessage(m)
 }

@@ -12,7 +12,7 @@ import (
 
 var requestParentRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-parent-required"),
-	OnlyIf: isCreateRequestMessage,
+	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("parent") == nil {
 			// Sanity check: If the resource has a pattern, and that pattern

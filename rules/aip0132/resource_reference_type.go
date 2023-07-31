@@ -29,13 +29,12 @@ var resourceReferenceType = &lint.MethodRule{
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		p := m.GetInputType().FindFieldByName("parent")
 
-		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
 		var resource *annotations.ResourceDescriptor
-		if len(repeated) > 0 {
-			resource = utils.GetResource(repeated[0].GetMessageType())
+		resourceField := utils.GetListResourceMessage(m)
+		if resourceField != nil {
+			resource = utils.GetResource(resourceField)
 		}
-
-		return isListMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
+		return utils.IsListMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// The first repeated message field must be the paginated resource.

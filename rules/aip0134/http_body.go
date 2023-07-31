@@ -27,7 +27,7 @@ import (
 // Update methods should have an HTTP body.
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "http-body"),
-	OnlyIf: isUpdateMethod,
+	OnlyIf: utils.IsUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		fieldName := strcase.SnakeCase(m.GetName()[6:])
 		// Establish that the RPC has HTTP body equal to fieldName.

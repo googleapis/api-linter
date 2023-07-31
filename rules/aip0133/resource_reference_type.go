@@ -26,23 +26,15 @@ import (
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "resource-reference-type"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
-		}
-
+		ot := utils.GetResponseType(m)
 		// Unresolvable response_type for an Operation results in nil here.
 		resource := utils.GetResource(ot)
 		p := m.GetInputType().FindFieldByName("parent")
-		return isCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
+		return utils.IsCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
-		ot := m.GetOutputType()
-		if ot.GetName() == "Operation" {
-			ot = utils.GetResponseType(m)
-		}
+		ot := utils.GetResponseType(m)
 		resource := utils.GetResource(ot)
 		parent := m.GetInputType().FindFieldByName("parent")
 		ref := utils.GetResourceReference(parent)

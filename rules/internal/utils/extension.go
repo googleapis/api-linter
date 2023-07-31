@@ -50,9 +50,9 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 	return nil
 }
 
-// GetResponseType returns the message referred to by the
+// GetOperationResponseType returns the message referred to by the
 // (google.longrunning.operation_info).response_type annotation.
-func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -63,6 +63,25 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	typ := FindMessage(m.GetFile(), info.GetResponseType())
 
 	return typ
+}
+
+// GetResponseType returns the OutputType if the response is
+// not an LRO, or the ResponseType otherwise.
+func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+	if m == nil {
+		return nil
+	}
+
+	ot := m.GetOutputType()
+	if !isLongRunningOperation(ot) {
+		return ot
+	}
+
+	return GetOperationResponseType(m)
+}
+
+func isLongRunningOperation(m *desc.MessageDescriptor) bool {
+	return m.GetFile().GetPackage() == "google.longrunning" && m.GetName() == "Operation"
 }
 
 // GetMetadataType returns the message referred to by the
@@ -141,6 +160,9 @@ func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
 
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+	if f == nil {
+		return nil
+	}
 	opts := f.GetFieldOptions()
 	if x := proto.GetExtension(opts, apb.E_ResourceReference); x != nil {
 		return x.(*apb.ResourceReference)
@@ -150,7 +172,7 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 
 // FindResource returns first resource of type matching the reference param.
 // resource Type name being referenced. It looks within a given file and its
-// depenedncies, it cannot search within the entire protobuf package.
+// depenedencies, it cannot search within the entire protobuf package.
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
@@ -165,4 +187,49 @@ func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDesc
 		}
 	}
 	return nil
+}
+
+// SplitResourceTypeName splits the `Resource.type` field into the service name
+// and the resource type name.
+func SplitResourceTypeName(typ string) (service string, typeName string, ok bool) {
+	split := strings.Split(typ, "/")
+	if len(split) != 2 || split[0] == "" || split[1] == "" {
+		return
+	}
+
+	service = split[0]
+	typeName = split[1]
+	ok = true
+
+	return
+}
+
+// FindResourceChildren attempts to search for other resources defined in the
+// package that are parented by the given resource.
+func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescriptor) []*apb.ResourceDescriptor {
+	pats := parent.GetPattern()
+	if len(pats) == 0 {
+		return nil
+	}
+	// Use the first pattern in the resource because:
+	// 1. Patterns cannot be rearranged, so this is the true first pattern
+	// 2. The true first pattern is the one most likely to be used as a parent.
+	first := pats[0]
+
+	var children []*apb.ResourceDescriptor
+	files := append(file.GetDependencies(), file)
+	for _, f := range files {
+		for _, m := range f.GetMessageTypes() {
+			if r := GetResource(m); r != nil && r.GetType() != parent.GetType() {
+				for _, p := range r.GetPattern() {
+					if strings.HasPrefix(p, first) {
+						children = append(children, r)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return children
 }

@@ -16,7 +16,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 
 	"github.com/stoewer/go-strcase"
@@ -26,7 +26,7 @@ func checkRuleName(aip int, name string) []error {
 	path := fmt.Sprintf("rules/aip%04d/%s.go", aip, strcase.SnakeCase(name))
 
 	// Read in the file.
-	contentsBytes, err := ioutil.ReadFile(path)
+	contentsBytes, err := os.ReadFile(path)
 	if err != nil {
 		return []error{err}
 	}

@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -25,7 +26,7 @@ var deprecatedComment = &lint.DescriptorRule{
 	Name:   lint.NewRuleName(192, "deprecated-comment"),
 	OnlyIf: isDeprecated,
 	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
-		comment := separateInternalComments(d.GetSourceInfo().GetLeadingComments())
+		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
 		if len(comment.External) > 0 && strings.HasPrefix(comment.External[0], "Deprecated:") {
 			return nil
 		}

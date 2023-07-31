@@ -18,12 +18,13 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var requestNameRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-name-required"),
-	OnlyIf: isDeleteRequestMessage,
+	OnlyIf: utils.IsDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{

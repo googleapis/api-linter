@@ -18,13 +18,14 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // The Get standard method should have some required fields.
 var requestNameRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(131, "request-name-required"),
-	OnlyIf: isGetRequestMessage,
+	OnlyIf: utils.IsGetRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{

@@ -19,6 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -26,7 +27,7 @@ import (
 var hasComments = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "has-comments"),
 	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
-		comment := separateInternalComments(d.GetSourceInfo().GetLeadingComments())
+		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
 		if len(comment.External) == 0 {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf("Missing comment over %q.", d.GetName()),

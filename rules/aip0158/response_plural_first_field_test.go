@@ -55,6 +55,44 @@ func TestResponsePluralFirstField(t *testing.T) {
 		})
 	}
 
+	tests = []struct {
+		testName    string
+		MessageName string
+		problems    testutils.Problems
+	}{
+		{"ValidResourcePlural", "library_books", testutils.Problems{}},
+		{"InvalidResourcePlural", "books", testutils.Problems{{Suggestion: "library_books"}}},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			// Create the proto message.
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+
+				message LibraryBook {
+					option (google.api.resource) = {
+						type: "example.com/LibraryBook"
+						pattern: "libraryBooks/{libraryBook}"
+						singular: "libraryBook"
+						plural: "libraryBooks"
+					};
+					string name = 1;
+				}
+
+				message ListLibraryBooksResponse {
+					repeated LibraryBook {{.MessageName}} = 1;
+					string next_page_token = 2;
+				}
+			`, test)
+
+			// Run the lint rule and establish we get the correct problems.
+			problems := responsePluralFirstField.Lint(f)
+			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByNumber(1)).Diff(problems); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+
 	t.Run("ValidNoFields", func(t *testing.T) {
 		f := testutils.ParseProto3Tmpl(t, `
 			message ListStudentProfilesResponse {}

@@ -71,8 +71,13 @@ func TestRuleIsEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test message")
 			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, false), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
+			}
+			if !test.enabled {
+				if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, true), true; got != want {
+					t.Errorf("Expected the test rule with ignoreCommentDisables true to return %v from ruleIsEnabled, got %v", want, got)
+				}
 			}
 		})
 	}
@@ -98,10 +103,10 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, nil), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, nil, false), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil, nil), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil, nil, false), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
 	}
 }
@@ -126,10 +131,10 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), false; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil, nil), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil, nil, false), true; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
 }
@@ -166,7 +171,7 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test file: %q", err)
 			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), test.enabled; got != want {
 				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 			}
 		})

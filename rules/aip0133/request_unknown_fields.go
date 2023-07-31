@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
@@ -27,7 +28,7 @@ import (
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-unknown-fields"),
-	OnlyIf: isCreateRequestMessage,
+	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
@@ -39,13 +40,12 @@ var unknownFields = &lint.MessageRule{
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				allowedFields[fieldDesc.GetName()] = nil // AIP-133
-			}
-		}
-
 		for _, field := range m.GetFields() {
+			// Skip the check with the field that is the body.
+			if t := field.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+				continue
+			}
+			// Check the remaining fields.
 			if _, ok := allowedFields[string(field.GetName())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
