@@ -133,6 +133,20 @@ message BadThing {
 If a proto block _begins with_ a comment that says only `Incorrect.` or
 `Correct.`, it picks up different styling when viewing in GitHub Pages.
 
+## Releases
+
+Releases are handled automatically by [release-please][]. If a manual release
+is desired, simply open a pull request with an empty commit and the proper
+conventional commit message for the desired semver bump. For example:
+
+```sh
+# releasing a minor version
+git commit --allow-empty -m 'feat: new minor release'
+
+# releasing a patch version
+git commit --allow-empty -m 'fix: new patch release'
+```
+
 <!-- prettier-ignore-start -->
 [aip]: https://aip.dev/
 [go]: https://golang.org/
@@ -141,4 +155,5 @@ If a proto block _begins with_ a comment that says only `Incorrect.` or
 [protoreflect]: https://godoc.org/github.com/jhump/protoreflect
 [`rules.go`]: https://github.com/googleapis/api-linter/blob/main/rules/rules.go
 [visitor pattern]: https://en.wikipedia.org/wiki/Visitor_pattern
+[release-please]: https://github.com/googleapis/release-please
 <!-- prettier-ignore-end -->

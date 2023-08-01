@@ -1,0 +1,5 @@
+handleGHRelease: true
+manifest: true
+manifestFile: .release-please-manifest.json
+manifestConfig: .release-please-config.json
+releaseType: go-yoshi
