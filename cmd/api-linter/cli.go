@@ -23,6 +23,7 @@ import (
 	"sync"
 
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/googleapis/api-linter/internal"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -108,7 +109,7 @@ func newCli(args []string) *cli {
 func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	// Print version and exit if asked.
 	if c.VersionFlag {
-		fmt.Printf("api-linter %s\n", version)
+		fmt.Printf("api-linter %s\n", internal.Version)
 		return nil
 	}
 

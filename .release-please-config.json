@@ -1,0 +1,10 @@
+{
+    "release-type": "go-yoshi",
+    "include-component-in-tag": false,
+    "include-v-in-tag": true,
+    "packages": {
+        ".": {
+            "component": "api-linter"
+        }
+    }
+}
