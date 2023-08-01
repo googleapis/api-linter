@@ -14,7 +14,9 @@ jobs:
           fetch-depth: 0
       - name: Get release information
         id: release_tool
-        run: go run ./.github/release-tool/
+        run: |
+          git config --global --add safe.directory '*'
+          go run ./.github/release-tool/
     outputs:
       version: ${{ steps.release_tool.outputs.version }}
       release_notes: ${{ steps.release_tool.outputs.release_notes }}
