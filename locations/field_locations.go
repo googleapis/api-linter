@@ -18,14 +18,14 @@ import (
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // FieldOption returns the precise location for the given extension defintion on
 // the given field. This is useful for writing rules against custom extensions.
 //
 // Example: locations.FieldOption(field, fieldbehaviorpb.E_FieldBehavior)
-func FieldOption(f *desc.FieldDescriptor, e *protoimpl.ExtensionInfo) *dpb.SourceCodeInfo_Location {
+func FieldOption(f *desc.FieldDescriptor, e protoreflect.ExtensionType) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, int(e.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
