@@ -15,7 +15,7 @@ jobs:
       - name: Get release information
         id: release_tool
         run: |
-          git config --global --add safe.directory '*'
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           go run ./.github/release-tool/
     outputs:
       version: ${{ steps.release_tool.outputs.version }}
