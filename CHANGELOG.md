@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.55.2](https://github.com/googleapis/api-linter/compare/v1.55.1...v1.55.2) (2023-08-02)
+
+
+### Bug Fixes
+
+* **ci:** fix release asset job ([#1222](https://github.com/googleapis/api-linter/issues/1222)) ([af6066d](https://github.com/googleapis/api-linter/commit/af6066d83b00bacae8c3f3535729110580bc8f75))
+
 ## [1.55.1](https://github.com/googleapis/api-linter/compare/v1.55.0...v1.55.1) (2023-08-02)
 
 
