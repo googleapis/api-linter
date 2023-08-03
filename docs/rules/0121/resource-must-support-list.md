@@ -2,7 +2,7 @@
 rule:
   aip: 121
   name: [core, '0121', resource-must-support-list]
-  summary: All resource names must use camel case in collection identifiers.
+  summary: All resources names must have a Standard List.
 permalink: /121/resource-must-support-list
 redirect_from:
   - /0121/resource-must-support-list
