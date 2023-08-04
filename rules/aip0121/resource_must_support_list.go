@@ -26,11 +26,10 @@ import (
 var resourceMustSupportList = &lint.ServiceRule{
 	Name: lint.NewRuleName(121, "resource-must-support-list"),
 	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
-		problems := []lint.Problem{}
-		// Add the empty string to avoid adding multiple nil checks.
-		// Just say it's valid instead.
-		resourcesWithList := stringset.New("")
-		resourcesWithOtherMethods := map[string]*desc.MessageDescriptor{}
+		var problems []lint.Problem
+		var resourcesWithList stringset.Set
+		var resourcesWithOtherMethods stringset.Set
+
 		// Iterate all RPCs and try to find resources. Mark the
 		// resources which have a List method, and which ones do not.
 		for _, m := range s.GetMethods() {
@@ -46,7 +45,7 @@ var resourceMustSupportList = &lint.ServiceRule{
 						continue
 					}
 					t := utils.GetResource(msg).GetType()
-					resourcesWithOtherMethods[t] = msg
+					resourcesWithOtherMethods.Add(t)
 				}
 			}
 		}

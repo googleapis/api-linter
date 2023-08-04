@@ -26,11 +26,10 @@ import (
 var resourceMustSupportGet = &lint.ServiceRule{
 	Name: lint.NewRuleName(121, "resource-must-support-get"),
 	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
-		problems := []lint.Problem{}
-		// Add the empty string to avoid adding multiple nil checks.
-		// Just say it's valid instead.
-		resourcesWithGet := stringset.New("")
-		resourcesWithOtherMethods := map[string]*desc.MessageDescriptor{}
+		var problems []lint.Problem
+		var resourcesWithGet stringset.Set
+		var resourcesWithOtherMethods stringset.Set
+
 		// Iterate all RPCs and try to find resources. Mark the
 		// resources which have a Get method, and which ones do not.
 		for _, m := range s.GetMethods() {
@@ -40,12 +39,12 @@ var resourceMustSupportGet = &lint.ServiceRule{
 			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) {
 				if msg := utils.GetResponseType(m); msg != nil {
 					t := utils.GetResource(msg).GetType()
-					resourcesWithOtherMethods[t] = msg
+					resourcesWithOtherMethods.Add(t)
 				}
 			} else if utils.IsListMethod(m) {
 				if msg := utils.GetListResourceMessage(m); msg != nil {
 					t := utils.GetResource(msg).GetType()
-					resourcesWithOtherMethods[t] = msg
+					resourcesWithOtherMethods.Add(t)
 				}
 			}
 		}
