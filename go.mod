@@ -14,7 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.3.0
-	golang.org/x/text v0.11.0
+	golang.org/x/text v0.12.0
 	google.golang.org/genproto v0.0.0-20230726155614-23370e0ffb3e
 	google.golang.org/genproto/googleapis/api v0.0.0-20230731193218-e0aa005b6bdf
 	google.golang.org/protobuf v1.31.0
