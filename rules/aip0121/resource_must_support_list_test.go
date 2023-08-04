@@ -75,7 +75,7 @@ func TestResourceMustSupportList(t *testing.T) {
 		`, []lint.Problem{
 			{Message: `resource "library.googleapis.com/Book"`},
 		}},
-		{"IgnoreSingleton", `
+		{"ValidIgnoreSingleton", `
 			rpc GetBookCover(GetBookCoverRequest) returns (BookCover) {};
 		`, nil},
 	} {
