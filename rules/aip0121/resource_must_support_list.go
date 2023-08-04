@@ -23,26 +23,27 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-var resourceMustSupportGet = &lint.ServiceRule{
-	Name: lint.NewRuleName(121, "resource-must-support-get"),
+var resourceMustSupportList = &lint.ServiceRule{
+	Name: lint.NewRuleName(121, "resource-must-support-list"),
 	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
 		var problems []lint.Problem
-		var resourcesWithGet stringset.Set
+		var resourcesWithList stringset.Set
 		var resourcesWithOtherMethods stringset.Set
 
 		// Iterate all RPCs and try to find resources. Mark the
-		// resources which have a Get method, and which ones do not.
+		// resources which have a List method, and which ones do not.
 		for _, m := range s.GetMethods() {
-			if utils.IsGetMethod(m) {
-				t := utils.GetResource(m.GetOutputType()).GetType()
-				resourcesWithGet.Add(t)
-			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) {
-				if msg := utils.GetResponseType(m); msg != nil {
-					t := utils.GetResource(msg).GetType()
-					resourcesWithOtherMethods.Add(t)
-				}
-			} else if utils.IsListMethod(m) {
+			if utils.IsListMethod(m) {
 				if msg := utils.GetListResourceMessage(m); msg != nil {
+					t := utils.GetResource(msg).GetType()
+					resourcesWithList.Add(t)
+				}
+			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) || utils.IsGetMethod(m) {
+				if msg := utils.GetResponseType(m); msg != nil {
+					// Skip tracking Singleton resources, they do not need List.
+					if utils.IsSingletonResource(msg) {
+						continue
+					}
 					t := utils.GetResource(msg).GetType()
 					resourcesWithOtherMethods.Add(t)
 				}
@@ -50,10 +51,10 @@ var resourceMustSupportGet = &lint.ServiceRule{
 		}
 
 		for t := range resourcesWithOtherMethods {
-			if !resourcesWithGet.Contains(t) {
+			if !resourcesWithList.Contains(t) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
-						"Missing Standard Get method for resource %q", t,
+						"Missing Standard List method for resource %q", t,
 					),
 					Descriptor: s,
 				})
