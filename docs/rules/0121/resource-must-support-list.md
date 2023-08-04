@@ -2,7 +2,7 @@
 rule:
   aip: 121
   name: [core, '0121', resource-must-support-list]
-  summary: All resources names must have a Standard List.
+  summary: All resources must have a Standard List method.
 permalink: /121/resource-must-support-list
 redirect_from:
   - /0121/resource-must-support-list
