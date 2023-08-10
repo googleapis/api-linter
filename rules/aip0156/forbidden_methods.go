@@ -42,8 +42,8 @@ var forbiddenMethods = &lint.MethodRule{
 		return false
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Singletons should not use Create, List, or Delete.
-		for _, badPrefix := range []string{"Create", "List", "Delete"} {
+		// Singletons should not use Create, or Delete.
+		for _, badPrefix := range []string{"Create", "Delete"} {
 			if strings.HasPrefix(m.GetName(), badPrefix) {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Singletons must not define %q methods.", badPrefix),

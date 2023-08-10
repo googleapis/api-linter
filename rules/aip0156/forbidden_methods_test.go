@@ -29,8 +29,8 @@ func TestForbiddenMethods(t *testing.T) {
 	}{
 		{"ValidGet", "GetPublisherSettings", "/settings", testutils.Problems{}},
 		{"ValidUpdate", "UpdatePublisherSettings", "/settings", testutils.Problems{}},
+		{"ValidList", "ListPublisherSettings", "/settings", testutils.Problems{}},
 		{"InvalidCreate", "CreatePublisherSettings", "/settings", testutils.Problems{{Message: "Create"}}},
-		{"InvalidList", "ListPublisherSettings", "/settings", testutils.Problems{{Message: "List"}}},
 		{"InvalidDelete", "DeletePublisherSettings", "/settings", testutils.Problems{{Message: "Delete"}}},
 		{"Irrelevant", "CreatePublisher", "", testutils.Problems{}},
 	} {
