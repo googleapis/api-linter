@@ -35,13 +35,21 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-// Returns true if this is a deprecated method or service, false otherwise.
+// Returns true if this is a deprecated descriptor, false otherwise.
 func isDeprecated(d desc.Descriptor) bool {
 	switch d := d.(type) {
 	case *desc.MethodDescriptor:
 		return d.GetMethodOptions().GetDeprecated()
 	case *desc.ServiceDescriptor:
 		return d.GetServiceOptions().GetDeprecated()
+	case *desc.FieldDescriptor:
+		return d.GetFieldOptions().GetDeprecated()
+	case *desc.EnumDescriptor:
+		return d.GetEnumOptions().GetDeprecated()
+	case *desc.EnumValueDescriptor:
+		return d.GetEnumValueOptions().GetDeprecated()
+	case *desc.MessageDescriptor:
+		return d.GetMessageOptions().GetDeprecated()
 	default:
 		return false
 	}
