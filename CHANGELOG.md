@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.56.0](https://github.com/googleapis/api-linter/compare/v1.55.2...v1.56.0) (2023-08-11)
+
+
+### Features
+
+* **AIP-121:** enforce list requirement ([#1225](https://github.com/googleapis/api-linter/issues/1225)) ([7ad11d0](https://github.com/googleapis/api-linter/commit/7ad11d0add4228236bae63f8b3e87812428758e8))
+* **AIP-156:** allow singleton list ([#1230](https://github.com/googleapis/api-linter/issues/1230)) ([ccb38cf](https://github.com/googleapis/api-linter/commit/ccb38cfed985c24dad9055704103583a2d8ff326))
+
 ## [1.55.2](https://github.com/googleapis/api-linter/compare/v1.55.1...v1.55.2) (2023-08-02)
 
 
