@@ -2,7 +2,7 @@
 rule:
   aip: 156
   name: [core, '0156', forbidden-methods]
-  summary: Singletons must not define List, Create, or Delete methods.
+  summary: Singletons must not define Create, or Delete methods.
 permalink: /156/forbidden-methods
 redirect_from:
   - /0156/forbidden-methods
@@ -10,15 +10,15 @@ redirect_from:
 
 # Singletons: Forbidden methods
 
-This rule enforces that singleton resources do not define `List`, `Create`, or
-`Delete` methods, as mandated in [AIP-156][].
+This rule enforces that singleton resources do not define `Create`, or `Delete`
+methods, as mandated in [AIP-156][].
 
 ## Details
 
 This rule looks at any message with a `name` variable in the URI where the name
 ends in anything other than `*`. It assumes that this is a method operating on
-a singleton resource, and complains if the method is a `List`, `Create`, or
-`Delete` standard method.
+a singleton resource, and complains if the method is a `Create`, or `Delete`
+standard method.
 
 ## Examples
 
