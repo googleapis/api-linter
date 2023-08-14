@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.56.1](https://github.com/googleapis/api-linter/compare/v1.56.0...v1.56.1) (2023-08-14)
+
+
+### Bug Fixes
+
+* **AIP-121:** strict check of resource type ([#1235](https://github.com/googleapis/api-linter/issues/1235)) ([3764f3c](https://github.com/googleapis/api-linter/commit/3764f3c9eef1caae3a806c0de175f03e059fcf74))
+* **AIP-192:** enforce deprecated comment on all non-file descriptors ([#1233](https://github.com/googleapis/api-linter/issues/1233)) ([efaced9](https://github.com/googleapis/api-linter/commit/efaced966aa2b7712259cae71dfd539b79bb01ed))
+
 ## [1.56.0](https://github.com/googleapis/api-linter/compare/v1.55.2...v1.56.0) (2023-08-11)
 
 
