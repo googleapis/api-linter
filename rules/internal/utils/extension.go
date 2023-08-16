@@ -184,11 +184,8 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
-	if m := FindResourceMessage(reference, file); m != nil {
-		return GetResource(m)
-	}
-
-	return nil
+	m := FindResourceMessage(reference, file)
+	return GetResource(m)
 }
 
 // FindResourceMessage returns the message containing the first resource of type
