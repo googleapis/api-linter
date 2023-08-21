@@ -10,13 +10,13 @@ redirect_from:
 
 # Resource must support get
 
-This rule enforces that resources do not create reference cycles as mandated in
-[AIP-121][].
+This rule enforces that resources do not create reference cycles of mutable 
+references as mandated in [AIP-121][].
 
 ## Details
 
 This rule scans the fields of every resource and ensures that any references to
-other resources do not create a cycle between them.
+other resources do not create a mutable cycle between them.
 
 ## Examples
 
