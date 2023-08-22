@@ -1,11 +1,11 @@
 ---
 rule:
   aip: 121
-  name: [core, '0121', no-cycles]
+  name: [core, '0121', no-mutable-cycles]
   summary: Resources must not form a resource reference cycle.
-permalink: /121/no-cycles
+permalink: /121/no-mutable-cycles
 redirect_from:
-  - /0121/no-cycles
+  - /0121/no-mutable-cycles
 ---
 
 # Resource must support get
@@ -99,7 +99,7 @@ message Book {
 
   string name = 1;
 
-  // (-- api-linter: core::0121::no-cycles=disabled
+  // (-- api-linter: core::0121::no-mutable-cycles=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string author = 2 [
     (google.api.resource_reference).type = "library.googleapis.com/Author"
@@ -114,7 +114,7 @@ message Author {
 
   string name = 1;
 
-  // (-- api-linter: core::0121::no-cycles=disabled
+  // (-- api-linter: core::0121::no-mutable-cycles=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
   string book = 2 [
     (google.api.resource_reference).type = "library.googleapis.com/Book"

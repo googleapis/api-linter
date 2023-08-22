@@ -26,6 +26,6 @@ func AddRules(r lint.RuleRegistry) error {
 		121,
 		resourceMustSupportGet,
 		resourceMustSupportList,
-		noCycles,
+		noMutableCycles,
 	)
 }

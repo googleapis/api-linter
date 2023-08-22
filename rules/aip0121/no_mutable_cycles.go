@@ -23,8 +23,8 @@ import (
 	rpb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
-var noCycles = &lint.MessageRule{
-	Name:   lint.NewRuleName(121, "no-cycles"),
+var noMutableCycles = &lint.MessageRule{
+	Name:   lint.NewRuleName(121, "no-mutable-cycles"),
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem

@@ -20,7 +20,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestNoCycles(t *testing.T) {
+func TestNoMutableCycles(t *testing.T) {
 
 	for _, test := range []struct {
 		name                                                   string
@@ -122,7 +122,7 @@ func TestNoCycles(t *testing.T) {
 			// If this rule was run on the entire test file, there would be two
 			// findings, one for each resource in the cycle. To simplify that,
 			// we just lint one of the offending messages.
-			if diff := test.problems.SetDescriptor(field).Diff(noCycles.LintMessage(msg)); diff != "" {
+			if diff := test.problems.SetDescriptor(field).Diff(noMutableCycles.LintMessage(msg)); diff != "" {
 				t.Error(diff)
 			}
 		})
