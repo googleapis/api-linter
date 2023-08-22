@@ -23,19 +23,39 @@ import (
 func TestNoCycles(t *testing.T) {
 
 	for _, test := range []struct {
-		name                                     string
-		ResourceAExtensions, ResourceBExtensions string
-		problems                                 testutils.Problems
+		name                                                   string
+		BookExtensions, PublisherExtensions, LibraryExtensions string
+		problems                                               testutils.Problems
 	}{
 		{
 			"ValidNoCycle",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
+			"",
 			nil,
 		},
 		{
 			"InvalidCycle",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
+			"",
+			testutils.Problems{{
+				Message: "cycle",
+			}},
+		},
+		{
+			"InvalidSelfReferenceCycle",
+			"",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			"",
+			testutils.Problems{{
+				Message: "cycle",
+			}},
+		},
+		{
+			"InvalidDeepCycle",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
 			testutils.Problems{{
 				Message: "cycle",
@@ -44,6 +64,17 @@ func TestNoCycles(t *testing.T) {
 		{
 			"ValidOutputOnlyCyclicReference",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[
+				(google.api.resource_reference).type = "library.googleapis.com/Book",
+				(google.api.field_behavior) = OUTPUT_ONLY
+			]`,
+			"",
+			nil,
+		},
+		{
+			"ValidOutputOnlyDeepCyclicReference",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
 			`[
 				(google.api.resource_reference).type = "library.googleapis.com/Book",
 				(google.api.field_behavior) = OUTPUT_ONLY
@@ -62,7 +93,7 @@ func TestNoCycles(t *testing.T) {
 				};
 				string name = 1;
 
-				string resource = 2 {{.ResourceAExtensions}};
+				string resource = 2 {{.BookExtensions}};
 			}
 
 			message Publisher {
@@ -72,7 +103,7 @@ func TestNoCycles(t *testing.T) {
 				};
 				string name = 1;
 
-				string resource = 2 {{.ResourceBExtensions}};
+				string resource = 2 {{.PublisherExtensions}};
 			}
 
 			message Library {
@@ -81,6 +112,8 @@ func TestNoCycles(t *testing.T) {
 					pattern: "libraries/{library}"
 				};
 				string name = 1;
+
+				string resource = 3 {{.LibraryExtensions}};
 			}
 			`, test)
 

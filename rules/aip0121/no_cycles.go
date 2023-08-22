@@ -15,10 +15,12 @@
 package aip0121
 
 import (
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	rpb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var noCycles = &lint.MessageRule{
@@ -26,7 +28,7 @@ var noCycles = &lint.MessageRule{
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
-		references := make(map[*desc.FieldDescriptor]*desc.MessageDescriptor)
+		res := utils.GetResource(m)
 
 		for _, field := range m.GetFields() {
 			if !isMutableReference(field) {
@@ -34,40 +36,52 @@ var noCycles = &lint.MessageRule{
 			}
 
 			ref := utils.GetResourceReference(field)
-			// Ignore child_type references for right now, only focus on direct
-			// references.
+			// Focus on direct type references.
 			if ref.GetChildType() != "" {
 				continue
 			}
-			resMsg := utils.FindResourceMessage(ref.GetType(), m.GetFile())
-			// Skip unresolvable resource references, or those that don't resolve
-			// to a message e.g. file-level google.api.resource_defintion.
-			if resMsg == nil {
-				continue
-			}
-			references[field] = resMsg
-		}
 
-		origRes := utils.GetResource(m)
-		for origRef, refMsg := range references {
-			for _, field := range refMsg.GetFields() {
-				if !isMutableReference(field) {
-					continue
-				}
-				ref := utils.GetResourceReference(field)
-				if ref.GetType() == origRes.GetType() {
-					problems = append(problems, lint.Problem{
-						Message:    "mutable resource reference introduces a resource reference cycle",
-						Descriptor: origRef,
-						Location:   locations.FieldResourceReference(origRef),
-					})
-					break
-				}
+			if p := findCycle(res, m, ref.GetType(), stringset.New()); p != nil {
+				p.Descriptor = field
+				p.Location = locations.FieldResourceReference(field)
+				problems = append(problems, *p)
 			}
 		}
 
 		return problems
 	},
+}
+
+func findCycle(orig *rpb.ResourceDescriptor, node *desc.MessageDescriptor, nodeRef string, seen stringset.Set) *lint.Problem {
+	refMsg := utils.FindResourceMessage(nodeRef, node.GetFile())
+	if refMsg == nil {
+		// Unable to resolve the resource reference to a message.
+		return nil
+	}
+	seen.Add(nodeRef)
+
+	for _, f := range refMsg.GetFields() {
+		if !isMutableReference(f) {
+			continue
+		}
+		ref := utils.GetResourceReference(f)
+		// Focus on direct type references.
+		if ref.GetChildType() != "" {
+			continue
+		}
+		if ref.GetType() == orig.GetType() {
+			return &lint.Problem{
+				Message: "mutable resource reference introduces a resource reference cycle",
+			}
+		}
+		if !seen.Contains(ref.GetType()) {
+			if p := findCycle(orig, refMsg, ref.GetType(), seen); p != nil {
+				return p
+			}
+		}
+	}
+
+	return nil
 }
 
 func isMutableReference(f *desc.FieldDescriptor) bool {
