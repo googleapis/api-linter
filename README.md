@@ -45,7 +45,7 @@ being useful.
 
 ## Contributing
 
-We are thrilled that you are interested in contributing to the API linter. Please look into the [guide](./docs/contributing.md) to learn more.
+If you are interested in contributing to the API linter, please review the [contributing guide](https://linter.aip.dev/contributing) to learn more.
 
 ## License
 
