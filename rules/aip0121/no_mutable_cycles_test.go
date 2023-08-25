@@ -117,7 +117,7 @@ func TestNoMutableCycles(t *testing.T) {
 			}
 			`, test)
 
-			msg := f.GetMessageTypes()[1]
+			msg := f.FindMessage("Publisher")
 			field := msg.FindFieldByName("resource")
 			// If this rule was run on the entire test file, there would be two
 			// findings, one for each resource in the cycle. To simplify that,

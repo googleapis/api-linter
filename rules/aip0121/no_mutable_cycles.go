@@ -15,6 +15,8 @@
 package aip0121
 
 import (
+	"strings"
+
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
@@ -41,7 +43,7 @@ var noMutableCycles = &lint.MessageRule{
 				continue
 			}
 
-			if p := findCycle(res, m, ref.GetType(), stringset.New()); p != nil {
+			if p := findCycle(res, m, ref.GetType(), stringset.New(res.GetType())); p != nil {
 				p.Descriptor = field
 				p.Location = locations.FieldResourceReference(field)
 				problems = append(problems, *p)
@@ -70,8 +72,9 @@ func findCycle(orig *rpb.ResourceDescriptor, node *desc.MessageDescriptor, nodeR
 			continue
 		}
 		if ref.GetType() == orig.GetType() {
+			cycle := strings.Join(append(seen.Unordered(), orig.GetType()), " > ")
 			return &lint.Problem{
-				Message: "mutable resource reference introduces a resource reference cycle",
+				Message: "mutable resource reference introduces a reference cycle:\n" + cycle,
 			}
 		}
 		if !seen.Contains(ref.GetType()) {
