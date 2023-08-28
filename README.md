@@ -43,6 +43,10 @@ general:
 This is an attempt to follow the spirit of semantic versioning while still
 being useful.
 
+## Contributing
+
+If you are interested in contributing to the API linter, please review the [contributing guide](https://linter.aip.dev/contributing) to learn more.
+
 ## License
 
 This software is made available under the [Apache 2.0][] license.
