@@ -23,7 +23,7 @@ import (
 )
 
 var embeddedResource = &lint.MessageRule{
-	Name:   lint.NewRuleName(122, "embedded-resources"),
+	Name:   lint.NewRuleName(122, "embedded-resource"),
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
