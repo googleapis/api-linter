@@ -23,14 +23,15 @@ import (
 func TestNoMutableCycles(t *testing.T) {
 
 	for _, test := range []struct {
-		name                                                   string
-		BookExtensions, PublisherExtensions, LibraryExtensions string
-		problems                                               testutils.Problems
+		name                                                                             string
+		BookExtensions, PublisherExtensions, LibraryExtensions, OtherPublisherExtensions string
+		problems                                                                         testutils.Problems
 	}{
 		{
 			"ValidNoCycle",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
+			"",
 			"",
 			nil,
 		},
@@ -38,6 +39,7 @@ func TestNoMutableCycles(t *testing.T) {
 			"InvalidCycle",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
+			"",
 			"",
 			testutils.Problems{{
 				Message: "cycle",
@@ -48,6 +50,7 @@ func TestNoMutableCycles(t *testing.T) {
 			"",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			"",
+			"",
 			testutils.Problems{{
 				Message: "cycle",
 			}},
@@ -57,9 +60,25 @@ func TestNoMutableCycles(t *testing.T) {
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
+			"",
 			testutils.Problems{{
 				Message: "cycle",
 			}},
+		},
+		{
+			"InvalidDeepAndShallowCycles",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
+			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
+			testutils.Problems{
+				{
+					Message: "cycle",
+				},
+				{
+					Message: "cycle",
+				},
+			},
 		},
 		{
 			"ValidOutputOnlyCyclicReference",
@@ -68,6 +87,7 @@ func TestNoMutableCycles(t *testing.T) {
 				(google.api.resource_reference).type = "library.googleapis.com/Book",
 				(google.api.field_behavior) = OUTPUT_ONLY
 			]`,
+			"",
 			"",
 			nil,
 		},
@@ -79,6 +99,7 @@ func TestNoMutableCycles(t *testing.T) {
 				(google.api.resource_reference).type = "library.googleapis.com/Book",
 				(google.api.field_behavior) = OUTPUT_ONLY
 			]`,
+			"",
 			nil,
 		},
 	} {
@@ -104,6 +125,8 @@ func TestNoMutableCycles(t *testing.T) {
 				string name = 1;
 
 				string resource = 2 {{.PublisherExtensions}};
+
+				string other_resource = 3 {{.OtherPublisherExtensions}};
 			}
 
 			message Library {
@@ -118,11 +141,17 @@ func TestNoMutableCycles(t *testing.T) {
 			`, test)
 
 			msg := f.FindMessage("Publisher")
-			field := msg.FindFieldByName("resource")
+			want := test.problems
+			if len(want) >= 1 {
+				want[0].Descriptor = msg.FindFieldByName("resource")
+			}
+			if len(want) == 2 {
+				want[1].Descriptor = msg.FindFieldByName("other_resource")
+			}
 			// If this rule was run on the entire test file, there would be two
 			// findings, one for each resource in the cycle. To simplify that,
 			// we just lint one of the offending messages.
-			if diff := test.problems.SetDescriptor(field).Diff(noMutableCycles.LintMessage(msg)); diff != "" {
+			if diff := want.Diff(noMutableCycles.LintMessage(msg)); diff != "" {
 				t.Error(diff)
 			}
 		})

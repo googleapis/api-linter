@@ -22,69 +22,66 @@ import (
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	rpb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var noMutableCycles = &lint.MessageRule{
 	Name:   lint.NewRuleName(121, "no-mutable-cycles"),
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		var problems []lint.Problem
 		res := utils.GetResource(m)
 
-		for _, field := range m.GetFields() {
-			if !isMutableReference(field) {
-				continue
-			}
-
-			ref := utils.GetResourceReference(field)
-			// Focus on direct type references.
-			if ref.GetChildType() != "" {
-				continue
-			}
-
-			if p := findCycle(res, m, ref.GetType(), stringset.New(res.GetType())); p != nil {
-				p.Descriptor = field
-				p.Location = locations.FieldResourceReference(field)
-				problems = append(problems, *p)
-			}
-		}
-
-		return problems
+		return findCycles(res.GetType(), m, stringset.New(), nil)
 	},
 }
 
-func findCycle(orig *rpb.ResourceDescriptor, node *desc.MessageDescriptor, nodeRef string, seen stringset.Set) *lint.Problem {
-	refMsg := utils.FindResourceMessage(nodeRef, node.GetFile())
-	if refMsg == nil {
-		// Unable to resolve the resource reference to a message.
-		return nil
-	}
-	seen.Add(nodeRef)
+func findCycles(start string, node *desc.MessageDescriptor, seen stringset.Set, chain []string) []lint.Problem {
+	var problems []lint.Problem
+	nodeRes := utils.GetResource(node)
 
-	for _, f := range refMsg.GetFields() {
+	chain = append(chain, nodeRes.GetType())
+	seen.Add(nodeRes.GetType())
+
+	for _, f := range node.GetFields() {
 		if !isMutableReference(f) {
 			continue
 		}
 		ref := utils.GetResourceReference(f)
-		// Focus on direct type references.
+		// Skip indirect references for now.
 		if ref.GetChildType() != "" {
 			continue
 		}
-		if ref.GetType() == orig.GetType() {
-			cycle := strings.Join(append(seen.Unordered(), orig.GetType()), " > ")
-			return &lint.Problem{
-				Message: "mutable resource reference introduces a reference cycle:\n" + cycle,
+		if ref.GetType() == start {
+			cycle := strings.Join(append(chain, start), " > ")
+			problems = append(problems, lint.Problem{
+				Message:    "mutable resource reference introduces a reference cycle:\n" + cycle,
+				Descriptor: f,
+				Location:   locations.FieldResourceReference(f),
+			})
+		} else if !seen.Contains(ref.GetType()) {
+			next := utils.FindResourceMessage(ref.GetType(), node.GetFile())
+			// Skip unresolvable references.
+			if next == nil {
+				continue
+			}
+			if probs := findCycles(start, next, seen.Clone(), chain); len(probs) == 1 {
+				// A recursive call will only have one finding as it returns
+				// immediately.
+				p := probs[0]
+				p.Descriptor = f
+				p.Location = locations.FieldResourceReference(f)
+
+				problems = append(problems, p)
 			}
 		}
-		if !seen.Contains(ref.GetType()) {
-			if p := findCycle(orig, refMsg, ref.GetType(), seen); p != nil {
-				return p
-			}
+		// Recursive calls should return immediately upon finding a cycle.
+		// The initial scan of the starting resource message should scan
+		// all of its own fields and not return immediately.
+		if len(problems) > 0 && len(chain) > 1 {
+			return problems
 		}
 	}
 
-	return nil
+	return problems
 }
 
 func isMutableReference(f *desc.FieldDescriptor) bool {
