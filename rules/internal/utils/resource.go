@@ -49,3 +49,16 @@ func GetResourcePlural(r *apb.ResourceDescriptor) string {
 
 	return r.Plural
 }
+
+// GetResourceNameField is a convenience method for getting the name of the
+// field that represents the resource's name. This is either set by the
+// `name_field` attribute, or defaults to "name".
+func GetResourceNameField(r *apb.ResourceDescriptor) string {
+	if r == nil {
+		return ""
+	}
+	if n := r.GetNameField(); n != "" {
+		return n
+	}
+	return "name"
+}

@@ -26,5 +26,6 @@ func AddRules(r lint.RuleRegistry) error {
 		fieldBehaviorRequired,
 		unorderedListRepeated,
 		resourceNameIdentifier,
+		resourceIdentifierOnly,
 	)
 }
