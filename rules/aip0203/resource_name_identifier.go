@@ -26,12 +26,7 @@ var resourceNameIdentifier = &lint.MessageRule{
 	Name:   lint.NewRuleName(203, "resource-name-identifier"),
 	OnlyIf: utils.IsResource,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		n := "name"
-		if nf := utils.GetResource(m).GetNameField(); nf != "" {
-			n = nf
-		}
-
-		f := m.FindFieldByName(n)
+		f := m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m)))
 		fb := utils.GetFieldBehavior(f)
 		if len(fb) == 0 || !fb.Contains(fpb.FieldBehavior_IDENTIFIER.String()) {
 			return []lint.Problem{{
