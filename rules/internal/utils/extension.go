@@ -158,6 +158,14 @@ func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
 	return nil
 }
 
+// HasResourceReference returns if the field has a google.api.resource_reference annotation.
+func HasResourceReference(f *desc.FieldDescriptor) bool {
+	if f == nil {
+		return false
+	}
+	return proto.HasExtension(f.GetFieldOptions(), apb.E_ResourceReference)
+}
+
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 	if f == nil {
@@ -176,12 +184,23 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
+	m := FindResourceMessage(reference, file)
+	return GetResource(m)
+}
+
+// FindResourceMessage returns the message containing the first resource of type
+// matching the resource Type name being referenced. It looks within a given
+// file and its depenedencies, it cannot search within the entire protobuf
+// package. This is especially useful for resolving
+// google.api.resource_reference annotations to the message that owns a
+// resource.
+func FindResourceMessage(reference string, file *desc.FileDescriptor) *desc.MessageDescriptor {
 	files := append(file.GetDependencies(), file)
 	for _, f := range files {
 		for _, m := range f.GetMessageTypes() {
 			if r := GetResource(m); r != nil {
 				if r.GetType() == reference {
-					return r
+					return m
 				}
 			}
 		}
