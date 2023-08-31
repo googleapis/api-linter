@@ -17,6 +17,7 @@ package utils
 import (
 	"testing"
 
+	"github.com/googleapis/api-linter/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
@@ -98,6 +99,84 @@ func TestGetResourcePlural(t *testing.T) {
 			got := GetResourcePlural(test.resource)
 			if got != test.want {
 				t.Errorf("GetResourcePlural: expected %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestIsResourceRevision(t *testing.T) {
+	for _, test := range []struct {
+		name, Message, Resource string
+		want                    bool
+	}{
+		{
+			name:     "valid_revision",
+			Message:  "BookRevision",
+			Resource: `option (google.api.resource) = {type: "library.googleapis.com/BookRevision"};`,
+			want:     true,
+		},
+		{
+			name:    "not_revision_no_resource",
+			Message: "BookRevision",
+			want:    false,
+		},
+		{
+			name:     "not_revision_bad_name",
+			Message:  "Book",
+			Resource: `option (google.api.resource) = {type: "library.googleapis.com/Book"};`,
+			want:     false,
+		},
+	} {
+		f := testutils.ParseProto3Tmpl(t, `
+			import "google/api/resource.proto";
+			message {{.Message}} {
+				{{.Resource}}
+				string name = 1;
+			}
+		`, test)
+		m := f.FindMessage(test.Message)
+		if got := IsResourceRevision(m); got != test.want {
+			t.Errorf("IsResourceRevision(%+v): got %v, want %v", m, got, test.want)
+		}
+	}
+}
+
+func TestIsRevisionRelationship(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		typeA, typeB string
+		want         bool
+	}{
+		{
+			name:  "revision_relationship",
+			typeA: "library.googleapis.com/Book",
+			typeB: "library.googleapis.com/BookRevision",
+			want:  true,
+		},
+		{
+			name:  "non_revision_relationship",
+			typeA: "library.googleapis.com/Book",
+			typeB: "library.googleapis.com/Library",
+			want:  false,
+		},
+		{
+			name:  "invalid_type_a",
+			typeA: "library.googleapis.com",
+			typeB: "library.googleapis.com/Library",
+			want:  false,
+		},
+		{
+			name:  "invalid_type_b",
+			typeA: "library.googleapis.com/Book",
+			typeB: "library.googleapis.com",
+			want:  false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			a := &apb.ResourceDescriptor{Type: test.typeA}
+			b := &apb.ResourceDescriptor{Type: test.typeB}
+			if got := IsRevisionRelationship(a, b); got != test.want {
+				t.Errorf("IsRevisionRelationship(%s, %s): got %v, want %v", test.typeA, test.typeB, got, test.want)
 			}
 		})
 	}
