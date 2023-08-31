@@ -32,7 +32,12 @@ var embeddedResource = &lint.MessageRule{
 			if mt == nil || !utils.IsResource(mt) {
 				continue
 			}
+
 			r := utils.GetResource(mt)
+			if utils.IsResourceRevision(m) && utils.IsRevisionRelationship(r, utils.GetResource(m)) {
+				continue
+			}
+
 			suggestion := fmt.Sprintf(`string %s = %d [(google.api.resource_reference).type = %q];`, f.GetName(), f.GetNumber(), r.GetType())
 			if f.IsRepeated() {
 				suggestion = fmt.Sprintf("repeated %s", suggestion)

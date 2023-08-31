@@ -95,10 +95,63 @@ func TestEmbeddedResource(t *testing.T) {
 			if len(want) > 0 {
 				want[0].Descriptor = m.FindFieldByName("library")
 			}
-			if len(want) == 2 {
+			if len(want) > 1 {
 				want[1].Descriptor = m.FindFieldByName("librarian")
 			}
 			if diff := want.Diff(embeddedResource.Lint(f)); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
+func TestEmbeddedResource_Revisions(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		SnapshotType string
+		problems     testutils.Problems
+	}{
+		{"Valid", "Book", nil},
+		{
+			"InvalidEmbeddedResource",
+			"Library",
+			testutils.Problems{{
+				Message:    "not by embedding",
+				Suggestion: `string snapshot = 2 [(google.api.resource_reference).type = "library.googleapis.com/Library"];`,
+			}},
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+			import "google/api/resource.proto";
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+				string name = 1;
+			}
+
+			message BookRevision {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/BookRevision"
+					pattern: "publishers/{publisher}/books/{book}/revisions/{revision}"
+				};
+				string name = 1;
+
+				{{.SnapshotType}} snapshot = 2;
+			}
+
+			message Library {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Library"
+					pattern: "libraries/{library}"
+				};
+				string name = 1;
+			}
+		`, test)
+			field := f.FindMessage("BookRevision").FindFieldByName("snapshot")
+			if diff := test.problems.SetDescriptor(field).Diff(embeddedResource.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
