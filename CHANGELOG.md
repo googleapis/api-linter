@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.57.0](https://github.com/googleapis/api-linter/compare/v1.56.1...v1.57.0) (2023-09-11)
+
+
+### Features
+
+* **AIP-121:** lint for mutable reference cycles ([#1238](https://github.com/googleapis/api-linter/issues/1238)) ([a3895eb](https://github.com/googleapis/api-linter/commit/a3895eba02890c72318bad0726b0599f5b37b261)), refs [#1109](https://github.com/googleapis/api-linter/issues/1109)
+* **AIP-122:** disallow embedded resource ([#1245](https://github.com/googleapis/api-linter/issues/1245)) ([e3bbdb3](https://github.com/googleapis/api-linter/commit/e3bbdb313f7507139d7ec91995200b9bc543d7ae))
+* **AIP-203:** add resource name IDENTIFIER enforcement ([#1241](https://github.com/googleapis/api-linter/issues/1241)) ([7d9daab](https://github.com/googleapis/api-linter/commit/7d9daab01d4da23d90e42fc78673d27086289cf4))
+* **AIP-203:** disallow IDENTIFIER on non-name ([#1244](https://github.com/googleapis/api-linter/issues/1244)) ([1022df2](https://github.com/googleapis/api-linter/commit/1022df2e3160df675ca6dfd460cc6e77dfe5e954))
+
+
+### Documentation
+
+* Add contributing section to README ([#1242](https://github.com/googleapis/api-linter/issues/1242)) ([45f8534](https://github.com/googleapis/api-linter/commit/45f853426f1d737258df2345e14e60ff20e50645))
+
 ## [1.56.1](https://github.com/googleapis/api-linter/compare/v1.56.0...v1.56.1) (2023-08-14)
 
 
