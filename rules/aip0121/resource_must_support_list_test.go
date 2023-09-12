@@ -81,6 +81,9 @@ func TestResourceMustSupportList(t *testing.T) {
 		{"ValidIgnoreNonResource", `
 			rpc GetBookCover(GetBookCoverRequest) returns (Other) {};
 		`, nil},
+		{"ValidIgnoreStreamingLookalike", `
+			rpc GetBook(GetBookRequest) returns (stream Book) {};
+		`, nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `

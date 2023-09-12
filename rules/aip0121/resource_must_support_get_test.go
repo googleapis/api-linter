@@ -60,6 +60,9 @@ func TestResourceMustSupportGet(t *testing.T) {
 		{"ValidIgnoreNonResourceList", `
 			rpc ListBooks(ListBooksRequest) returns (RepeatedOther) {};
 		`, nil},
+		{"ValidIgnoreStreamingLookalike", `
+			rpc CreateBook(CreateBookRequest) returns (stream Book) {};
+		`, nil},
 		{"InvalidCreateOnly", `
 			rpc CreateBook(CreateBookRequest) returns (Book) {};
 		`, []lint.Problem{

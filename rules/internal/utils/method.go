@@ -75,3 +75,8 @@ func GetListResourceMessage(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	}
 	return nil
 }
+
+// IsStreaming returns if the method is either client or server streaming.
+func IsStreaming(m *desc.MethodDescriptor) bool {
+	return m.IsClientStreaming() || m.IsServerStreaming()
+}
