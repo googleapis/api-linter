@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.57.1](https://github.com/googleapis/api-linter/compare/v1.57.0...v1.57.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* **AIP-121:** ignore standard method lookalikes ([#1250](https://github.com/googleapis/api-linter/issues/1250)) ([34aa3c8](https://github.com/googleapis/api-linter/commit/34aa3c8ef5bd58879d2982542e5b786abedd971b))
+* **AIP-121:** ignore streaming lookalikes ([#1252](https://github.com/googleapis/api-linter/issues/1252)) ([e723668](https://github.com/googleapis/api-linter/commit/e7236687b64c1e465ce03048c8b67fe09db1091b))
+
 ## [1.57.0](https://github.com/googleapis/api-linter/compare/v1.56.1...v1.57.0) (2023-09-11)
 
 
