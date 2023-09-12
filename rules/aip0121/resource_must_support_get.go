@@ -33,6 +33,12 @@ var resourceMustSupportGet = &lint.ServiceRule{
 		// Iterate all RPCs and try to find resources. Mark the
 		// resources which have a Get method, and which ones do not.
 		for _, m := range s.GetMethods() {
+			// Streaming methods do not count as standard methods even if they
+			// look like them.
+			if utils.IsStreaming(m) {
+				continue
+			}
+
 			if utils.IsGetMethod(m) && utils.IsResource(utils.GetResponseType(m)) {
 				t := utils.GetResource(m.GetOutputType()).GetType()
 				resourcesWithGet.Add(t)
