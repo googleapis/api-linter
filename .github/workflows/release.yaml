@@ -49,7 +49,8 @@ jobs:
       - name: Set raw version
         id: raw_tag
         # Strips the 'v' from the actual semver version.
-        run: echo ::set-output name=raw_version::"${TAG_NAME#v}"
+        run: echo "raw_version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
+        shell: bash
       - name: Upload the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} release.
         uses: actions/upload-release-asset@v1
         env:
