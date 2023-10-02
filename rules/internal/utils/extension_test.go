@@ -622,3 +622,135 @@ func TestFindResourceChildren(t *testing.T) {
 		})
 	}
 }
+
+func TestHasFieldInfo(t *testing.T) {
+	testCases := []struct {
+		name, FieldInfo string
+		want            bool
+	}{
+		{
+			name:      "HasFieldInfo",
+			FieldInfo: "[(google.api.field_info).format = UUID4]",
+			want:      true,
+		},
+		{
+			name: "NoFieldInfo",
+			want: false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 {{.FieldInfo}};
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := HasFieldInfo(fd); got != tc.want {
+				t.Errorf("HasFieldInfo(%+v): expected %v, got %v", fd, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldInfo(t *testing.T) {
+	testCases := []struct {
+		name, FieldInfo string
+		want            *apb.FieldInfo
+	}{
+		{
+			name:      "HasFieldInfo",
+			FieldInfo: "[(google.api.field_info).format = UUID4]",
+			want:      &apb.FieldInfo{Format: apb.FieldInfo_UUID4},
+		},
+		{
+			name: "NoFieldInfo",
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 {{.FieldInfo}};
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			got := GetFieldInfo(fd)
+			if diff := cmp.Diff(got, tc.want, cmp.Comparer(proto.Equal)); diff != "" {
+				t.Errorf("GetFieldInfo(%+v): got(-),want(+):\n%s", fd, diff)
+			}
+		})
+	}
+}
+
+func TestHasFormat(t *testing.T) {
+	testCases := []struct {
+		name, Format string
+		want         bool
+	}{
+		{
+			name:   "HasFormat",
+			Format: "format: UUID4",
+			want:   true,
+		},
+		{
+			name: "NoFormat",
+			want: false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 [(google.api.field_info) = {
+					{{.Format}}
+				}];
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := HasFormat(fd); got != tc.want {
+				t.Errorf("HasFormat(%+v): expected %v, got %v", fd, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestGetFormat(t *testing.T) {
+	testCases := []struct {
+		name, Format string
+		want         apb.FieldInfo_Format
+	}{
+		{
+			name:   "HasUUID4Format",
+			Format: "format: UUID4",
+			want:   apb.FieldInfo_UUID4,
+		},
+		{
+			name: "NoFormat",
+			want: apb.FieldInfo_FORMAT_UNSPECIFIED,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 [(google.api.field_info) = {
+					{{.Format}}
+				}];
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := GetFormat(fd); got != tc.want {
+				t.Errorf("GetFormat(%+v): expected %v, got %v", fd, tc.want, got)
+			}
+		})
+	}
+}

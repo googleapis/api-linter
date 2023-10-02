@@ -252,3 +252,31 @@ func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescrip
 
 	return children
 }
+
+func HasFieldInfo(fd *desc.FieldDescriptor) bool {
+	return fd != nil && proto.HasExtension(fd.GetFieldOptions(), apb.E_FieldInfo)
+}
+
+func GetFieldInfo(fd *desc.FieldDescriptor) *apb.FieldInfo {
+	if !HasFieldInfo(fd) {
+		return nil
+	}
+
+	return proto.GetExtension(fd.GetFieldOptions(), apb.E_FieldInfo).(*apb.FieldInfo)
+}
+
+func HasFormat(fd *desc.FieldDescriptor) bool {
+	if !HasFieldInfo(fd) {
+		return false
+	}
+
+	fi := GetFieldInfo(fd)
+	return fi.GetFormat() != apb.FieldInfo_FORMAT_UNSPECIFIED
+}
+
+func GetFormat(fd *desc.FieldDescriptor) apb.FieldInfo_Format {
+	if !HasFormat(fd) {
+		return apb.FieldInfo_FORMAT_UNSPECIFIED
+	}
+	return GetFieldInfo(fd).GetFormat()
+}
