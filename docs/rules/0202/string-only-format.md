@@ -45,6 +45,8 @@ message Book {
 
   int32 edition = 2;
 
+  // This is a correct example of a string-only format
+  // on a string field.
   string uid = 3 [(google.api.field_info).format = UUID4];
 }
 ```
