@@ -44,6 +44,8 @@ message Book {
   string name = 1;
 
   int32 edition = 2;
+
+  string uid = 3 [(google.api.field_info).format = UUID4];
 }
 ```
 
