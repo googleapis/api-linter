@@ -33,7 +33,6 @@ var resourceNameIdentifier = &lint.MessageRule{
 				Message:    "resource name field must have field_behavior IDENTIFIER",
 				Descriptor: f,
 				Location:   locations.FieldOption(f, fpb.E_FieldBehavior),
-				Suggestion: "(google.api.field_behavior) = IDENTIFIER",
 			}}
 		}
 
