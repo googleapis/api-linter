@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.58.1](https://github.com/googleapis/api-linter/compare/v1.58.0...v1.58.1) (2023-10-05)
+
+
+### Bug Fixes
+
+* **AIP-203:** remove resource name identifier suggestion ([#1263](https://github.com/googleapis/api-linter/issues/1263)) ([687fe7f](https://github.com/googleapis/api-linter/commit/687fe7f087018f140df677c8cb9836da0bf37b93))
+
 ## [1.58.0](https://github.com/googleapis/api-linter/compare/v1.57.1...v1.58.0) (2023-10-03)
 
 
