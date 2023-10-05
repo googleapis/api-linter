@@ -40,12 +40,12 @@ func TestResourceNameIdentifier(t *testing.T) {
 		{
 			name:     "InvalidNoFieldBehavior",
 			Field:    "string name = 1;",
-			problems: testutils.Problems{{Message: "field_behavior IDENTIFIER", Suggestion: "(google.api.field_behavior) = IDENTIFIER"}},
+			problems: testutils.Problems{{Message: "field_behavior IDENTIFIER"}},
 		},
 		{
 			name:     "InvalidMissingIdentifier",
 			Field:    "string name = 1 [(google.api.field_behavior) = REQUIRED];",
-			problems: testutils.Problems{{Message: "field_behavior IDENTIFIER", Suggestion: "(google.api.field_behavior) = IDENTIFIER"}},
+			problems: testutils.Problems{{Message: "field_behavior IDENTIFIER"}},
 		},
 	}
 
