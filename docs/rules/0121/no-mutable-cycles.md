@@ -8,7 +8,7 @@ redirect_from:
   - /0121/no-mutable-cycles
 ---
 
-# Resource must support get
+# Resources must not form a resource reference cycle
 
 This rule enforces that resources do not create reference cycles of mutable 
 references as mandated in [AIP-121][].
