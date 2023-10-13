@@ -26,6 +26,7 @@ func AddRules(r lint.RuleRegistry) error {
 		declarativeFriendlyRequired,
 		fieldBehavior,
 		humanNames,
+		ipAddressFormat,
 		useUid,
 	)
 }
