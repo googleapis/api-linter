@@ -27,5 +27,6 @@ func AddRules(r lint.RuleRegistry) error {
 		fieldBehavior,
 		humanNames,
 		useUid,
+		uidFormat,
 	)
 }
