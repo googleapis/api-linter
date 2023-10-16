@@ -21,6 +21,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var ipAddressFormats = []annotations.FieldInfo_Format{
@@ -32,7 +33,7 @@ var ipAddressFormats = []annotations.FieldInfo_Format{
 var ipAddressFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "ip-address-format"),
 	OnlyIf: func(fd *desc.FieldDescriptor) bool {
-		return fd.GetName() == "ip_address" || strings.HasSuffix(fd.GetName(), "_ip_address")
+		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING && (fd.GetName() == "ip_address" || strings.HasSuffix(fd.GetName(), "_ip_address"))
 	},
 	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
 		if !utils.HasFormat(fd) || !oneofFormats(utils.GetFormat(fd), ipAddressFormats) {

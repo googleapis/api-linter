@@ -22,36 +22,47 @@ import (
 
 func TestIpAddressFormat(t *testing.T) {
 	for _, test := range []struct {
-		name, FieldName, Annotation string
-		problems                    testutils.Problems
+		name, Annotation, FieldName, Type string
+		problems                          testutils.Problems
 	}{
 		{
 			name:       "ValidIpAddressFormat",
 			FieldName:  "ip_address",
 			Annotation: "[(google.api.field_info).format = IPV4_OR_IPV6]",
+			Type:       "string",
 		},
 		{
 			name:       "ValidIpAddressSuffixFormat",
 			FieldName:  "incoming_ip_address",
 			Annotation: "[(google.api.field_info).format = IPV4_OR_IPV6]",
+			Type:       "string",
 		},
 		{
 			name:      "SkipNonIpAddress",
 			FieldName: "other",
+			Type:      "string",
 		},
 		{
 			name:      "SkipNonIpAddressSuffix",
 			FieldName: "zip_address",
+			Type:      "string",
+		},
+		{
+			name:      "SkipNonStringIpAddress",
+			FieldName: "ip_address",
+			Type:      "Foo",
 		},
 		{
 			name:      "InvalidMissingFormat",
 			FieldName: "ip_address",
+			Type:      "string",
 			problems:  testutils.Problems{{Message: "must specify one of"}},
 		},
 		{
 			name:       "InvalidWrongFormat",
 			FieldName:  "ip_address",
 			Annotation: "[(google.api.field_info).format = UUID4]",
+			Type:       "string",
 			problems:   testutils.Problems{{Message: "must specify one of"}},
 		},
 	} {
@@ -60,8 +71,10 @@ func TestIpAddressFormat(t *testing.T) {
 				import "google/api/field_info.proto";
 
 				message Person {
-					string {{.FieldName}} = 2 {{.Annotation}};
+					{{.Type}} {{.FieldName}} = 2 {{.Annotation}};
 				}
+
+				message Foo {}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(ipAddressFormat.Lint(f)); diff != "" {
