@@ -246,6 +246,47 @@ func TestRuleConfigs_IsRuleEnabled(t *testing.T) {
 	}
 }
 
+func TestConfigs_ImportPaths(t *testing.T) {
+	tests := []struct {
+		name    string
+		configs Configs
+		want    []string
+	}{
+		{"EmptyImportPaths", nil, nil},
+		{
+			"SingleConfigImportPath",
+			Configs{{ImportPaths: []string{"path1"}}},
+			[]string{"path1"},
+		},
+		{
+			"DoubleConfigs_ImportPaths",
+			Configs{
+				{ImportPaths: []string{"path1"}},
+				{ImportPaths: []string{"."}},
+			},
+			[]string{"path1", "."},
+		},
+		{
+			"TripleConfigs_ImportPaths",
+			Configs{
+				{ImportPaths: []string{"path1"}},
+				{ImportPaths: []string{"."}},
+				{ImportPaths: []string{"any/path"}},
+			},
+			[]string{"path1", ".", "any/path"},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.configs.ImportPaths()
+
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("ImportPaths: got %v, but want %v", got, test.want)
+			}
+		})
+	}
+}
+
 type errReader int
 
 func (errReader) Read(p []byte) (int, error) {
@@ -281,7 +322,8 @@ func TestReadConfigsJSON(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	]
 	`
@@ -297,6 +339,7 @@ func TestReadConfigsJSON(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
@@ -317,7 +360,8 @@ func TestReadConfigsYAMLFormatError(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	`
 
@@ -339,6 +383,9 @@ func TestReadConfigsYAML(t *testing.T) {
   enabled_rules:
     - 'rule_c'
     - 'rule_d'
+  import_paths:
+    - 'import_a'
+    - 'import_b'
 `
 
 	configs, err := ReadConfigsYAML(strings.NewReader(content))
@@ -352,6 +399,7 @@ func TestReadConfigsYAML(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
@@ -366,6 +414,7 @@ func TestReadConfigsFromFile(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 
@@ -375,7 +424,8 @@ func TestReadConfigsFromFile(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	]
 	`
@@ -394,6 +444,9 @@ func TestReadConfigsFromFile(t *testing.T) {
   enabled_rules:
     - 'rule_c'
     - 'rule_d'
+  import_paths:
+    - 'import_a'
+    - 'import_b'
 `
 	yamlConfigsFile := createTempFile(t, "test.yaml", yamlConfigsText)
 	defer os.Remove(yamlConfigsFile)

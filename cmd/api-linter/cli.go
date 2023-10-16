@@ -137,6 +137,10 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	configs = append(configs, lint.Config{
 		DisabledRules: c.DisabledRules,
 	})
+	// Add configs for the import path.
+	configs = append(configs, lint.Config{
+		ImportPaths: c.ProtoImportPaths,
+	})
 	// Prepare proto import lookup.
 	fs, err := loadFileDescriptors(c.ProtoDescPath...)
 	if err != nil {
@@ -152,7 +156,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
-		ImportPaths:           c.ProtoImportPaths,
+		ImportPaths:           configs.ImportPaths(),
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
@@ -165,7 +169,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		},
 	}
 	// Resolve file absolute paths to relative ones.
-	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
+	protoFiles, err := protoparse.ResolveFilenames(p.ImportPaths, c.ProtoFiles...)
 	if err != nil {
 		return err
 	}

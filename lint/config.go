@@ -37,6 +37,7 @@ type Config struct {
 	ExcludedPaths []string `json:"excluded_paths" yaml:"excluded_paths"`
 	EnabledRules  []string `json:"enabled_rules" yaml:"enabled_rules"`
 	DisabledRules []string `json:"disabled_rules" yaml:"disabled_rules"`
+	ImportPaths   []string `json:"import_paths" yaml:"import_paths"`
 }
 
 // ReadConfigsFromFile reads Configs from a file.
@@ -86,6 +87,17 @@ func ReadConfigsYAML(f io.Reader) (Configs, error) {
 		return nil, err
 	}
 	return c, nil
+}
+
+// ImportPaths returns all configured folders for searching proto imports.
+func (configs Configs) ImportPaths() []string {
+	var paths []string
+	for _, c := range configs {
+		if c.ImportPaths != nil && len(c.ImportPaths) > 0 {
+			paths = append(paths, c.ImportPaths...)
+		}
+	}
+	return paths
 }
 
 // IsRuleEnabled returns true if a rule is enabled by the configs.
