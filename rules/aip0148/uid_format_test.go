@@ -22,27 +22,36 @@ import (
 
 func TestUidFormat(t *testing.T) {
 	for _, test := range []struct {
-		name, FieldName, Annotation string
-		problems                    testutils.Problems
+		name, Annotation, FieldName, Type string
+		problems                          testutils.Problems
 	}{
 		{
 			name:       "ValidUidFormat",
 			FieldName:  "uid",
 			Annotation: "[(google.api.field_info).format = UUID4]",
+			Type:       "string",
 		},
 		{
 			name:      "SkipNonUid",
 			FieldName: "other",
+			Type:      "string",
+		},
+		{
+			name:      "SkipNonStringUid",
+			FieldName: "uid",
+			Type:      "Foo",
 		},
 		{
 			name:      "InvalidMissingFormat",
 			FieldName: "uid",
+			Type:      "string",
 			problems:  testutils.Problems{{Message: "format = UUID4"}},
 		},
 		{
 			name:       "InvalidWrongFormat",
 			FieldName:  "uid",
 			Annotation: "[(google.api.field_info).format = IPV4]",
+			Type:       "string",
 			problems:   testutils.Problems{{Message: "format = UUID4"}},
 		},
 	} {
@@ -51,8 +60,10 @@ func TestUidFormat(t *testing.T) {
 				import "google/api/field_info.proto";
 
 				message Person {
-					string {{.FieldName}} = 2 {{.Annotation}};
+					{{.Type}} {{.FieldName}} = 2 {{.Annotation}};
 				}
+
+				message Foo {}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(uidFormat.Lint(f)); diff != "" {
