@@ -60,8 +60,6 @@ enclosing message. Remember to also include an [aip.dev/not-precedent][]
 comment explaining why.
 
 ```proto
-// (-- api-linter: core::0148::ip-address-format=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
@@ -70,6 +68,8 @@ message Book {
 
   string name = 1;
 
+  // (-- api-linter: core::0148::ip-address-format=disabled
+  //     aip.dev/not-precedent: We need to do this because reasons. --)
   string ip_address = 2;
 }
 ```
