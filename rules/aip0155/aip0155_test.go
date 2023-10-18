@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0148 contains rules defined in https://aip.dev/148.
-package aip0148
+package aip0155
 
 import (
+	"testing"
+
 	"github.com/googleapis/api-linter/lint"
 )
 
-// AddRules adds all of the AIP-148 rules to the provided registry.
-func AddRules(r lint.RuleRegistry) error {
-	return r.Register(
-		148,
-		declarativeFriendlyRequired,
-		fieldBehavior,
-		humanNames,
-		ipAddressFormat,
-		useUid,
-		uidFormat,
-	)
+func TestAddRules(t *testing.T) {
+	if err := AddRules(lint.NewRuleRegistry()); err != nil {
+		t.Errorf("AddRules got an error: %v", err)
+	}
 }

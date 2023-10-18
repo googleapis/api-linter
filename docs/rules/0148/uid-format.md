@@ -1,22 +1,23 @@
 ---
 rule:
   aip: 148
-  name: [core, '0148', use-uid]
-  summary: Use uid instead of id in resource messages.
-permalink: /148/use-uid
+  name: [core, '0148', uid-format]
+  summary: Annotate uid with UUID4 format.
+permalink: /148/uid-format
 redirect_from:
-  - /0148/use-uid
+  - /0148/uid-format
 ---
 
-# Use `uid` as the resource ID field
+# `uid` format annotation
 
-This rule encourages the use of `uid` instead of `id` for resource messages, as
-mandated in [AIP-148][].
+This rule encourages the use of the `UUID4` format annotation on the `uid`
+field, as mandated in [AIP-148][].
 
 ## Details
 
-This rule looks on resource messages for a field named `id`, complains if it
-finds it, and suggests the use of `uid` instead.
+This rule looks on for fields named `uid` and complains if it does not have the
+`(google.api.field_info).format = UUID4` annotation or has a format other than
+`UUID4`.
 
 ## Examples
 
@@ -30,8 +31,8 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
-  string id = 2; // Should be `uid`
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+  string uid = 2; // missing (google.api.field_info).format = UUID4
 }
 ```
 
@@ -45,8 +46,8 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
-  string uid = 2;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+  string uid = 2 [(google.api.field_info).format = UUID4];
 }
 ```
 
@@ -57,16 +58,17 @@ enclosing message. Remember to also include an [aip.dev/not-precedent][]
 comment explaining why.
 
 ```proto
-// (-- api-linter: core::0148::use-uid=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/Book"
     pattern: "books/{book}"
   };
 
-  string name = 1;
-  string id = 2;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // (-- api-linter: core::0148::uid-format=disabled
+  //     aip.dev/not-precedent: We need to do this because reasons. --)
+  string uid = 2;
 }
 ```
 
