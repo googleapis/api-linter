@@ -33,7 +33,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
   string ip_address = 2; // missing (google.api.field_info).format = IPV4
 }
 ```
@@ -48,7 +48,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
   string ip_address = 2 [(google.api.field_info).format = IPV4];
 }
 ```
@@ -66,7 +66,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // (-- api-linter: core::0148::ip-address-format=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
