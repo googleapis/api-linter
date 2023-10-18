@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.59.0](https://github.com/googleapis/api-linter/compare/v1.58.1...v1.59.0) (2023-10-18)
+
+
+### Features
+
+* **AIP-148:** add uid-format rule ([#1270](https://github.com/googleapis/api-linter/issues/1270)) ([79cd201](https://github.com/googleapis/api-linter/commit/79cd20109925c348e7a898211d5d8a8533f5a0c3))
+* **AIP-148:** lint IP Address field format ([#1271](https://github.com/googleapis/api-linter/issues/1271)) ([cb30ca8](https://github.com/googleapis/api-linter/commit/cb30ca877e249f9a0492a5b95742ed8f1a4f092b))
+* **AIP-155:** enforce format uuid4 guidance ([#1272](https://github.com/googleapis/api-linter/issues/1272)) ([2f2e34b](https://github.com/googleapis/api-linter/commit/2f2e34b24c8ac967094418654ebbffcecbd2d04d))
+
 ## [1.58.1](https://github.com/googleapis/api-linter/compare/v1.58.0...v1.58.1) (2023-10-05)
 
 
