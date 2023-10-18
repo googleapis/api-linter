@@ -31,7 +31,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
   string uid = 2; // missing (google.api.field_info).format = UUID4
 }
 ```
@@ -46,7 +46,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
   string uid = 2 [(google.api.field_info).format = UUID4];
 }
 ```
@@ -64,7 +64,7 @@ message Book {
     pattern: "books/{book}"
   };
 
-  string name = 1;
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // (-- api-linter: core::0148::uid-format=disabled
   //     aip.dev/not-precedent: We need to do this because reasons. --)
