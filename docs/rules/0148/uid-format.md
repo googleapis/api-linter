@@ -16,8 +16,9 @@ field, as mandated in [AIP-148][].
 ## Details
 
 This rule looks on for fields named `uid` and complains if it does not have the
-`(google.api.field_info).format = UUID4` annotation or has a format other than
-`UUID4`.
+`(google.api.field_info).format = UUID4` annotation or has a
+[format](https://github.com/googleapis/googleapis/blob/master/google/api/field_info.proto#L54)
+other than `UUID4`.
 
 ## Examples
 
