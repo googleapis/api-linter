@@ -38,7 +38,7 @@ func TestResourceNameIdentifier(t *testing.T) {
 			problems:  nil,
 		},
 		{
-			name:     "MissingNameField",
+			name:     "SkipMissingNameField",
 			Field:    "string other = 1;",
 			problems: nil,
 		},
