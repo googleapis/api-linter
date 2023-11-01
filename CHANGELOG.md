@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.59.1](https://github.com/googleapis/api-linter/compare/v1.59.0...v1.59.1) (2023-11-01)
+
+
+### Bug Fixes
+
+* **AIP-203:** skip identifier check if  missing name field ([#1282](https://github.com/googleapis/api-linter/issues/1282)) ([2050717](https://github.com/googleapis/api-linter/commit/2050717c5f965a7374956f87b35ee048d1f2f53a))
+
 ## [1.59.0](https://github.com/googleapis/api-linter/compare/v1.58.1...v1.59.0) (2023-10-18)
 
 
