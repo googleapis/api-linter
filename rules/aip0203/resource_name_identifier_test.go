@@ -38,6 +38,11 @@ func TestResourceNameIdentifier(t *testing.T) {
 			problems:  nil,
 		},
 		{
+			name:     "SkipMissingNameField",
+			Field:    "string other = 1;",
+			problems: nil,
+		},
+		{
 			name:     "InvalidNoFieldBehavior",
 			Field:    "string name = 1;",
 			problems: testutils.Problems{{Message: "field_behavior IDENTIFIER"}},
