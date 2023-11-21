@@ -57,20 +57,27 @@ To see the help message, run `api-linter -h`
 ```text
 Usage of api-linter:
       --config string                   The linter config file.
+      --debug                           Run in debug mode. Panics will print stack.
       --descriptor-set-in stringArray   The file containing a FileDescriptorSet for searching proto imports.
                                         May be specified multiple times.
       --disable-rule stringArray        Disable a rule with the given name.
                                         May be specified multiple times.
       --enable-rule stringArray         Enable a rule with the given name.
                                         May be specified multiple times.
+      --ignore-comment-disables         If set to true, disable comments will be ignored.
+                                        This is helpful when strict enforcement of AIPs are necessary and
+                                        proto definitions should not be able to disable checks.
+      --list-rules                      Print the rules and exit.  Honors the output-format flag.
       --output-format string            The format of the linting results.
-                                        Supported formats include "yaml", "json" and "summary" table.
+                                        Supported formats include "yaml", "json","github" and "summary" table.
                                         YAML is the default.
   -o, --output-path string              The output file path.
                                         If not given, the linting results will be printed out to STDOUT.
   -I, --proto-path stringArray          The folder for searching proto imports.
                                         May be specified multiple times; directories will be searched in order.
                                         The current working directory is always used.
+      --set-exit-status                 Return exit status 1 when lint errors are found.
+      --version                         Print version and exit.
 ```
 
 ## License
