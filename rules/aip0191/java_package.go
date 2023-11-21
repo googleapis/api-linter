@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+var JAVA_PACKAGE_PREFIX = "com.google"
+
 var javaPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-package"),
 	OnlyIf: func(f *desc.FileDescriptor) bool {
@@ -45,6 +47,13 @@ var javaPackage = &lint.FileRule{
 				Location:   locations.FileJavaPackage(f),
 			}}
 		}
+		if !strings.HasPrefix(javaPkg, JAVA_PACKAGE_PREFIX) {
+			return []lint.Problem{{
+			 Message:    fmt.Sprintf(`The Java Package should have prefix "%s".`, JAVA_PACKAGE_PREFIX),
+			 Descriptor: f,
+			 Location:   locations.FileJavaPackage(f),
+			}}
+		 }
 		return nil
 	},
 }

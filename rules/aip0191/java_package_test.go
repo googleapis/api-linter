@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,13 +27,16 @@ func TestJavaPackage(t *testing.T) {
 		statements []string
 		problems   testutils.Problems
 	}{
-		{"Valid", []string{"package foo.v1;", `option java_package = "com.foo.v1";`}, testutils.Problems{}},
+		{"Valid", []string{"package foo.v1;", `option java_package = "com.google.foo.v1";`}, testutils.Problems{}},
 		{"InvalidEmpty", []string{"package foo.v1;", ""}, testutils.Problems{{Message: "java_package"}}},
 		{"InvalidWrong", []string{"package foo.v1;", `option java_package = "something.else";`}, testutils.Problems{{
 			Suggestion: `option java_package = "com.foo.v1";`,
 		}}},
 		{"Ignored", []string{"", ""}, testutils.Problems{}},
 		{"IgnoredMaster", []string{"package foo.master;", ""}, testutils.Problems{}},
+		{"InvalidPrefix", []string{"package maps.foo.v1;", `option java_package = "google.maps.foo.v1";`}, testutils.Problems{{
+			Message: `The Java Package should have prefix "com.google".`,
+		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))
