@@ -23,9 +23,11 @@ It also looks for common field names, regardless of type, and complains if they
 are used. These are:
 
 - created
+- creation
 - expired
 - modified
 - updated
+- purged
 
 ## Examples
 

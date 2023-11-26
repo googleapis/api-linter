@@ -29,6 +29,7 @@ var fieldNames = &lint.FieldRule{
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{
 			"created":  "create_time",
+			"creation": "create_time",
 			"expired":  "expire_time",
 			"modified": "update_time",
 			"updated":  "update_time",
