@@ -25,6 +25,7 @@ func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		192,
 		absoluteLinks,
+		closedBackticks,
 		deprecatedComment,
 		hasComments,
 		noHTML,
