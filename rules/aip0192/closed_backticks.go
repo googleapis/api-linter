@@ -129,10 +129,7 @@ func computeBacktickPairs(backticks []backtick) []backtick {
 
 		// If paired, this backtick cannot be used as an `opening` for another
 		// backtick.
-		prevBacktickOpen = false
-		if backtick.opening && backtick.pair != paired {
-			prevBacktickOpen = true
-		}
+		prevBacktickOpen = backtick.opening && backtick.pair != paired
 
 		computed = append(computed, backtick)
 	}
