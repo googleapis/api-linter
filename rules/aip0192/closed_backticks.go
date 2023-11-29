@@ -70,10 +70,10 @@ var closedBackticks = &lint.DescriptorRule{
 					backticks = append(backticks, backtickAtIndex(line, loc[0]))
 				}
 
-				// Compute whether the backticks are paired.
+				// Compute which backticks are paired.
 				backticks = computeBacktickPairs(filterUnusableBackticks(backticks))
 
-				// Add a problem for each backtick that is missing a pair.
+				// Add a problem for any backtick that is missing a pair.
 				for _, backtick := range backticks {
 					if backtick.pair != paired {
 						problems = append(problems, lint.Problem{
@@ -110,7 +110,7 @@ func filterUnusableBackticks(backticks []backtick) []backtick {
 
 // Compute whether each backtick is paired with an adjacent backtick.
 //
-// A backtick pair consists of a set of adjacent backticks, where the first is
+// A backtick pair consists of two adjacent backticks, where the first is
 // opening and the second is closing. Each backtick can be in at most one pair.
 //
 // This fills in the `pair` field for each backtick. It assumes every backtick
@@ -122,7 +122,7 @@ func computeBacktickPairs(backticks []backtick) []backtick {
 	for i, backtick := range backticks {
 		backtick.pair = computePairState(backtick, prevBacktickOpen)
 
-		// If this backtick got paired, mark the previous one as paired as well.
+		// If this backtick got paired, mark the previous one paired as well.
 		if backtick.pair == paired {
 			computed[i-1].pair = paired
 		}

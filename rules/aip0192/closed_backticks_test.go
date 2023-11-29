@@ -58,10 +58,10 @@ func TestClosedBackticks(t *testing.T) {
 		{"MissingFrontBacktickComma", "name`, a string", testutils.Problems{{Suggestion: "`name`"}}},
 		{"MissingBackBacktickComma", "`name, a string", testutils.Problems{{Suggestion: "`name`"}}},
 
-		{"ValidMultipleCodeText", "`name`: `string`", nil},
-		{"MissingFrontBacktickMultipleCodeText", "name`: string`", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
-		{"MissingBackBacktickMultipleCodeText", "`name: `string", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
-		{"MissingFrontAndBackBacktickMultipleCodeText", "name`: `string", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
+		{"ValidMultipleInlineCode", "`name`: `string`", nil},
+		{"MissingFrontBacktickMultipleInlineCode", "name`: string`", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
+		{"MissingBackBacktickMultipleInlineCode", "`name: `string", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
+		{"MissingFrontAndBackBacktickMultipleInlineCode", "name`: `string", testutils.Problems{{Suggestion: "`name`"}, {Suggestion: "`string`"}}},
 
 		{"ValidContainsColon", "`name: string`", nil},
 
