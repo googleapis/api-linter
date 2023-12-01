@@ -32,6 +32,9 @@ func TestResourcePattern(t *testing.T) {
 		{"SnakeCase", `pattern: "book_publishers/{book_publisher}/books/{book}"`, testutils.Problems{{
 			Message: "bookPublishers/{book_publisher}/books/{book}",
 		}}},
+		{"HasSpaces", `pattern: "publishers/{publisher}/ books /{book}"`, testutils.Problems{{
+			Message: "Resource patterns should not have spaces",
+		}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
