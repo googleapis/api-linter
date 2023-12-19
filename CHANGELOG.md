@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.60.0](https://github.com/googleapis/api-linter/compare/v1.59.2...v1.60.0) (2023-12-15)
+
+
+### Features
+
+* **AIP-142:** warn on creation_time ([#1291](https://github.com/googleapis/api-linter/issues/1291)) ([ebf2763](https://github.com/googleapis/api-linter/commit/ebf27633aed7afc0679664fab0b8493110a5462f))
+* require golang 1.20 or later ([#1299](https://github.com/googleapis/api-linter/issues/1299)) ([6864876](https://github.com/googleapis/api-linter/commit/6864876c07c8f2adfd3e81bd651edbfdaa621a79))
+
+
+### Bug Fixes
+
+* **AIP-123:** disallow spaces in pattern ([#1293](https://github.com/googleapis/api-linter/issues/1293)) ([4d6e057](https://github.com/googleapis/api-linter/commit/4d6e0574c9bc8537968cc4f301e5fe2e4b121618))
+
+
+### Documentation
+
+* update help message in usage section ([#1288](https://github.com/googleapis/api-linter/issues/1288)) ([eb09eb6](https://github.com/googleapis/api-linter/commit/eb09eb6d8e2600431a326b3ab7b332054e5cf10b))
+
 ## [1.59.2](https://github.com/googleapis/api-linter/compare/v1.59.1...v1.59.2) (2023-11-13)
 
 
