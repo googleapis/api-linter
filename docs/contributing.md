@@ -136,7 +136,7 @@ If a proto block _begins with_ a comment that says only `Incorrect.` or
 ## Releases
 
 Releases are handled automatically by [release-please][] by sending PRs
-after changes starting with `bug:` or `feat:` have been merged.
+after changes starting with `fix:` or `feat:` have been merged.
 [example release pr][].
 
 If a manual release is desired, simply open a pull request with an empty commit
