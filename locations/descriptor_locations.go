@@ -15,8 +15,8 @@
 package locations
 
 import (
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // DescriptorName returns the precise location for a descriptor's name.

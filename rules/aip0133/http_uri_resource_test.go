@@ -30,9 +30,11 @@ func TestHTTPURIResource(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*}/books", "publishers/{publisher}/books/{book}", nil},
+		{"ValidCustomLookalike", "/v1/{parent=publishers/*}/books:createAndCheckout", "publishers/{publisher}/books/{book}", nil},
 		{"MethodMissingURIPath", "", "publishers/{publisher}/books/{book}", nil},
 		{"MethodMissingCollectionURISuffix", "/v1/", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "The URI path does not end in a collection identifier."}}},
 		{"ResourceMissingCollectionInPattern", "/v1/{parent=publishers/*}/books", "publishers/{publisher}", testutils.Problems{{Message: "Resource pattern should contain the collection identifier \"books/\"."}}},
+		{"ResourceMissingCollectionCustomLookalike", "/v1/{parent=publishers/*}/books:createAndCheckout", "publishers/{publisher}", testutils.Problems{{Message: "Resource pattern should contain the collection identifier \"books/\"."}}},
 	}
 
 	for _, test := range tests {

@@ -155,8 +155,8 @@ func TestRules_DisabledByConfig(t *testing.T) {
 }
 
 func TestBuildErrors(t *testing.T) {
-	expected := `internal/testdata/build_errors.proto:8:1: syntax error: unexpected '}', expecting ';' or '['
-internal/testdata/build_errors.proto:13:1: syntax error: unexpected '}', expecting ';' or '['`
+	expected := `internal/testdata/build_errors.proto:8:1: expected ';'
+internal/testdata/build_errors.proto:13:1: expected ';'`
 	err := runCLI([]string{"internal/testdata/build_errors.proto"})
 	if err == nil {
 		t.Fatal("expected build error for build_errors.proto")

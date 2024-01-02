@@ -19,8 +19,8 @@ import (
 	"strings"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc/builder"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v2"
 )
 

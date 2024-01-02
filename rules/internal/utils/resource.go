@@ -15,6 +15,9 @@
 package utils
 
 import (
+	"strings"
+
+	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
@@ -48,4 +51,42 @@ func GetResourcePlural(r *apb.ResourceDescriptor) string {
 	}
 
 	return r.Plural
+}
+
+// GetResourceNameField is a convenience method for getting the name of the
+// field that represents the resource's name. This is either set by the
+// `name_field` attribute, or defaults to "name".
+func GetResourceNameField(r *apb.ResourceDescriptor) string {
+	if r == nil {
+		return ""
+	}
+	if n := r.GetNameField(); n != "" {
+		return n
+	}
+	return "name"
+}
+
+// IsResourceRevision determines if the given message represents a resource
+// revision as described in AIP-162.
+func IsResourceRevision(m *desc.MessageDescriptor) bool {
+	return IsResource(m) && strings.HasSuffix(m.GetName(), "Revision")
+}
+
+// IsRevisionRelationship determines if the "revision" resource is actually
+// a revision of the "parent" resource.
+func IsRevisionRelationship(parent, revision *apb.ResourceDescriptor) bool {
+	_, pType, ok := SplitResourceTypeName(parent.GetType())
+	if !ok {
+		return false
+	}
+	_, rType, ok := SplitResourceTypeName(revision.GetType())
+	if !ok {
+		return false
+	}
+
+	if !strings.HasSuffix(rType, "Revision") {
+		return false
+	}
+	rType = strings.TrimSuffix(rType, "Revision")
+	return pType == rType
 }
