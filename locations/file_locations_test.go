@@ -17,10 +17,10 @@ package locations
 import (
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestLocations(t *testing.T) {
