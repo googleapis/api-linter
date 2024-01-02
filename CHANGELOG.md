@@ -1,5 +1,72 @@
 # Changelog
 
+## [1.61.0](https://github.com/googleapis/api-linter/compare/v1.60.0...v1.61.0) (2024-01-02)
+
+
+### Features
+
+* undelete should not be required for declarative-friendly interfaces ([#1304](https://github.com/googleapis/api-linter/issues/1304)) ([b40c90d](https://github.com/googleapis/api-linter/commit/b40c90d9b1a30d50c08e1373dd9c7b468dd651c2))
+
+
+### Documentation
+
+* update release docs ([#1301](https://github.com/googleapis/api-linter/issues/1301)) ([3cfd411](https://github.com/googleapis/api-linter/commit/3cfd4111355af9ac581a5bc45e860d8592869418))
+
+## [1.60.0](https://github.com/googleapis/api-linter/compare/v1.59.2...v1.60.0) (2023-12-15)
+
+
+### Features
+
+* **AIP-142:** warn on creation_time ([#1291](https://github.com/googleapis/api-linter/issues/1291)) ([ebf2763](https://github.com/googleapis/api-linter/commit/ebf27633aed7afc0679664fab0b8493110a5462f))
+* require golang 1.20 or later ([#1299](https://github.com/googleapis/api-linter/issues/1299)) ([6864876](https://github.com/googleapis/api-linter/commit/6864876c07c8f2adfd3e81bd651edbfdaa621a79))
+
+
+### Bug Fixes
+
+* **AIP-123:** disallow spaces in pattern ([#1293](https://github.com/googleapis/api-linter/issues/1293)) ([4d6e057](https://github.com/googleapis/api-linter/commit/4d6e0574c9bc8537968cc4f301e5fe2e4b121618))
+
+
+### Documentation
+
+* update help message in usage section ([#1288](https://github.com/googleapis/api-linter/issues/1288)) ([eb09eb6](https://github.com/googleapis/api-linter/commit/eb09eb6d8e2600431a326b3ab7b332054e5cf10b))
+
+## [1.59.2](https://github.com/googleapis/api-linter/compare/v1.59.1...v1.59.2) (2023-11-13)
+
+
+### Bug Fixes
+
+* **AIP-133:** lint http collection ID for lookalikes ([#1286](https://github.com/googleapis/api-linter/issues/1286)) ([3397db6](https://github.com/googleapis/api-linter/commit/3397db63db4adab4f80f022bf247019483473644))
+
+## [1.59.1](https://github.com/googleapis/api-linter/compare/v1.59.0...v1.59.1) (2023-11-01)
+
+
+### Bug Fixes
+
+* **AIP-203:** skip identifier check if  missing name field ([#1282](https://github.com/googleapis/api-linter/issues/1282)) ([2050717](https://github.com/googleapis/api-linter/commit/2050717c5f965a7374956f87b35ee048d1f2f53a))
+
+## [1.59.0](https://github.com/googleapis/api-linter/compare/v1.58.1...v1.59.0) (2023-10-18)
+
+
+### Features
+
+* **AIP-148:** add uid-format rule ([#1270](https://github.com/googleapis/api-linter/issues/1270)) ([79cd201](https://github.com/googleapis/api-linter/commit/79cd20109925c348e7a898211d5d8a8533f5a0c3))
+* **AIP-148:** lint IP Address field format ([#1271](https://github.com/googleapis/api-linter/issues/1271)) ([cb30ca8](https://github.com/googleapis/api-linter/commit/cb30ca877e249f9a0492a5b95742ed8f1a4f092b))
+* **AIP-155:** enforce format uuid4 guidance ([#1272](https://github.com/googleapis/api-linter/issues/1272)) ([2f2e34b](https://github.com/googleapis/api-linter/commit/2f2e34b24c8ac967094418654ebbffcecbd2d04d))
+
+## [1.58.1](https://github.com/googleapis/api-linter/compare/v1.58.0...v1.58.1) (2023-10-05)
+
+
+### Bug Fixes
+
+* **AIP-203:** remove resource name identifier suggestion ([#1263](https://github.com/googleapis/api-linter/issues/1263)) ([687fe7f](https://github.com/googleapis/api-linter/commit/687fe7f087018f140df677c8cb9836da0bf37b93))
+
+## [1.58.0](https://github.com/googleapis/api-linter/compare/v1.57.1...v1.58.0) (2023-10-03)
+
+
+### Features
+
+* **AIP-202:** add string-only-format rule ([#1261](https://github.com/googleapis/api-linter/issues/1261)) ([b67339e](https://github.com/googleapis/api-linter/commit/b67339ed8cfb49fcafd0f47f4585a636f8da8600))
+
 ## [1.57.1](https://github.com/googleapis/api-linter/compare/v1.57.0...v1.57.1) (2023-09-12)
 
 

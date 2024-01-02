@@ -36,6 +36,12 @@ var httpURIResource = &lint.MethodRule{
 		// Extract the suffix of the URI path as the collection identifier.
 		uriParts := strings.Split(utils.GetHTTPRules(m)[0].URI, "/")
 		collectionName := uriParts[len(uriParts)-1]
+		// Custom Method Standard Create lookalikes can still be linted, but
+		// don't include the custom method http suffix
+		// e.g. .../books:createAndCheckout --> books.
+		if strings.Contains(collectionName, ":") {
+			collectionName = strings.Split(collectionName, ":")[0]
+		}
 
 		// Ensure that a collection identifier is provided.
 		if collectionName == "" {

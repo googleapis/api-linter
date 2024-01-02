@@ -19,11 +19,11 @@ import (
 	"sort"
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 type resourceDef struct {

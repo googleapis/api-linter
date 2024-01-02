@@ -12,29 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aip0203
+package aip0155
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
-	fpb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-var resourceNameIdentifier = &lint.MessageRule{
-	Name: lint.NewRuleName(203, "resource-name-identifier"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.IsResource(m) && m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m))) != nil
+var requestIdFormat = &lint.FieldRule{
+	Name: lint.NewRuleName(155, "request-id-format"),
+	OnlyIf: func(fd *desc.FieldDescriptor) bool {
+		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING &&
+			fd.GetName() == "request_id"
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		f := m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m)))
-		fb := utils.GetFieldBehavior(f)
-		if len(fb) == 0 || !fb.Contains(fpb.FieldBehavior_IDENTIFIER.String()) {
+	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
+		if !utils.HasFormat(fd) || utils.GetFormat(fd) != annotations.FieldInfo_UUID4 {
 			return []lint.Problem{{
-				Message:    "resource name field must have field_behavior IDENTIFIER",
-				Descriptor: f,
-				Location:   locations.FieldOption(f, fpb.E_FieldBehavior),
+				Message:    "The `request_id` field should have a `(google.api.field_info).format = UUID4` annotation.",
+				Descriptor: fd,
 			}}
 		}
 

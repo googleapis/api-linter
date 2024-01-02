@@ -15,9 +15,9 @@
 package locations
 
 import (
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // MessageResource returns the precise location of the `google.api.resource`
