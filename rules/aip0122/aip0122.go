@@ -27,6 +27,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourceCollectionIdentifiers,
 		httpURICase,
 		nameSuffix,
+		noSelfLinks,
 		resourceReferenceType,
 		resourceIdOutputOnly,
 		embeddedResource,
