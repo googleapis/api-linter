@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.61.0](https://github.com/googleapis/api-linter/compare/v1.60.0...v1.61.0) (2024-01-02)
+
+
+### Features
+
+* undelete should not be required for declarative-friendly interfaces ([#1304](https://github.com/googleapis/api-linter/issues/1304)) ([b40c90d](https://github.com/googleapis/api-linter/commit/b40c90d9b1a30d50c08e1373dd9c7b468dd651c2))
+
+
+### Documentation
+
+* update release docs ([#1301](https://github.com/googleapis/api-linter/issues/1301)) ([3cfd411](https://github.com/googleapis/api-linter/commit/3cfd4111355af9ac581a5bc45e860d8592869418))
+
 ## [1.60.0](https://github.com/googleapis/api-linter/compare/v1.59.2...v1.60.0) (2023-12-15)
 
 
