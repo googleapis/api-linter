@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.62.0](https://github.com/googleapis/api-linter/compare/v1.61.0...v1.62.0) (2024-01-02)
+
+
+### Features
+
+* **AIP-122:** Flag self-link fields in resources ([#1294](https://github.com/googleapis/api-linter/issues/1294)) ([d7228d3](https://github.com/googleapis/api-linter/commit/d7228d329ed90ced353dd6a9022d19570069adab))
+
 ## [1.61.0](https://github.com/googleapis/api-linter/compare/v1.60.0...v1.61.0) (2024-01-02)
 
 
