@@ -27,7 +27,7 @@ jobs:
             arch: amd64
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
       # The API linter does not use these,  but we need them to build the
