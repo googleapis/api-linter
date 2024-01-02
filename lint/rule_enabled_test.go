@@ -17,9 +17,9 @@ package lint
 import (
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestRuleIsEnabled(t *testing.T) {

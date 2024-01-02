@@ -17,8 +17,8 @@ package lint
 import (
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // defaultDisabledRules is the list of rules or groups that are by default
