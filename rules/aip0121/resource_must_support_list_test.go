@@ -78,6 +78,12 @@ func TestResourceMustSupportList(t *testing.T) {
 		{"ValidIgnoreSingleton", `
 			rpc GetBookCover(GetBookCoverRequest) returns (BookCover) {};
 		`, nil},
+		{"ValidIgnoreNonResource", `
+			rpc GetBookCover(GetBookCoverRequest) returns (Other) {};
+		`, nil},
+		{"ValidIgnoreStreamingLookalike", `
+			rpc GetBook(GetBookRequest) returns (stream Book) {};
+		`, nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
@@ -138,6 +144,10 @@ func TestResourceMustSupportList(t *testing.T) {
 				 message ListBooksResponse {
 					repeated Book books = 1;
 					string next_page_token = 2;
+				 }
+
+				 message Other {
+					string other = 1;
 				 }
 			`, test)
 			s := file.GetServices()[0]

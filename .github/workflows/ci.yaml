@@ -8,18 +8,18 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.18
+          go-version: "1.20"
       - run: go test -p 1 ./...
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.18
+          go-version: "1.20"
       - name: staticcheck
         uses: dominikh/staticcheck-action@v1.3.0
         with:
@@ -27,9 +27,9 @@ jobs:
   quality-checker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.18
+          go-version: "1.20"
       - name: Run the quality checker (which catches obvious mistakes, missing docs, etc.)
         run: go run ./.github/quality-checker

@@ -33,13 +33,19 @@ var resourceMustSupportList = &lint.ServiceRule{
 		// Iterate all RPCs and try to find resources. Mark the
 		// resources which have a List method, and which ones do not.
 		for _, m := range s.GetMethods() {
+			// Streaming methods do not count as standard methods even if they
+			// look like them.
+			if utils.IsStreaming(m) {
+				continue
+			}
+
 			if utils.IsListMethod(m) {
-				if msg := utils.GetListResourceMessage(m); msg != nil {
+				if msg := utils.GetListResourceMessage(m); msg != nil && utils.IsResource(msg) {
 					t := utils.GetResource(msg).GetType()
 					resourcesWithList.Add(t)
 				}
 			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) || utils.IsGetMethod(m) {
-				if msg := utils.GetResponseType(m); msg != nil {
+				if msg := utils.GetResponseType(m); msg != nil && utils.IsResource(msg) {
 					// Skip tracking Singleton resources, they do not need List.
 					if utils.IsSingletonResource(msg) {
 						continue

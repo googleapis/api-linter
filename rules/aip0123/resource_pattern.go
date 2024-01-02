@@ -18,12 +18,12 @@ import (
 	"fmt"
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var resourcePattern = &lint.MessageRule{
@@ -46,14 +46,23 @@ func lintResourcePattern(resource *annotations.ResourceDescriptor, desc desc.Des
 	}
 
 	// Ensure that the constant segments of the pattern uses camel case,
-	// not snake case.
+	// not snake case, and there are no spaces.
 	for _, pattern := range resource.GetPattern() {
-		if strings.Contains(getPlainPattern(pattern), "_") {
+		plainPattern := getPlainPattern(pattern)
+
+		if strings.Contains(plainPattern, "_") {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Resource patterns should use camel case (apart from the variable names), such as %q.",
 					getDesiredPattern(pattern),
 				),
+				Descriptor: desc,
+				Location:   loc,
+			}}
+		}
+		if strings.Contains(plainPattern, " ") {
+			return []lint.Problem{{
+				Message:    "Resource patterns should not have spaces",
 				Descriptor: desc,
 				Location:   loc,
 			}}

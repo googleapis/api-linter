@@ -2,7 +2,7 @@
 rule:
   aip: 192
   name: [core, '0192', deprecated-comment]
-  summary: Deprecated methods must have a corresponding comment.
+  summary: Deprecated elements must have a corresponding comment.
 permalink: /192/deprecated-comment
 redirect_from:
   - /0192/deprecated-comment
@@ -10,14 +10,14 @@ redirect_from:
 
 # Deprecated comments
 
-This rule enforces that every RPC marked with the protobuf `deprecated` option
-has `"Deprecated: <reason>"` as the first line in the public leading comment, as
-mandated in [AIP-192][].
+This rule enforces that every element marked with the protobuf `deprecated`
+option has `"Deprecated: <reason>"` as the first line in the public leading
+comment, as mandated in [AIP-192][].
 
 ## Details
 
-This rule looks at each method descriptor in each proto file, and complains if
-the protobuf `deprecated` option is set to `true`, but the first line of the public
+This rule looks at each descriptor in each proto file, and complains if the
+protobuf `deprecated` option is set to `true`, but the first line of the public
 comment does not begin with "Deprecated: ".
 
 ## Examples
