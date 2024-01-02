@@ -18,12 +18,12 @@ import (
 	"fmt"
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var resourcePattern = &lint.MessageRule{

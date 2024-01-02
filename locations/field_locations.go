@@ -15,10 +15,10 @@
 package locations
 
 import (
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // FieldOption returns the precise location for the given extension defintion on

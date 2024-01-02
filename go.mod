@@ -7,7 +7,6 @@ require (
 	cloud.google.com/go/longrunning v0.5.2
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/gertd/go-pluralize v0.2.1
-	github.com/golang/protobuf v1.5.3
 	github.com/google/go-cmp v0.6.0
 	github.com/jhump/protoreflect v1.15.3
 	github.com/lithammer/dedent v1.1.0
@@ -23,6 +22,7 @@ require (
 
 require (
 	github.com/bufbuild/protocompile v0.6.0 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect

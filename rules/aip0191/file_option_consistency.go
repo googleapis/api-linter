@@ -19,10 +19,10 @@ import (
 	"sort"
 	"strconv"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var consistentOptions = map[string]func(*dpb.FileOptions) string{
