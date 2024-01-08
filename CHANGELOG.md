@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.0](https://github.com/googleapis/api-linter/compare/v1.62.0...v1.63.0) (2024-01-08)
+
+
+### Features
+
+* allow `request_id` for standard Get and List ([#1312](https://github.com/googleapis/api-linter/issues/1312)) ([b41be6e](https://github.com/googleapis/api-linter/commit/b41be6ea41dfc2fb230f5b9f5aa5de4e5d276849))
+
 ## [1.62.0](https://github.com/googleapis/api-linter/compare/v1.61.0...v1.62.0) (2024-01-02)
 
 
