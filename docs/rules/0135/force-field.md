@@ -8,7 +8,7 @@ redirect_from:
   - /0135/force-field
 ---
 
-# Delete methods: Name field
+# Delete methods: `force` field
 
 This rule enforces that the standard `Delete` method for a resource that parents
 other resources in the service have a `bool force` field in the request message,
