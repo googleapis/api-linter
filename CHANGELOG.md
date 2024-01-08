@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.1](https://github.com/googleapis/api-linter/compare/v1.63.0...v1.63.1) (2024-01-08)
+
+
+### Documentation
+
+* **AIP-135:** fix title heading ([#1314](https://github.com/googleapis/api-linter/issues/1314)) ([963c7d8](https://github.com/googleapis/api-linter/commit/963c7d8ac016d4feec7e4b4d552dfb08ff421cfe))
+
 ## [1.63.0](https://github.com/googleapis/api-linter/compare/v1.62.0...v1.63.0) (2024-01-08)
 
 
