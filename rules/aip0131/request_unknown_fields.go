@@ -24,6 +24,13 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+var allowedFields = stringset.New(
+	"name",       // AIP-131
+	"request_id", // AIP-155
+	"read_mask",  // AIP-157
+	"view",       // AIP-157
+)
+
 // Get methods should not have unrecognized fields.
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(131, "request-unknown-fields"),
@@ -31,7 +38,6 @@ var unknownFields = &lint.FieldRule{
 		return utils.IsGetRequestMessage(f.GetOwner())
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
-		allowedFields := stringset.New("name", "read_mask", "view")
 		if !allowedFields.Contains(field.GetName()) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(

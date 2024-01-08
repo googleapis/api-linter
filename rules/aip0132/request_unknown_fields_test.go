@@ -44,6 +44,7 @@ func TestUnknownFields(t *testing.T) {
 		{"Filter", "ListBooksRequest", "filter", builder.FieldTypeString(), testutils.Problems{}},
 		{"OrderBy", "ListBooksRequest", "order_by", builder.FieldTypeString(), testutils.Problems{}},
 		{"ShowDeleted", "ListBooksRequest", "show_deleted", builder.FieldTypeBool(), testutils.Problems{}},
+		{"RequestId", "ListBooksRequest", "request_id", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
 		{"ReadMask", "ListBooksRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
 		{"View", "ListBooksRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View").AddValue(builder.NewEnumValue("BASIC"))), testutils.Problems{}},
 		{"Invalid", "ListBooksRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{Message: "explicitly described"}}},

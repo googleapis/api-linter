@@ -29,6 +29,7 @@ var allowedFields = stringset.New(
 	"filter",       // AIP-132
 	"order_by",     // AIP-132
 	"show_deleted", // AIP-135
+	"request_id",   // AIP-155
 	"read_mask",    // AIP-157
 	"view",         // AIP-157
 )

@@ -25,6 +25,7 @@ comes across any fields other than:
 - `string filter` ([AIP-132][])
 - `string order_by` ([AIP-132][])
 - `bool show_deleted` ([AIP-132][])
+- `string request_id` ([AIP-155][])
 - `google.protobuf.FieldMask read_mask` ([AIP-157][])
 - `View view` ([AIP-157][])
 
@@ -79,6 +80,7 @@ top of the file.
 
 [aip-132]: https://aip.dev/132
 [aip-135]: https://aip.dev/135
+[aip-155]: https://aip.dev/155
 [aip-157]: https://aip.dev/157
 [aip-158]: https://aip.dev/158
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
