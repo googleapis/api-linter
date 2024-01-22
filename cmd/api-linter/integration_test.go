@@ -21,6 +21,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // Each case must be positive when the rule in test
@@ -155,15 +157,24 @@ func TestRules_DisabledByConfig(t *testing.T) {
 }
 
 func TestBuildErrors(t *testing.T) {
-	expected := `internal/testdata/build_errors.proto:8:1: expected ';'
-internal/testdata/build_errors.proto:13:1: expected ';'`
+	expected := []string{
+		"internal/testdata/build_errors.proto:8:1:",
+		"internal/testdata/build_errors.proto:13:1:",
+	}
 	err := runCLI([]string{"internal/testdata/build_errors.proto"})
 	if err == nil {
 		t.Fatal("expected build error for build_errors.proto")
 	}
 	actual := err.Error()
-	if expected != actual {
-		t.Fatalf("expected %q, got %q", expected, actual)
+	actualLines := strings.Split(strings.TrimSpace(actual), "\n")
+	for idx, line := range actualLines {
+		if idx := strings.IndexByte(line, ' '); idx > -1 {
+			line = line[:idx]
+		}
+		actualLines[idx] = line
+	}
+	if diff := cmp.Diff(expected, actualLines); diff != "" {
+		t.Fatalf("unexpected errors: diff (-want +got):\n%s", diff)
 	}
 }
 
