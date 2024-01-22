@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.2](https://github.com/googleapis/api-linter/compare/v1.63.1...v1.63.2) (2024-01-22)
+
+
+### Bug Fixes
+
+* tweak cli integration test ([#1320](https://github.com/googleapis/api-linter/issues/1320)) ([931ab2d](https://github.com/googleapis/api-linter/commit/931ab2dec5005d7c4fcc7b656bcd4141c55daeaa))
+
 ## [1.63.1](https://github.com/googleapis/api-linter/compare/v1.63.0...v1.63.1) (2024-01-08)
 
 
