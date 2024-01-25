@@ -10,15 +10,15 @@ redirect_from:
 
 # Resource annotation presence
 
-This rule enforces that messages that appear to represent resources have a
-`google.api.resource` annotation, as described in [AIP-123][].
+This rule enforces that top-level messages that appear to represent resources
+have a `google.api.resource` annotation, as described in [AIP-123][].
 
 ## Details
 
-This rule scans all messages, and assumes that messages with a `string name`
-field are resources unless the message name ends with `Request`. For messages
-that are resources, it complains if the `google.api.resource` annotation is
-missing.
+This rule scans all top-level messages, and assumes that messages with a
+ `string name` field are resources unless the message name ends with `Request`.
+For messages that are resources, it complains if the `google.api.resource`
+annotation is missing.
 
 ## Examples
 

@@ -38,6 +38,20 @@ func TestResourceAnnotation(t *testing.T) {
 		}
 	})
 
+	t.Run("SkipNested", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			message Foo {
+				message Bar {
+					string name = 1;
+				}
+				Bar bar = 1;
+			}
+		`)
+		if diff := (testutils.Problems{}).Diff(resourceAnnotation.Lint(f)); diff != "" {
+			t.Errorf(diff)
+		}
+	})
+
 	// The rule should fail if the option is absent on a resource message,
 	// but pass on messages that are not resource messages.
 	for _, test := range []struct {
