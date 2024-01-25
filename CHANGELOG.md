@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.3](https://github.com/googleapis/api-linter/compare/v1.63.2...v1.63.3) (2024-01-25)
+
+
+### Bug Fixes
+
+* **AIP-123:** allow name in nested messages ([#1325](https://github.com/googleapis/api-linter/issues/1325)) ([16316a5](https://github.com/googleapis/api-linter/commit/16316a5405bd967e926a1482f3bd1e85e1c45eed))
+
 ## [1.63.2](https://github.com/googleapis/api-linter/compare/v1.63.1...v1.63.2) (2024-01-22)
 
 
