@@ -19,6 +19,7 @@ This rule looks at any message matching `Get*Request` and complains if it comes
 across any fields other than:
 
 - `string name` ([AIP-131][])
+- `string request_id` ([AIP-155][])
 - `google.protobuf.FieldMask read_mask` ([AIP-157][])
 - `View view` ([AIP-157][])
 
@@ -62,5 +63,6 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 [aip-131]: https://aip.dev/131
+[aip-155]: https://aip.dev/155
 [aip-157]: https://aip.dev/157
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

@@ -1,5 +1,70 @@
 # Changelog
 
+## [1.63.3](https://github.com/googleapis/api-linter/compare/v1.63.2...v1.63.3) (2024-01-25)
+
+
+### Bug Fixes
+
+* **AIP-123:** allow name in nested messages ([#1325](https://github.com/googleapis/api-linter/issues/1325)) ([16316a5](https://github.com/googleapis/api-linter/commit/16316a5405bd967e926a1482f3bd1e85e1c45eed))
+
+## [1.63.2](https://github.com/googleapis/api-linter/compare/v1.63.1...v1.63.2) (2024-01-22)
+
+
+### Bug Fixes
+
+* tweak cli integration test ([#1320](https://github.com/googleapis/api-linter/issues/1320)) ([931ab2d](https://github.com/googleapis/api-linter/commit/931ab2dec5005d7c4fcc7b656bcd4141c55daeaa))
+
+## [1.63.1](https://github.com/googleapis/api-linter/compare/v1.63.0...v1.63.1) (2024-01-08)
+
+
+### Documentation
+
+* **AIP-135:** fix title heading ([#1314](https://github.com/googleapis/api-linter/issues/1314)) ([963c7d8](https://github.com/googleapis/api-linter/commit/963c7d8ac016d4feec7e4b4d552dfb08ff421cfe))
+
+## [1.63.0](https://github.com/googleapis/api-linter/compare/v1.62.0...v1.63.0) (2024-01-08)
+
+
+### Features
+
+* allow `request_id` for standard Get and List ([#1312](https://github.com/googleapis/api-linter/issues/1312)) ([b41be6e](https://github.com/googleapis/api-linter/commit/b41be6ea41dfc2fb230f5b9f5aa5de4e5d276849))
+
+## [1.62.0](https://github.com/googleapis/api-linter/compare/v1.61.0...v1.62.0) (2024-01-02)
+
+
+### Features
+
+* **AIP-122:** Flag self-link fields in resources ([#1294](https://github.com/googleapis/api-linter/issues/1294)) ([d7228d3](https://github.com/googleapis/api-linter/commit/d7228d329ed90ced353dd6a9022d19570069adab))
+
+## [1.61.0](https://github.com/googleapis/api-linter/compare/v1.60.0...v1.61.0) (2024-01-02)
+
+
+### Features
+
+* undelete should not be required for declarative-friendly interfaces ([#1304](https://github.com/googleapis/api-linter/issues/1304)) ([b40c90d](https://github.com/googleapis/api-linter/commit/b40c90d9b1a30d50c08e1373dd9c7b468dd651c2))
+
+
+### Documentation
+
+* update release docs ([#1301](https://github.com/googleapis/api-linter/issues/1301)) ([3cfd411](https://github.com/googleapis/api-linter/commit/3cfd4111355af9ac581a5bc45e860d8592869418))
+
+## [1.60.0](https://github.com/googleapis/api-linter/compare/v1.59.2...v1.60.0) (2023-12-15)
+
+
+### Features
+
+* **AIP-142:** warn on creation_time ([#1291](https://github.com/googleapis/api-linter/issues/1291)) ([ebf2763](https://github.com/googleapis/api-linter/commit/ebf27633aed7afc0679664fab0b8493110a5462f))
+* require golang 1.20 or later ([#1299](https://github.com/googleapis/api-linter/issues/1299)) ([6864876](https://github.com/googleapis/api-linter/commit/6864876c07c8f2adfd3e81bd651edbfdaa621a79))
+
+
+### Bug Fixes
+
+* **AIP-123:** disallow spaces in pattern ([#1293](https://github.com/googleapis/api-linter/issues/1293)) ([4d6e057](https://github.com/googleapis/api-linter/commit/4d6e0574c9bc8537968cc4f301e5fe2e4b121618))
+
+
+### Documentation
+
+* update help message in usage section ([#1288](https://github.com/googleapis/api-linter/issues/1288)) ([eb09eb6](https://github.com/googleapis/api-linter/commit/eb09eb6d8e2600431a326b3ab7b332054e5cf10b))
+
 ## [1.59.2](https://github.com/googleapis/api-linter/compare/v1.59.1...v1.59.2) (2023-11-13)
 
 
