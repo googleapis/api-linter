@@ -20,7 +20,7 @@ with a specific name that doesn't have the corresponding common type.
 
 Some example pairings of common types and field names that are checked are:
 
-* `google.protobuf.Duration`: "duration"
+* `google.protobuf.Duration`: "delay", "duration", "timeout"
 * `google.type.Color`: "color", "colour"
 * `google.type.PhoneNumber`: "mobile_number", "phone", "phone_number"
 

@@ -27,13 +27,18 @@ func TestCommonTypesFields(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"ValidCommonType", "google.protobuf.Duration duration", nil},
+		{"ValidFieldEndingInCommonTerm", "google.protobuf.Duration max_duration", nil},
+		{"ValidFieldEndingInMultipleCommonTerms", "google.type.TimeOfDay end_time_of_day", nil},
 		{"ValidOtherType", "string bar", nil},
 		{"FieldDoesNotUseMessageType", "map<int32, int32> duration", testutils.Problems{{Message: "common type"}}},
+		{"FieldEndingInCommonTermDoesNotUseMessageType", "map<int32, int32> max_duration", testutils.Problems{{Message: "common type"}}},
+		{"FieldEndingInMultipleCommonTermsDoesNotUseMessageType", "map<int32, int32> end_time_of_day", testutils.Problems{{Message: "common type"}}},
 		{"FieldDoesNotUseCommonType", "int32 duration", testutils.Problems{{Message: "common type"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/duration.proto";
+				import "google/type/timeofday.proto";
 
 				message Foo {
 					{{.Field}} = 1;
