@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.4](https://github.com/googleapis/api-linter/compare/v1.63.3...v1.63.4) (2024-02-16)
+
+
+### Bug Fixes
+
+* **AIP 133-135:** fix false positive in 133-135 ([#1335](https://github.com/googleapis/api-linter/issues/1335)) ([d79af9c](https://github.com/googleapis/api-linter/commit/d79af9cc85959ce2f22d2a12f1d2fbfca0fd2e7b))
+
 ## [1.63.3](https://github.com/googleapis/api-linter/compare/v1.63.2...v1.63.3) (2024-01-25)
 
 
