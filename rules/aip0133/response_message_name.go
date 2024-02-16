@@ -28,7 +28,7 @@ var outputName = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "response-message-name"),
 	OnlyIf: utils.IsCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		want := getResourceMsgName(m)
+		want := utils.GetResourceMessageName(m, "Create")
 
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.

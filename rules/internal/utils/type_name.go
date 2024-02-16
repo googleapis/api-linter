@@ -40,3 +40,19 @@ func GetTypeName(f *desc.FieldDescriptor) string {
 func IsOperation(m *desc.MessageDescriptor) bool {
 	return m.GetFullyQualifiedName() == "google.longrunning.Operation"
 }
+
+// GetResourceMessageName returns the resource message type name from method
+func GetResourceMessageName(m *desc.MethodDescriptor, expectedVerb string) string {
+	if !strings.HasPrefix(m.GetName(), expectedVerb) {
+		return ""
+	}
+
+	// Usually the response message will be the resource message, and its name will
+	// be part of method name (make a double check here to avoid the issue when
+	// method or output naming doesn't follow the right principles)
+	// Ignore this rule if the return type is an LRO
+	if strings.Contains(m.GetName()[len(expectedVerb):], m.GetOutputType().GetName()) && !IsOperation(m.GetOutputType()) {
+		return m.GetOutputType().GetName()
+	}
+	return m.GetName()[len(expectedVerb):]
+}
