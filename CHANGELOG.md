@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.5](https://github.com/googleapis/api-linter/compare/v1.63.4...v1.63.5) (2024-02-16)
+
+
+### Bug Fixes
+
+* **AIP-4232:** correct repeated field check ([#1337](https://github.com/googleapis/api-linter/issues/1337)) ([b383639](https://github.com/googleapis/api-linter/commit/b383639288fb14c776ad644368bf22d62c83e3b7))
+
 ## [1.63.4](https://github.com/googleapis/api-linter/compare/v1.63.3...v1.63.4) (2024-02-16)
 
 
