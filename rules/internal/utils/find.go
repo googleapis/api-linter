@@ -134,13 +134,14 @@ func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor
 // google.api.method_signature annotations.
 func FindFieldDotNotation(msg *desc.MessageDescriptor, ref string) *desc.FieldDescriptor {
 	path := strings.Split(ref, ".")
-	for _, seg := range path {
+	end := len(path) - 1
+	for i, seg := range path {
 		field := msg.FindFieldByName(seg)
 		if field == nil {
 			return nil
 		}
 
-		if m := field.GetMessageType(); m != nil {
+		if m := field.GetMessageType(); m != nil && i != end {
 			msg = m
 			continue
 		}
