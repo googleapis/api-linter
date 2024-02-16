@@ -31,6 +31,7 @@ func TestResponseMessageName(t *testing.T) {
 	}{
 		{"ValidResource", "UpdateBook", "Book", false, testutils.Problems{}},
 		{"ValidLRO", "UpdateBook", "Book", true, testutils.Problems{}},
+		{"ValidLROContainingOperation", "UpdateUnitOperation", "UnitOperation", true, testutils.Problems{}},
 		{"Invalid", "UpdateBook", "UpdateBookResponse", false, testutils.Problems{{Suggestion: "Book"}}},
 		{"InvalidLRO", "UpdateBook", "UpdateBookResponse", true, testutils.Problems{{Suggestion: "Book"}}},
 		{"Irrelevant", "MutateBook", "MutateBookResponse", false, testutils.Problems{}},

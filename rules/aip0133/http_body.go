@@ -29,7 +29,7 @@ var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "http-body"),
 	OnlyIf: utils.IsCreateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		resourceMsgName := getResourceMsgName(m)
+		resourceMsgName := utils.GetResourceMessageName(m, "Create")
 		resourceFieldName := strings.ToLower(resourceMsgName)
 		for _, fieldDesc := range m.GetInputType().GetFields() {
 			// when msgDesc is nil, the resource field in the request message is

@@ -30,6 +30,7 @@ func TestMethodSignature(t *testing.T) {
 	}{
 		{"ValidNoID", "CreateBook", `option (google.api.method_signature) = "parent,book";`, "", testutils.Problems{}},
 		{"ValidID", "CreateBook", `option (google.api.method_signature) = "parent,book,book_id";`, "string book_id = 3;", testutils.Problems{}},
+		{"ValidOperation", "CreateUnitOperation", `option (google.api.method_signature) = "parent,unit_operation,unit_operation_id";`, "string unit_operation_id = 3;", testutils.Problems{}},
 		{"MissingNoID", "CreateBook", "", "", testutils.Problems{{Message: `(google.api.method_signature) = "parent,book"`}}},
 		{
 			"MissingID",
