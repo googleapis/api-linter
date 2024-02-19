@@ -41,7 +41,14 @@ var requiredFields = &lint.MethodRule{
 			}
 		}
 		for i, sig := range sigs {
-			sigset := stringset.New(sig...)
+			sigset := stringset.New(sig...).Map(func(s string) string {
+				if !strings.Contains(s, ".") {
+					return s
+				}
+				// If signature contains nested fields, get the root field
+				// to use in top-level required field check.
+				return strings.Split(s, ".")[0]
+			})
 			if !sigset.Contains(requiredFields...) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Method signature %q missing at least one of the required fields: %q", strings.Join(sig, ","), strings.Join(requiredFields, ",")),
