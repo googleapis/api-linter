@@ -27,7 +27,8 @@ func TestRequiredFields(t *testing.T) {
 		FieldBehavior string
 		problems      testutils.Problems
 	}{
-		{"Valid", "name,paperback_only", "REQUIRED", nil},
+		{"Valid", "name,paperback_only,shelf", "REQUIRED", nil},
+		{"ValidNested", "name,paperback_only,shelf.name", "REQUIRED", nil},
 		{"ValidNotRequired", "paperback_only", "OPTIONAL", nil},
 		{"Invalid", "paperback_only", "REQUIRED", testutils.Problems{{Message: "missing at least one"}}},
 	}
@@ -46,8 +47,13 @@ func TestRequiredFields(t *testing.T) {
 					string name = 1 [(google.api.field_behavior) = {{.FieldBehavior}}];
 
 					bool paperback_only = 2;
+
+					Shelf shelf = 3 [(google.api.field_behavior) = {{.FieldBehavior}}];
 				}
 				message ArchiveBookResponse {}
+				message Shelf {
+					string name = 1;
+				}
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(requiredFields.Lint(f)); diff != "" {
