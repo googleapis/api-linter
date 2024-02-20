@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.6](https://github.com/googleapis/api-linter/compare/v1.63.5...v1.63.6) (2024-02-20)
+
+
+### Bug Fixes
+
+* **AIP-4232:** support nested field of required field ([#1339](https://github.com/googleapis/api-linter/issues/1339)) ([e86a159](https://github.com/googleapis/api-linter/commit/e86a159cfecf8e19bff7d869e3c0bca9c140ce08))
+
 ## [1.63.5](https://github.com/googleapis/api-linter/compare/v1.63.4...v1.63.5) (2024-02-16)
 
 
