@@ -47,6 +47,10 @@ func TestResourceMustSupportList(t *testing.T) {
 			rpc GetBook(GetBookRequest) returns (Book) {};
 			rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {};
 		`, nil},
+		{"ValidListGetRevisions", `
+			rpc GetBookRevision(GetBookRevisionRequest) returns (BookRevision) {};
+			rpc ListBookRevisions(ListBookRevisionsRequest) returns (ListBookRevisionsResponse) {};
+		`, nil},
 		{"ValidUpdateList", `
 			rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {};
 			rpc UpdateBook(UpdateBookRequest) returns (Book) {};
@@ -74,6 +78,11 @@ func TestResourceMustSupportList(t *testing.T) {
 			rpc GetBook(GetBookRequest) returns (Book) {};
 		`, []lint.Problem{
 			{Message: `resource "library.googleapis.com/Book"`},
+		}},
+		{"InvalidGetRevisionOnly", `
+			rpc GetBookRevision(GetBookRevisionRequest) returns (BookRevision) {};
+		`, []lint.Problem{
+			{Message: `resource "library.googleapis.com/BookRevision"`},
 		}},
 		{"ValidIgnoreSingleton", `
 			rpc GetBookCover(GetBookCoverRequest) returns (BookCover) {};
@@ -105,6 +114,17 @@ func TestResourceMustSupportList(t *testing.T) {
 					};
 				}
 
+				// This is at the top to make it retrievable
+				// by the test code.
+				message BookRevision {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/BookRevision"
+						pattern: "books/{book}/revisions/{revision}"
+						singular: "bookRevision"
+						plural: "bookRevisions"
+					};
+				}
+
 				message BookCover {
 					option (google.api.resource) = {
 						type: "library.googleapis.com/BookCover"
@@ -130,6 +150,10 @@ func TestResourceMustSupportList(t *testing.T) {
 					string name = 1;
 				}
 
+				message GetBookRevisionRequest {
+					string name = 1;
+				}
+
 				message UpdateBookRequest {
 					Book book = 1;
 					google.protobuf.FieldMask update_mask = 2;
@@ -143,6 +167,17 @@ func TestResourceMustSupportList(t *testing.T) {
 
 				 message ListBooksResponse {
 					repeated Book books = 1;
+					string next_page_token = 2;
+				 }
+
+				 message ListBookRevisionsRequest {
+					string parent = 1;
+					int32 page_size = 2;
+					string page_token = 3;
+				 }
+
+				 message ListBookRevisionsResponse {
+					repeated BookRevision book_revisions = 1;
 					string next_page_token = 2;
 				 }
 

@@ -39,7 +39,7 @@ var resourceMustSupportList = &lint.ServiceRule{
 				continue
 			}
 
-			if utils.IsListMethod(m) {
+			if utils.IsListMethod(m) || utils.IsListRevisionsMethod(m) {
 				if msg := utils.GetListResourceMessage(m); msg != nil && utils.IsResource(msg) {
 					t := utils.GetResource(msg).GetType()
 					resourcesWithList.Add(t)
