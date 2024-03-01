@@ -21,13 +21,14 @@ import (
 )
 
 var (
-	createMethodRegexp         = regexp.MustCompile("^Create(?:[A-Z]|$)")
-	getMethodRegexp            = regexp.MustCompile("^Get(?:[A-Z]|$)")
-	listMethodRegexp           = regexp.MustCompile("^List(?:[A-Z]|$)")
-	listRevisionsMethodRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
-	updateMethodRegexp         = regexp.MustCompile("^Update(?:[A-Z]|$)")
-	deleteMethodRegexp         = regexp.MustCompile("^Delete(?:[A-Z]|$)")
-	deleteRevisionMethodRegexp = regexp.MustCompile("^Delete[A-Za-z0-9]*Revision$")
+	createMethodRegexp               = regexp.MustCompile("^Create(?:[A-Z]|$)")
+	getMethodRegexp                  = regexp.MustCompile("^Get(?:[A-Z]|$)")
+	listMethodRegexp                 = regexp.MustCompile("^List(?:[A-Z]|$)")
+	listRevisionsMethodRegexp        = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)Revisions$`)
+	updateMethodRegexp               = regexp.MustCompile("^Update(?:[A-Z]|$)")
+	deleteMethodRegexp               = regexp.MustCompile("^Delete(?:[A-Z]|$)")
+	deleteRevisionMethodRegexp       = regexp.MustCompile("^Delete[A-Za-z0-9]*Revision$")
+	legacyListRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
 )
 
 // IsCreateMethod returns true if this is a AIP-133 Create method.
@@ -46,13 +47,34 @@ func IsGetMethod(m *desc.MethodDescriptor) bool {
 
 // IsListMethod return true if this is an AIP-132 List method
 func IsListMethod(m *desc.MethodDescriptor) bool {
-	return listMethodRegexp.MatchString(m.GetName()) && !IsListRevisionsMethod(m)
+	return listMethodRegexp.MatchString(m.GetName()) && !IsLegacyListRevisionsMethod(m)
 }
 
-// IsListRevisionsMethod returns true if this is an AIP-162 List Revisions method,
-// false otherwise.
-func IsListRevisionsMethod(m *desc.MethodDescriptor) bool {
-	return listRevisionsMethodRegexp.MatchString(m.GetName())
+// IsLegacyListRevisions identifies such a method by having the appropriate
+// method name, having a `name` field instead of parent, and a HTTP suffix of
+// `listRevisions`.
+func IsLegacyListRevisionsMethod(m *desc.MethodDescriptor) bool {
+	// Must be named like List{Resource}Revisions.
+	if !listRevisionsMethodRegexp.MatchString(m.GetName()) {
+		return false
+	}
+
+	// Must have a `name` field instead of `parent`.
+	if m.GetInputType().FindFieldByName("name") == nil {
+		return false
+	}
+
+	// Must have the `:listRevisions` HTTP URI suffix.
+	if !HasHTTPRules(m) {
+		// If it doesn't have HTTP bindings, we shouldn't proceed to the next
+		// check, but a List{Resource}Revisions method with a `name` field is
+		// probably enough to be sure in the absence of HTTP bindings.
+		return true
+	}
+
+	// Just check the first bidning as they should all have the same suffix.
+	h := GetHTTPRules(m)[0].GetPlainURI()
+	return legacyListRevisionsURINameRegexp.MatchString(h)
 }
 
 // IsUpdateMethod returns true if this is a AIP-134 Update method
