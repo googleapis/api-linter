@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.64.0](https://github.com/googleapis/api-linter/compare/v1.63.6...v1.64.0) (2024-03-04)
+
+
+### Features
+
+* remove legacy list revisions rules ([#1348](https://github.com/googleapis/api-linter/issues/1348)) ([2bc5c57](https://github.com/googleapis/api-linter/commit/2bc5c574eb2e33aee2df502bd3b70454dbfae542))
+
+
+### Documentation
+
+* **AIP-191:** remove ambiguity in java_outer_classname ([#1345](https://github.com/googleapis/api-linter/issues/1345)) ([1d8d76d](https://github.com/googleapis/api-linter/commit/1d8d76d561e5042735c63fa23ec26c7520d11498))
+
 ## [1.63.6](https://github.com/googleapis/api-linter/compare/v1.63.5...v1.63.6) (2024-02-20)
 
 
