@@ -1,9 +1,11 @@
 module github.com/googleapis/api-linter
 
-go 1.20
+go 1.21
+
+toolchain go1.22.1
 
 require (
-	bitbucket.org/creachadair/stringset v0.0.12
+	bitbucket.org/creachadair/stringset v0.0.14
 	cloud.google.com/go/longrunning v0.5.6
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/gertd/go-pluralize v0.2.1
