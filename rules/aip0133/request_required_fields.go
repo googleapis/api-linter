@@ -28,7 +28,7 @@ import (
 // The create request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "request-required-fields"),
-	OnlyIf: utils.IsCreateMethod,
+	OnlyIf: utils.IsCreateMethodWithResolvedReturnType,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
 		r := utils.GetResource(ot)
