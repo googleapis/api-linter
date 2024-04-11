@@ -45,12 +45,7 @@ func IsCreateMethodWithResolvedReturnType(m *desc.MethodDescriptor) bool {
 		return false
 	}
 
-	res := m.GetOutputType()
-
-	if info := GetOperationInfo(m); info != nil {
-		res = FindMessage(m.GetFile(), info.GetResponseType())
-	}
-	return res != nil
+	return GetResponseType(m) != nil
 }
 
 // IsGetMethod returns true if this is a AIP-131 Get method.
