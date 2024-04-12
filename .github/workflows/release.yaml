@@ -44,7 +44,7 @@ jobs:
           go get github.com/inconshreveable/mousetrap
       - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
-          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
+          CGO_ENABLED=0  gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
           tar cvfz api-linter.tar.gz api-linter*
       - name: Set raw version
         id: raw_tag
