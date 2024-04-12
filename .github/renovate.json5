@@ -7,6 +7,14 @@
   ],
   labels: ["automerge"],
   postUpdateOptions: ["gomodTidy"],
+  packageRules: [
+    {
+      matchPackageNames: [
+        "^bitbucket.org/creachadair/stringset",
+      ],
+      enabled: false
+    }
+  ],
   force: {
     constraints: {
       go: "1.20"
