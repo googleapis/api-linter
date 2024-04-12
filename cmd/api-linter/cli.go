@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/pflag"
 	"google.golang.org/protobuf/proto"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type cli struct {
