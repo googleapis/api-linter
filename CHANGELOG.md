@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.0](https://github.com/googleapis/api-linter/compare/v1.64.0...v1.65.0) (2024-04-12)
+
+
+### Features
+
+* **AIP-133:** ignore create methods with invalid LRO response types ([#1366](https://github.com/googleapis/api-linter/issues/1366)) ([22d015a](https://github.com/googleapis/api-linter/commit/22d015afc1067f8895a2603ae859d11d33f06a36))
+
 ## [1.64.0](https://github.com/googleapis/api-linter/compare/v1.63.6...v1.64.0) (2024-03-04)
 
 
