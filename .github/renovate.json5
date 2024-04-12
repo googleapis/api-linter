@@ -7,4 +7,9 @@
   ],
   labels: ["automerge"],
   postUpdateOptions: ["gomodTidy"],
+  "force": {
+    "constraints": {
+      "go": "1.20"
+    }
+  }
 }
