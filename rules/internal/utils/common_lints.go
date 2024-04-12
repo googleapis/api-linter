@@ -74,7 +74,7 @@ func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
 
 // LintNotOneof returns a problem if the field is a oneof.
 func LintNotOneof(f *desc.FieldDescriptor) []lint.Problem {
-	if f.GetOneOf() != nil {
+	if f.GetOneOf() != nil && !f.IsProto3Optional() {
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
 			Descriptor: f,

@@ -260,6 +260,7 @@ func TestLintNotOneof(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", `string foo = 1;`, nil},
+		{"ValidProto3Optional", `optional string foo = 1;`, nil},
 		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
