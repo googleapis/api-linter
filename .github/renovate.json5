@@ -11,6 +11,7 @@
     {
       matchPackageNames: [
         "^bitbucket.org/creachadair/stringset",
+        "^dominikh/staticcheck-action",
       ],
       enabled: false
     }
