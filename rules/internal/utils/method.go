@@ -36,7 +36,7 @@ func IsCreateMethod(m *desc.MethodDescriptor) bool {
 	return createMethodRegexp.MatchString(m.GetName())
 }
 
-// IsCreateMethod returns true if this is a AIP-133 Create method with
+// IsCreateMethodWithResolvedReturnType returns true if this is a AIP-133 Create method with
 // a non-nil response type. This method should be used for filtering in linter
 // rules which access the response type of the method, to avoid crashing due
 // to dereferencing a nil pointer to the response.
