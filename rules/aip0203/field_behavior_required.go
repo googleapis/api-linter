@@ -27,6 +27,11 @@ var minimumRequiredFieldBehavior = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY", "IMMUTABLE",
 )
 
+var excusedResourceFields = stringset.New(
+	"name", // Uses https://google.aip.dev/203#identifier
+	"etag", // Prohibited by https://google.aip.dev/154
+)
+
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
@@ -51,7 +56,7 @@ func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor
 		}
 		visited[f] = true
 
-		if utils.IsResource(m) && f.GetName() == "name" {
+		if utils.IsResource(m) && excusedResourceFields.Contains(f.GetName()) {
 			continue
 		}
 

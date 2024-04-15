@@ -117,6 +117,8 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 					};
 
 					string name = 1;
+
+					string etag = 2;
 				}
 			`, tc)
 			field := f.GetMessageTypes()[0].GetFields()[0]
