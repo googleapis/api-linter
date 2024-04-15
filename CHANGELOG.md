@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.65.1](https://github.com/googleapis/api-linter/compare/v1.65.0...v1.65.1) (2024-04-15)
+
+
+### Bug Fixes
+
+* **ci:** build binaries with CGO_ENABLED=0 ([#1371](https://github.com/googleapis/api-linter/issues/1371)) ([f776eca](https://github.com/googleapis/api-linter/commit/f776ecaa0fbab579726120383139c13e9f57e479))
+* ignore proto3_optional fields in oneof check ([#1370](https://github.com/googleapis/api-linter/issues/1370)) ([0d6e074](https://github.com/googleapis/api-linter/commit/0d6e0742603c377e86e6abbc557d6ff20e142a46)), refs [#1323](https://github.com/googleapis/api-linter/issues/1323)
+
 ## [1.65.0](https://github.com/googleapis/api-linter/compare/v1.64.0...v1.65.0) (2024-04-12)
 
 
