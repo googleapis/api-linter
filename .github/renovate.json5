@@ -10,8 +10,8 @@
   packageRules: [
     {
       matchPackageNames: [
-        "^bitbucket.org/creachadair/stringset",
-        "^dominikh/staticcheck-action",
+        "bitbucket.org/creachadair/stringset",
+        "dominikh/staticcheck-action",
       ],
       enabled: false
     }
