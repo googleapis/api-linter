@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.2](https://github.com/googleapis/api-linter/compare/v1.65.1...v1.65.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* **AIP-203:** resource etag should not have behavior ([#1376](https://github.com/googleapis/api-linter/issues/1376)) ([1c0f838](https://github.com/googleapis/api-linter/commit/1c0f838941e064caa0eda046a5b4f1c2b7fb2788))
+
 ## [1.65.1](https://github.com/googleapis/api-linter/compare/v1.65.0...v1.65.1) (2024-04-15)
 
 
