@@ -8,7 +8,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.6.0
-	github.com/jhump/protoreflect v1.16.0
+	github.com/jhump/protoreflect v1.15.6
 	github.com/lithammer/dedent v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.5
@@ -16,12 +16,12 @@ require (
 	golang.org/x/text v0.14.0
 	google.golang.org/genproto v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
-	google.golang.org/protobuf v1.33.1-0.20240422163739-e4ad8f9dfc8b
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/bufbuild/protocompile v0.10.0 // indirect
+	github.com/bufbuild/protocompile v0.9.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.23.0 // indirect
