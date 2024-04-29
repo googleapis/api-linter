@@ -16,7 +16,7 @@ require (
 	golang.org/x/text v0.14.0
 	google.golang.org/genproto v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
-	google.golang.org/protobuf v1.33.1-0.20240422163739-e4ad8f9dfc8b
+	google.golang.org/protobuf v1.33.1-0.20240423095020-c2b76eee36e7
 	gopkg.in/yaml.v3 v3.0.1
 )
 
