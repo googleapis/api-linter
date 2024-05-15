@@ -41,9 +41,7 @@ func TestRequestMessageName(t *testing.T) {
 					rpc {{.MethodName}}({{.ReqMessageName}}) returns (Book) {}
 				}
 				message {{.ReqMessageName}} {}
-				{{if ne .ReqMessageName "Book"}}
 				message Book {}
-				{{end}}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(requestMessageName.Lint(f)); diff != "" {
