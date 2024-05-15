@@ -31,6 +31,7 @@ func AddRules(r lint.RuleRegistry) error {
 		httpBody,
 		httpMethod,
 		noPrepositions,
+		responseMessageName,
 		standardMethodsOnly,
 		uriSuffix,
 		verbNoun,
