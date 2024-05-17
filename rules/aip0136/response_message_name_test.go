@@ -30,7 +30,8 @@ func TestResponseMessageName(t *testing.T) {
 			problems        testutils.Problems
 		}{
 			{"Valid", "ArchiveBook", "ArchiveBookResponse", testutils.Problems{}},
-			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{Suggestion: "ArchiveBookResponse"}}},
+			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{
+				Message: "Custom methods should return a message matching the RPC name, with a `Response` suffix, or the resource being operated on, not \"ArchiveBookResp\"."}}},
 		}
 
 		for _, test := range tests {

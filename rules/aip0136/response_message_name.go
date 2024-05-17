@@ -48,17 +48,11 @@ var responseMessageName = &lint.MethodRule{
 
 		response := utils.GetResponseType(m)
 		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
-
-		// If we can't determine if this is a resource-based custom method return the
-		// findings from the above matching response name lint
-		if !utils.IsResource(response) || requestResourceType == "" {
-			return suffixFindings
-		}
+		responseResourceType := utils.GetResource(response).GetType()
 
 		// However, if we can determine that this is a resource-based custom method,
 		// the ensure that they equal
-		responseResourceType := utils.GetResource(response).GetType()
-		if responseResourceType == requestResourceType {
+		if utils.IsResource(response) && responseResourceType == requestResourceType {
 			return nil
 		}
 
