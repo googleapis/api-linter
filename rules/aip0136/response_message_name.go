@@ -40,7 +40,7 @@ var responseMessageName = &lint.MethodRule{
 		// Reference of the input type's `name` field. This guidance is documented
 		// in https://google.aip.dev/136#resource-based-custom-methods
 
-		// Output type has `Response` suffix
+		// Short-circuit: Output type has `Response` suffix
 		suffixFindings := utils.LintMethodHasMatchingResponseName(m)
 		if len(suffixFindings) == 0 {
 			return nil
@@ -50,8 +50,7 @@ var responseMessageName = &lint.MethodRule{
 		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
 		responseResourceType := utils.GetResource(response).GetType()
 
-		// However, if we can determine that this is a resource-based custom method,
-		// the ensure that they equal
+		// Short-circuit: Output type is the resource being operated on
 		if utils.IsResource(response) && responseResourceType == requestResourceType {
 			return nil
 		}
