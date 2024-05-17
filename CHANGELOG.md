@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.66.0](https://github.com/googleapis/api-linter/compare/v1.65.2...v1.66.0) (2024-05-17)
+
+
+### Features
+
+* **AIP-136:** request message name ([#1386](https://github.com/googleapis/api-linter/issues/1386)) ([46a6e43](https://github.com/googleapis/api-linter/commit/46a6e43d1d6bb6a6e79131866f16f0b1dfd2e326))
+* **aip-136:** response message name ([#1387](https://github.com/googleapis/api-linter/issues/1387)) ([9e43e3f](https://github.com/googleapis/api-linter/commit/9e43e3f1c98dfe716d4c8ede6fc213239425c6ef))
+
 ## [1.65.2](https://github.com/googleapis/api-linter/compare/v1.65.1...v1.65.2) (2024-04-22)
 
 
