@@ -23,6 +23,10 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
+const responseMessageNameErrorMessage = "" +
+	"Custom methods should return a message matching the RPC name, with a `Response` suffix, " +
+	"or the resource being operated on, not %q."
+
 // Custom methods should return a response message matching the RPC name,
 // with a Response suffix, or the resource being operated on.
 var responseMessageName = &lint.MethodRule{
@@ -36,31 +40,30 @@ var responseMessageName = &lint.MethodRule{
 		// Reference of the input type's `name` field. This guidance is documented
 		// in https://google.aip.dev/136#resource-based-custom-methods
 
-		response := utils.GetResponseType(m)
-		requestType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
-		resourceOperatedOn := utils.FindResourceMessage(requestType, m.GetFile())
-
 		// Output type has `Response` suffix
-		if len(utils.LintMethodHasMatchingResponseName(m)) == 0 {
+		suffixFindings := utils.LintMethodHasMatchingResponseName(m)
+		if len(suffixFindings) == 0 {
 			return nil
 		}
 
-		// Response is the resource being operated on
-		if response == resourceOperatedOn {
-			return nil
+		response := utils.GetResponseType(m)
+		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
+
+		// If we can't determine if this is a resource-based custom method return the
+		// findings from the above matching response name lint
+		if !utils.IsResource(response) || requestResourceType == "" {
+			return suffixFindings
 		}
 
-		msg := "Custom methods should return a message matching the RPC name, with a `Response` suffix, or the resource being operated on, not %q."
-		got := m.GetName()
-
-		suggestion := got + "Response"
-		if utils.IsResource(response) && resourceOperatedOn != nil {
-			suggestion += " or " + resourceOperatedOn.GetName()
+		// However, if we can determine that this is a resource-based custom method,
+		// the ensure that they equal
+		responseResourceType := utils.GetResource(response).GetType()
+		if responseResourceType == requestResourceType {
+			return nil
 		}
 
 		return []lint.Problem{{
-			Message:    fmt.Sprintf(msg, got),
-			Suggestion: suggestion,
+			Message:    fmt.Sprintf(responseMessageNameErrorMessage, response.GetName()),
 			Descriptor: m,
 			Location:   locations.MethodResponseType(m),
 		}}
