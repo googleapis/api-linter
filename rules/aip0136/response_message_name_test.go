@@ -83,10 +83,10 @@ func TestResponseMessageName(t *testing.T) {
 							post: "/v1/{name=publishers/*/books/*}:foo"
 							body: "*"
 						};
-						{{ if (.LRO) }}
+						{{ if .LRO }}
 						option (google.longrunning.operation_info) = {
 							response_type: "{{ .RespMessageName }}"
-							metadata_type: "{{ .RespMessageName | printf "%s%s" "Metadata" }}"
+							metadata_type: "{{ .RespMessageName }}Metadata"
 						};
 						{{ end }}
 					};
@@ -109,15 +109,8 @@ func TestResponseMessageName(t *testing.T) {
 				message {{.MethodName}}Request {
 					// The book to operate on.
 					// Format: publishers/{publisher}/books/{book}
-					string name = 1 [
-					  (google.api.resource_reference) = {
-						type: "library.googleapis.com/Book"
-					  }];
+					string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 				}
-
-				{{ if and (ne .RespMessageName "Book") (ne .RespMessageName "Author") }}
-				message {{.RespMessageName}} {}
-				{{ end }}
 				`, test)
 				method := file.GetServices()[0].GetMethods()[0]
 				problems := responseMessageName.Lint(file)
