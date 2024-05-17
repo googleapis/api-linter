@@ -21,63 +21,110 @@ import (
 )
 
 func TestResponseMessageName(t *testing.T) {
-	// Set up the testing permutations.
-	tests := []struct {
-		testName            string
-		MethodName          string
-		RespMessageName     string
-		OperatingOnResource bool
-		problems            testutils.Problems
-	}{
-		{"Valid Resource", "ArchiveBook", "Book", true, testutils.Problems{}},
-		{"Invalid Resource", "ArchiveBook", "Author", true, testutils.Problems{{Suggestion: "ArchiveBookResponse or Book"}}},
-		{"Valid Response Suffix Stateful", "ArchiveBook", "ArchiveBookResponse", true, testutils.Problems{}},
-		{"Valid Response Suffix Stateless", "ArchiveBook", "ArchiveBookResponse", false, testutils.Problems{}},
-		{"Invalid Response Suffix", "ArchiveBook", "ArchiveBookResp", true, testutils.Problems{{Suggestion: "ArchiveBookResponse or Book"}}},
-		{"Unable To Find Resource", "ArchiveBook", "ArchiveBookResp", false, testutils.Problems{{Suggestion: "ArchiveBookResponse"}}},
-		{"Irrelevant", "DeleteBook", "DeleteBookResp", true, testutils.Problems{}},
-	}
+	t.Run("Response Suffix", func(t *testing.T) {
+		// Set up the testing permutations.
+		tests := []struct {
+			testName        string
+			MethodName      string
+			RespMessageName string
+			problems        testutils.Problems
+		}{
+			{"Valid", "ArchiveBook", "ArchiveBookResponse", testutils.Problems{}},
+			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{Suggestion: "ArchiveBookResponse"}}},
+		}
 
-	// Run each test individually.
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
-			package test;
-			import "google/api/resource.proto";
-			service Library {
-				rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespMessageName}});
-			}
-			message {{.MethodName}}Request {
-				{{ if (.OperatingOnResource) }}
-				// The book to archive.
-				// Format: publishers/{publisher}/books/{book}
-				string name = 1 [
-				  (google.api.resource_reference) = {
-					type: "library.googleapis.com/Book"
-				  }];
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				file := testutils.ParseProto3Tmpl(t, `
+				package test;
+				import "google/api/resource.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespMessageName}});
+				}
+				message {{.MethodName}}Request {}
+				message {{.RespMessageName}} {}
+				`, test)
+				method := file.GetServices()[0].GetMethods()[0]
+				problems := responseMessageName.Lint(file)
+				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+					t.Error(diff)
+				}
+			})
+		}
+	})
+
+	t.Run("Resource", func(t *testing.T) {
+		// Set up the testing permutations.
+		tests := []struct {
+			testName        string
+			MethodName      string
+			RespMessageName string
+			LRO             bool
+			problems        testutils.Problems
+		}{
+			{"Valid", "ArchiveBook", "Book", false, testutils.Problems{}},
+			{"Valid LRO", "ArchiveBook", "Book", true, testutils.Problems{}},
+			{"Invalid", "ArchiveBook", "Author", false, testutils.Problems{{Suggestion: "ArchiveBookResponse or Book"}}},
+			{"Invalid LRO", "ArchiveBook", "Author", true, testutils.Problems{{Suggestion: "ArchiveBookResponse or Book"}}},
+		}
+
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				file := testutils.ParseProto3Tmpl(t, `
+				package test;
+
+				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{ if .LRO }}google.longrunning.Operation{{ else }}{{.RespMessageName}}{{ end }}) {
+						option (google.api.http) = {
+							post: "/v1/{name=publishers/*/books/*}:foo"
+							body: "*"
+						};
+						{{ if (.LRO) }}
+						option (google.longrunning.operation_info) = {
+							response_type: "{{ .RespMessageName }}"
+							metadata_type: "{{ .RespMessageName | printf "%s%s" "Metadata" }}"
+						};
+						{{ end }}
+					};
+				}
+
+				message Book {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Book"
+						pattern: "publishers/{publisher}/books/{book}"
+					};
+				}
+
+				message Author {
+					option (google.api.resource) = {
+						type: "library.googleapis.com/Author"
+						pattern: "authors/{author}"
+					};
+				}
+
+				message {{.MethodName}}Request {
+					// The book to operate on.
+					// Format: publishers/{publisher}/books/{book}
+					string name = 1 [
+					  (google.api.resource_reference) = {
+						type: "library.googleapis.com/Book"
+					  }];
+				}
+
+				{{ if and (ne .RespMessageName "Book") (ne .RespMessageName "Author") }}
+				message {{.RespMessageName}} {}
 				{{ end }}
-			}
-			message Book {
-				option (google.api.resource) = {
-					type: "library.googleapis.com/Book"
-					pattern: "publishers/{publisher}/books/{book}"
-				};
-			}
-			message Author {
-				option (google.api.resource) = {
-					type: "library.googleapis.com/Author"
-					pattern: "authors/{author}"
-				};
-			}
-			{{ if and (ne .RespMessageName "Book") (ne .RespMessageName "Author") }}
-			message {{.RespMessageName}} {}
-			{{ end }}
-			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
-			problems := responseMessageName.Lint(file)
-			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Error(diff)
-			}
-		})
-	}
+				`, test)
+				method := file.GetServices()[0].GetMethods()[0]
+				problems := responseMessageName.Lint(file)
+				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+					t.Error(diff)
+				}
+			})
+		}
+	})
 }

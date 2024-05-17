@@ -17,7 +17,6 @@ package aip0136
 import (
 	"fmt"
 
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -25,40 +24,46 @@ import (
 )
 
 // Custom methods should return a response message matching the RPC name,
-// with a Response suffix.
+// with a Response suffix, or the resource being operated on.
 var responseMessageName = &lint.MethodRule{
-	Name:   lint.NewRuleName(135, "response-message-name"),
+	Name:   lint.NewRuleName(136, "response-message-name"),
 	OnlyIf: isCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		matchingResponseName := m.GetName() + "Response"
-		suggestion := matchingResponseName
+		// A response is considered valid if
+		// - The response name matches the RPC name with a `Response` suffix
+		// - The response is the resource being operated on
+		// To identify the resource being operated on, we inspect the Resource
+		// Reference of the input type's `name` field. This guidance is documented
+		// in https://google.aip.dev/136#resource-based-custom-methods
 
-		got := m.GetOutputType().GetName()
-		want := stringset.New(matchingResponseName)
+		response := utils.GetResponseType(m)
+		requestType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
+		resourceOperatedOn := utils.FindResourceMessage(requestType, m.GetFile())
 
-		// Get the resource name from the first request message field, if it
-		// is a resource reference
-		if len(m.GetInputType().GetFields()) > 0 {
-			rr := utils.GetResourceReference(m.GetInputType().GetFields()[0])
-			if _, resourceMsgNameSingular, ok := utils.SplitResourceTypeName(rr.GetType()); ok {
-				want.Add(resourceMsgNameSingular)
-				suggestion += " or " + resourceMsgNameSingular
-			}
+		// Output type has `Response` suffix
+		if len(utils.LintMethodHasMatchingResponseName(m)) == 0 {
+			return nil
 		}
 
-		if !want.Contains(got) {
-			msg := "Custom methods should return a response message matching the RPC name, with a Response suffix, or the resource, not %q."
-
-			problem := lint.Problem{
-				Message:    fmt.Sprintf(msg, got),
-				Suggestion: suggestion,
-				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
-			}
-
-			return []lint.Problem{problem}
+		// Response is the resource being operated on
+		if response == resourceOperatedOn {
+			return nil
 		}
 
-		return nil
+		msg := "Custom methods should return a message matching the RPC name, with a `Response` suffix, or the resource being operated on, not %q."
+		got := m.GetName()
+
+		suggestion := got + "Response"
+		if utils.IsResource(response) && resourceOperatedOn != nil {
+			suggestion += " or " + resourceOperatedOn.GetName()
+		}
+
+		return []lint.Problem{{
+			Message:    fmt.Sprintf(msg, got),
+			Suggestion: suggestion,
+			Descriptor: m,
+			Location:   locations.MethodResponseType(m),
+		}}
+
 	},
 }
