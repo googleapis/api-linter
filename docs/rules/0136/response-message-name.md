@@ -20,10 +20,9 @@ This rule looks at any method that is not a standard method, and complains if
 the name of the corresponding output message does not match the name of the RPC
 with the suffix `Response` appended, or the resource being operated on.
 
-**Note:** To identify the resource being operated on, the rule inspects the
-name path parameter, which maps to the `name` field on the input type checking
-that the resource message derived from `(google.api.resource_reference).type`
-matches the response resource.
+**Note:** To identify the resource being operated on, the rule checks for
+the request field `name`, and comparing its `(google.api.resource_reference).type`,
+if present, to the response message's `(google.api.resource).type`, if present.
 
 ## Examples
 
