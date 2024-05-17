@@ -10,9 +10,9 @@ redirect_from:
 
 # Custom methods: Response message
 
-This rule enforces that all custom methods should take a response message
-matching the RPC name, with a `Response` suffix, or the resource being operated
-on [AIP-136][].
+This rule enforces that custom methods have a response message that is named to
+match the RPC name with a `Response` suffix, or that is the resource being operated
+on, as described in [AIP-136][].
 
 ## Details
 
