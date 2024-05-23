@@ -205,20 +205,31 @@ func TestLintMethodHasMatchingRequestName(t *testing.T) {
 
 func TestLintMethodHasMatchingResponseName(t *testing.T) {
 	for _, test := range []struct {
-		testName    string
-		MessageName string
-		problems    testutils.Problems
+		testName     string
+		ResponseName string
+		MessageName  string
+		problems     testutils.Problems
 	}{
-		{"Valid", "GetBookResponse", nil},
-		{"Invalid", "AcquireBookResponse", testutils.Problems{{Suggestion: "GetBookResponse"}}},
+		{"Valid", "GetBookResponse", "GetBookResponse", nil},
+		{"ValidLongRunningOperation", "google.longrunning.Operation", "GetBookResponse", nil},
+		{"Invalid", "AcquireBookResponse", "AcquireBookResponse", testutils.Problems{{Suggestion: "GetBookResponse"}}},
+		{"InvalidLongRunningOperation", "google.longrunning.Operation", "AcquireBookResponse", testutils.Problems{{Message: "GetBookResponse"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+
 				service Library {
-					rpc GetBook(GetBookRequest) returns ({{.MessageName}});
+					rpc GetBook(GetBookRequest) returns ({{.ResponseName}}) {
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.MessageName}}"
+							metadata_type: "OperationMetadata"
+						};
+					}
 				}
 				message GetBookRequest {}
 				message {{.MessageName}} {}
+				message OperationMetadata {}
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			problems := LintMethodHasMatchingResponseName(method)

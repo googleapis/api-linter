@@ -181,12 +181,24 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 // LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
 // have a name matching the method's, with a "Response" suffix.
 func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
-	if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
+	// GetResponseType handles the LRO case.
+	if got, want := GetResponseType(m).GetName(), m.GetName()+"Response"; got != want {
+		loc := locations.MethodResponseType(m)
+		suggestion := want
+
+		// If the RPC is an LRO, we need to tweak the finding.
+		if isLongRunningOperation(m.GetOutputType()) {
+			loc = locations.MethodOperationInfo(m)
+			// Clear the suggestion b.c we cannot easily pin point the
+			// response_type field.
+			suggestion = ""
+		}
+
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("Response message should be named after the RPC, i.e. %q.", want),
-			Suggestion: want,
+			Suggestion: suggestion,
 			Descriptor: m,
-			Location:   locations.MethodResponseType(m),
+			Location:   loc,
 		}}
 	}
 	return nil

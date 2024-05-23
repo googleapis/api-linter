@@ -27,10 +27,12 @@ func TestResponseMessageName(t *testing.T) {
 			testName        string
 			MethodName      string
 			RespMessageName string
+			MessageName     string
 			problems        testutils.Problems
 		}{
-			{"Valid", "ArchiveBook", "ArchiveBookResponse", testutils.Problems{}},
-			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{Message: "not \"ArchiveBookResp\"."}}},
+			{"Valid", "ArchiveBook", "ArchiveBookResponse", "ArchiveBookResponse", testutils.Problems{}},
+			{"ValidLongRunningOperation", "ArchiveBook", "ArchiveBookResponse", "ArchiveBookResponse", testutils.Problems{}},
+			{"Invalid", "ArchiveBook", "ArchiveBookResp", "ArchiveBookResp", testutils.Problems{{Message: "not \"ArchiveBookResp\"."}}},
 		}
 
 		for _, test := range tests {
@@ -38,11 +40,19 @@ func TestResponseMessageName(t *testing.T) {
 				file := testutils.ParseProto3Tmpl(t, `
 				package test;
 				import "google/api/resource.proto";
+				import "google/longrunning/operations.proto";
+
 				service Library {
-					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespMessageName}});
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.RespMessageName}}) {
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.MessageName}}"
+							metadata_type: "OperationMetadata"
+						};
+					};
 				}
 				message {{.MethodName}}Request {}
-				message {{.RespMessageName}} {}
+				message {{.MessageName}} {}
+				message OperationMetadata {}
 				`, test)
 				method := file.GetServices()[0].GetMethods()[0]
 				problems := responseMessageName.Lint(file)
