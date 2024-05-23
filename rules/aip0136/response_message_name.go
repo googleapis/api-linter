@@ -55,10 +55,15 @@ var responseMessageName = &lint.MethodRule{
 			return nil
 		}
 
+		loc := locations.MethodResponseType(m)
+		if utils.IsOperation(m.GetOutputType()) {
+			loc = locations.MethodOperationInfo(m)
+		}
+
 		return []lint.Problem{{
 			Message:    fmt.Sprintf(responseMessageNameErrorMessage, response.GetName()),
 			Descriptor: m,
-			Location:   locations.MethodResponseType(m),
+			Location:   loc,
 		}}
 
 	},
