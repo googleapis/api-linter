@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.66.1](https://github.com/googleapis/api-linter/compare/v1.66.0...v1.66.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* **AIP-136:** handle LRO response names ([#1391](https://github.com/googleapis/api-linter/issues/1391)) ([ec79f53](https://github.com/googleapis/api-linter/commit/ec79f5392829fc58a44f577dce55a936ea112988))
+
 ## [1.66.0](https://github.com/googleapis/api-linter/compare/v1.65.2...v1.66.0) (2024-05-17)
 
 
