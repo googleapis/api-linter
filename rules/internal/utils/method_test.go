@@ -318,3 +318,70 @@ func TestGetListResourceMessage(t *testing.T) {
 		})
 	}
 }
+
+func TestIsStandardMethod(t *testing.T) {
+	for _, test := range []struct {
+		name           string
+		RPCs           string
+		wantIsStandard bool
+	}{
+		{"ValidCreate", `
+			rpc CreateBook(Book) returns (Book) {};
+		`, true},
+		{"ValidUpdate", `
+			rpc UpdateBook(Book) returns (Book) {};
+		`, true},
+		{"ValidGet", `
+			rpc GetBook(Book) returns (Book) {};
+		`, true},
+		{"ValidDelete", `
+			rpc DeleteBook(Book) returns (Book) {};
+		`, true},
+		{"ValidList", `
+			rpc ListBooks(Book) returns (Book) {};
+		`, true},
+		{"ValidBatchCreate", `
+			rpc BatchCreateBooks(Book) returns (Book) {};
+		`, true},
+		{"ValidBatchUpdate", `
+			rpc BatchUpdateBooks(Book) returns (Book) {};
+		`, true},
+		{"ValidBatchGet", `
+			rpc BatchGetBooks(Book) returns (Book) {};
+		`, true},
+		{"ValidBatchDelete", `
+			rpc BatchDeleteBooks(Book) returns (Book) {};
+		`, true},
+		{"InvalidArchive", `
+			rpc ArchiveBook(Book) returns (Book) {};
+		`, false},
+		{"InvalidSort", `
+			rpc SortBooks(Book) returns (Book) {};
+		`, false},
+		{"InvalidTranslate", `
+			rpc TranslateText(Book) returns (Book) {};
+		`, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				service Foo {
+					{{.RPCs}}
+				}
+
+				// This is the request and response, which is irrelevant for
+				// asserting if the rpc is a standard method or not. We just
+				// check the naming of the rpc against a regex
+				message Book {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			gotIsStandard := IsStandardMethod(method)
+			gotIsCustom := IsCustomMethod(method)
+			if gotIsStandard != test.wantIsStandard {
+				t.Errorf("IsStandardMethod got %v, want %v", gotIsStandard, test.wantIsStandard)
+			}
+			if gotIsCustom != !test.wantIsStandard {
+				t.Errorf("IsCustomMethod got %v, want %v", gotIsCustom, !test.wantIsStandard)
+			}
+		})
+	}
+}

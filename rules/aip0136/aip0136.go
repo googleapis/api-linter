@@ -16,11 +16,7 @@
 package aip0136
 
 import (
-	"strings"
-
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
 
 // AddRules accepts a register function and registers each of
@@ -41,23 +37,4 @@ func AddRules(r lint.RuleRegistry) error {
 		// httpNameVariable,
 		// httpParentVariable,
 	)
-}
-
-func isCustomMethod(m *desc.MethodDescriptor) bool {
-	// Anything with a `:` in the method URI is automatically a custom
-	// method, regardless of the RPC name.
-	for _, httpRule := range utils.GetHTTPRules(m) {
-		if strings.Contains(httpRule.GetPlainURI(), ":") {
-			return true
-		}
-	}
-
-	// Methods with no `:` in the URI are standard methods if they begin with
-	// one of the standard method names.
-	for _, prefix := range []string{"Get", "List", "Create", "Update", "Delete", "Replace"} {
-		if strings.HasPrefix(m.GetName(), prefix) {
-			return false
-		}
-	}
-	return true
 }
