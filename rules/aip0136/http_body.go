@@ -27,7 +27,7 @@ import (
 
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-body"),
-	OnlyIf: isCustomMethod,
+	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			noBody := stringset.New("GET", "DELETE")

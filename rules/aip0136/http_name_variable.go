@@ -27,7 +27,7 @@ import (
 
 var httpNameVariable = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-name-variable"),
-	OnlyIf: isCustomMethod,
+	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		p := pluralize.NewClient()
 		for _, http := range utils.GetHTTPRules(m) {

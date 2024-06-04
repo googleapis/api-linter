@@ -22,6 +22,6 @@ import (
 // Custom methods should have a properly named Request message.
 var requestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(136, "request-message-name"),
-	OnlyIf:     isCustomMethod,
+	OnlyIf:     utils.IsCustomMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }
