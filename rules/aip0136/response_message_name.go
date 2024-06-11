@@ -31,7 +31,7 @@ const responseMessageNameErrorMessage = "" +
 // with a Response suffix, or the resource being operated on.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "response-message-name"),
-	OnlyIf: isCustomMethod,
+	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// A response is considered valid if
 		// - The response name matches the RPC name with a `Response` suffix

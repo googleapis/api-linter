@@ -29,7 +29,7 @@ import (
 var uriSuffix = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "http-uri-suffix"),
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isCustomMethod(m) && httpNameVariable.LintMethod(m) == nil && httpParentVariable.LintMethod(m) == nil
+		return utils.IsCustomMethod(m) && httpNameVariable.LintMethod(m) == nil && httpParentVariable.LintMethod(m) == nil
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {

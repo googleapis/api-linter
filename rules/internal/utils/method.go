@@ -29,6 +29,7 @@ var (
 	deleteMethodRegexp               = regexp.MustCompile("^Delete(?:[A-Z]|$)")
 	deleteRevisionMethodRegexp       = regexp.MustCompile("^Delete[A-Za-z0-9]*Revision$")
 	legacyListRevisionsURINameRegexp = regexp.MustCompile(`:listRevisions$`)
+	standardMethodRegexp             = regexp.MustCompile("^(Batch(Get|Create|Update|Delete))|(Get|Create|Update|Delete|List)(?:[A-Z]|$)")
 )
 
 // IsCreateMethod returns true if this is a AIP-133 Create method.
@@ -113,4 +114,14 @@ func GetListResourceMessage(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 // IsStreaming returns if the method is either client or server streaming.
 func IsStreaming(m *desc.MethodDescriptor) bool {
 	return m.IsClientStreaming() || m.IsServerStreaming()
+}
+
+// IsStandardMethod returns true if this is a AIP-130 Standard Method
+func IsStandardMethod(m *desc.MethodDescriptor) bool {
+	return standardMethodRegexp.MatchString(m.GetName())
+}
+
+// IsCustomMethod returns true if this is a AIP-130 Custom Method
+func IsCustomMethod(m *desc.MethodDescriptor) bool {
+	return !IsStandardMethod(m)
 }
