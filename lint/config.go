@@ -37,6 +37,7 @@ type Config struct {
 	ExcludedPaths []string `json:"excluded_paths" yaml:"excluded_paths"`
 	EnabledRules  []string `json:"enabled_rules" yaml:"enabled_rules"`
 	DisabledRules []string `json:"disabled_rules" yaml:"disabled_rules"`
+	ImportPaths   []string `json:"import_paths" yaml:"import_paths"`
 }
 
 // ReadConfigsFromFile reads Configs from a file.
