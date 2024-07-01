@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.66.3](https://github.com/googleapis/api-linter/compare/v1.66.2...v1.66.3) (2024-07-01)
+
+
+### Bug Fixes
+
+* docs typo ([#1401](https://github.com/googleapis/api-linter/issues/1401)) ([4acf04c](https://github.com/googleapis/api-linter/commit/4acf04c6829ffe7f57cf2997c4f9ccc956de9274))
+
 ## [1.66.2](https://github.com/googleapis/api-linter/compare/v1.66.1...v1.66.2) (2024-06-04)
 
 
