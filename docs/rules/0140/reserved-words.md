@@ -16,7 +16,7 @@ This rule enforces that field names are not reserved words, as mandated in
 ## Details
 
 This rule looks at each field and complains if it the name is a reserved word
-in a common programming lanaguge.
+in a common programming language.
 
 Currently, the linter checks all the reserved words in Java, JavaScript, and
 Python 3. The exhaustive list of reserved words is found in [the code][].
