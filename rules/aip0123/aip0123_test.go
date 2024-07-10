@@ -191,7 +191,7 @@ func TestIsTopLevelResourcePattern(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			if got := isTopLevelResourcePattern(test.pattern); got != test.want {
+			if got := isRootLevelResourcePattern(test.pattern); got != test.want {
 				t.Errorf("got %v, expected %v for pattern %q", got, test.want, test.pattern)
 			}
 		})

@@ -78,10 +78,10 @@ func getVariables(pattern string) []string {
 	return answer
 }
 
-// isTopLevelResourcePattern determines if the given pattern is that of a
-// top-level resource by checking how many segments it has - top-level resource
-// patterns have only two segments, thus one delimeter.
-func isTopLevelResourcePattern(pattern string) bool {
+// isRootLevelResourcePattern determines if the given pattern is that of a
+// root-level resource by checking how many segments it has - root-level
+// resource patterns have only two segments, thus one delimeter.
+func isRootLevelResourcePattern(pattern string) bool {
 	return strings.Count(pattern, "/") == 1
 }
 
@@ -91,7 +91,7 @@ func isTopLevelResourcePattern(pattern string) bool {
 func getParentIDVariable(pattern string) string {
 	variables := getVariables(pattern)
 	// no variables shouldn't happen but should be safe
-	if len(variables) == 0 || isTopLevelResourcePattern(pattern) {
+	if len(variables) == 0 || isRootLevelResourcePattern(pattern) {
 		return ""
 	}
 
@@ -138,7 +138,7 @@ func isNestedName(resource *apb.ResourceDescriptor) bool {
 	pattern := resource.GetPattern()[0]
 
 	// Can't be a nested collection if it is a top level resource.
-	if isTopLevelResourcePattern(pattern) {
+	if isRootLevelResourcePattern(pattern) {
 		return false
 	}
 
