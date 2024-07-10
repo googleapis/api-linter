@@ -15,8 +15,8 @@ uses `google.api.field_behavior = OPTIONAL`, as mandated in [AIP-134][].
 
 ## Details
 
-This rule looks at any field named `update_mask` that's in a `Update*Request`
-and complains if it the field is not annotated with
+This rule looks at any field named `update_mask` that's in an `Update*Request`
+and complains if the field is not annotated with
 `google.api.field_behavior = OPTIONAL`.
 
 ## Examples
