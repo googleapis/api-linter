@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.66.2](https://github.com/googleapis/api-linter/compare/v1.66.1...v1.66.2) (2024-06-04)
+
+
+### Bug Fixes
+
+* **aip-130:** identify standard and custom methods ([#1396](https://github.com/googleapis/api-linter/issues/1396)) ([be41d72](https://github.com/googleapis/api-linter/commit/be41d72e50032b45f4263779e638fc8ec0ff9013))
+
 ## [1.66.1](https://github.com/googleapis/api-linter/compare/v1.66.0...v1.66.1) (2024-05-23)
 
 
