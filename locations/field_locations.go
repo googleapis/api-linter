@@ -35,6 +35,12 @@ func FieldResourceReference(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Locatio
 	return pathLocation(f, 8, int(apb.E_ResourceReference.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
+// FieldBehavior returns the precise location for a field's
+// field_behavior annotation.
+func FieldBehavior(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+	return pathLocation(f, 8, int(apb.E_FieldBehavior.TypeDescriptor().Number())) // FieldDescriptor.options == 8
+}
+
 // FieldType returns the precise location for a field's type.
 func FieldType(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
 	if f.GetMessageType() != nil || f.GetEnumType() != nil {
