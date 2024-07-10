@@ -11,7 +11,7 @@ redirect_from:
 # Resource `pattern` use of `singular`
 
 This rule enforces that messages that have a `google.api.resource` annotation
-use the `singular` as the resource ID segment, as described in [AIP-123][].
+use the `singular` form as the resource ID segment, as described in [AIP-123][].
 
 ## Details
 

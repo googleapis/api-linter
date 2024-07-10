@@ -85,7 +85,7 @@ func isTopLevelResourcePattern(pattern string) bool {
 	return strings.Count(pattern, "/") == 1
 }
 
-// getparentIDVariable is a helper that returns the parent resource ID segment
+// getParentIDVariable is a helper that returns the parent resource ID segment
 // for a given pattern. Returns empty string if the pattern has no variables or
 // is a top-level resource.
 func getParentIDVariable(pattern string) string {
