@@ -22,16 +22,17 @@ import (
 )
 
 var allowedFields = stringset.New(
-	"parent",       // AIP-132
-	"page_size",    // AIP-158
-	"page_token",   // AIP-158
-	"skip",         // AIP-158
-	"filter",       // AIP-132
-	"order_by",     // AIP-132
-	"show_deleted", // AIP-135
-	"request_id",   // AIP-155
-	"read_mask",    // AIP-157
-	"view",         // AIP-157
+	"parent",                 // AIP-132
+	"page_size",              // AIP-158
+	"page_token",             // AIP-158
+	"skip",                   // AIP-158
+	"filter",                 // AIP-132
+	"order_by",               // AIP-132
+	"show_deleted",           // AIP-135
+	"request_id",             // AIP-155
+	"read_mask",              // AIP-157
+	"view",                   // AIP-157
+	"return_partial_success", // AIP-217
 )
 
 // List methods should not have unrecognized fields.
