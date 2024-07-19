@@ -29,7 +29,7 @@ var returnPartialSuccessType = &lint.FieldRule{
 	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
 		if utils.GetTypeName(f) != "bool" {
 			problems = append(problems, lint.Problem{
-				Message:    "`return_partial_success` field should be a `bool`.",
+				Message:    "`return_partial_success` field must be a `bool`.",
 				Suggestion: "bool",
 				Descriptor: f,
 				Location:   locations.FieldType(f),
