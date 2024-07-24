@@ -82,7 +82,7 @@ func getVariables(pattern string) []string {
 // root-level resource by checking how many segments it has - root-level
 // resource patterns have only two segments, thus one delimeter.
 func isRootLevelResourcePattern(pattern string) bool {
-	return strings.Count(pattern, "/") == 1
+	return strings.Count(pattern, "/") <= 1
 }
 
 // getParentIDVariable is a helper that returns the parent resource ID segment
