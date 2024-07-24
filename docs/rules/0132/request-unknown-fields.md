@@ -28,7 +28,7 @@ comes across any fields other than:
 - `string request_id` ([AIP-155][])
 - `google.protobuf.FieldMask read_mask` ([AIP-157][])
 - `View view` ([AIP-157][])
-- `bool return_partial_succes` ([AIP-217][])
+- `bool return_partial_success` ([AIP-217][])
 
 It only checks field names; it does not validate type correctness. This is
 handled by other rules, such as
