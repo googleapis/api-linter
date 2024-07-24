@@ -106,7 +106,7 @@ func getParentIDVariable(pattern string) string {
 
 // nestedSingular returns the would be reduced singular form of a nested
 // resource. Use isNestedName to check eligibility before using nestedSingular.
-// This will return empty if the reosurce is not eligible for nested name
+// This will return empty if the resource is not eligible for nested name
 // reduction.
 func nestedSingular(resource *apb.ResourceDescriptor) string {
 	if !isNestedName(resource) {
