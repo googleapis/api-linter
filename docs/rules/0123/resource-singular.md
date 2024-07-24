@@ -8,7 +8,7 @@ redirect_from:
   - /0123/resource-singular
 ---
 
-# Resource type name
+# Resource `singular`
 
 This rule enforces that messages that have a `google.api.resource` annotation,
 have a properly formatted `singular`, as described in [AIP-123][].
@@ -60,7 +60,7 @@ If you need to violate this rule, use a leading comment above the message.
 //     aip.dev/not-precedent: We need to do this because reasons. --)
 message Book {
   option (google.api.resource) = {
-    type: "library.googleapis.com/Genre/Mystery/Book"
+    type: "library.googleapis.com/Book"
     pattern: "publishers/{publisher}/books/{book}"
     singular: "shelf",
   };
