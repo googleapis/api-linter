@@ -37,7 +37,8 @@ message Book {
     type: "library.googleapis.com/BookShelf"
     // resource ID segment doesn't match the singular.
     pattern: "publishers/{publisher}/bookShelves/{shelf}"
-    singular: "bookShelf",
+    singular: "bookShelf"
+    plural: "bookShelves"
   };
 
   string name = 1;
@@ -52,7 +53,8 @@ message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/BookShelf"
     pattern: "publishers/{publisher}/bookShelves/{book_shelf}"
-    singular: "bookShelf",
+    singular: "bookShelf"
+    plural: "bookShelves"
   };
 
   string name = 1;
@@ -70,7 +72,8 @@ message Book {
   option (google.api.resource) = {
     type: "library.googleapis.com/BookShelf"
     pattern: "publishers/{publisher}/bookShelves/{shelf}"
-    singular: "bookShelf",
+    singular: "bookShelf"
+    plural: "bookShelves"
   };
 
   string name = 1;
