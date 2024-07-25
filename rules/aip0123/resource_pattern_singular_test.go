@@ -30,6 +30,7 @@ func TestResourcePatternSingularSimple(t *testing.T) {
 		{"ValidSingleton", "publishers/{publisher}/bookShelf", testutils.Problems{}},
 		{"Invalid", "publishers/{publisher}/bookShelves/{shelf}", testutils.Problems{{Message: "final segment must include the resource singular"}}},
 		{"InvalidSingleton", "publishers/{publisher}/shelf", testutils.Problems{{Message: "final segment must include the resource singular"}}},
+		{"SkipRootLevel", "publishers/{publisher}", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
