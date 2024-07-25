@@ -28,7 +28,7 @@ import (
 var resourcePatternPlural = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "resource-pattern-plural"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0 && !utils.IsSingletonResource(m) && !isRootLevelResource(utils.GetResource(m))
+		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0 && !utils.IsSingletonResource(m)
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
@@ -41,6 +41,9 @@ var resourcePatternPlural = &lint.MessageRule{
 
 		patterns := res.GetPattern()
 		plural := fmt.Sprintf("/%s/", utils.GetResourcePlural(res))
+		if isRootLevelResource(res) {
+			plural = strings.TrimPrefix(plural, "/")
+		}
 		nn = fmt.Sprintf("/%s/", nn)
 
 		// If the first pattern is reduced or non-compliant, but is nested name eligible, we want to recommend the nested name.

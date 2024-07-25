@@ -29,7 +29,7 @@ import (
 var resourcePatternSingular = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "resource-pattern-singular"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0 && !isRootLevelResource(utils.GetResource(m))
+		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem

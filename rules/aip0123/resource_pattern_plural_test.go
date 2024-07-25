@@ -27,8 +27,8 @@ func TestResourcePatternPluralSimple(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "publishers/{publisher}/bookShelves/{book_shelf}", testutils.Problems{}},
+		{"ValidRootLevel", "bookShelves/{book_shelf}", testutils.Problems{}},
 		{"Invalid", "publishers/{publisher}/bookShelfs/{book_shelf}", testutils.Problems{{Message: "collection segment must be the resource plural"}}},
-		{"SkipRootLevel", "publishers/{publisher}", testutils.Problems{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
