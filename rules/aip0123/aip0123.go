@@ -79,18 +79,6 @@ func getVariables(pattern string) []string {
 	return answer
 }
 
-// getCollections returns a slice of the collection ID segements in the pattern.
-//
-// For example, a pattern of "publishers/{publisher}/bookShelves/{book_shelf}"
-// would return []string{"publishers", "bookShelves"}.
-func getCollections(pattern string) []string {
-	answer := []string{}
-	for _, match := range collectionRegexp.FindAllStringSubmatch(pattern, -1) {
-		answer = append(answer, match[1])
-	}
-	return answer
-}
-
 // isRootLevelResourcePattern determines if the given pattern is that of a
 // root-level resource by checking how many segments it has - root-level
 // resource patterns have only two segments, thus one delimeter.
@@ -141,6 +129,11 @@ func nestedPlural(resource *apb.ResourceDescriptor) string {
 	if !isNestedName(resource) {
 		return ""
 	}
+
+	// use the singular variable to trim the singular prefix of the compound
+	// child colleciton name that is pluralized e.g.
+	// "users/{user}/userEvents/{user_event}" the parent singular "user" is the
+	// prefix of the child collection "userEvents".
 	parentIDVar := getParentIDVariable(resource.GetPattern()[0])
 	parentIDVar = strcase.LowerCamelCase(parentIDVar)
 
@@ -215,4 +208,3 @@ func getDesiredPattern(pattern string) string {
 }
 
 var varRegexp = regexp.MustCompile(`\{([^}=]+)}`)
-var collectionRegexp = regexp.MustCompile(`([a-z][a-zA-Z]+)/`)
