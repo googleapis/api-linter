@@ -79,6 +79,18 @@ func getVariables(pattern string) []string {
 	return answer
 }
 
+// isRootLevelResource determines if the given resource is a root-level
+// resource using the isRootLevelResourcePattern helper.
+func isRootLevelResource(resource *apb.ResourceDescriptor) bool {
+	if len(resource.GetPattern()) == 0 {
+		return false
+	}
+
+	pattern := resource.GetPattern()[0]
+
+	return isRootLevelResourcePattern(pattern)
+}
+
 // isRootLevelResourcePattern determines if the given pattern is that of a
 // root-level resource by checking how many segments it has - root-level
 // resource patterns have only two segments, thus one delimeter.

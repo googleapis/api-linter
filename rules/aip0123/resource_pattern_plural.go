@@ -28,7 +28,7 @@ import (
 var resourcePatternPlural = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "resource-pattern-plural"),
 	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0 && !utils.IsSingletonResource(m)
+		return utils.IsResource(m) && len(utils.GetResource(m).GetPattern()) > 0 && !utils.IsSingletonResource(m) && !isRootLevelResource(utils.GetResource(m))
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
