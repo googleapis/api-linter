@@ -46,6 +46,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourceDefinitionPatterns,
 		resourceDefinitionTypeName,
 		resourcePatternSingular,
+		resourcePatternPlural,
 		nameNeverOptional,
 	)
 }
@@ -73,6 +74,18 @@ func hasResourceDefinitionAnnotation(f *desc.FileDescriptor) bool {
 func getVariables(pattern string) []string {
 	answer := []string{}
 	for _, match := range varRegexp.FindAllStringSubmatch(pattern, -1) {
+		answer = append(answer, match[1])
+	}
+	return answer
+}
+
+// getCollections returns a slice of the collection ID segements in the pattern.
+//
+// For example, a pattern of "publishers/{publisher}/bookShelves/{book_shelf}"
+// would return []string{"publishers", "bookShelves"}.
+func getCollections(pattern string) []string {
+	answer := []string{}
+	for _, match := range collectionRegexp.FindAllStringSubmatch(pattern, -1) {
 		answer = append(answer, match[1])
 	}
 	return answer
@@ -118,6 +131,21 @@ func nestedSingular(resource *apb.ResourceDescriptor) string {
 	singularSnake := strcase.SnakeCase(singular)
 
 	return strings.TrimPrefix(singularSnake, parentIDVar+"_")
+}
+
+// nestedPlural returns the would be reduced plural form of a nested
+// resource. Use isNestedName to check eligibility before using nestedPlural.
+// This will return empty if the resource is not eligible for nested name
+// reduction.
+func nestedPlural(resource *apb.ResourceDescriptor) string {
+	if !isNestedName(resource) {
+		return ""
+	}
+	parentIDVar := getParentIDVariable(resource.GetPattern()[0])
+	parentIDVar = strcase.LowerCamelCase(parentIDVar)
+
+	plural := utils.GetResourcePlural(resource)
+	return strcase.LowerCamelCase(strings.TrimPrefix(plural, parentIDVar))
 }
 
 // isNestedName determines if the resource naming could be reduced as a
@@ -187,3 +215,4 @@ func getDesiredPattern(pattern string) string {
 }
 
 var varRegexp = regexp.MustCompile(`\{([^}=]+)}`)
+var collectionRegexp = regexp.MustCompile(`([a-z][a-zA-Z]+)/`)
