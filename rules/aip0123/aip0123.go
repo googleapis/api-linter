@@ -46,6 +46,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourceDefinitionPatterns,
 		resourceDefinitionTypeName,
 		resourcePatternSingular,
+		resourcePatternPlural,
 		nameNeverOptional,
 	)
 }
@@ -76,6 +77,18 @@ func getVariables(pattern string) []string {
 		answer = append(answer, match[1])
 	}
 	return answer
+}
+
+// isRootLevelResource determines if the given resource is a root-level
+// resource using the isRootLevelResourcePattern helper.
+func isRootLevelResource(resource *apb.ResourceDescriptor) bool {
+	if len(resource.GetPattern()) == 0 {
+		return false
+	}
+
+	pattern := resource.GetPattern()[0]
+
+	return isRootLevelResourcePattern(pattern)
 }
 
 // isRootLevelResourcePattern determines if the given pattern is that of a
@@ -118,6 +131,26 @@ func nestedSingular(resource *apb.ResourceDescriptor) string {
 	singularSnake := strcase.SnakeCase(singular)
 
 	return strings.TrimPrefix(singularSnake, parentIDVar+"_")
+}
+
+// nestedPlural returns the would be reduced plural form of a nested
+// resource. Use isNestedName to check eligibility before using nestedPlural.
+// This will return empty if the resource is not eligible for nested name
+// reduction.
+func nestedPlural(resource *apb.ResourceDescriptor) string {
+	if !isNestedName(resource) {
+		return ""
+	}
+
+	// use the singular variable to trim the singular prefix of the compound
+	// child colleciton name that is pluralized e.g.
+	// "users/{user}/userEvents/{user_event}" the parent singular "user" is the
+	// prefix of the child collection "userEvents".
+	parentIDVar := getParentIDVariable(resource.GetPattern()[0])
+	parentIDVar = strcase.LowerCamelCase(parentIDVar)
+
+	plural := utils.GetResourcePlural(resource)
+	return strcase.LowerCamelCase(strings.TrimPrefix(plural, parentIDVar))
 }
 
 // isNestedName determines if the resource naming could be reduced as a

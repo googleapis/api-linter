@@ -20,17 +20,15 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
-func TestResourcePatternSingularSimple(t *testing.T) {
+func TestResourcePatternPluralSimple(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		Pattern  string
 		problems testutils.Problems
 	}{
 		{"Valid", "publishers/{publisher}/bookShelves/{book_shelf}", testutils.Problems{}},
-		{"ValidSingleton", "publishers/{publisher}/bookShelf", testutils.Problems{}},
 		{"ValidRootLevel", "bookShelves/{book_shelf}", testutils.Problems{}},
-		{"Invalid", "publishers/{publisher}/bookShelves/{shelf}", testutils.Problems{{Message: "final segment must include the resource singular"}}},
-		{"InvalidSingleton", "publishers/{publisher}/shelf", testutils.Problems{{Message: "final segment must include the resource singular"}}},
+		{"Invalid", "publishers/{publisher}/bookShelfs/{book_shelf}", testutils.Problems{{Message: "collection segment must be the resource plural"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -47,14 +45,14 @@ func TestResourcePatternSingularSimple(t *testing.T) {
 				}
 			`, test)
 			m := f.GetMessageTypes()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternSingular.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
 	}
 }
 
-func TestResourcePatternSingularNested(t *testing.T) {
+func TestResourcePatternPluralNested(t *testing.T) {
 	for _, test := range []struct {
 		name          string
 		FirstPattern  string
@@ -74,34 +72,16 @@ func TestResourcePatternSingularNested(t *testing.T) {
 			problems:      testutils.Problems{},
 		},
 		{
-			name:          "ValidSingleton",
-			FirstPattern:  "publishers/{publisher}/credit",
-			SecondPattern: "authors/{author}/credit",
-			problems:      testutils.Problems{},
-		},
-		{
-			name:          "ValidSingletonFull",
-			FirstPattern:  "publishers/{publisher}/publisherCredit",
-			SecondPattern: "authors/{author}/publisherCredit",
-			problems:      testutils.Problems{},
-		},
-		{
 			name:          "InvalidSecondWithFirstNestedName",
 			FirstPattern:  "publishers/{publisher}/credits/{credit}",
-			SecondPattern: "authors/{author}/credits/{published}",
-			problems:      testutils.Problems{{Message: `final segment must include the resource singular "{credit}"`}},
+			SecondPattern: "authors/{author}/publisherCredits/{credit}",
+			problems:      testutils.Problems{{Message: `collection segment must be the resource plural "/credits/"`}},
 		},
 		{
 			name:          "InvalidFirstWithReducedSecond",
-			FirstPattern:  "publishers/{publisher}/credits/{published}",
+			FirstPattern:  "publishers/{publisher}/pubCredits/{credit}",
 			SecondPattern: "authors/{author}/credits/{credit}",
-			problems:      testutils.Problems{{Message: `final segment must include the resource singular "{credit}"`}},
-		},
-		{
-			name:          "InvalidSingletonFirstPattern",
-			FirstPattern:  "publishers/{publisher}/published",
-			SecondPattern: "authors/{author}/credit",
-			problems:      testutils.Problems{{Message: `final segment must include the resource singular "credit"`}},
+			problems:      testutils.Problems{{Message: `collection segment must be the resource plural "/credits/"`}},
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -120,7 +100,7 @@ func TestResourcePatternSingularNested(t *testing.T) {
 				}
 			`, test)
 			m := f.GetMessageTypes()[0]
-			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternSingular.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
 				t.Errorf(diff)
 			}
 		})
