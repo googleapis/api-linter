@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.67.0](https://github.com/googleapis/api-linter/compare/v1.66.2...v1.67.0) (2024-07-26)
+
+
+### Features
+
+* **AIP-123:** enforce singular as ID segment ([#1403](https://github.com/googleapis/api-linter/issues/1403)) ([088ec19](https://github.com/googleapis/api-linter/commit/088ec196da93a9338b2abf60469cb55ecec5c34d))
+* **AIP-123:** resource collection matches plural ([#1408](https://github.com/googleapis/api-linter/issues/1408)) ([9025d3d](https://github.com/googleapis/api-linter/commit/9025d3d674df9f918483decc0f559f168737ee69))
+* **AIP-134:** update_mask must be OPTIONAL ([#1394](https://github.com/googleapis/api-linter/issues/1394)) ([9fc0d05](https://github.com/googleapis/api-linter/commit/9fc0d05f3d89905ea7d3b22c9b44fbfa79edac07))
+* **AIP-217:** add various rules for return_partial_success support ([#1406](https://github.com/googleapis/api-linter/issues/1406)) ([cf4ba12](https://github.com/googleapis/api-linter/commit/cf4ba1284bbab151275e7dedf291ffea0e488b1c))
+
+
+### Bug Fixes
+
+* docs typo ([#1401](https://github.com/googleapis/api-linter/issues/1401)) ([4acf04c](https://github.com/googleapis/api-linter/commit/4acf04c6829ffe7f57cf2997c4f9ccc956de9274))
+
 ## [1.66.2](https://github.com/googleapis/api-linter/compare/v1.66.1...v1.66.2) (2024-06-04)
 
 
