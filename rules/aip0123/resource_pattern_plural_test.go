@@ -106,3 +106,23 @@ func TestResourcePatternPluralNested(t *testing.T) {
 		})
 	}
 }
+
+func TestResourcePatternPluralSkipNoPlural(t *testing.T) {
+	f := testutils.ParseProto3String(t, `
+		import "google/api/resource.proto";
+
+		message BookShelf {
+			option (google.api.resource) = {
+				type: "library.googleapis.com/BookShelf"
+				singular: "bookShelf"
+				plural: ""
+				pattern: "shelves/{shelf}/missingPlural/{book_shelf}"
+			};
+			string name = 1;
+		}
+	`)
+	findings := resourcePatternPlural.Lint(f)
+	if got, want := len(findings), 0; got != want {
+		t.Errorf("expected %d findings, got %d: %v", want, got, findings)
+	}
+}
