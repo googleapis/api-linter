@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.1](https://github.com/googleapis/api-linter/compare/v1.67.0...v1.67.1) (2024-07-31)
+
+
+### Bug Fixes
+
+* **AIP-123:** skip resource-pattern-plural when there is no plural ([#1409](https://github.com/googleapis/api-linter/issues/1409)) ([93a601d](https://github.com/googleapis/api-linter/commit/93a601d92adbeb0c17fa8724212ee344f934a4aa))
+
 ## [1.67.0](https://github.com/googleapis/api-linter/compare/v1.66.2...v1.67.0) (2024-07-26)
 
 
