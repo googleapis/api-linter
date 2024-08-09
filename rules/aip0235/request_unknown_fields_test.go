@@ -27,10 +27,11 @@ func TestRequestUnknownFields(t *testing.T) {
 		FieldName   string
 		problems    testutils.Problems
 	}{
+		{"Valid-AllowMissing", "BatchDeleteBooks", "allow_missing", testutils.Problems{}},
 		{"Valid-Force", "BatchDeleteBooks", "force", testutils.Problems{}},
 		{"Valid-Names", "BatchDeleteBooks", "names", testutils.Problems{}},
 		{"Valid-Parent", "BatchDeleteBooks", "parent", testutils.Problems{}},
-		{"Valid-RequestID", "BatchCreateBooks", "request_id", testutils.Problems{}},
+		{"Valid-RequestID", "BatchDeleteBooks", "request_id", testutils.Problems{}},
 		{"Valid-Requests", "BatchDeleteBooks", "requests", testutils.Problems{}},
 		{"Valid-ValidateOnly", "BatchDeleteBooks", "validate_only", testutils.Problems{}},
 		{"Invalid", "BatchDeleteBooks", "foo", testutils.Problems{{Message: "Unexpected field"}}},
