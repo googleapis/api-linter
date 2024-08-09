@@ -31,6 +31,9 @@ var requestRequiredFields = &lint.MethodRule{
 	OnlyIf: utils.IsCreateMethodWithResolvedReturnType,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
+		if ot == nil {
+			return nil
+		}
 		r := utils.GetResource(ot)
 		resourceMsgName := utils.GetResourceSingular(r)
 

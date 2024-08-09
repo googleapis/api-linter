@@ -28,6 +28,9 @@ var resourceReferenceType = &lint.MethodRule{
 	OnlyIf: func(m *desc.MethodDescriptor) bool {
 		// Return type of the RPC.
 		ot := utils.GetResponseType(m)
+		if ot == nil {
+			return false
+		}
 
 		// First repeated message field must be annotated with google.api.resource.
 		repeated := utils.GetRepeatedMessageFields(ot)
