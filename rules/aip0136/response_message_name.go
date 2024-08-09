@@ -47,6 +47,12 @@ var responseMessageName = &lint.MethodRule{
 		}
 
 		response := utils.GetResponseType(m)
+		if response == nil {
+			// If the return type is not resolveable (bad) or if an LRO and
+			// missing the operation_info annotation (covered by AIP-151 rules),
+			// just exit.
+			return nil
+		}
 		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
 		responseResourceType := utils.GetResource(response).GetType()
 
