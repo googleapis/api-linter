@@ -46,6 +46,11 @@ var resourcePatternSingular = &lint.MessageRule{
 		if !utils.IsSingletonResource(m) {
 			singular = fmt.Sprintf("{%s}", strcase.SnakeCase(singular))
 			nn = fmt.Sprintf("{%s}", nn)
+		} else {
+			// singular is already in lower camel case
+			// but nested name is returned in snake_case form
+			// and final segment of singleton is lowerCamelCase
+			nn = strcase.LowerCamelCase(nn)
 		}
 
 		// If the first pattern is reduced or non-compliant, but is nested name eligible, we want to recommend the nested name.

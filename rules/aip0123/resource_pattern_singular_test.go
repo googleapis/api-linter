@@ -54,6 +54,41 @@ func TestResourcePatternSingularSimple(t *testing.T) {
 	}
 }
 
+func TestResourcePatternSingularMultiWord(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		Pattern  string
+		problems testutils.Problems
+	}{
+		{"Valid", "fooBars/{foo_bar}/fooBarBazBuzzes/{foo_bar_baz_buz}", testutils.Problems{}},
+		{"ValidReduced", "fooBars/{foo_bar}/bazBuzzes/{baz_buz}", testutils.Problems{}},
+		{"ValidSingleton", "fooBars/{foo_bar}/fooBarBazBuz", testutils.Problems{}},
+		{"ValidSingletonReduced", "fooBars/{foo_bar}/bazBuz", testutils.Problems{}},
+		{"Invalid", "fooBars/{foo_bar}/fooBarBazBuzzes/{buz}", testutils.Problems{{Message: "baz_buz"}}},
+		{"InvalidSingleton", "fooBars/{foo_bar}/buz", testutils.Problems{{Message: "bazBuz"}}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+
+				message FooBarBazBuz {
+					option (google.api.resource) = {
+						type: "foo.googleapis.com/FooBarBazBuz"
+						singular: "fooBarBazBuz"
+						plural: "fooBarBazBuzzes"
+						pattern: "{{.Pattern}}"
+					};
+					string name = 1;
+				}
+			`, test)
+			m := f.GetMessageTypes()[0]
+			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternSingular.Lint(f)); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
 func TestResourcePatternSingularNested(t *testing.T) {
 	for _, test := range []struct {
 		name          string
