@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.67.2](https://github.com/googleapis/api-linter/compare/v1.67.1...v1.67.2) (2024-08-14)
+
+
+### Bug Fixes
+
+* **AIP-123:** multiword singleton reduction ([#1417](https://github.com/googleapis/api-linter/issues/1417)) ([7868552](https://github.com/googleapis/api-linter/commit/7868552ff7b27c2fa0f2ff9be3a538763f0450c5))
+* **AIP-135:** allow required etag in Delete ([#1414](https://github.com/googleapis/api-linter/issues/1414)) ([aa9587b](https://github.com/googleapis/api-linter/commit/aa9587bc7184a78109f138c809baa00018ea75e9)), refs [#1395](https://github.com/googleapis/api-linter/issues/1395)
+* **AIP-235:** allow hosting allow_missing ([#1416](https://github.com/googleapis/api-linter/issues/1416)) ([6bfbcdf](https://github.com/googleapis/api-linter/commit/6bfbcdfa8858ccdba98760d76e2d2a757855cc7b)), refs [#1404](https://github.com/googleapis/api-linter/issues/1404)
+* exit rule if response type cannot be resolved ([#1415](https://github.com/googleapis/api-linter/issues/1415)) ([6874dab](https://github.com/googleapis/api-linter/commit/6874dabb4f0d3503f267bb0ab970d62785d12727)), refs [#1399](https://github.com/googleapis/api-linter/issues/1399)
+
+
+### Documentation
+
+* **AIP-143:** fix rule name used for implementation link ([#1411](https://github.com/googleapis/api-linter/issues/1411)) ([f9cf2eb](https://github.com/googleapis/api-linter/commit/f9cf2ebc9589abfce88317b1e3318a9e1547b41a))
+
 ## [1.67.1](https://github.com/googleapis/api-linter/compare/v1.67.0...v1.67.1) (2024-07-31)
 
 
