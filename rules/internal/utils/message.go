@@ -23,10 +23,10 @@ import (
 
 var (
 	getReqMessageRegexp            = regexp.MustCompile("^Get[A-Za-z0-9]*Request$")
-	listReqMessageRegexp           = regexp.MustCompile("^List[A-Za-z0-9]*Request$")
-	listRespMessageRegexp          = regexp.MustCompile("^List([A-Za-z0-9]*)Response$")
-	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsRequest$`)
-	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Za-z0-9]+)RevisionsResponse$`)
+	listReqMessageRegexp           = regexp.MustCompile("^List[A-Z]+[A-Za-z0-9]*Request$")
+	listRespMessageRegexp          = regexp.MustCompile("^List([A-Z]+[A-Za-z0-9]*)Response$")
+	listRevisionsReqMessageRegexp  = regexp.MustCompile(`^List(?:[A-Z]+[A-Za-z0-9]+)RevisionsRequest$`)
+	listRevisionsRespMessageRegexp = regexp.MustCompile(`^List(?:[A-Z]+[A-Za-z0-9]+)RevisionsResponse$`)
 	createReqMessageRegexp         = regexp.MustCompile("^Create[A-Za-z0-9]*Request$")
 	updateReqMessageRegexp         = regexp.MustCompile("^Update[A-Za-z0-9]*Request$")
 	deleteReqMessageRegexp         = regexp.MustCompile("^Delete[A-Za-z0-9]*Request$")
