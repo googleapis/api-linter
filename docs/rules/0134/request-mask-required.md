@@ -11,7 +11,7 @@ redirect_from:
 # Update methods: Mask field
 
 This rule enforces that all `Update` standard methods have a field in the
-request message for the field mask, as mandated in [AIP-134][].
+request message for the field mask, as recommended in [AIP-134][].
 
 ## Details
 
