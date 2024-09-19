@@ -33,7 +33,6 @@ func TestRollbackResponseMessageName(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				import "google/longrunning/operations.proto";
 				service Library {
 					rpc {{.Method}}(RollbackBookRequest) returns ({{.ResponseType}});
 				}
@@ -56,7 +55,7 @@ func TestRollbackOperationResponse(t *testing.T) {
 		problems     testutils.Problems
 	}{
 		{"Valid", "RollbackBook", "Book", nil},
-		{"Invalid", "RollbackBook", "RollbackBookResponse", testutils.Problems{{Suggestion: "Book"}}},
+		{"Invalid", "RollbackBook", "RollbackBookResponse", testutils.Problems{{Message: "Book"}}},
 		{"Irrelevant", "AcquireBook", "PurgeBooksResponse", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
