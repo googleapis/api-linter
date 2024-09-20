@@ -19,6 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
@@ -28,8 +29,19 @@ var commitResponseMessageName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `CommitBook`, the response
 		// message is `Book`.
+		response := utils.GetResponseType(m)
+		if response == nil {
+			return nil
+		}
+		got := response.GetName()
 		want := commitMethodRegexp.FindStringSubmatch(m.GetName())[1]
-		got := m.GetOutputType().GetName()
+		loc := locations.MethodResponseType(m)
+		suggestion := want
+
+		if utils.GetOperationInfo(m) != nil {
+			loc = locations.MethodOperationInfo(m)
+			suggestion = "" // We cannot offer a precise enough location to make a suggestion.
+		}
 
 		// Return a problem if we did not get the expected return name.
 		if got != want {
@@ -39,9 +51,9 @@ var commitResponseMessageName = &lint.MethodRule{
 					want,
 					got,
 				),
-				Suggestion: want,
+				Suggestion: suggestion,
 				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
+				Location:   loc,
 			}}
 		}
 		return nil
