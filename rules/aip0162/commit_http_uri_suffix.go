@@ -24,7 +24,7 @@ import (
 // Commit methods should have a proper HTTP pattern.
 var commitHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "commit-http-uri-suffix"),
-	OnlyIf: isCommitMethod,
+	OnlyIf: utils.IsCommitRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !commitURINameRegexp.MatchString(httpRule.URI) {

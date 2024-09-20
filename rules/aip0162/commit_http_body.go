@@ -22,6 +22,6 @@ import (
 // Commit methods should have "*" as the HTTP body.
 var commitHTTPBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "commit-http-body"),
-	OnlyIf:     isCommitMethod,
+	OnlyIf:     utils.IsCommitRevisionMethod,
 	LintMethod: utils.LintWildcardHTTPBody,
 }

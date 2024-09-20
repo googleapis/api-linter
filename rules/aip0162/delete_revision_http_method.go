@@ -22,6 +22,6 @@ import (
 // Delete Revision methods should use the HTTP DELETE method.
 var deleteRevisionHTTPMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "delete-revision-http-method"),
-	OnlyIf:     isDeleteRevisionMethod,
+	OnlyIf:     utils.IsDeleteRevisionMethod,
 	LintMethod: utils.LintHTTPMethod("DELETE"),
 }

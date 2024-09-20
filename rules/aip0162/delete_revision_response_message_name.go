@@ -16,7 +16,6 @@ package aip0162
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
@@ -27,14 +26,17 @@ import (
 // Delete Revision methods should return the resource itself.
 var deleteRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "delete-revision-response-message-name"),
-	OnlyIf: isDeleteRevisionMethod,
+	OnlyIf: utils.IsDeleteRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		response := utils.GetResponseType(m)
 		if response == nil {
 			return nil
 		}
 		got := response.GetName()
-		want := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Revision"), "Delete")
 
 		loc := locations.MethodResponseType(m)
 		suggestion := want

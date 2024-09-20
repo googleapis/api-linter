@@ -25,16 +25,19 @@ import (
 
 var commitResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "commit-response-message-name"),
-	OnlyIf: isCommitMethod,
+	OnlyIf: utils.IsCommitRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `CommitBook`, the response
 		// message is `Book`.
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		response := utils.GetResponseType(m)
 		if response == nil {
 			return nil
 		}
 		got := response.GetName()
-		want := commitMethodRegexp.FindStringSubmatch(m.GetName())[1]
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 

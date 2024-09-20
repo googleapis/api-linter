@@ -22,6 +22,6 @@ import (
 // Commit methods should use the HTTP POST method.
 var commitHTTPMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "commit-http-method"),
-	OnlyIf:     isCommitMethod,
+	OnlyIf:     utils.IsCommitRevisionMethod,
 	LintMethod: utils.LintHTTPMethod("POST"),
 }

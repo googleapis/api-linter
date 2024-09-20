@@ -25,11 +25,14 @@ import (
 
 var tagRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "tag-revision-response-message-name"),
-	OnlyIf: isTagRevisionMethod,
+	OnlyIf: utils.IsTagRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `TagBookRevision`, the response
 		// message is `Book`.
-		want := tagRevisionMethodRegexp.FindStringSubmatch(m.GetName())[1]
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		response := utils.GetResponseType(m)
 		if response == nil {
 			return nil
