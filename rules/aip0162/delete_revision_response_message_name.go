@@ -28,17 +28,30 @@ var deleteRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "delete-revision-response-message-name"),
 	OnlyIf: utils.IsDeleteRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		got := m.GetOutputType().GetName()
 		want, ok := utils.ExtractRevisionResource(m)
 		if !ok {
 			return nil
 		}
+		response := utils.GetResponseType(m)
+		if response == nil {
+			return nil
+		}
+		got := response.GetName()
+
+		loc := locations.MethodResponseType(m)
+		suggestion := want
+
+		if utils.GetOperationInfo(m) != nil {
+			loc = locations.MethodOperationInfo(m)
+			suggestion = "" // We cannot offer a precise enough location to make a suggestion.
+		}
+
 		if got != want {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Delete Revision methods should return the resource itself (`%s`), not `%s`.", want, got),
-				Suggestion: want,
+				Suggestion: suggestion,
 				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
+				Location:   loc,
 			}}
 		}
 		return nil

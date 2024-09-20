@@ -33,12 +33,45 @@ func TestCommitResponseMessageName(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				import "google/longrunning/operations.proto";
 				service Library {
 					rpc {{.Method}}(CommitBookRequest) returns ({{.ResponseType}});
 				}
 				message CommitBookRequest {}
 				message {{.ResponseType}} {}
+			`, test)
+			m := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {
+				t.Errorf(diff)
+			}
+		})
+	}
+}
+
+func TestCommitResponseMessageNameLRO(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		Method       string
+		ResponseType string
+		problems     testutils.Problems
+	}{
+		{"Valid", "CommitBook", "Book", nil},
+		{"Invalid", "CommitBook", "CommitBookResponse", testutils.Problems{{Message: "Book"}}},
+		{"Irrelevant", "AcquireBook", "PurgeBooksResponse", nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.Method}}(CommitBookRequest) returns (google.longrunning.Operation) {
+					  option (google.longrunning.operation_info) = {
+					    response_type: "{{.ResponseType}}"
+						metadata_type: "OperationMetadata"
+					  };
+					};
+				}
+				message CommitBookRequest {}
+				message {{.ResponseType}} {}
+				message OperationMetadata{}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {

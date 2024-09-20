@@ -33,7 +33,18 @@ var tagRevisionResponseMessageName = &lint.MethodRule{
 		if !ok {
 			return nil
 		}
-		got := m.GetOutputType().GetName()
+		response := utils.GetResponseType(m)
+		if response == nil {
+			return nil
+		}
+		got := response.GetName()
+		loc := locations.MethodResponseType(m)
+		suggestion := want
+
+		if utils.GetOperationInfo(m) != nil {
+			loc = locations.MethodOperationInfo(m)
+			suggestion = "" // We cannot offer a precise enough location to make a suggestion.
+		}
 
 		// Return a problem if we did not get the expected return name.
 		if got != want {
@@ -43,9 +54,9 @@ var tagRevisionResponseMessageName = &lint.MethodRule{
 					want,
 					got,
 				),
-				Suggestion: want,
+				Suggestion: suggestion,
 				Descriptor: m,
-				Location:   locations.MethodResponseType(m),
+				Location:   loc,
 			}}
 		}
 		return nil
