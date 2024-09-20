@@ -19,16 +19,20 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var commitResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "commit-response-message-name"),
-	OnlyIf: isCommitMethod,
+	OnlyIf: utils.IsCommitRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `CommitBook`, the response
 		// message is `Book`.
-		want := commitMethodRegexp.FindStringSubmatch(m.GetName())[1]
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		got := m.GetOutputType().GetName()
 
 		// Return a problem if we did not get the expected return name.

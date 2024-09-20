@@ -26,11 +26,14 @@ import (
 
 var rollbackResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "rollback-response-message-name"),
-	OnlyIf: isRollbackMethod,
+	OnlyIf: utils.IsRollbackRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `RollbackBook`, the response
 		// message is `Book`.
-		want := rollbackMethodRegexp.FindStringSubmatch(m.GetName())[1]
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		got := m.GetOutputType().GetName()
 		loc := locations.MethodResponseType(m)
 

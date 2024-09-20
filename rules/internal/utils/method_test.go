@@ -17,6 +17,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/jhump/protoreflect/desc"
 )
 
 func TestIsCreateMethod(t *testing.T) {
@@ -381,6 +382,118 @@ func TestIsStandardMethod(t *testing.T) {
 			}
 			if gotIsCustom != !test.wantIsStandard {
 				t.Errorf("IsCustomMethod got %v, want %v", gotIsCustom, !test.wantIsStandard)
+			}
+		})
+	}
+}
+
+func TestIsRevisionMethod(t *testing.T) {
+	for _, test := range []struct {
+		name       string
+		MethodName string
+		want       bool
+		is         func(m *desc.MethodDescriptor) bool
+	}{
+		{
+			"IsRollbackRevisionMethod",
+			"RollbackBook",
+			true,
+			IsRollbackRevisionMethod,
+		},
+		{
+			"IsCommitRevisionMethod",
+			"CommitBook",
+			true,
+			IsCommitRevisionMethod,
+		},
+		{
+			"IsTagRevisionMethod",
+			"TagBookRevision",
+			true,
+			IsTagRevisionMethod,
+		},
+		{
+			"IsDeleteRevisionMethod",
+			"DeleteBookRevision",
+			true,
+			IsDeleteRevisionMethod,
+		},
+		{
+			"NotRevisionMethod",
+			"GetBook",
+			false,
+			isRevisionMethod,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				service Foo {
+					rpc {{.MethodName}}(Book) returns (Book);
+				}
+
+				// This is the request and response, which is irrelevant for
+				// asserting if the rpc is a standard method or not. We just
+				// check the naming of the rpc against a regex
+				message Book {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			got := test.is(method)
+
+			if got != test.want {
+				t.Errorf("got %v want %v", got, test.want)
+			}
+		})
+	}
+}
+
+func TestExtractRevisionResource(t *testing.T) {
+	for _, test := range []struct {
+		name       string
+		MethodName string
+		want       string
+	}{
+		{
+			"RollbackRevisionMethod",
+			"RollbackBook",
+			"Book",
+		},
+		{
+			"CommitRevisionMethod",
+			"CommitBook",
+			"Book",
+		},
+		{
+			"TagRevisionMethod",
+			"TagBookRevision",
+			"Book",
+		},
+		{
+			"DeleteRevisionMethod",
+			"DeleteBookRevision",
+			"Book",
+		},
+		{
+			"NotRevisionMethod",
+			"GetBook",
+			"",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				service Foo {
+					rpc {{.MethodName}}(Book) returns (Book);
+				}
+
+				// This is the request and response, which is irrelevant for
+				// asserting if the rpc is a standard method or not. We just
+				// check the naming of the rpc against a regex
+				message Book {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			got, _ := ExtractRevisionResource(method)
+
+			if got != test.want {
+				t.Errorf("got %q want %q", got, test.want)
 			}
 		})
 	}

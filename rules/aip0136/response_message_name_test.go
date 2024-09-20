@@ -31,6 +31,7 @@ func TestResponseMessageName(t *testing.T) {
 		}{
 			{"Valid", "ArchiveBook", "ArchiveBookResponse", testutils.Problems{}},
 			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{Message: "not \"ArchiveBookResp\"."}}},
+			{"SkipRevisionMethod", "CommitBook", "Book", testutils.Problems{}},
 		}
 
 		for _, test := range tests {

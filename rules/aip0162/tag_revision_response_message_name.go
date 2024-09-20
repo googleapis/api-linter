@@ -19,16 +19,20 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var tagRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "tag-revision-response-message-name"),
-	OnlyIf: isTagRevisionMethod,
+	OnlyIf: utils.IsTagRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `TagBookRevision`, the response
 		// message is `Book`.
-		want := tagRevisionMethodRegexp.FindStringSubmatch(m.GetName())[1]
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		got := m.GetOutputType().GetName()
 
 		// Return a problem if we did not get the expected return name.

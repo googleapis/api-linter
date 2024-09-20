@@ -16,20 +16,23 @@ package aip0162
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // Delete Revision methods should return the resource itself.
 var deleteRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "delete-revision-response-message-name"),
-	OnlyIf: isDeleteRevisionMethod,
+	OnlyIf: utils.IsDeleteRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		got := m.GetOutputType().GetName()
-		want := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Revision"), "Delete")
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
 		if got != want {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Delete Revision methods should return the resource itself (`%s`), not `%s`.", want, got),
