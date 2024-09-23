@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.67.3](https://github.com/googleapis/api-linter/compare/v1.67.2...v1.67.3) (2024-09-23)
+
+
+### Bug Fixes
+
+* **AIP-132:** refine List request response regex ([#1420](https://github.com/googleapis/api-linter/issues/1420)) ([5cc4d27](https://github.com/googleapis/api-linter/commit/5cc4d279c9cfc80545a9d2447b4fe13a8032b2aa))
+* **AIP-136:** ignore revision methods ([#1432](https://github.com/googleapis/api-linter/issues/1432)) ([a6ba5f3](https://github.com/googleapis/api-linter/commit/a6ba5f32458cefc42b662019d97199d0a8e86551))
+* **AIP-162:** handle LRO in response name rules ([#1431](https://github.com/googleapis/api-linter/issues/1431)) ([8bca1dd](https://github.com/googleapis/api-linter/commit/8bca1dd68ccf00c39a06da9862ac8c599029297e))
+* **internal/utils:** refine Get, Create, Update, Delete request regex ([#1422](https://github.com/googleapis/api-linter/issues/1422)) ([487328c](https://github.com/googleapis/api-linter/commit/487328ca8708521562be2921d3c4f2aabaf8a5ae))
+* **locations:** make source info access concurrent safe ([#1433](https://github.com/googleapis/api-linter/issues/1433)) ([223aa5b](https://github.com/googleapis/api-linter/commit/223aa5bb6cf4f24193ad6c6037e1b88160474f2e))
+
+
+### Documentation
+
+* **AIP-132:** fix incorrect field for AIP-217 ([#1423](https://github.com/googleapis/api-linter/issues/1423)) ([6a52a68](https://github.com/googleapis/api-linter/commit/6a52a6845bf8f240a4d9f9a305a26609a2699c17))
+* **AIP-134:** change mandated to recommended ([#1426](https://github.com/googleapis/api-linter/issues/1426)) ([338b6a9](https://github.com/googleapis/api-linter/commit/338b6a95906b61ba5a83805bce92919dd53725dc))
+
 ## [1.67.2](https://github.com/googleapis/api-linter/compare/v1.67.1...v1.67.2) (2024-08-14)
 
 
