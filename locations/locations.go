@@ -40,8 +40,9 @@ func pathLocation(d desc.Descriptor, path ...int) *dpb.SourceCodeInfo_Location {
 }
 
 type sourceInfo struct {
-	info map[string]*dpb.SourceCodeInfo_Location
-	lock sync.Mutex
+	// infoMu protects the info map
+	infoMu sync.Mutex
+	info   map[string]*dpb.SourceCodeInfo_Location
 }
 
 func newSourceInfo() *sourceInfo {
@@ -52,8 +53,8 @@ func newSourceInfo() *sourceInfo {
 
 // findLocation returns the Location for a given path.
 func (si *sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
-	si.lock.Lock()
-	defer si.lock.Unlock()
+	si.infoMu.Lock()
+	defer si.infoMu.Unlock()
 
 	// If the path exists in the source info registry, return that object.
 	if loc, ok := si.info[strPath(path)]; ok {
@@ -68,8 +69,9 @@ func (si *sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
 // any file descriptor that it is given, but then caches it to avoid computing
 // the source map for the same file descriptors over and over.
 type sourceInfoRegistryType struct {
-	registry map[*desc.FileDescriptor]*sourceInfo
-	lock     sync.Mutex
+	// registryMu protects the registry map
+	registryMu sync.Mutex
+	registry   map[*desc.FileDescriptor]*sourceInfo
 }
 
 func newSourceInfoRegistryType() *sourceInfoRegistryType {
@@ -94,8 +96,8 @@ func strPath(segments []int32) (p string) {
 // It also caches this into a registry, so subsequent calls using the same
 // descriptor will return the same object.
 func (sir *sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) *sourceInfo {
-	sir.lock.Lock()
-	defer sir.lock.Unlock()
+	sir.registryMu.Lock()
+	defer sir.registryMu.Unlock()
 	answer, ok := sir.registry[fd]
 	if !ok {
 		answer = newSourceInfo()
