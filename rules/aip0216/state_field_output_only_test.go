@@ -76,7 +76,7 @@ func TestStateFieldOutputOnly(t *testing.T) {
 
 			field := f.GetMessageTypes()[0].GetFields()[1]
 			if diff := test.problems.SetDescriptor(field).Diff(stateFieldOutputOnly.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
