@@ -1,4 +1,4 @@
-# Google API Linter
+## Google API Linter
 
 [![ci](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml/badge.svg)](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml)
 ![latest release](https://img.shields.io/github/v/release/googleapis/api-linter)
