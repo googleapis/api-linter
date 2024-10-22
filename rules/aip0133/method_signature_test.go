@@ -126,7 +126,7 @@ func TestMethodSignature(t *testing.T) {
 				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 					option (google.api.method_signature) = "book,book_id";
 					option (google.longrunning.operation_info) = {
-					    response_type: "Book"
+						response_type: "Book"
 						metadata_type: "Book"
 					};
 				}
@@ -146,8 +146,8 @@ func TestMethodSignature(t *testing.T) {
 			t.Errorf(diff)
 		}
 	})
-	// Add a separate test for the LRO case rather than introducing yet
-	// another knob on the above test.
+	// Add a separate test for the non-standard resource field case rather than
+	// introducing yet another knob on the above test.
 	t.Run("NonStandardResourceFieldName", func(t *testing.T) {
 		file := testutils.ParseProto3String(t, `
 			import "google/api/client.proto";
