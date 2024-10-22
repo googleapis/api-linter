@@ -32,15 +32,21 @@ var methodSignature = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 
-		// Determine what signature we want. The {resource}_id is desired
-		// if and only if the field exists on the request.
-		resourceField := strcase.SnakeCase(utils.GetResourceMessageName(m, "Create"))
+		// Determine what signature we want.
 		want := []string{}
-		if !hasNoParent(m.GetOutputType()) {
+		if !hasNoParent(utils.GetResponseType(m)) {
 			want = append(want, "parent")
 		}
-		want = append(want, resourceField)
-		if idField := resourceField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
+		for _, f := range m.GetInputType().GetFields() {
+			if mt := f.GetMessageType(); mt != nil && utils.IsResource(mt) {
+				want = append(want, f.GetName())
+				break
+			}
+		}
+		// The {resource}_id is desired if and only if the field exists on the
+		// request.
+		expectedResourceIDField := strcase.SnakeCase(utils.GetResourceMessageName(m, "Create"))
+		if idField := expectedResourceIDField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
 			want = append(want, idField)
 		}
 
