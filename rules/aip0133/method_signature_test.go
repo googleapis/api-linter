@@ -78,7 +78,7 @@ func TestMethodSignature(t *testing.T) {
 				message Book {
 				  option (google.api.resource) = {
 				    type: "library.googleapis.com/Book"
-					pattern: "libraries/{library}/books/{book}"
+					  pattern: "libraries/{library}/books/{book}"
 				  };
 				}
 			`, test)
