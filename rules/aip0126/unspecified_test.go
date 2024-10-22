@@ -48,7 +48,7 @@ func TestUnspecified(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := unspecified.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -67,7 +67,7 @@ func TestUnspecified(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := unspecified.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

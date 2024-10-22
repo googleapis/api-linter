@@ -51,7 +51,7 @@ func TestCount(t *testing.T) {
 			})
 		}
 		if diff := wantProblems.Diff(count.Lint(file)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	}
 }

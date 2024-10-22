@@ -46,7 +46,7 @@ func TestResourcePatternPluralSimple(t *testing.T) {
 			`, test)
 			m := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -101,7 +101,7 @@ func TestResourcePatternPluralNested(t *testing.T) {
 			`, test)
 			m := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

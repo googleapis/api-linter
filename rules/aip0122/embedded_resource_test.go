@@ -99,7 +99,7 @@ func TestEmbeddedResource(t *testing.T) {
 				want[1].Descriptor = m.FindFieldByName("librarian")
 			}
 			if diff := want.Diff(embeddedResource.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -152,7 +152,7 @@ func TestEmbeddedResource_Revisions(t *testing.T) {
 		`, test)
 			field := f.FindMessage("BookRevision").FindFieldByName("snapshot")
 			if diff := test.problems.SetDescriptor(field).Diff(embeddedResource.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

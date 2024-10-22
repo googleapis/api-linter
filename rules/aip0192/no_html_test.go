@@ -47,7 +47,7 @@ func TestNoHTML(t *testing.T) {
 			`, "{{.Comment}}", test.comment))
 			message := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(message).Diff(noHTML.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

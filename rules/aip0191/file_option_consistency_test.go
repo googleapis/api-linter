@@ -71,7 +71,7 @@ func TestFileOptionConsistency(t *testing.T) {
 				t.Fatalf("Could not build test file.")
 			}
 			if diff := test.getProblems(testFile).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -85,7 +85,7 @@ func TestFileOptionConsistency(t *testing.T) {
 			t.Fatalf("Could not build test file.")
 		}
 		if diff := (testutils.Problems{}).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

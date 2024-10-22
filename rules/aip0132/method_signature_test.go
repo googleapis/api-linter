@@ -52,7 +52,7 @@ func TestMethodSignature(t *testing.T) {
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(methodSignature.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -68,7 +68,7 @@ func TestMethodSignature(t *testing.T) {
 			message Book {}
 		`)
 		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(f)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

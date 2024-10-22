@@ -51,7 +51,7 @@ func TestLROResponse(t *testing.T) {
 			problems := lroResponse.Lint(f)
 			d := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

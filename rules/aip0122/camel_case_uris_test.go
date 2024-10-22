@@ -53,7 +53,7 @@ func TestHttpUriField(t *testing.T) {
 			method := file.GetServices()[0].GetMethods()[0]
 			problems := httpURICase.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

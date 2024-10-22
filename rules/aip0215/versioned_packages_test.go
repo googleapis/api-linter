@@ -57,7 +57,7 @@ func TestVersionedPackages(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, "{{.PackageStmt}}", test)
 			if diff := test.problems.SetDescriptor(f).Diff(versionedPackages.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

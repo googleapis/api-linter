@@ -28,7 +28,7 @@ func TestRequestParentRequired(t *testing.T) {
 			`, test)
 			problems := requestParentRequired.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -59,7 +59,7 @@ func TestRequestParentRequired(t *testing.T) {
 			`, test)
 			problems := requestParentRequired.Lint(f)
 			if diff := (testutils.Problems{}).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

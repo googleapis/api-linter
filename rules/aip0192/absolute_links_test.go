@@ -38,7 +38,7 @@ func TestAbsoluteLinks(t *testing.T) {
 			m := f.GetMessageTypes()[0]
 			problems := absoluteLinks.Lint(f)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -55,7 +55,7 @@ func TestOutputName(t *testing.T) {
 
 			problems := outputName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

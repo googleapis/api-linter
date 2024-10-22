@@ -85,7 +85,7 @@ func TestOnlyLeadingComments(t *testing.T) {
 			`, test)
 			problems := onlyLeadingComments.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetMessageTypes()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

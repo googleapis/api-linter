@@ -38,7 +38,7 @@ func TestJavaMultipleFiles(t *testing.T) {
 				{{.Opt}}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(javaMultipleFiles.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

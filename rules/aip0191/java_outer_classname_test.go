@@ -44,7 +44,7 @@ func TestJavaOuterClassname(t *testing.T) {
 			files := testutils.ParseProtoStrings(t, map[string]string{test.filename: strings.Join(test.statements, "\n")})
 			f := files[test.filename]
 			if diff := test.problems.SetDescriptor(f).Diff(javaOuterClassname.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

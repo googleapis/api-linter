@@ -53,7 +53,7 @@ func TestResourceAnnotationsField(t *testing.T) {
 				d = f.GetMessageTypes()[0].GetFields()[1]
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(resourceAnnotationsField.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

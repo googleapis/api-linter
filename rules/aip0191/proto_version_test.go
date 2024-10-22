@@ -43,7 +43,7 @@ func TestSyntax(t *testing.T) {
 
 			// Lint the file, and ensure we got the expected problems.
 			if diff := test.problems.SetDescriptor(f).Diff(syntax.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

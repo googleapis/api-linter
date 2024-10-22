@@ -44,7 +44,7 @@ func TestResourceDefinitionVariables(t *testing.T) {
 			`, test)
 			got := resourceDefinitionVariables.Lint(f)
 			if diff := test.problems.SetDescriptor(f).Diff(got); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

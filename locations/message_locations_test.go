@@ -32,6 +32,6 @@ func TestMessageResource(t *testing.T) {
 	`)
 	loc := MessageResource(f.GetMessageTypes()[0])
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 2, 7, 4}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }

@@ -124,7 +124,7 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 			field := f.GetMessageTypes()[0].GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -177,7 +177,7 @@ func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
 			field := f.GetMessageTypes()[1].GetFields()[1]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -242,7 +242,7 @@ func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
 			nestedField := it.GetFields()[0].GetMessageType().GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(nestedField).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -333,7 +333,7 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 			fd := it.GetFields()[0].GetMessageType().GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(fd).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 
 			if tc.problems != nil {

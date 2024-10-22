@@ -73,7 +73,7 @@ func TestResponseMessageName(t *testing.T) {
 			method := file.GetServices()[0].GetMethods()[0]
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

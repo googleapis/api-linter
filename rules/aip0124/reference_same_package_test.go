@@ -58,7 +58,7 @@ func TestReferenceSamePackage(t *testing.T) {
 				file := files["leaf.proto"]
 				field := file.GetMessageTypes()[0].GetFields()[0]
 				if diff := test.problems.SetDescriptor(field).Diff(referenceSamePackage.Lint(file)); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 
@@ -83,7 +83,7 @@ func TestReferenceSamePackage(t *testing.T) {
 				file := files["leaf.proto"]
 				field := file.GetMessageTypes()[0].GetFields()[0]
 				if diff := test.problems.SetDescriptor(field).Diff(referenceSamePackage.Lint(file)); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 
@@ -111,7 +111,7 @@ func TestReferenceSamePackage(t *testing.T) {
 				file := files["leaf.proto"]
 				field := file.GetMessageTypes()[0].GetFields()[0]
 				if diff := test.problems.SetDescriptor(field).Diff(referenceSamePackage.Lint(file)); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		})

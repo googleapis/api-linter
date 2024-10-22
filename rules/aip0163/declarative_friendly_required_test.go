@@ -73,7 +73,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 			`, test)
 			dbr := f.FindMessage("DeleteBookRequest")
 			if diff := test.problems.SetDescriptor(dbr).Diff(declarativeFriendlyRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

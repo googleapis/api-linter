@@ -47,7 +47,7 @@ func TestResourceNameExtraction(t *testing.T) {
 			method := f.GetServices()[0].GetMethods()[0]
 			problems := resourceNameExtraction.Lint(f)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

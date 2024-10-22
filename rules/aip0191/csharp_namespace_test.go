@@ -56,7 +56,7 @@ func TestCsharpNamespace(t *testing.T) {
 				service FooBar {}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(csharpNamespace.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

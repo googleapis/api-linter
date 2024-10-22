@@ -44,7 +44,7 @@ func TestNoMarkdownHeadings(t *testing.T) {
 			`, struct{ Comment string }{cmt})
 			m := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(noMarkdownHeadings.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

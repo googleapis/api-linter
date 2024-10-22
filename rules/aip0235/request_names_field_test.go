@@ -144,7 +144,7 @@ func TestNamesField(t *testing.T) {
 
 			problems := requestNamesField.Lint(file)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

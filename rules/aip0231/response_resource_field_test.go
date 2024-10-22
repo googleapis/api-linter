@@ -88,7 +88,7 @@ func TestResourceField(t *testing.T) {
 
 			problems := resourceField.Lint(file)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

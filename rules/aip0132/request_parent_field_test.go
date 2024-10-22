@@ -51,7 +51,7 @@ func TestRequestParentField(t *testing.T) {
 			problems := requestParentField.Lint(f)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

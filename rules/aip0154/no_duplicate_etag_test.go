@@ -53,7 +53,7 @@ func TestNoDuplicateEtag(t *testing.T) {
 			`, test)
 			m := f.GetMessageTypes()
 			if diff := test.problems.SetDescriptor(m[0].FindFieldByName("etag")).Diff(noDuplicateEtag.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

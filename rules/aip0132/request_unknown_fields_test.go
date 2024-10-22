@@ -70,7 +70,7 @@ func TestUnknownFields(t *testing.T) {
 			// number of problems.
 			problems := unknownFields.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(message.GetFields()[1]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

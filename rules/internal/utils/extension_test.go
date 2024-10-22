@@ -51,7 +51,7 @@ func TestGetFieldBehavior(t *testing.T) {
 		t.Run(test.fieldName, func(t *testing.T) {
 			f := msg.FindFieldByName(test.fieldName)
 			if diff := cmp.Diff(GetFieldBehavior(f), test.fieldBehaviors); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -85,7 +85,7 @@ func TestGetMethodSignatures(t *testing.T) {
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := cmp.Diff(GetMethodSignatures(method), test.want); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

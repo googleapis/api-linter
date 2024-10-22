@@ -36,7 +36,7 @@ func TestSynonyms(t *testing.T) {
 			`, test)
 			field := file.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(synonyms.Lint(file)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

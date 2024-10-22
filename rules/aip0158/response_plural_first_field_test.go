@@ -50,7 +50,7 @@ func TestResponsePluralFirstField(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := responsePluralFirstField.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByNumber(1)).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -88,7 +88,7 @@ func TestResponsePluralFirstField(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := responsePluralFirstField.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1].FindFieldByNumber(1)).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

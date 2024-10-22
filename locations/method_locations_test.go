@@ -31,7 +31,7 @@ func TestMethodRequestType(t *testing.T) {
 	loc := MethodRequestType(f.GetServices()[0].GetMethods()[0])
 	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 14, 28}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -46,7 +46,7 @@ func TestMethodResponseType(t *testing.T) {
 	loc := MethodResponseType(f.GetServices()[0].GetMethods()[0])
 	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 39, 43}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -66,7 +66,7 @@ func TestMethodHTTPRule(t *testing.T) {
 	loc := MethodHTTPRule(f.GetServices()[0].GetMethods()[0])
 	// Four character span: start line, start column, end line, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 7, 6}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -86,7 +86,7 @@ func TestMethodOperationInfo(t *testing.T) {
 	loc := MethodOperationInfo(f.GetServices()[0].GetMethods()[0])
 	// Four character span: start line, start column, end line, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 8, 6}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -113,7 +113,7 @@ func TestMethodSignature(t *testing.T) {
 		loc := MethodSignature(f.GetServices()[0].GetMethods()[0], test.index)
 		// Four character span: start line, start column, end line, end column.
 		if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	}
 }

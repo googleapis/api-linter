@@ -41,7 +41,7 @@ func TestDescriptorName(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			if diff := cmp.Diff(DescriptorName(test.d).Span, test.wantSpan); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
