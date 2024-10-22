@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.4](https://github.com/googleapis/api-linter/compare/v1.67.3...v1.67.4) (2024-10-22)
+
+
+### Bug Fixes
+
+* **AIP-133:** use resource field in signature suggestion ([#1439](https://github.com/googleapis/api-linter/issues/1439)) ([20c96b6](https://github.com/googleapis/api-linter/commit/20c96b624560f7646342068ccc45984b114849fa))
+
 ## [1.67.3](https://github.com/googleapis/api-linter/compare/v1.67.2...v1.67.3) (2024-09-23)
 
 
