@@ -1,6 +1,6 @@
 module github.com/googleapis/api-linter
 
-go 1.20
+go 1.21
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.12
@@ -16,16 +16,16 @@ require (
 	golang.org/x/text v0.16.0
 	google.golang.org/genproto v0.0.0-20240521202816-d264139d666e
 	google.golang.org/genproto/googleapis/api v0.0.0-20240521202816-d264139d666e
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/bufbuild/protocompile v0.10.0 // indirect
+	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240515191416-fc5f0ca64291 // indirect
 	google.golang.org/grpc v1.64.1 // indirect
