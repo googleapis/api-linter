@@ -146,4 +146,42 @@ func TestMethodSignature(t *testing.T) {
 			t.Errorf(diff)
 		}
 	})
+	// Add a separate test for the LRO case rather than introducing yet
+	// another knob on the above test.
+	t.Run("NonStandardResourceFieldName", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			import "google/api/resource.proto";
+			import "google/longrunning/operations.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+					option (google.api.method_signature) = "book,book_id";
+					option (google.longrunning.operation_info) = {
+					    response_type: "Book"
+						metadata_type: "Book"
+					};
+				}
+			}
+			message CreateBookRequest {
+				Book not_book = 1;
+				string book_id = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "books/{book}"
+				};
+			}
+		`)
+		want := testutils.Problems{
+			{
+				Message:    "not_book,book",
+				Suggestion: `option (google.api.method_signature) = "not_book,book_id";`,
+				Descriptor: file.GetServices()[0].GetMethods()[0],
+			},
+		}
+		if diff := want.Diff(methodSignature.Lint(file)); diff != "" {
+			t.Errorf(diff)
+		}
+	})
 }
