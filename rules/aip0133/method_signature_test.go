@@ -157,7 +157,7 @@ func TestMethodSignature(t *testing.T) {
 				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 					option (google.api.method_signature) = "book,book_id";
 					option (google.longrunning.operation_info) = {
-					    response_type: "Book"
+						response_type: "Book"
 						metadata_type: "Book"
 					};
 				}
