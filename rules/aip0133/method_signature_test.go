@@ -30,7 +30,6 @@ func TestMethodSignature(t *testing.T) {
 	}{
 		{"ValidNoID", "CreateBook", `option (google.api.method_signature) = "parent,book";`, "", testutils.Problems{}},
 		{"ValidID", "CreateBook", `option (google.api.method_signature) = "parent,book,book_id";`, "string book_id = 3;", testutils.Problems{}},
-		{"ValidOperation", "CreateUnitOperation", `option (google.api.method_signature) = "parent,unit_operation,unit_operation_id";`, "string unit_operation_id = 3;", testutils.Problems{}},
 		{"MissingNoID", "CreateBook", "", "", testutils.Problems{{Message: `(google.api.method_signature) = "parent,book"`}}},
 		{
 			"MissingID",
@@ -65,6 +64,7 @@ func TestMethodSignature(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/client.proto";
+				import "google/api/resource.proto";
 				service Library {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
 						{{.Signature}}
@@ -75,7 +75,12 @@ func TestMethodSignature(t *testing.T) {
 					Book book = 2;
 					{{.IDField}}
 				}
-				message Book {}
+				message Book {
+				  option (google.api.resource) = {
+				    type: "library.googleapis.com/Book"
+					pattern: "libraries/{library}/books/{book}"
+				  };
+				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(methodSignature.Lint(f)); diff != "" {
@@ -101,6 +106,38 @@ func TestMethodSignature(t *testing.T) {
 			}
 			message Book {
 				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "books/{book}"
+				};
+			}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
+			t.Errorf(diff)
+		}
+	})
+	// Add a separate test for the LRO case rather than introducing yet
+	// another knob on the above test.
+	t.Run("Longrunning", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			import "google/api/resource.proto";
+			import "google/longrunning/operations.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+					option (google.api.method_signature) = "book,book_id";
+					option (google.longrunning.operation_info) = {
+					    response_type: "Book"
+						metadata_type: "Book"
+					};
+				}
+			}
+			message CreateBookRequest {
+				Book book = 1;
+				string book_id = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
 					pattern: "books/{book}"
 				};
 			}
