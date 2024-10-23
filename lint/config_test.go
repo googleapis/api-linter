@@ -281,7 +281,8 @@ func TestReadConfigsJSON(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	]
 	`
@@ -297,6 +298,7 @@ func TestReadConfigsJSON(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
@@ -317,7 +319,8 @@ func TestReadConfigsYAMLFormatError(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	`
 
@@ -339,6 +342,9 @@ func TestReadConfigsYAML(t *testing.T) {
   enabled_rules:
     - 'rule_c'
     - 'rule_d'
+  import_paths:
+    - 'import_a'
+    - 'import_b'
 `
 
 	configs, err := ReadConfigsYAML(strings.NewReader(content))
@@ -352,6 +358,7 @@ func TestReadConfigsYAML(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 	if !reflect.DeepEqual(configs, expected) {
@@ -366,6 +373,7 @@ func TestReadConfigsFromFile(t *testing.T) {
 			ExcludedPaths: []string{"path_b"},
 			DisabledRules: []string{"rule_a", "rule_b"},
 			EnabledRules:  []string{"rule_c", "rule_d"},
+			ImportPaths:   []string{"import_a", "import_b"},
 		},
 	}
 
@@ -375,7 +383,8 @@ func TestReadConfigsFromFile(t *testing.T) {
 			"included_paths": ["path_a"],
 			"excluded_paths": ["path_b"],
 			"disabled_rules": ["rule_a", "rule_b"],
-			"enabled_rules": ["rule_c", "rule_d"]
+			"enabled_rules": ["rule_c", "rule_d"],
+			"import_paths": ["import_a", "import_b"]
 		}
 	]
 	`
@@ -394,6 +403,9 @@ func TestReadConfigsFromFile(t *testing.T) {
   enabled_rules:
     - 'rule_c'
     - 'rule_d'
+  import_paths:
+    - 'import_a'
+    - 'import_b'
 `
 	yamlConfigsFile := createTempFile(t, "test.yaml", yamlConfigsText)
 	defer os.Remove(yamlConfigsFile)
