@@ -50,7 +50,7 @@ func TestForbiddenMethods(t *testing.T) {
 		method := f.GetServices()[0].GetMethods()[0]
 		problems := forbiddenMethods.Lint(f)
 		if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	}
 }

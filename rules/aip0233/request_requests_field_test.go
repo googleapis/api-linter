@@ -93,7 +93,7 @@ func TestRequestRequestsField(t *testing.T) {
 
 			problems := requestRequestsField.Lint(file)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

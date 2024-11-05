@@ -34,7 +34,7 @@ func TestAnnotationExistsValid(t *testing.T) {
 		message WriteBookRequest {}
 	`)
 	if diff := (testutils.Problems{}).Diff(lroAnnotationExists.Lint(f)); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -51,6 +51,6 @@ func TestAnnotationExistsInvalid(t *testing.T) {
 		Message:    "operation_info annotation",
 	}}
 	if diff := want.Diff(lroAnnotationExists.Lint(f)); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }

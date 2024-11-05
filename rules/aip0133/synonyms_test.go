@@ -41,7 +41,7 @@ func TestSynonyms(t *testing.T) {
 			`, test)
 			m := file.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(file)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

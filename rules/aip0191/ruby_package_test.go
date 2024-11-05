@@ -51,7 +51,7 @@ func TestRubyPackage(t *testing.T) {
 				service FooBar {}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(rubyPackage.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
