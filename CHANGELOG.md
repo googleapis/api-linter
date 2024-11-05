@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.5](https://github.com/googleapis/api-linter/compare/v1.67.4...v1.67.5) (2024-11-05)
+
+
+### Bug Fixes
+
+* **deps:** upgrade webrick dep ([#1441](https://github.com/googleapis/api-linter/issues/1441)) ([30b0a84](https://github.com/googleapis/api-linter/commit/30b0a84f70c67e55b101abea3c11fc34f8ada01a))
+
 ## [1.67.4](https://github.com/googleapis/api-linter/compare/v1.67.3...v1.67.4) (2024-10-22)
 
 
