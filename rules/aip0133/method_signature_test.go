@@ -143,7 +143,7 @@ func TestMethodSignature(t *testing.T) {
 			}
 		`)
 		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 	// Add a separate test for the non-standard resource field case rather than
@@ -181,7 +181,7 @@ func TestMethodSignature(t *testing.T) {
 			},
 		}
 		if diff := want.Diff(methodSignature.Lint(file)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
