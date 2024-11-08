@@ -60,3 +60,38 @@ func TestHttpBody(t *testing.T) {
 		})
 	}
 }
+
+func TestHttpBody_exceptions(t *testing.T) {
+	tests := []struct {
+		testName string
+		BodyType string
+		problems testutils.Problems
+	}{
+		{"ValidPostBody", "google.api.HttpBody", testutils.Problems{}},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				import "google/api/httpbody.proto";
+				service Library {
+					rpc ArchiveBook(ArchiveBookRequest) returns (ArchiveBookResponse) {
+						option (google.api.http) = {
+							post: "/v1:frob"
+							body: "body"
+						};
+					}
+				}
+				message ArchiveBookRequest {
+					{{.BodyType}} body = 1;
+				}
+				message ArchiveBookResponse {}
+			`, test)
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := httpBody.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
