@@ -47,7 +47,7 @@ func TestResponsePurgeSampleField(t *testing.T) {
 				d = f.GetMessageTypes()[0].GetFields()[0]
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(responsePurgeSampleField.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

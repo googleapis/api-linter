@@ -51,7 +51,7 @@ func TestPhpNamespace(t *testing.T) {
 				service FooBar {}
 			`, test)
 			if diff := test.problems.SetDescriptor(f).Diff(phpNamespace.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

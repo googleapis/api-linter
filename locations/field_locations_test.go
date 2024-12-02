@@ -42,7 +42,7 @@ func TestFieldLocations(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			l := FieldType(test.field)
 			if diff := cmp.Diff(l.GetSpan(), test.span); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -66,7 +66,7 @@ func TestFieldLabel(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			l := FieldLabel(test.field)
 			if diff := cmp.Diff(l.GetSpan(), test.span); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -84,7 +84,7 @@ func TestFieldResourceReference(t *testing.T) {
 	loc := FieldResourceReference(f.GetMessageTypes()[0].GetFields()[0])
 	// resource_reference annotation location is roughly line 4, column 19.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -99,6 +99,6 @@ func TestFieldOption(t *testing.T) {
 	`)
 	loc := FieldOption(f.GetMessageTypes()[0].GetFields()[0], apb.E_ResourceReference)
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }

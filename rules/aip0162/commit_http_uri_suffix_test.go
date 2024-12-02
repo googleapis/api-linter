@@ -50,7 +50,7 @@ func TestCommitHTTPURISuffix(t *testing.T) {
 
 			problems := commitHTTPURISuffix.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.67.6](https://github.com/googleapis/api-linter/compare/v1.67.5...v1.67.6) (2024-11-08)
+
+
+### Bug Fixes
+
+* **AIP-136:** allow google.api.HttpBody as body field ([#1444](https://github.com/googleapis/api-linter/issues/1444)) ([5327865](https://github.com/googleapis/api-linter/commit/5327865093c518404f621c1a7da2f81dd23997bc))
+
+## [1.67.5](https://github.com/googleapis/api-linter/compare/v1.67.4...v1.67.5) (2024-11-05)
+
+
+### Bug Fixes
+
+* **deps:** upgrade webrick dep ([#1441](https://github.com/googleapis/api-linter/issues/1441)) ([30b0a84](https://github.com/googleapis/api-linter/commit/30b0a84f70c67e55b101abea3c11fc34f8ada01a))
+
 ## [1.67.4](https://github.com/googleapis/api-linter/compare/v1.67.3...v1.67.4) (2024-10-22)
 
 

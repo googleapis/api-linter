@@ -74,7 +74,7 @@ func TestRequestMessageName(t *testing.T) {
 
 			problems := requestMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
