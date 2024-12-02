@@ -42,7 +42,7 @@ func TestRequestRequestsBehavior(t *testing.T) {
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(requestRequestsBehavior.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

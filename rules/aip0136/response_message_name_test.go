@@ -31,6 +31,7 @@ func TestResponseMessageName(t *testing.T) {
 		}{
 			{"Valid", "ArchiveBook", "ArchiveBookResponse", testutils.Problems{}},
 			{"Invalid", "ArchiveBook", "ArchiveBookResp", testutils.Problems{{Message: "not \"ArchiveBookResp\"."}}},
+			{"SkipRevisionMethod", "CommitBook", "Book", testutils.Problems{}},
 		}
 
 		for _, test := range tests {
@@ -153,6 +154,43 @@ func TestResponseMessageName(t *testing.T) {
 					// Format: publishers/{publisher}/books/{book}
 					string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 				}
+				`, test)
+				method := file.GetServices()[0].GetMethods()[0]
+				problems := responseMessageName.Lint(file)
+				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+					t.Error(diff)
+				}
+			})
+		}
+	})
+
+	t.Run("Batch methods", func(t *testing.T) {
+		// Set up the testing permutations.
+		tests := []struct {
+			testName   string
+			MethodName string
+			problems   testutils.Problems
+		}{
+			{"BatchGet", "BatchGetBooks", testutils.Problems{}},
+			{"BatchUpdate", "BatchUpdateBooks", testutils.Problems{}},
+			{"BatchCreate", "BatchCreateBooks", testutils.Problems{}},
+			{"BatchDelete", "BatchDeleteBooks", testutils.Problems{}},
+		}
+
+		for _, test := range tests {
+			t.Run(test.testName, func(t *testing.T) {
+				// Batch methods are standard methods according to AIP-130, as such they should not
+				// be considered for this lint rule.  These tests are setting up request and response
+				// models that should fail this linter if it were to run
+				file := testutils.ParseProto3Tmpl(t, `
+				package test;
+
+				service Library {
+					rpc {{.MethodName}}(DummyRequest) returns (DummyResponse) {};
+				}
+
+				message DummyRequest {}
+				message DummyResponse {}
 				`, test)
 				method := file.GetServices()[0].GetMethods()[0]
 				problems := responseMessageName.Lint(file)

@@ -24,7 +24,7 @@ import (
 // Delete Revision methods should have a proper HTTP pattern.
 var deleteRevisionHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "delete-revision-http-uri-suffix"),
-	OnlyIf: isDeleteRevisionMethod,
+	OnlyIf: utils.IsDeleteRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !deleteRevisionURINameRegexp.MatchString(httpRule.URI) {

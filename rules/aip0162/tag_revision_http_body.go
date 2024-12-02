@@ -22,6 +22,6 @@ import (
 // Tag Revision methods should have "*" as the HTTP body.
 var tagRevisionHTTPBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "tag-revision-http-body"),
-	OnlyIf:     isTagRevisionMethod,
+	OnlyIf:     utils.IsTagRevisionMethod,
 	LintMethod: utils.LintWildcardHTTPBody,
 }

@@ -22,6 +22,6 @@ import (
 // Delete Revision methods should have no HTTP body.
 var deleteRevisionHTTPBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "delete-revision-http-body"),
-	OnlyIf:     isDeleteRevisionMethod,
+	OnlyIf:     utils.IsDeleteRevisionMethod,
 	LintMethod: utils.LintNoHTTPBody,
 }

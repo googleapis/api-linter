@@ -31,7 +31,7 @@ const responseMessageNameErrorMessage = "" +
 // with a Response suffix, or the resource being operated on.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "response-message-name"),
-	OnlyIf: isCustomMethod,
+	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// A response is considered valid if
 		// - The response name matches the RPC name with a `Response` suffix
@@ -47,6 +47,12 @@ var responseMessageName = &lint.MethodRule{
 		}
 
 		response := utils.GetResponseType(m)
+		if response == nil {
+			// If the return type is not resolveable (bad) or if an LRO and
+			// missing the operation_info annotation (covered by AIP-151 rules),
+			// just exit.
+			return nil
+		}
 		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
 		responseResourceType := utils.GetResource(response).GetType()
 

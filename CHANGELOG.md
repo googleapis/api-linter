@@ -1,5 +1,94 @@
 # Changelog
 
+## [1.67.6](https://github.com/googleapis/api-linter/compare/v1.67.5...v1.67.6) (2024-11-08)
+
+
+### Bug Fixes
+
+* **AIP-136:** allow google.api.HttpBody as body field ([#1444](https://github.com/googleapis/api-linter/issues/1444)) ([5327865](https://github.com/googleapis/api-linter/commit/5327865093c518404f621c1a7da2f81dd23997bc))
+
+## [1.67.5](https://github.com/googleapis/api-linter/compare/v1.67.4...v1.67.5) (2024-11-05)
+
+
+### Bug Fixes
+
+* **deps:** upgrade webrick dep ([#1441](https://github.com/googleapis/api-linter/issues/1441)) ([30b0a84](https://github.com/googleapis/api-linter/commit/30b0a84f70c67e55b101abea3c11fc34f8ada01a))
+
+## [1.67.4](https://github.com/googleapis/api-linter/compare/v1.67.3...v1.67.4) (2024-10-22)
+
+
+### Bug Fixes
+
+* **AIP-133:** use resource field in signature suggestion ([#1439](https://github.com/googleapis/api-linter/issues/1439)) ([20c96b6](https://github.com/googleapis/api-linter/commit/20c96b624560f7646342068ccc45984b114849fa))
+
+## [1.67.3](https://github.com/googleapis/api-linter/compare/v1.67.2...v1.67.3) (2024-09-23)
+
+
+### Bug Fixes
+
+* **AIP-132:** refine List request response regex ([#1420](https://github.com/googleapis/api-linter/issues/1420)) ([5cc4d27](https://github.com/googleapis/api-linter/commit/5cc4d279c9cfc80545a9d2447b4fe13a8032b2aa))
+* **AIP-136:** ignore revision methods ([#1432](https://github.com/googleapis/api-linter/issues/1432)) ([a6ba5f3](https://github.com/googleapis/api-linter/commit/a6ba5f32458cefc42b662019d97199d0a8e86551))
+* **AIP-162:** handle LRO in response name rules ([#1431](https://github.com/googleapis/api-linter/issues/1431)) ([8bca1dd](https://github.com/googleapis/api-linter/commit/8bca1dd68ccf00c39a06da9862ac8c599029297e))
+* **internal/utils:** refine Get, Create, Update, Delete request regex ([#1422](https://github.com/googleapis/api-linter/issues/1422)) ([487328c](https://github.com/googleapis/api-linter/commit/487328ca8708521562be2921d3c4f2aabaf8a5ae))
+* **locations:** make source info access concurrent safe ([#1433](https://github.com/googleapis/api-linter/issues/1433)) ([223aa5b](https://github.com/googleapis/api-linter/commit/223aa5bb6cf4f24193ad6c6037e1b88160474f2e))
+
+
+### Documentation
+
+* **AIP-132:** fix incorrect field for AIP-217 ([#1423](https://github.com/googleapis/api-linter/issues/1423)) ([6a52a68](https://github.com/googleapis/api-linter/commit/6a52a6845bf8f240a4d9f9a305a26609a2699c17))
+* **AIP-134:** change mandated to recommended ([#1426](https://github.com/googleapis/api-linter/issues/1426)) ([338b6a9](https://github.com/googleapis/api-linter/commit/338b6a95906b61ba5a83805bce92919dd53725dc))
+
+## [1.67.2](https://github.com/googleapis/api-linter/compare/v1.67.1...v1.67.2) (2024-08-14)
+
+
+### Bug Fixes
+
+* **AIP-123:** multiword singleton reduction ([#1417](https://github.com/googleapis/api-linter/issues/1417)) ([7868552](https://github.com/googleapis/api-linter/commit/7868552ff7b27c2fa0f2ff9be3a538763f0450c5))
+* **AIP-135:** allow required etag in Delete ([#1414](https://github.com/googleapis/api-linter/issues/1414)) ([aa9587b](https://github.com/googleapis/api-linter/commit/aa9587bc7184a78109f138c809baa00018ea75e9)), refs [#1395](https://github.com/googleapis/api-linter/issues/1395)
+* **AIP-235:** allow hosting allow_missing ([#1416](https://github.com/googleapis/api-linter/issues/1416)) ([6bfbcdf](https://github.com/googleapis/api-linter/commit/6bfbcdfa8858ccdba98760d76e2d2a757855cc7b)), refs [#1404](https://github.com/googleapis/api-linter/issues/1404)
+* exit rule if response type cannot be resolved ([#1415](https://github.com/googleapis/api-linter/issues/1415)) ([6874dab](https://github.com/googleapis/api-linter/commit/6874dabb4f0d3503f267bb0ab970d62785d12727)), refs [#1399](https://github.com/googleapis/api-linter/issues/1399)
+
+
+### Documentation
+
+* **AIP-143:** fix rule name used for implementation link ([#1411](https://github.com/googleapis/api-linter/issues/1411)) ([f9cf2eb](https://github.com/googleapis/api-linter/commit/f9cf2ebc9589abfce88317b1e3318a9e1547b41a))
+
+## [1.67.1](https://github.com/googleapis/api-linter/compare/v1.67.0...v1.67.1) (2024-07-31)
+
+
+### Bug Fixes
+
+* **AIP-123:** skip resource-pattern-plural when there is no plural ([#1409](https://github.com/googleapis/api-linter/issues/1409)) ([93a601d](https://github.com/googleapis/api-linter/commit/93a601d92adbeb0c17fa8724212ee344f934a4aa))
+
+## [1.67.0](https://github.com/googleapis/api-linter/compare/v1.66.2...v1.67.0) (2024-07-26)
+
+
+### Features
+
+* **AIP-123:** enforce singular as ID segment ([#1403](https://github.com/googleapis/api-linter/issues/1403)) ([088ec19](https://github.com/googleapis/api-linter/commit/088ec196da93a9338b2abf60469cb55ecec5c34d))
+* **AIP-123:** resource collection matches plural ([#1408](https://github.com/googleapis/api-linter/issues/1408)) ([9025d3d](https://github.com/googleapis/api-linter/commit/9025d3d674df9f918483decc0f559f168737ee69))
+* **AIP-134:** update_mask must be OPTIONAL ([#1394](https://github.com/googleapis/api-linter/issues/1394)) ([9fc0d05](https://github.com/googleapis/api-linter/commit/9fc0d05f3d89905ea7d3b22c9b44fbfa79edac07))
+* **AIP-217:** add various rules for return_partial_success support ([#1406](https://github.com/googleapis/api-linter/issues/1406)) ([cf4ba12](https://github.com/googleapis/api-linter/commit/cf4ba1284bbab151275e7dedf291ffea0e488b1c))
+
+
+### Bug Fixes
+
+* docs typo ([#1401](https://github.com/googleapis/api-linter/issues/1401)) ([4acf04c](https://github.com/googleapis/api-linter/commit/4acf04c6829ffe7f57cf2997c4f9ccc956de9274))
+
+## [1.66.2](https://github.com/googleapis/api-linter/compare/v1.66.1...v1.66.2) (2024-06-04)
+
+
+### Bug Fixes
+
+* **aip-130:** identify standard and custom methods ([#1396](https://github.com/googleapis/api-linter/issues/1396)) ([be41d72](https://github.com/googleapis/api-linter/commit/be41d72e50032b45f4263779e638fc8ec0ff9013))
+
+## [1.66.1](https://github.com/googleapis/api-linter/compare/v1.66.0...v1.66.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* **AIP-136:** handle LRO response names ([#1391](https://github.com/googleapis/api-linter/issues/1391)) ([ec79f53](https://github.com/googleapis/api-linter/commit/ec79f5392829fc58a44f577dce55a936ea112988))
+
 ## [1.66.0](https://github.com/googleapis/api-linter/compare/v1.65.2...v1.66.0) (2024-05-17)
 
 

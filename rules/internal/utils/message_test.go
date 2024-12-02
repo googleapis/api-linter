@@ -44,3 +44,315 @@ func TestListResponseResourceName(t *testing.T) {
 		})
 	}
 }
+
+func TestIsListResponseMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid list response",
+			RPC:  "ListBooks",
+			want: true,
+		},
+		{
+			name: "not list response",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike response",
+			RPC:  "Listen",
+			want: false,
+		},
+		{
+			name: "multiword lookalike response",
+			RPC:  "ListenForever",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Response {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsListResponseMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsListRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid list request",
+			RPC:  "ListBooks",
+			want: true,
+		},
+		{
+			name: "not list request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Listen",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "ListenForever",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Request {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsListRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsListRevisionsResponseMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid list revisions response",
+			RPC:  "ListBook",
+			want: true,
+		},
+		{
+			name: "not list revisions response",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike response",
+			RPC:  "Listen",
+			want: false,
+		},
+		{
+			name: "multiword lookalike response",
+			RPC:  "ListenForever",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}RevisionsResponse {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsListRevisionsResponseMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsListRevisionsRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid list revisions request",
+			RPC:  "ListBook",
+			want: true,
+		},
+		{
+			name: "not list revisions request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Listen",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "ListenForever",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}RevisionsRequest {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsListRevisionsRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsGetRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid get request",
+			RPC:  "GetBook",
+			want: true,
+		},
+		{
+			name: "not get request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Getup",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "GetupFinder",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Request {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsGetRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsCreateRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid create request",
+			RPC:  "CreateBook",
+			want: true,
+		},
+		{
+			name: "not create request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Created",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "CreatedBook",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Request {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsCreateRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsUpdateRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid update request",
+			RPC:  "UpdateBook",
+			want: true,
+		},
+		{
+			name: "not update request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Updater",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "UpdaterAndCreator",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Request {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsUpdateRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestIsDeleteRequestMessage(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		RPC  string
+		want bool
+	}{
+		{
+			name: "valid delete request",
+			RPC:  "DeleteBook",
+			want: true,
+		},
+		{
+			name: "not delete request",
+			RPC:  "ArchiveBook",
+			want: false,
+		},
+		{
+			name: "lookalike request",
+			RPC:  "Deleter",
+			want: false,
+		},
+		{
+			name: "multiword lookalike request",
+			RPC:  "DeleterAndPurge",
+			want: false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				message {{.RPC}}Request {}
+			`, test)
+			m := file.GetMessageTypes()[0]
+			if got, want := IsDeleteRequestMessage(m), test.want; got != want {
+				t.Errorf("got %v, want %v", got, want)
+			}
+		})
+	}
+}

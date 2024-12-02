@@ -25,9 +25,11 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
+var allowedBodyTypes = stringset.New("google.api.HttpBody")
+
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-body"),
-	OnlyIf: isCustomMethod,
+	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			noBody := stringset.New("GET", "DELETE")
@@ -37,6 +39,14 @@ var httpBody = &lint.MethodRule{
 				// word and that the resource is everything else.
 				resource := strings.Join(strings.Split(strcase.SnakeCase(m.GetName()), "_")[1:], "_")
 				if !stringset.New(resource, "*").Contains(httpRule.Body) {
+					// Some field types make sense to use as a body instead of the entire request message,
+					// e.g. google.api.HttpBody.
+					b := m.GetInputType().FindFieldByName(httpRule.Body)
+					isMessageType := b != nil && b.GetMessageType() != nil
+					if isMessageType && allowedBodyTypes.Contains(b.GetMessageType().GetFullyQualifiedName()) {
+						continue
+					}
+
 					// FIXME: We intentionally only return one Problem here.
 					// When we can attach problems to the particular annotation, update this
 					// to return multiples.

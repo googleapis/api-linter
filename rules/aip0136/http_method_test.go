@@ -36,7 +36,6 @@ func TestHttpMethod(t *testing.T) {
 		{"InvalidDelete", "ArchiveBook", "delete", "", testutils.Problems{{Message: "POST or GET"}}},
 		{"IrrelevantPatch", "UpdateBook", "patch", "", nil},
 		{"IrrelevantDelete", "DeleteBook", "delete", "", nil},
-		{"IrrelevantPut", "ReplaceBook", "put", "", nil},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
@@ -55,7 +54,7 @@ func TestHttpMethod(t *testing.T) {
 			method := file.GetServices()[0].GetMethods()[0]
 			got := httpMethod.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(got); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

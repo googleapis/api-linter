@@ -16,6 +16,7 @@ package locations
 
 import (
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/jhump/protoreflect/desc"
@@ -46,4 +47,31 @@ func parse(t *testing.T, s string) *desc.FileDescriptor {
 		t.Fatalf("%v", err)
 	}
 	return fds[0]
+}
+
+func TestSourceInfo_Concurrency(t *testing.T) {
+	fd := parse(t, `
+	syntax = "proto3";
+	package foo.bar;
+	`)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		FileSyntax(fd)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		FilePackage(fd)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		FileImport(fd, 0)
+	}()
+	wg.Wait()
 }

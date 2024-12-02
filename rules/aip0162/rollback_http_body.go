@@ -22,6 +22,6 @@ import (
 // Rollback methods should have "*" as the HTTP body.
 var rollbackHTTPBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "rollback-http-body"),
-	OnlyIf:     isRollbackMethod,
+	OnlyIf:     utils.IsRollbackRevisionMethod,
 	LintMethod: utils.LintWildcardHTTPBody,
 }

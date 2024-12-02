@@ -50,7 +50,7 @@ func TestHttpUriSuffix(t *testing.T) {
 				`, test)
 			problems := httpURISuffix.Lint(file)
 			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

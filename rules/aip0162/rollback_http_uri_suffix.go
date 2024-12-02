@@ -24,7 +24,7 @@ import (
 // Rollback methods should have a proper HTTP pattern.
 var rollbackHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "rollback-http-uri-suffix"),
-	OnlyIf: isRollbackMethod,
+	OnlyIf: utils.IsRollbackRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !rollbackURINameRegexp.MatchString(httpRule.URI) {

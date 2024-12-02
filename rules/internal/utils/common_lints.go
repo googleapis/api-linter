@@ -182,7 +182,11 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 // have a name matching the method's, with a "Response" suffix.
 func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
 	// GetResponseType handles the LRO case.
-	if got, want := GetResponseType(m).GetName(), m.GetName()+"Response"; got != want {
+	rt := GetResponseType(m)
+	if rt == nil {
+		return nil
+	}
+	if got, want := rt.GetName(), m.GetName()+"Response"; got != want {
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 
