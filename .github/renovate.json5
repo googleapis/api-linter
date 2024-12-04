@@ -12,6 +12,7 @@
       matchPackageNames: [
         "bitbucket.org/creachadair/stringset",
         "dominikh/staticcheck-action",
+        "github.com/jhump/protoreflect",
       ],
       enabled: false
     }
