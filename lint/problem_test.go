@@ -120,3 +120,37 @@ func TestProblemDescriptor(t *testing.T) {
 		})
 	}
 }
+
+func TestFileLocationFromPBLocation(t *testing.T) {
+	tests := []struct {
+		testName         string
+		pbLocation       *dpb.SourceCodeInfo_Location
+		expectedLocation FileLocation
+	}{
+		{
+			testName:   "MultilineSpan",
+			pbLocation: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
+			expectedLocation: FileLocation{
+				Start: Position{3, 1},
+				End:   Position{6, 70},
+			},
+		},
+		{
+			testName:   "SingleLineSpan",
+			pbLocation: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
+			expectedLocation: FileLocation{
+				Start: Position{3, 1},
+				End:   Position{3, 42},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			actual := FileLocationFromPBLocation(test.pbLocation)
+			if actual != test.expectedLocation {
+				t.Errorf("Got:\n%v\nExpected\n%v", actual, test.expectedLocation)
+			}
+		})
+	}
+}
