@@ -40,6 +40,7 @@ func AddRules(r lint.RuleRegistry) error {
 		resourcePlural,
 		resourceReferenceType,
 		resourceSingular,
+		resourceTypeMessage,
 		resourceTypeName,
 		resourceVariables,
 		resourceDefinitionVariables,
