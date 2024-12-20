@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.68.0](https://github.com/googleapis/api-linter/compare/v1.67.6...v1.68.0) (2024-12-20)
+
+
+### Features
+
+* **AIP-123:** resource type name matches message ([#1452](https://github.com/googleapis/api-linter/issues/1452)) ([8f3e2ac](https://github.com/googleapis/api-linter/commit/8f3e2ac2ecdba4798a18cd8c3962ded1b0f86b6c))
+
 ## [1.67.6](https://github.com/googleapis/api-linter/compare/v1.67.5...v1.67.6) (2024-11-08)
 
 
