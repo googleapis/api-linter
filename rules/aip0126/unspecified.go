@@ -30,8 +30,9 @@ var unspecified = &lint.EnumRule{
 	Name: lint.NewRuleName(126, "unspecified"),
 	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
 		name := endNum.ReplaceAllString(e.GetName(), "${1}_${2}")
-		unspec := strings.ToUpper(strcase.SnakeCase(name) + "_UNSPECIFIED")
-		allowed := stringset.New(unspec, "UNKNOWN")
+		sn := strings.ToUpper(strcase.SnakeCase(name))
+		unspec := sn + "_UNSPECIFIED"
+		allowed := stringset.New(unspec, "UNKNOWN", sn+"_UNKNOWN")
 		for _, element := range e.GetValues() {
 			if allowed.Contains(element.GetName()) && element.GetNumber() == 0 {
 				return nil
