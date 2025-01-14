@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.68.0](https://github.com/googleapis/api-linter/compare/v1.67.6...v1.68.0) (2025-01-14)
+
+
+### Features
+
+* **AIP-123:** resource type name matches message ([#1452](https://github.com/googleapis/api-linter/issues/1452)) ([8f3e2ac](https://github.com/googleapis/api-linter/commit/8f3e2ac2ecdba4798a18cd8c3962ded1b0f86b6c))
+* **deps:** update to min version to Go 1.22 ([#1457](https://github.com/googleapis/api-linter/issues/1457)) ([f34f16b](https://github.com/googleapis/api-linter/commit/f34f16b865968ce58dc8140d1bb4943ae984b0f4))
+
+
+### Bug Fixes
+
+* **AIP-126:** Allow prefixed UNKNOWN value ([#1455](https://github.com/googleapis/api-linter/issues/1455)) ([9353565](https://github.com/googleapis/api-linter/commit/93535656cef91b214b6b40edc5a0eac51db89134))
+
+
+### Documentation
+
+* **AIP-148:** linkify UUID4 format in rule ([#1456](https://github.com/googleapis/api-linter/issues/1456)) ([5eb475f](https://github.com/googleapis/api-linter/commit/5eb475fb13945253c20a29b24952354cb37e3a71))
+
 ## [1.67.6](https://github.com/googleapis/api-linter/compare/v1.67.5...v1.67.6) (2024-11-08)
 
 
