@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package aip0123 contains rules defined in https://aip.dev/123.
 package aip0123
 
 import (
