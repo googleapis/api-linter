@@ -1,4 +1,4 @@
-FROM ruby:3.3-alpine
+FROM ruby:3.4-alpine
 
 # Copy the existing code into the Docker image.
 #
