@@ -5,6 +5,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: write
+
 env:
   # e.g. v1.0.0
   TAG_NAME: ${{ github.event.release.tag_name }}
