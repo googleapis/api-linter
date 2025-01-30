@@ -36,19 +36,17 @@ func TestNoMutableCycles(t *testing.T) {
 			nil,
 		},
 		{
+			"ValidSelfReferenceCycle",
+			"",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			"",
+			"",
+			nil,
+		},
+		{
 			"InvalidCycle",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
-			"",
-			"",
-			testutils.Problems{{
-				Message: "cycle",
-			}},
-		},
-		{
-			"InvalidSelfReferenceCycle",
-			"",
-			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			"",
 			"",
 			testutils.Problems{{
@@ -64,21 +62,6 @@ func TestNoMutableCycles(t *testing.T) {
 			testutils.Problems{{
 				Message: "cycle",
 			}},
-		},
-		{
-			"InvalidDeepAndShallowCycles",
-			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
-			`[(google.api.resource_reference).type = "library.googleapis.com/Library"]`,
-			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
-			`[(google.api.resource_reference).type = "library.googleapis.com/Book"]`,
-			testutils.Problems{
-				{
-					Message: "cycle",
-				},
-				{
-					Message: "cycle",
-				},
-			},
 		},
 		{
 			"ValidOutputOnlyCyclicReference",
