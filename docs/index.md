@@ -31,7 +31,11 @@ understanding API guidance.
 Each linter rule has its own [rule documentation][], and rules can be
 [configured][configuration] using a config file, or in a proto file itself.
 
-## Installation
+The linter is available as a standalone CLI tool, as well as a buf plugin.
+
+## CLI
+
+### Installation
 
 To install `api-linter`, use `go install`:
 
@@ -46,7 +50,7 @@ binary directory.
 **Note:** For working in Google-internal source control, you should use the
 released binary `/google/bin/releases/api-linter/api-linter`.
 
-## Usage
+### Usage
 
 ```sh
 api-linter proto_file1 proto_file2 ...
@@ -78,6 +82,32 @@ Usage of api-linter:
                                         The current working directory is always used.
       --set-exit-status                 Return exit status 1 when lint errors are found.
       --version                         Print version and exit.
+```
+
+## Buf Plugin
+
+### Installation
+
+To install `buf-plugin-google-api`, use `go install`:
+
+```sh
+go install github.com/googleapis/api-linter/cmd/buf-plugin-google-api
+```
+
+### Usage
+
+Reference the plugin in buf.yaml
+
+```yaml
+lint:
+  use:
+    # Specific rules
+    - GOOGLE_CORE_0121_RESOURCE_MUST_SUPPORT_GET
+    - GOOGLE_CORE_0192_HAS_COMMENTS
+    # Alternatively, enable all rules
+    - GOOGLE_ALL
+plugins:
+  - plugin: buf-plugin-google-api
 ```
 
 ## License
