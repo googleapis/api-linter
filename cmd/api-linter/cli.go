@@ -94,7 +94,7 @@ func newCli(args []string) *cli {
 		FormatType:                fmtFlag,
 		OutputPath:                outFlag,
 		ExitStatusOnLintFailure:   setExitStatusOnLintFailure,
-		ProtoImportPaths:          append(protoImportFlag, "."),
+		ProtoImportPaths:          protoImportFlag,
 		ProtoDescPath:             protoDescFlag,
 		EnabledRules:              ruleEnableFlag,
 		DisabledRules:             ruleDisableFlag,
@@ -152,7 +152,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
-		ImportPaths:           c.ProtoImportPaths,
+		ImportPaths:           append(c.ProtoImportPaths, "."),
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
