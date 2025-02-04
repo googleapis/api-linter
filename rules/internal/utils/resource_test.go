@@ -181,3 +181,42 @@ func TestIsRevisionRelationship(t *testing.T) {
 		})
 	}
 }
+
+func TestHasParent(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		pattern string
+		want    bool
+	}{
+		{
+			name:    "child resource",
+			pattern: "foos/{foo}/bars/{bar}",
+			want:    true,
+		},
+		{
+			name:    "top level resource",
+			pattern: "foos/{foo}",
+			want:    false,
+		},
+		{
+			name:    "top level singleton",
+			pattern: "foo",
+			want:    false,
+		},
+		{
+			name:    "empty",
+			pattern: "",
+			want:    false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var in *apb.ResourceDescriptor
+			if test.pattern != "" {
+				in = &apb.ResourceDescriptor{Pattern: []string{test.pattern}}
+			}
+			if got := HasParent(in); got != test.want {
+				t.Errorf("HasParent(%s): got %v, want %v", test.pattern, got, test.want)
+			}
+		})
+	}
+}
