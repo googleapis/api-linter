@@ -56,4 +56,25 @@ func TestRequestParentFieldRequired(t *testing.T) {
 			t.Error(diff)
 		}
 	})
+
+	// Test the "top-level exception", which is more involved
+	// than the other tests and therefore handled separately.
+	t.Run("SkipTopLevelSingleton", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			import "google/api/resource.proto";
+			message CreateBookRequest {
+				Book book = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					pattern: "book"
+				};
+				string name = 1;
+			}
+		`)
+		problems := requestParentRequired.Lint(f)
+		if diff := (testutils.Problems{}).Diff(problems); diff != "" {
+			t.Error(diff)
+		}
+	})
 }
