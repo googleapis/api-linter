@@ -20,6 +20,45 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 )
 
+// Tests our regexp normalizes strings to the expected path.
+func TestVersionNormalization(t *testing.T) {
+	for _, tc := range []struct {
+		in   string
+		want string
+	}{
+		{
+			in:   "",
+			want: "",
+		},
+		{
+			in:   "foo.bar.baz",
+			want: "",
+		},
+		{
+			// This one's a bit iffy.  Should a version be allowed as the first segment?
+			in:   "v1beta",
+			want: "",
+		},
+		{
+			in:   "foo.v3",
+			want: "foo.v3",
+		},
+		{
+			in:   "foo.v99alpha.bar",
+			want: "foo.v99alpha",
+		},
+		{
+			in:   "foo.v2.bar.v2",
+			want: "foo.v2.bar.v2",
+		},
+	} {
+		got := versionedPrefix.FindString(tc.in)
+		if got != tc.want {
+			t.Errorf("mismatch: in %q, got %q, want %q", tc.in, got, tc.want)
+		}
+	}
+}
+
 func TestForeignTypeReference(t *testing.T) {
 
 	for _, tc := range []struct {
@@ -58,11 +97,25 @@ func TestForeignTypeReference(t *testing.T) {
 			problems:      testutils.Problems{{Message: "foreign type referenced"}},
 		},
 		{
-			description:   "refers to subpkg",
+			description:   "unversioned subpackage",
 			CallingPkg:    "somepackage",
 			ReferencePkg:  "somepackage.sub",
 			ReferencedMsg: "somepackage.sub.OtherMessage",
 			problems:      testutils.Problems{{Message: "foreign type referenced"}},
+		},
+		{
+			description:   "versioned subpackage",
+			CallingPkg:    "somepackage.v6",
+			ReferencePkg:  "somepackage.v6.sub",
+			ReferencedMsg: "somepackage.v6.sub.OtherMessage",
+			problems:      nil,
+		},
+		{
+			description:   "versioned deep subpackaging",
+			CallingPkg:    "somepackage.v1.abc",
+			ReferencePkg:  "somepackage.v1.lol.xyz",
+			ReferencedMsg: "somepackage.v1.lol.xyz.OtherMessage",
+			problems:      nil,
 		},
 		{
 			description:   "refers to component package",

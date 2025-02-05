@@ -16,6 +16,7 @@ package aip0215
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
@@ -30,32 +31,52 @@ var foreignTypeReference = &lint.FieldRule{
 		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE
 	},
 	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
-		curPkg := getPackage(fd)
-		if msg := fd.GetMessageType(); msg != nil {
-			msgPkg := getPackage(msg)
-			if !utils.IsCommonProto(fd.GetMessageType().GetFile()) {
-				if curPkg != "" && msgPkg != "" && !isComponentPackage(msgPkg) && curPkg != msgPkg {
-					return []lint.Problem{{
-						Message:    fmt.Sprintf("foreign type referenced, current field in %q message in %q", curPkg, msgPkg),
-						Descriptor: fd,
-					}}
-				}
-			}
+		curPkg := getNormalizedPackage(fd)
+		if curPkg == "" {
+			return nil // Empty or unavailable package.
 		}
+		msg := fd.GetMessageType()
+		if msg == nil {
+			return nil // Couldn't resolve type.
+		}
+		msgPkg := getNormalizedPackage(msg)
+		if msgPkg == "" {
+			return nil // Empty or unavailable package.
+		}
+
+		if utils.IsCommonProto(msg.GetFile()) {
+			return nil // reference to a well known proto package.
+		}
+
+		if strings.HasSuffix(msgPkg, ".type") {
+			return nil // AIP-213 component type.
+		}
+
+		if curPkg != msgPkg {
+			return []lint.Problem{{
+				Message:    fmt.Sprintf("foreign type referenced, current field in %q message in %q", curPkg, msgPkg),
+				Descriptor: fd,
+			}}
+		}
+
 		return nil
 	},
 }
 
-func getPackage(d desc.Descriptor) string {
-	if f := d.GetFile(); f != nil {
-		return f.GetPackage()
-	}
-	return ""
-}
+// Regexp to capture everything up to a versioned segment.
+var versionedPrefix = regexp.MustCompile(`^.*\.v[\d]+(p[\d]+)?(alpha|beta|eap|test)?[\d]*`)
 
-// check if a package path is an AIP-213 component package path.
-// Valid component packages are expected to end in ".type".
-func isComponentPackage(pkg string) bool {
-	parts := strings.Split(pkg, ".")
-	return parts[len(parts)-1] == "type"
+// getNormalizedPackage returns a normalized package path.
+// If package cannot be resolved it returns the empty string.
+// If the package path has a "versioned" segment, the path is truncated to that segment.
+func getNormalizedPackage(d desc.Descriptor) string {
+	f := d.GetFile()
+	if f == nil {
+		return ""
+	}
+	pkg := f.GetPackage()
+	if normPkg := versionedPrefix.FindString(pkg); normPkg != "" {
+		pkg = normPkg
+	}
+	return pkg
 }

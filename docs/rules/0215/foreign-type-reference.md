@@ -3,9 +3,9 @@ rule:
   aip: 215
   name: [core, '0215', foreign-type-reference]
   summary: API-specific protos should be in versioned packages.
-permalink: /215/versioned-packages
+permalink: /215/foreign-type-reference
 redirect_from:
-  - /0215/versioned-packages
+  - /0215/foreign-type-reference
 ---
 
 # Versioned packages
@@ -47,8 +47,18 @@ message SomeMessage {
 
 ## Known issues
 
-This package disallows subpackaging, and allows any package that ends with `.type` to
-avoid flagging possible legitimate uses of AIP-213 component packages.
+This check only allows subpackage usage if you're within a versioned path, but generates warnings for unversioned subpackage usage.
+It also ignores if the referenced package is a "common" package like google.api, or if the package path ends in ".type" indicating
+the package is an AIP-213 component package.
+
+Examples of foreign type references and their expected results:
+
+| Calling Package | Referenced Package | Result       |
+| --------------- | ------------------ | ------------ |
+| foo.bar         | foo.xyz            | lint warning |
+| foo.v2.bar      | foo.v2.xyz         | ok           |
+| foo.bar         | foo.type           | ok           |
+| foo.bar         | google.api         | ok           |
 
 ## Disabling
 
