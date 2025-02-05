@@ -34,8 +34,6 @@ var foreignTypeReference = &lint.FieldRule{
 		if msg := fd.GetMessageType(); msg != nil {
 			msgPkg := getPackage(msg)
 			if !utils.IsCommonProto(fd.GetMessageType().GetFile()) {
-				// TODO: consider whether this should be less strict, and shares some common path fragment.
-				// If relaxed, how much path deviation is allowed?  AIP-213 likely relates here (common components).
 				if curPkg != "" && msgPkg != "" && !isComponentPackage(msgPkg) && curPkg != msgPkg {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("foreign type referenced, current field in %q message in %q", curPkg, msgPkg),
@@ -55,6 +53,8 @@ func getPackage(d desc.Descriptor) string {
 	return ""
 }
 
+// check if a package path is an AIP-213 component package path.
+// Valid component packages are expected to end in ".type".
 func isComponentPackage(pkg string) bool {
 	parts := strings.Split(pkg, ".")
 	if parts[len(parts)-1] == "type" {
