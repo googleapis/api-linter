@@ -16,6 +16,7 @@ package aip0215
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -35,7 +36,7 @@ var foreignTypeReference = &lint.FieldRule{
 			if !utils.IsCommonProto(fd.GetMessageType().GetFile()) {
 				// TODO: consider whether this should be less strict, and shares some common path fragment.
 				// If relaxed, how much path deviation is allowed?  AIP-213 likely relates here (common components).
-				if curPkg != "" && msgPkg != "" && curPkg != msgPkg {
+				if curPkg != "" && msgPkg != "" && !isComponentPackage(msgPkg) && curPkg != msgPkg {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("foreign type referenced, current field in %q message in %q", curPkg, msgPkg),
 						Descriptor: fd,
@@ -52,4 +53,12 @@ func getPackage(d desc.Descriptor) string {
 		return f.GetPackage()
 	}
 	return ""
+}
+
+func isComponentPackage(pkg string) bool {
+	parts := strings.Split(pkg, ".")
+	if parts[len(parts)-1] == "type" {
+		return true
+	}
+	return false
 }

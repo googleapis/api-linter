@@ -64,6 +64,13 @@ func TestForeignTypeReference(t *testing.T) {
 			ReferencedMsg: "somepackage.sub.OtherMessage",
 			problems:      testutils.Problems{{Message: "foreign type referenced"}},
 		},
+		{
+			description:   "refers to component package",
+			CallingPkg:    "somepackage",
+			ReferencePkg:  "otherpackage.type",
+			ReferencedMsg: "otherpackage.type.OtherMessage",
+			problems:      nil,
+		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
 			files := testutils.ParseProto3Tmpls(t, map[string]string{
