@@ -2,7 +2,7 @@
 rule:
   aip: 215
   name: [core, '0215', foreign-type-reference]
-  summary: API-specific protos should be in versioned packages.
+  summary: API should not reference foreign types outside of the API scope.
 permalink: /215/foreign-type-reference
 redirect_from:
   - /0215/foreign-type-reference
