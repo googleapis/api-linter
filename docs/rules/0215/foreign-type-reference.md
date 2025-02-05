@@ -48,7 +48,7 @@ message SomeMessage {
 ## Known issues
 
 This check only allows subpackage usage within a versioned path, but generates warnings for unversioned subpackage usage.
-It also ignores if the referenced package is a "common" package like google.api, or if the package path ends in ".type" indicating
+It also ignores if the referenced package is a "common" package like `google.api`, or if the package path ends in `.type` indicating
 the package is an AIP-213 component package.
 
 Examples of foreign type references and their expected results:
