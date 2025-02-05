@@ -57,8 +57,5 @@ func getPackage(d desc.Descriptor) string {
 // Valid component packages are expected to end in ".type".
 func isComponentPackage(pkg string) bool {
 	parts := strings.Split(pkg, ".")
-	if parts[len(parts)-1] == "type" {
-		return true
-	}
-	return false
+	return parts[len(parts)-1] == "type"
 }
