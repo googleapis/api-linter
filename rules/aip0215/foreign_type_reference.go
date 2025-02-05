@@ -24,7 +24,7 @@ import (
 )
 
 var foreignTypeReference = &lint.FieldRule{
-	Name: lint.NewRuleName(202, "foreign-type-reference"),
+	Name: lint.NewRuleName(215, "foreign-type-reference"),
 	OnlyIf: func(fd *desc.FieldDescriptor) bool {
 		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE
 	},
