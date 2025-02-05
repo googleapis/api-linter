@@ -47,7 +47,7 @@ message SomeMessage {
 
 ## Known issues
 
-This check only allows subpackage usage if you're within a versioned path, but generates warnings for unversioned subpackage usage.
+This check only allows subpackage usage within a versioned path, but generates warnings for unversioned subpackage usage.
 It also ignores if the referenced package is a "common" package like google.api, or if the package path ends in ".type" indicating
 the package is an AIP-213 component package.
 
