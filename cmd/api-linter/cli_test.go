@@ -30,7 +30,7 @@ func TestNewCli(t *testing.T) {
 				OutputPath:       "out",
 				FormatType:       "json",
 				ProtoDescPath:    []string{"proto_desc1", "proto_desc2"},
-				ProtoImportPaths: []string{"proto_path_a", "proto_path_b", "."},
+				ProtoImportPaths: []string{"proto_path_a", "proto_path_b"},
 				ProtoFiles:       []string{"a.proto", "b.proto"},
 			},
 		},
@@ -41,7 +41,6 @@ func TestNewCli(t *testing.T) {
 			},
 			wantCli: &cli{
 				ExitStatusOnLintFailure: true,
-				ProtoImportPaths:        []string{"."},
 				ProtoFiles:              []string{},
 			},
 		},
