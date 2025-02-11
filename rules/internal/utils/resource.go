@@ -90,3 +90,21 @@ func IsRevisionRelationship(parent, revision *apb.ResourceDescriptor) bool {
 	rType = strings.TrimSuffix(rType, "Revision")
 	return pType == rType
 }
+
+// HasParent determines if the given resource has a parent resource or not
+// based on the pattern(s) it defines having multiple resource ID segments
+// or not. Incomplete or nil input returns false.
+func HasParent(resource *apb.ResourceDescriptor) bool {
+	if resource == nil || len(resource.GetPattern()) == 0 {
+		return false
+	}
+
+	for _, pattern := range resource.GetPattern() {
+		// multiple ID variable segments indicates presence of parent
+		if strings.Count(pattern, "{") > 1 {
+			return true
+		}
+	}
+
+	return false
+}

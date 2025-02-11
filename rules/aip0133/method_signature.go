@@ -34,7 +34,7 @@ var methodSignature = &lint.MethodRule{
 
 		// Determine what signature we want.
 		want := []string{}
-		if !hasNoParent(utils.GetResponseType(m)) {
+		if utils.HasParent(utils.GetResource(utils.GetResponseType(m))) {
 			want = append(want, "parent")
 		}
 		for _, f := range m.GetInputType().GetFields() {

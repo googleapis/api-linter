@@ -40,7 +40,7 @@ var httpURIParent = &lint.MethodRule{
 			}
 		}
 
-		return utils.IsCreateMethod(m) && !hasNoParent(res)
+		return utils.IsCreateMethod(m) && utils.HasParent(utils.GetResource(res))
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		if problems := utils.LintHTTPURIHasParentVariable(m); problems != nil {
