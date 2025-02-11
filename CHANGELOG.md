@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.69.0](https://github.com/googleapis/api-linter/compare/v1.68.0...v1.69.0) (2025-02-11)
+
+
+### Features
+
+* **AIP-215:** augment foreign type checking ([#1467](https://github.com/googleapis/api-linter/issues/1467)) ([6c514fb](https://github.com/googleapis/api-linter/commit/6c514fb12f5839bb3dbf27742ca62af36466c6cf))
+
+
+### Bug Fixes
+
+* **cli:** exclude cwd from input path resolution ([#1466](https://github.com/googleapis/api-linter/issues/1466)) ([a14ed3d](https://github.com/googleapis/api-linter/commit/a14ed3de28a0d20ee82b9692d5d290d3732e690d))
+* **rules:** fix HasParent check and utilify it ([#1468](https://github.com/googleapis/api-linter/issues/1468)) ([6ac3b57](https://github.com/googleapis/api-linter/commit/6ac3b57ca3bccd15806a714239a89e751ac42428))
+
 ## [1.68.0](https://github.com/googleapis/api-linter/compare/v1.67.6...v1.68.0) (2025-01-14)
 
 
