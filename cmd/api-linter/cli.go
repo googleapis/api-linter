@@ -165,7 +165,18 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		},
 	}
 	// Resolve file absolute paths to relative ones.
+	// Using supplied import paths first.
 	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
+	if err != nil {
+		return err
+	}
+	// Then resolve again against ".", the local directory.
+	// This is necessary because ResolveFilenames won't resolve a path if it
+	// relative to *at least one* of the given import paths, which can result
+	// in duplicate file parsing and compilation errors, as seen in #1465 and
+	// #1471. So we resolve against local (default) and flag specified import
+	// paths separately.
+	protoFiles, err = protoparse.ResolveFilenames([]string{"."}, protoFiles...)
 	if err != nil {
 		return err
 	}
