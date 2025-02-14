@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.69.1](https://github.com/googleapis/api-linter/compare/v1.69.0...v1.69.1) (2025-02-14)
+
+
+### Bug Fixes
+
+* **cli:** resolve against cwd separately ([#1474](https://github.com/googleapis/api-linter/issues/1474)) ([6206451](https://github.com/googleapis/api-linter/commit/620645169d3e717fb24651b6cffce3a4aa85b837))
+
+
+### Documentation
+
+* **AIP-215:** fix incorrect heading for `foreign-type-reference` ([#1472](https://github.com/googleapis/api-linter/issues/1472)) ([cd0f8a1](https://github.com/googleapis/api-linter/commit/cd0f8a1accaf504572248c3a3c2a13eec39e0dd2))
+
 ## [1.69.0](https://github.com/googleapis/api-linter/compare/v1.68.0...v1.69.0) (2025-02-11)
 
 
