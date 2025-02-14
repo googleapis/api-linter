@@ -8,7 +8,7 @@ redirect_from:
   - /0215/foreign-type-reference
 ---
 
-# Versioned packages
+# Foreign type reference
 
 This rule enforces that none of the fields in an API reference message types in a different
 proto package namespace other than well-known common packages.
