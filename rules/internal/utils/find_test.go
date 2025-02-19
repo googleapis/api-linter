@@ -41,7 +41,13 @@ func TestFindMessage(t *testing.T) {
 		t.Errorf("Got nil, expected Book message.")
 	}
 	if scroll := FindMessage(files["c.proto"], "Scroll"); scroll != nil {
-		t.Errorf("Got Sctoll message, expected nil.")
+		t.Errorf("Got Scroll message, expected nil.")
+	}
+	if book := FindMessage(files["c.proto"], "test.Book"); book == nil {
+		t.Errorf("Got nil, expected Book message from qualified name.")
+	}
+	if scroll := FindMessage(files["c.proto"], "other.Scroll"); scroll == nil {
+		t.Errorf("Got nil message, expected Scroll message from qualified name.")
 	}
 }
 

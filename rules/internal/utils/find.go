@@ -25,10 +25,19 @@ import (
 // FindMessage looks for a message in a file and all imports within the
 // same package.
 func FindMessage(f *desc.FileDescriptor, name string) *desc.MessageDescriptor {
+	// Default to using the current file's package.
+	pkg := f.GetPackage()
+
 	// FileDescriptor.FindMessage requires fully-qualified message names;
 	// attempt to infer that.
-	if !strings.Contains(name, ".") && f.GetPackage() != "" {
-		name = f.GetPackage() + "." + name
+	if !strings.Contains(name, ".") {
+		if pkg != "" {
+			name = pkg + "." + name
+		}
+	} else if !strings.HasPrefix(name, pkg+".") {
+		// If value is fully qualified, but from a different package,
+		// accommodate that.
+		pkg = name[:strings.LastIndex(name, ".")]
 	}
 
 	// Attempt to find the message in the file provided.
@@ -39,7 +48,7 @@ func FindMessage(f *desc.FileDescriptor, name string) *desc.MessageDescriptor {
 	// Attempt to find the message in any dependency files if they are in the
 	// same package.
 	for _, dep := range f.GetDependencies() {
-		if f.GetPackage() == dep.GetPackage() {
+		if pkg == dep.GetPackage() {
 			if m := FindMessage(dep, name); m != nil {
 				return m
 			}
