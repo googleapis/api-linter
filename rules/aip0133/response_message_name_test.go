@@ -40,7 +40,7 @@ func TestOutputMessageName(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create a minimal service with a AIP-134 Update method
+			// Create a minimal service with a AIP-133 Create method
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {
@@ -63,6 +63,64 @@ func TestOutputMessageName(t *testing.T) {
 			problems := outputName.Lint(file)
 			method := file.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestResponseMessageName_FullyQualified(t *testing.T) {
+	for _, test := range []struct {
+		name              string
+		TypePkg           string
+		ServicePkg        string
+		TypeName          string
+		ResponseTypeValue string
+		problems          testutils.Problems
+	}{
+		{
+			name:       "ValidLocalImport",
+			TypePkg:    "library",
+			ServicePkg: "library",
+			TypeName:   "Book",
+			problems:   nil,
+		},
+		{
+			name:       "ValidXPkgImport",
+			TypePkg:    "other",
+			ServicePkg: "library",
+			TypeName:   "Book",
+			problems:   nil,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			files := testutils.ParseProto3Tmpls(t, map[string]string{
+				"type.proto": `
+			package {{.TypePkg}};
+	
+			message {{.TypeName}} {}
+			`,
+				"service.proto": `
+			package {{.ServicePkg}};
+	
+			import "google/longrunning/operations.proto";
+			import "type.proto";
+	
+			service Foo {
+				rpc Create{{.TypeName}} (Create{{.TypeName}}Request) returns (google.longrunning.Operation) {
+					option (google.longrunning.operation_info) = {
+					response_type: "{{.TypePkg}}.{{.TypeName}}"
+					metadata_type: "Create{{.TypeName}}Metadata"
+					};
+				}
+			}
+			message Create{{.TypeName}}Request {}
+			message Create{{.TypeName}}Metadata {}
+			`,
+			}, test)
+			file := files["service.proto"]
+			got := outputName.Lint(file)
+			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(got); diff != "" {
 				t.Error(diff)
 			}
 		})

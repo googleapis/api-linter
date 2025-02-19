@@ -30,12 +30,14 @@ var outputName = &lint.MethodRule{
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		want := utils.GetResourceMessageName(m, "Create")
 
-		// If this is an LRO, then use the annotated response type instead of
-		// the actual RPC return type.
-		got := m.GetOutputType().GetName()
-		if utils.IsOperation(m.GetOutputType()) {
-			got = utils.GetOperationInfo(m).GetResponseType()
+		// Load the response type, resolving the
+		// `google.longrunning.OperationInfo.response_type` if necessary.
+		resp := utils.GetResponseType(m)
+		if resp == nil {
+			// If we can't resolve it, let the AIP-151 rule warn about this.
+			return nil
 		}
+		got := resp.GetName()
 
 		// Rule check: Establish that for methods such as `CreateFoo`, the response
 		// message should be named `Foo`
