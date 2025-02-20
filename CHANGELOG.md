@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.69.2](https://github.com/googleapis/api-linter/compare/v1.69.1...v1.69.2) (2025-02-20)
+
+
+### Bug Fixes
+
+* **AIP-133/AIP-134:** handle qualified lro response type name comparison ([#1475](https://github.com/googleapis/api-linter/issues/1475)) ([5e8fe24](https://github.com/googleapis/api-linter/commit/5e8fe2442327ab2a3f1833ff77824723d8331e82))
+* **cli:** only call ResolveFilenames with ProtoImportPaths if specified ([#1478](https://github.com/googleapis/api-linter/issues/1478)) ([6a0ddc6](https://github.com/googleapis/api-linter/commit/6a0ddc6d441083d60e7a6e1e35cb0f18f562021e))
+
 ## [1.69.1](https://github.com/googleapis/api-linter/compare/v1.69.0...v1.69.1) (2025-02-14)
 
 
