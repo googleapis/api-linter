@@ -94,7 +94,7 @@ func newCli(args []string) *cli {
 		FormatType:                fmtFlag,
 		OutputPath:                outFlag,
 		ExitStatusOnLintFailure:   setExitStatusOnLintFailure,
-		ProtoImportPaths:          append(protoImportFlag, "."),
+		ProtoImportPaths:          protoImportFlag,
 		ProtoDescPath:             protoDescFlag,
 		EnabledRules:              ruleEnableFlag,
 		DisabledRules:             ruleDisableFlag,
@@ -152,7 +152,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	var lock sync.Mutex
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
-		ImportPaths:           c.ProtoImportPaths,
+		ImportPaths:           append(c.ProtoImportPaths, "."),
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
@@ -165,7 +165,21 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		},
 	}
 	// Resolve file absolute paths to relative ones.
-	protoFiles, err := protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
+	// Using supplied import paths first.
+	protoFiles := c.ProtoFiles
+	if len(c.ProtoImportPaths) > 0 {
+		protoFiles, err = protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
+		if err != nil {
+			return err
+		}
+	}
+	// Then resolve again against ".", the local directory.
+	// This is necessary because ResolveFilenames won't resolve a path if it
+	// relative to *at least one* of the given import paths, which can result
+	// in duplicate file parsing and compilation errors, as seen in #1465 and
+	// #1471. So we resolve against local (default) and flag specified import
+	// paths separately.
+	protoFiles, err = protoparse.ResolveFilenames([]string{"."}, protoFiles...)
 	if err != nil {
 		return err
 	}

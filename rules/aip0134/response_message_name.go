@@ -32,12 +32,15 @@ var responseMessageName = &lint.MethodRule{
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
 		want := strings.Replace(m.GetName(), "Update", "", 1)
-		got := m.GetOutputType().GetName()
 
-		// If the return type is an LRO, use the annotated response type instead.
-		if utils.IsOperation(m.GetOutputType()) {
-			got = utils.GetOperationInfo(m).GetResponseType()
+		// Load the response type, resolving the
+		// `google.longrunning.OperationInfo.response_type` if necessary.
+		resp := utils.GetResponseType(m)
+		if resp == nil {
+			// If we can't resolve it, let the AIP-151 rule warn about this.
+			return nil
 		}
+		got := resp.GetName()
 
 		// Return a problem if we did not get the expected return name.
 		//

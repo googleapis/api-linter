@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.69.2](https://github.com/googleapis/api-linter/compare/v1.69.1...v1.69.2) (2025-02-20)
+
+
+### Bug Fixes
+
+* **AIP-133/AIP-134:** handle qualified lro response type name comparison ([#1475](https://github.com/googleapis/api-linter/issues/1475)) ([5e8fe24](https://github.com/googleapis/api-linter/commit/5e8fe2442327ab2a3f1833ff77824723d8331e82))
+* **cli:** only call ResolveFilenames with ProtoImportPaths if specified ([#1478](https://github.com/googleapis/api-linter/issues/1478)) ([6a0ddc6](https://github.com/googleapis/api-linter/commit/6a0ddc6d441083d60e7a6e1e35cb0f18f562021e))
+
+## [1.69.1](https://github.com/googleapis/api-linter/compare/v1.69.0...v1.69.1) (2025-02-14)
+
+
+### Bug Fixes
+
+* **cli:** resolve against cwd separately ([#1474](https://github.com/googleapis/api-linter/issues/1474)) ([6206451](https://github.com/googleapis/api-linter/commit/620645169d3e717fb24651b6cffce3a4aa85b837))
+
+
+### Documentation
+
+* **AIP-215:** fix incorrect heading for `foreign-type-reference` ([#1472](https://github.com/googleapis/api-linter/issues/1472)) ([cd0f8a1](https://github.com/googleapis/api-linter/commit/cd0f8a1accaf504572248c3a3c2a13eec39e0dd2))
+
+## [1.69.0](https://github.com/googleapis/api-linter/compare/v1.68.0...v1.69.0) (2025-02-11)
+
+
+### Features
+
+* **AIP-215:** augment foreign type checking ([#1467](https://github.com/googleapis/api-linter/issues/1467)) ([6c514fb](https://github.com/googleapis/api-linter/commit/6c514fb12f5839bb3dbf27742ca62af36466c6cf))
+
+
+### Bug Fixes
+
+* **cli:** exclude cwd from input path resolution ([#1466](https://github.com/googleapis/api-linter/issues/1466)) ([a14ed3d](https://github.com/googleapis/api-linter/commit/a14ed3de28a0d20ee82b9692d5d290d3732e690d))
+* **rules:** fix HasParent check and utilify it ([#1468](https://github.com/googleapis/api-linter/issues/1468)) ([6ac3b57](https://github.com/googleapis/api-linter/commit/6ac3b57ca3bccd15806a714239a89e751ac42428))
+
 ## [1.68.0](https://github.com/googleapis/api-linter/compare/v1.67.6...v1.68.0) (2025-01-14)
 
 
