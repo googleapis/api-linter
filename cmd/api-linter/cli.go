@@ -137,6 +137,10 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	configs = append(configs, lint.Config{
 		DisabledRules: c.DisabledRules,
 	})
+	// Add configs for the import path.
+	configs = append(configs, lint.Config{
+		ImportPaths: c.ProtoImportPaths,
+	})
 	// Prepare proto import lookup.
 	fs, err := loadFileDescriptors(c.ProtoDescPath...)
 	if err != nil {
