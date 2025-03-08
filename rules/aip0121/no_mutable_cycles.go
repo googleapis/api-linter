@@ -51,6 +51,10 @@ func findCycles(start string, node *desc.MessageDescriptor, seen stringset.Set, 
 			continue
 		}
 		if ref.GetType() == start {
+			// Allow for mutable self-reference to support taxonomy cases.
+			if len(chain) == 1 {
+				continue
+			}
 			cycle := strings.Join(append(chain, start), " > ")
 			problems = append(problems, lint.Problem{
 				Message:    "mutable resource reference introduces a reference cycle:\n" + cycle,
