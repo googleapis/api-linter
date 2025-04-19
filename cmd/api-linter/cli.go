@@ -131,7 +131,6 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		if err := loadCustomRulePlugins(c.RulePluginPaths, rules); err != nil {
 			return fmt.Errorf("failed to load custom rule plugins: %v", err)
 		}
-		fmt.Printf("Loaded %d custom rule plugin(s)\n", len(c.RulePluginPaths))
 	}
 
 	// Read linter config and append it to the default.
