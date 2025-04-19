@@ -44,6 +44,17 @@ func TestNewCli(t *testing.T) {
 				ProtoFiles:              []string{},
 			},
 		},
+		{
+			name: "RulePlugins",
+			inputArgs: []string{
+				"--rule-plugin=plugin1.so",
+				"--rule-plugin=plugin2.so",
+			},
+			wantCli: &cli{
+				RulePluginPaths: []string{"plugin1.so", "plugin2.so"},
+				ProtoFiles:      []string{},
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

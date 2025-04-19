@@ -46,6 +46,7 @@ type cli struct {
 	ListRulesFlag             bool
 	DebugFlag                 bool
 	IgnoreCommentDisablesFlag bool
+	RulePluginPaths           []string
 }
 
 // ExitForLintFailure indicates that a problem was found during linting.
@@ -67,6 +68,7 @@ func newCli(args []string) *cli {
 	var listRulesFlag bool
 	var debugFlag bool
 	var ignoreCommentDisablesFlag bool
+	var rulePluginFlag []string
 
 	// Register flag variables.
 	fs := pflag.NewFlagSet("api-linter", pflag.ExitOnError)
@@ -82,6 +84,7 @@ func newCli(args []string) *cli {
 	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit.  Honors the output-format flag.")
 	fs.BoolVar(&debugFlag, "debug", false, "Run in debug mode. Panics will print stack.")
 	fs.BoolVar(&ignoreCommentDisablesFlag, "ignore-comment-disables", false, "If set to true, disable comments will be ignored.\nThis is helpful when strict enforcement of AIPs are necessary and\nproto definitions should not be able to disable checks.")
+	fs.StringArrayVar(&rulePluginFlag, "rule-plugin", nil, "The path to a custom rule plugin (.so file).\nMay be specified multiple times.")
 
 	// Parse flags.
 	err := fs.Parse(args)
@@ -103,6 +106,7 @@ func newCli(args []string) *cli {
 		ListRulesFlag:             listRulesFlag,
 		DebugFlag:                 debugFlag,
 		IgnoreCommentDisablesFlag: ignoreCommentDisablesFlag,
+		RulePluginPaths:           rulePluginFlag,
 	}
 }
 
