@@ -42,6 +42,26 @@ func TestAIPClientLibrariesGroup(t *testing.T) {
 	}
 }
 
+func TestAIPInternalGroup(t *testing.T) {
+	tests := []struct {
+		name  string
+		aip   int
+		group string
+	}{
+		{"InInternalGroup", 9001, "internal"},
+		{"NotInInternalGroup_Exactly9000", 9000, ""},
+		{"InInternalGroup_LargeNumber", 10000, "internal"},
+		{"NotInInternalGroup_LessThan9000", 8999, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := aipInternalGroup(test.aip); got != test.group {
+				t.Errorf("aipInternalGroup(%d) got %s, but want %s", test.aip, got, test.group)
+			}
+		})
+	}
+}
+
 func TestGetRuleGroupPanic(t *testing.T) {
 	var groups []func(int) string
 	defer func() {
