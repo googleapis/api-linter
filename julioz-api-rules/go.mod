@@ -1,9 +1,9 @@
 module github.com/julioz/julioz-api-rules
 
-go 1.23.3
+go 1.23
 
 require (
-	github.com/googleapis/api-linter v1.69.2
+	github.com/googleapis/api-linter v0.0.0-local
 	github.com/jhump/protoreflect v1.16.0
 )
 
@@ -14,3 +14,5 @@ require (
 	google.golang.org/protobuf v1.36.4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/googleapis/api-linter => ../
