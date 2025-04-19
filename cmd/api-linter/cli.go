@@ -125,6 +125,15 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	if len(c.ProtoFiles) == 0 {
 		return fmt.Errorf("no file to lint")
 	}
+
+	// Load custom rule plugins if provided
+	if len(c.RulePluginPaths) > 0 {
+		if err := loadCustomRulePlugins(c.RulePluginPaths, rules); err != nil {
+			return fmt.Errorf("failed to load custom rule plugins: %v", err)
+		}
+		fmt.Printf("Loaded %d custom rule plugin(s)\n", len(c.RulePluginPaths))
+	}
+
 	// Read linter config and append it to the default.
 	if c.ConfigPath != "" {
 		config, err := lint.ReadConfigsFromFile(c.ConfigPath)
