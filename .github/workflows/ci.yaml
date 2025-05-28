@@ -27,7 +27,7 @@ jobs:
       - name: staticcheck
         uses: dominikh/staticcheck-action@v1.3.1
         with:
-          version: "2023.1"
+          version: "2024.1.1"
           install-go: false
   quality-checker:
     runs-on: ubuntu-latest
@@ -38,5 +38,5 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - name: Run the quality checker (which catches obvious mistakes, missing docs, etc.)
+      - name: run the quality checker (which catches obvious mistakes, missing docs, etc.)
         run: go run ./.github/quality-checker
