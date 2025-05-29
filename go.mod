@@ -1,6 +1,6 @@
 module github.com/googleapis/api-linter
 
-go 1.22
+go 1.23
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.12
