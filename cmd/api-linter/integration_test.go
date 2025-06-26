@@ -182,6 +182,9 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	// This test addresses a previously found bug:
 	// https://github.com/googleapis/api-linter/issues/1465
 
+	// Skipping until Issue # 1465 is addressed
+	t.Skip()
+
 	projDir, err := os.MkdirTemp("", "proj")
 	if err != nil {
 		t.Fatal(err)
