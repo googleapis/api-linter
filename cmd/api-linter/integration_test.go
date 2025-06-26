@@ -178,6 +178,79 @@ func TestBuildErrors(t *testing.T) {
 	}
 }
 
+func TestMultipleFilesFromParentDir(t *testing.T) {
+	// This tests stems from a bug previouely found bug
+	// https://github.com/googleapis/api-linter/issues/1465
+
+	projDir, err := os.MkdirTemp("", "proj")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(projDir)
+
+	// Create the subdirectory for protos.
+	protoDir := filepath.Join(projDir, "proto")
+	if err := os.Mkdir(protoDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create subdirectory `a` and `b`.
+	dirA := filepath.Join(protoDir, "a")
+	if err := os.Mkdir(dirA, 0755); err != nil {
+		t.Fatal(err)
+	}
+	dirB := filepath.Join(protoDir, "b")
+	if err := os.Mkdir(dirB, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Write the proto files.
+	// a.proto imports b.proto.
+	if err := writeFile(filepath.Join(dirA, "a.proto"), `
+		syntax = "proto3";
+		package a;
+		import "b/b.proto";
+		message A {
+			b.B b_field = 1;
+		}
+	`); err != nil {
+		t.Fatal(err)
+	}
+	if err := writeFile(filepath.Join(dirB, "b.proto"), `
+		syntax = "proto3";
+		package b;
+		message B {}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Change the working directory to the project root.
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(projDir); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chdir(oldWD)
+
+	args := []string{
+		"-I", "proto",
+		"proto/a/a.proto",
+		"proto/b/b.proto",
+	}
+
+	err = runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "already defined") {
+			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
+	}
+}
+
 func TestExitStatusForLintFailure(t *testing.T) {
 	type testCase struct{ testName, rule, proto string }
 	failCase := testCase{
