@@ -125,7 +125,7 @@ func TestRules_DisabledByInlineComments(t *testing.T) {
 		for _, testConfig := range testConfigurations {
 			t.Run(test.testName+testConfig.suffix, func(t *testing.T) {
 				disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
-				proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+				proto := strings.ReplaceAll(test.proto, "disable-me-here", disableInline)
 				_, result := runLinterWithFailureStatus(t, proto, "", testConfig.appendArgs)
 				isDisabled := !strings.Contains(result, test.rule)
 				if isDisabled != testConfig.wantDisabled {
@@ -147,7 +147,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
-			c := strings.Replace(config, "replace-me-here", test.rule, -1)
+			c := strings.ReplaceAll(config, "replace-me-here", test.rule)
 			result := runLinter(t, test.proto, c)
 			if strings.Contains(result, test.rule) {
 				t.Errorf("rule %q should be disabled by the user config: %q", test.rule, c)
