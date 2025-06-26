@@ -189,36 +189,27 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	defer os.RemoveAll(projDir)
 
 	// Create the subdirectory for protos.
-	protoDir := filepath.Join(projDir, "proto")
-	if err := os.Mkdir(protoDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-
-	// Create subdirectory `a` and `b`.
-	dirA := filepath.Join(protoDir, "a")
-	if err := os.Mkdir(dirA, 0755); err != nil {
-		t.Fatal(err)
-	}
-	dirB := filepath.Join(protoDir, "b")
-	if err := os.Mkdir(dirB, 0755); err != nil {
+	protoDir := filepath.Join(projDir, "parent", "api")
+	if err := os.MkdirAll(protoDir, 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Write the proto files.
 	// a.proto imports b.proto.
-	if err := writeFile(filepath.Join(dirA, "a.proto"), `
+	if err := writeFile(filepath.Join(protoDir, "a.proto"), `
 		syntax = "proto3";
-		package a;
-		import "b/b.proto";
+		package parent.api;
+		import "parent/api/b.proto";
 		message A {
-			b.B b_field = 1;
+			B b_field = 1;
 		}
 	`); err != nil {
 		t.Fatal(err)
 	}
-	if err := writeFile(filepath.Join(dirB, "b.proto"), `
+
+	if err := writeFile(filepath.Join(protoDir, "b.proto"), `
 		syntax = "proto3";
-		package b;
+		package parent.api;
 		message B {}
 	`); err != nil {
 		t.Fatal(err)
@@ -235,9 +226,9 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	defer os.Chdir(oldWD)
 
 	args := []string{
-		"-I", "proto",
-		"proto/a/a.proto",
-		"proto/b/b.proto",
+		"-I", "parent",
+		filepath.Join("parent", "api", "a.proto"),
+		filepath.Join("parent", "api", "b.proto"),
 	}
 
 	err = runCLI(args)
