@@ -113,14 +113,6 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return nil
 	}
 
-	if c.DebugFlag {
-		if wd, err := os.Getwd(); err == nil {
-			fmt.Fprintf(os.Stderr, "DEBUG: Current working directory: %s\n", wd)
-		} else {
-			fmt.Fprintf(os.Stderr, "DEBUG: Could not get current working directory: %v\n", err)
-		}
-	}
-
 	if c.ListRulesFlag {
 		return outputRules(c.FormatType)
 	}
@@ -176,10 +168,6 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	protoFiles, err := protoparse.ResolveFilenames(p.ImportPaths, c.ProtoFiles...)
 	if err != nil {
 		return err
-	}
-	if c.DebugFlag {
-		fmt.Fprintf(os.Stderr, "DEBUG: c.ProtoImportPaths: %v\n", c.ProtoImportPaths)
-		fmt.Fprintf(os.Stderr, "DEBUG: Resolved protoFiles: %v\n", protoFiles)
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
