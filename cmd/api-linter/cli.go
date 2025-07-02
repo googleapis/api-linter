@@ -113,6 +113,14 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return nil
 	}
 
+	if c.DebugFlag {
+		if wd, err := os.Getwd(); err == nil {
+			fmt.Fprintf(os.Stderr, "DEBUG: Current working directory: %s\n", wd)
+		} else {
+			fmt.Fprintf(os.Stderr, "DEBUG: Could not get current working directory: %v\n", err)
+		}
+	}
+
 	if c.ListRulesFlag {
 		return outputRules(c.FormatType)
 	}
@@ -165,23 +173,13 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		},
 	}
 	// Resolve file absolute paths to relative ones.
-	// Using supplied import paths first.
-	protoFiles := c.ProtoFiles
-	if len(c.ProtoImportPaths) > 0 {
-		protoFiles, err = protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
-		if err != nil {
-			return err
-		}
-	}
-	// Then resolve again against ".", the local directory.
-	// This is necessary because ResolveFilenames won't resolve a path if it
-	// relative to *at least one* of the given import paths, which can result
-	// in duplicate file parsing and compilation errors, as seen in #1465 and
-	// #1471. So we resolve against local (default) and flag specified import
-	// paths separately.
-	protoFiles, err = protoparse.ResolveFilenames([]string{"."}, protoFiles...)
+	protoFiles, err := protoparse.ResolveFilenames(p.ImportPaths, c.ProtoFiles...)
 	if err != nil {
 		return err
+	}
+	if c.DebugFlag {
+		fmt.Fprintf(os.Stderr, "DEBUG: c.ProtoImportPaths: %v\n", c.ProtoImportPaths)
+		fmt.Fprintf(os.Stderr, "DEBUG: Resolved protoFiles: %v\n", protoFiles)
 	}
 	fd, err := p.ParseFiles(protoFiles...)
 	if err != nil {
