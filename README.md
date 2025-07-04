@@ -1,3 +1,43 @@
+# Zenjob API Linter (Fork of Google API Linter)
+
+## About this Fork
+
+This repository is a Zenjob-maintained fork of the [Google API Linter](https://github.com/googleapis/api-linter). Its purpose is to:
+
+- Add and maintain Zenjob-specific lint rules and organizational customizations.
+- Provide a Docker image and distribution pipeline under the Zenjob namespace.
+- Stay closely in sync with upstream improvements and bugfixes.
+
+> **Note:** We are tracking the upstream discussion for a plugin mechanism in [googleapis/api-linter#1485](https://github.com/googleapis/api-linter/issues/1485). If/when official plugin support is implemented, this fork may be retired in favor of upstream extensibility.
+
+## Keeping the Fork Up to Date
+
+To update this fork with the latest changes from upstream:
+
+1. Add the upstream remote if not already present:
+
+   ```sh
+   git remote add upstream https://github.com/googleapis/api-linter.git
+   ```
+
+2. Fetch upstream changes:
+
+   ```sh
+   git fetch upstream
+   ```
+
+3. Rebase or merge upstream/main into your working branch:
+
+   ```sh
+   git checkout main
+   git merge upstream/main
+   # or: git rebase upstream/main
+   ```
+
+4. Resolve any conflicts, test, and push changes to the Zenjob fork.
+
+---
+
 # Google API Linter
 
 [![ci](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml/badge.svg)](https://github.com/googleapis/api-linter/actions/workflows/ci.yaml)
