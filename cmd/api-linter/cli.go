@@ -307,8 +307,7 @@ func resolveImports(protoImportPaths []string) []string {
 	if err != nil {
 		// Fallback: If we can't get CWD, return only the provided paths and "."
 		seen := make(map[string]struct{})
-		var result []string
-		result = append(result, ".") // Always include "."
+		result := []string{"."} // Always include "."
 		seen["."] = struct{}{}
 		for _, p := range protoImportPaths {
 			if _, found := seen[p]; !found {
