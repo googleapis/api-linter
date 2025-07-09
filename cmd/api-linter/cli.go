@@ -306,12 +306,12 @@ func resolveImports(protoImportPaths []string) []string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		// Fallback: If we can't get CWD, return only the provided paths and "."
-		seen := make(map[string]struct{})
+		seen := make(map[string]bool)
+		seen["."] = true
 		result := []string{"."} // Always include "."
-		seen["."] = struct{}{}
 		for _, p := range protoImportPaths {
-			if _, found := seen[p]; !found {
-				seen[p] = struct{}{}
+			if !seen[p] {
+				seen[p] = true
 				result = append(result, p)
 			}
 		}
@@ -328,17 +328,16 @@ func resolveImports(protoImportPaths []string) []string {
 
 	// Initialize resolvedImports with "." and track its canonical absolute path.
 	resolvedImports := []string{"."}
-	seenAbsolutePaths := map[string]bool{
-	  evaluatedCwd: true, // Mark canonical CWD as seen
-	}
+	seenAbsolutePaths := make(map[string]bool)
+	seenAbsolutePaths[evaluatedCwd] = true // Mark canonical CWD as seen
 
 	for _, p := range protoImportPaths {
 		absPath, err := filepath.Abs(p)
 		if err != nil {
 			// If we can't get the absolute path, treat it as an external path
 			// and add it if not already seen (by its original string form).
-			if _, found := seenAbsolutePaths[p]; !found {
-				seenAbsolutePaths[p] = struct{}{}
+			if !seenAbsolutePaths[p] {
+				seenAbsolutePaths[p] = true
 				resolvedImports = append(resolvedImports, p)
 			}
 			continue
@@ -358,8 +357,8 @@ func resolveImports(protoImportPaths []string) []string {
 		}
 
 		// Add the original path if its canonical absolute form has not been seen before.
-		if _, found := seenAbsolutePaths[evaluatedAbsPath]; !found {
-			seenAbsolutePaths[evaluatedAbsPath] = struct{}{}
+		if !seenAbsolutePaths[evaluatedAbsPath] {
+			seenAbsolutePaths[evaluatedAbsPath] = true
 			resolvedImports = append(resolvedImports, p)
 		}
 	}
