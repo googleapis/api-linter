@@ -70,125 +70,130 @@ func TestResolveImports(t *testing.T) {
 		}
 	}()
 
+	defaultSetup := func(t *testing.T, cwd, externalDir string) {}
+
 	tests := []struct {
 		name             string
-		protoImportPaths []string
-		setupTempDir     func(t *testing.T) string // Function to set up a temporary directory
-		want             []string
+		protoImportPaths func(cwd, externalDir string) []string
+		setup            func(t *testing.T, cwd, externalDir string)
+		want             func(externalDir string) []string
 	}{
 		{
-			name:             "NoProtoImportPaths",
-			protoImportPaths: []string{},
-			want:             []string{"."},
+			name: "NoProtoImportPaths",
+			protoImportPaths: func(_, _ string) []string {
+				return []string{}
+			},
+			setup: defaultSetup,
+			want: func(_ string) []string {
+				return []string{"."}
+			},
 		},
 		{
-			name:             "ExplicitDot",
-			protoImportPaths: []string{"."},
-			want:             []string{"."},
+			name: "ExplicitDot",
+			protoImportPaths: func(_, _ string) []string {
+				return []string{"."}
+			},
+			setup: defaultSetup,
+			want: func(_ string) []string {
+				return []string{"."}
+			},
 		},
 		{
-			name:             "SubdirectoryOfCWD",
-			protoImportPaths: []string{"test_dir"},
-			setupTempDir: func(t *testing.T) string {
-				tmpDir := t.TempDir()
-				if err := os.Mkdir(filepath.Join(tmpDir, "test_dir"), 0755); err != nil {
+			name: "SubdirectoryOfCWD",
+			protoImportPaths: func(_, _ string) []string {
+				return []string{"test_dir"}
+			},
+			setup: func(t *testing.T, cwd, _ string) {
+				if err := os.Mkdir(filepath.Join(cwd, "test_dir"), 0755); err != nil {
 					t.Fatalf("Failed to create temp subdirectory: %v", err)
 				}
-				return tmpDir
 			},
-			want: []string{"."}, // "test_dir" should be covered by "."
+			want: func(_ string) []string {
+				return []string{"."} // "test_dir" should be covered by "."
+			},
 		},
 		{
-			name:             "SubdirectoryOfCWDWithDot",
-			protoImportPaths: []string{".", "test_dir"},
-			setupTempDir: func(t *testing.T) string {
-				tmpDir := t.TempDir()
-				if err := os.Mkdir(filepath.Join(tmpDir, "test_dir"), 0755); err != nil {
+			name: "SubdirectoryOfCWDWithDot",
+			protoImportPaths: func(_, _ string) []string {
+				return []string{".", "test_dir"}
+			},
+			setup: func(t *testing.T, cwd, _ string) {
+				if err := os.Mkdir(filepath.Join(cwd, "test_dir"), 0755); err != nil {
 					t.Fatalf("Failed to create temp subdirectory: %v", err)
 				}
-				return tmpDir
 			},
-			want: []string{"."},
+			want: func(_ string) []string {
+				return []string{"."}
+			},
 		},
 		{
-			name:             "ExternalAbsolutePath",
-			protoImportPaths: []string{"/tmp/external_proto"},
-			setupTempDir: func(t *testing.T) string {
-				tmpDir := t.TempDir()
-				// Create a dummy external directory to ensure filepath.Abs works
-				if err := os.MkdirAll("/tmp/external_proto", 0755); err != nil {
-					t.Fatalf("Failed to create external temp directory: %v", err)
-				}
-				t.Cleanup(func() { os.RemoveAll("/tmp/external_proto") })
-				return tmpDir
+			name: "ExternalAbsolutePath",
+			protoImportPaths: func(_, externalDir string) []string {
+				return []string{externalDir}
 			},
-			want: []string{".", "/tmp/external_proto"},
+			setup: defaultSetup,
+			want: func(externalDir string) []string {
+				return []string{".", externalDir}
+			},
 		},
 		{
-			name:             "MixedPaths",
-			protoImportPaths: []string{"./relative_dir", "/tmp/external_dir", "test_dir"},
-			setupTempDir: func(t *testing.T) string {
-				tmpDir := t.TempDir()
-				if err := os.Mkdir(filepath.Join(tmpDir, "relative_dir"), 0755); err != nil {
+			name: "MixedPaths",
+			protoImportPaths: func(_, externalDir string) []string {
+				return []string{"./relative_dir", externalDir, "test_dir"}
+			},
+			setup: func(t *testing.T, cwd, _ string) {
+				if err := os.Mkdir(filepath.Join(cwd, "relative_dir"), 0755); err != nil {
 					t.Fatalf("Failed to create relative_dir: %v", err)
 				}
-				if err := os.Mkdir(filepath.Join(tmpDir, "test_dir"), 0755); err != nil {
+				if err := os.Mkdir(filepath.Join(cwd, "test_dir"), 0755); err != nil {
 					t.Fatalf("Failed to create test_dir: %v", err)
 				}
-				if err := os.MkdirAll("/tmp/external_dir", 0755); err != nil {
-					t.Fatalf("Failed to create external_dir: %v", err)
-				}
-				t.Cleanup(func() { os.RemoveAll("/tmp/external_dir") })
-				return tmpDir
 			},
-			want: []string{".", "/tmp/external_dir"},
+			want: func(externalDir string) []string {
+				return []string{".", externalDir}
+			},
 		},
 		{
-			name:             "NonExistentRelativePath",
-			protoImportPaths: []string{"non_existent_dir"},
-			setupTempDir: func(t *testing.T) string {
-				return t.TempDir() // No special setup needed, just a temp dir
+			name: "NonExistentRelativePath",
+			protoImportPaths: func(_, _ string) []string {
+				return []string{"non_existent_dir"}
 			},
-			want: []string{"."}, // Should still resolve to just "." as non_existent_dir is relative to CWD
+			setup: defaultSetup,
+			want: func(_ string) []string {
+				return []string{"."} // Should still resolve to just "." as non_existent_dir is relative to CWD
+			},
 		},
 		{
-			name:             "CurrentDirAsAbsolutePath",
-			protoImportPaths: []string{}, // Will be set dynamically inside t.Run
-			setupTempDir: func(t *testing.T) string {
-				return t.TempDir() // No special setup needed, just a temp dir
+			name: "CurrentDirAsAbsolutePath",
+			protoImportPaths: func(cwd, _ string) []string {
+				return []string{cwd}
 			},
-			want: []string{"."},
+			setup: defaultSetup,
+			want: func(_ string) []string {
+				return []string{"."}
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			// Set up a temporary directory for the test if a setup function is provided.
-			// Change to this directory.
-			var currentTestDir string
-			if test.setupTempDir != nil {
-				currentTestDir = test.setupTempDir(t)
-			} else {
-				currentTestDir = t.TempDir()
+			cwd := t.TempDir()
+			externalDir := t.TempDir()
+
+			if err := os.Chdir(cwd); err != nil {
+				t.Fatalf("Failed to change directory to %q: %v", cwd, err)
 			}
 
-			// Dynamically set protoImportPaths for this specific test case
-			var actualProtoImportPaths []string
-			if test.name == "CurrentDirAsAbsolutePath" {
-				actualProtoImportPaths = []string{currentTestDir}
-			} else {
-				actualProtoImportPaths = test.protoImportPaths
-			}
+			test.setup(t, cwd, externalDir)
 
-			if err := os.Chdir(currentTestDir); err != nil {
-				t.Fatalf("Failed to change directory to %q: %v", currentTestDir, err)
-			}
+			protoImportPaths := test.protoImportPaths(cwd, externalDir)
+			want := test.want(externalDir)
 
-			got := resolveImports(actualProtoImportPaths)
+			got := resolveImports(protoImportPaths)
 			sort.Strings(got)
-			sort.Strings(test.want)
+			sort.Strings(want)
 
-			if diff := cmp.Diff(test.want, got); diff != "" {
+			if diff := cmp.Diff(want, got); diff != "" {
 				t.Errorf("resolveImports() mismatch (-want +got):\n%s", diff)
 			}
 		})
