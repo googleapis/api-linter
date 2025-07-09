@@ -181,7 +181,6 @@ func TestResolveImports(t *testing.T) {
 			}
 
 			if err := os.Chdir(currentTestDir); err != nil {
-
 				t.Fatalf("Failed to change directory to %q: %v", currentTestDir, err)
 			}
 
