@@ -329,8 +329,9 @@ func resolveImports(protoImportPaths []string) []string {
 
 	// Initialize resolvedImports with "." and track its canonical absolute path.
 	resolvedImports := []string{"."}
-	seenAbsolutePaths := make(map[string]bool)
-	seenAbsolutePaths[evaluatedCwd] = true // Mark canonical CWD as seen
+	seenAbsolutePaths := map[string]bool{
+	  evaluatedCwd: true, // Mark canonical CWD as seen
+	}
 
 	for _, p := range protoImportPaths {
 		absPath, err := filepath.Abs(p)
