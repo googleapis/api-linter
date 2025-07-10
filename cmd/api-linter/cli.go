@@ -306,8 +306,9 @@ func resolveImports(protoImportPaths []string) []string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		// Fallback: If we can't get CWD, return only the provided paths and "."
-		seen := make(map[string]bool)
-		seen["."] = true
+		seen := map[string]bool{
+		  ".": true,
+		}
 		result := []string{"."} // Always include "."
 		for _, p := range protoImportPaths {
 			if !seen[p] {
