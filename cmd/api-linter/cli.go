@@ -296,9 +296,9 @@ func getOutputFormatFunc(formatType string) formatFunc {
 	return yaml.Marshal
 }
 
-func resolveImports(protoImportPaths []string) []string {
+func resolveImports(imports []string) []string {
 	// If no import paths are provided, default to the current directory.
-	if len(protoImportPaths) == 0 {
+	if len(imports) == 0 {
 		return []string{"."}
 	}
 
@@ -307,10 +307,10 @@ func resolveImports(protoImportPaths []string) []string {
 	if err != nil {
 		// Fallback: If we can't get CWD, return only the provided paths and "."
 		seen := map[string]bool{
-		  ".": true,
+			".": true,
 		}
 		result := []string{"."} // Always include "."
-		for _, p := range protoImportPaths {
+		for _, p := range imports {
 			if !seen[p] {
 				seen[p] = true
 				result = append(result, p)
@@ -330,10 +330,10 @@ func resolveImports(protoImportPaths []string) []string {
 	// Initialize resolvedImports with "." and track its canonical absolute path.
 	resolvedImports := []string{"."}
 	seenAbsolutePaths := map[string]bool{
-	  evaluatedCwd: true, // Mark canonical CWD as seen
+		evaluatedCwd: true, // Mark canonical CWD as seen
 	}
 
-	for _, p := range protoImportPaths {
+	for _, p := range imports {
 		absPath, err := filepath.Abs(p)
 		if err != nil {
 			// If we can't get the absolute path, treat it as an external path
