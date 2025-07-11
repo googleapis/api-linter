@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -79,7 +80,7 @@ func newCli(args []string) *cli {
 	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
-	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit.  Honors the output-format flag.")
+	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit. Honors the output-format flag.")
 	fs.BoolVar(&debugFlag, "debug", false, "Run in debug mode. Panics will print stack.")
 	fs.BoolVar(&ignoreCommentDisablesFlag, "ignore-comment-disables", false, "If set to true, disable comments will be ignored.\nThis is helpful when strict enforcement of AIPs are necessary and\nproto definitions should not be able to disable checks.")
 
@@ -150,9 +151,12 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	var errorsWithPos []protoparse.ErrorWithPos
 	var lock sync.Mutex
+
+	imports := resolveImports(c.ProtoImportPaths)
+
 	// Parse proto files into `protoreflect` file descriptors.
 	p := protoparse.Parser{
-		ImportPaths:           append(c.ProtoImportPaths, "."),
+		ImportPaths:           imports,
 		IncludeSourceCodeInfo: true,
 		LookupImport:          lookupImport,
 		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
@@ -165,21 +169,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		},
 	}
 	// Resolve file absolute paths to relative ones.
-	// Using supplied import paths first.
-	protoFiles := c.ProtoFiles
-	if len(c.ProtoImportPaths) > 0 {
-		protoFiles, err = protoparse.ResolveFilenames(c.ProtoImportPaths, c.ProtoFiles...)
-		if err != nil {
-			return err
-		}
-	}
-	// Then resolve again against ".", the local directory.
-	// This is necessary because ResolveFilenames won't resolve a path if it
-	// relative to *at least one* of the given import paths, which can result
-	// in duplicate file parsing and compilation errors, as seen in #1465 and
-	// #1471. So we resolve against local (default) and flag specified import
-	// paths separately.
-	protoFiles, err = protoparse.ResolveFilenames([]string{"."}, protoFiles...)
+	protoFiles, err := protoparse.ResolveFilenames(p.ImportPaths, c.ProtoFiles...)
 	if err != nil {
 		return err
 	}
@@ -304,4 +294,76 @@ func getOutputFormatFunc(formatType string) formatFunc {
 		return f
 	}
 	return yaml.Marshal
+}
+
+func resolveImports(imports []string) []string {
+	// If no import paths are provided, default to the current directory.
+	if len(imports) == 0 {
+		return []string{"."}
+	}
+
+	// Get the absolute path of the current working directory.
+	cwd, err := os.Getwd()
+	if err != nil {
+		// Fallback: If we can't get CWD, return only the provided paths and "."
+		seen := map[string]bool{
+			".": true,
+		}
+		result := []string{"."} // Always include "."
+		for _, p := range imports {
+			if !seen[p] {
+				seen[p] = true
+				result = append(result, p)
+			}
+		}
+		return result
+	}
+
+	// Resolve the canonical path for the current working directory.
+	// This helps with symlinks (e.g., /var vs /private/var on macOS).
+	evaluatedCwd, err := filepath.EvalSymlinks(cwd)
+	if err != nil {
+		// Fallback to Clean if EvalSymlinks fails (e.g., path does not exist)
+		evaluatedCwd = filepath.Clean(cwd)
+	}
+
+	// Initialize resolvedImports with "." and track its canonical absolute path.
+	resolvedImports := []string{"."}
+	seenAbsolutePaths := map[string]bool{
+		evaluatedCwd: true, // Mark canonical CWD as seen
+	}
+
+	for _, p := range imports {
+		absPath, err := filepath.Abs(p)
+		if err != nil {
+			// If we can't get the absolute path, treat it as an external path
+			// and add it if not already seen (by its original string form).
+			if !seenAbsolutePaths[p] {
+				seenAbsolutePaths[p] = true
+				resolvedImports = append(resolvedImports, p)
+			}
+			continue
+		}
+
+		// Resolve the canonical path for the current import path.
+		evaluatedAbsPath, err := filepath.EvalSymlinks(absPath)
+		if err != nil {
+			// Fallback to Clean if EvalSymlinks fails
+			evaluatedAbsPath = filepath.Clean(absPath)
+		}
+
+		// Check if the current import path's canonical form is the CWD's canonical form
+		// or a subdirectory of it. If so, it's covered by ".", so we skip it.
+		if evaluatedAbsPath == evaluatedCwd || strings.HasPrefix(evaluatedAbsPath, evaluatedCwd+string(os.PathSeparator)) {
+			continue
+		}
+
+		// Add the original path if its canonical absolute form has not been seen before.
+		if !seenAbsolutePaths[evaluatedAbsPath] {
+			seenAbsolutePaths[evaluatedAbsPath] = true
+			resolvedImports = append(resolvedImports, p)
+		}
+	}
+
+	return resolvedImports
 }
