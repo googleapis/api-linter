@@ -41,7 +41,7 @@ var responsePluralFirstField = &lint.MessageRule{
 		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
 		if want != "" {
 			want = strcase.SnakeCase(want)
-			message = fmt.Sprintf("The name of the first field of a paginated response should be the snake_case plural of the resource, which is %q based on the `(google.api.resource).plural` annotation.", want)
+			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation.",
 		} else {
 			want = utils.ToPlural(firstField.GetName())
 			message = "First field of Paginated RPCs' response should be plural."
