@@ -15,8 +15,6 @@
 package aip0158
 
 import (
-	"fmt"
-
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -41,7 +39,7 @@ var responsePluralFirstField = &lint.MessageRule{
 		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
 		if want != "" {
 			want = strcase.SnakeCase(want)
-			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation.",
+			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation."
 		} else {
 			want = utils.ToPlural(firstField.GetName())
 			message = "First field of Paginated RPCs' response should be plural."
