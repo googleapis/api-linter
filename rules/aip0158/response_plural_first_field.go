@@ -28,6 +28,8 @@ var responsePluralFirstField = &lint.MessageRule{
 		return isPaginatedResponseMessage(m) && len(m.GetFields()) > 0
 	},
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+
+		var message string
 		// Throw a linter warning if, the first field in the message is not named
 		// according to plural(message_name.to_snake().split('_')[1:-1]).
 		firstField := m.GetFields()[0]
@@ -37,13 +39,15 @@ var responsePluralFirstField = &lint.MessageRule{
 		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
 		if want != "" {
 			want = strcase.SnakeCase(want)
+			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation."
 		} else {
 			want = utils.ToPlural(firstField.GetName())
+			message = "First field of Paginated RPCs' response should be plural."
 		}
 
 		if want != firstField.GetName() {
 			return []lint.Problem{{
-				Message:    "First field of Paginated RPCs' response should be plural.",
+				Message:    message,
 				Suggestion: want,
 				Descriptor: firstField,
 				Location:   locations.DescriptorName(firstField),
