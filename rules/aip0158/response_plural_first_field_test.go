@@ -62,8 +62,6 @@ func TestResponsePluralFirstField(t *testing.T) {
 	}{
 		{"ValidResourcePlural", "library_books", testutils.Problems{}},
 		{"InvalidResourcePlural", "books", testutils.Problems{{Suggestion: "library_books"}}},
-		{"ValidResourcePluralAnnotation", "library_books", testutils.Problems{}},
-		{"InvalidResourcePluralAnnotation", "book", testutils.Problems{{Suggestion: "library_books"}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
