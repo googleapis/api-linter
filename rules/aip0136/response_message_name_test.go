@@ -102,13 +102,15 @@ func TestResponseMessageName(t *testing.T) {
 			testName        string
 			MethodName      string
 			RespMessageName string
+			ReqFieldName    string
 			LRO             bool
 			problems        testutils.Problems
 		}{
-			{"Valid", "ArchiveBook", "Book", false, testutils.Problems{}},
-			{"Valid LRO", "ArchiveBook", "Book", true, testutils.Problems{}},
-			{"Invalid", "ArchiveBook", "Author", false, testutils.Problems{{Message: "not \"Author\"."}}},
-			{"Invalid LRO", "ArchiveBook", "Author", true, testutils.Problems{{Message: "not \"Author\"."}}},
+			{"Valid", "ArchiveBook", "Book", "name", false, testutils.Problems{}},
+			{"ValidResourceField", "ArchiveBook", "Book", "book", false, testutils.Problems{}},
+			{"Valid LRO", "ArchiveBook", "Book", "name", true, testutils.Problems{}},
+			{"Invalid", "ArchiveBook", "Author", "name", false, testutils.Problems{{Message: "not \"Author\"."}}},
+			{"Invalid LRO", "ArchiveBook", "Author", "name", true, testutils.Problems{{Message: "not \"Author\"."}}},
 		}
 
 		for _, test := range tests {
@@ -123,7 +125,7 @@ func TestResponseMessageName(t *testing.T) {
 				service Library {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{ if .LRO }}google.longrunning.Operation{{ else }}{{.RespMessageName}}{{ end }}) {
 						option (google.api.http) = {
-							post: "/v1/{name=publishers/*/books/*}:foo"
+							post: "/v1/{ {{.ReqFieldName}}=publishers/*/books/*}:foo"
 							body: "*"
 						};
 						{{ if .LRO }}
@@ -139,6 +141,8 @@ func TestResponseMessageName(t *testing.T) {
 					option (google.api.resource) = {
 						type: "library.googleapis.com/Book"
 						pattern: "publishers/{publisher}/books/{book}"
+						singular: "book"
+						plural: "books"
 					};
 				}
 
@@ -152,7 +156,7 @@ func TestResponseMessageName(t *testing.T) {
 				message {{.MethodName}}Request {
 					// The book to operate on.
 					// Format: publishers/{publisher}/books/{book}
-					string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
+					string {{.ReqFieldName}} = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
 				}
 				`, test)
 				method := file.GetServices()[0].GetMethods()[0]
