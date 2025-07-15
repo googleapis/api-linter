@@ -29,9 +29,9 @@ var durationOffsetComment = &lint.FieldRule{
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		comment := f.GetSourceInfo().GetLeadingComments()
-		if comment == "" {
+		if comment == "" || (!strings.Contains(strings.ToLower(comment), "relative") && !strings.Contains(strings.ToLower(comment), "in respect") && !strings.Contains(strings.ToLower(comment), "of the")) {
 			return []lint.Problem{{
-				Message:    "Duration fields ending in `_offset` must include a comment explaining the relative start point.",
+				Message:    "Duration fields ending in `_offset` must include a clear comment explaining the relative start point.",
 				Descriptor: f,
 			}}
 		}
