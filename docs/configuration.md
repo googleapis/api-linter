@@ -50,6 +50,28 @@ Disable the same rule using a YAML config file:
     - 'core::0140::lower-snake'
 ```
 
+Enable the rule `core::0140::lower-snake` for all proto files except the
+directory `tests` using a JSON config file:
+
+```json
+[
+  {
+    "excluded_paths": ["tests/**/*.proto"],
+    "enabled_rules": ["core::0140::lower-snake"]
+  }
+]
+```
+
+Enable the same rule using a YAML config file:
+
+```yaml
+---
+- excluded_paths:
+    - 'tests/**/*.proto'
+  enabled_rules:
+    - 'core::0140::lower-snake'
+```
+
 ## Proto comments
 
 Examples:
