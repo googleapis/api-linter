@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.70.0](https://github.com/googleapis/api-linter/compare/v1.69.2...v1.70.0) (2025-07-16)
+
+
+### Features
+
+* **AIP-142:** add relative time segments comment rule ([5fab299](https://github.com/googleapis/api-linter/commit/5fab2997d1f81bf60b55c6ae6e3e3605212c9870))
+* **AIP-142:** add time_offset type rule ([#1506](https://github.com/googleapis/api-linter/issues/1506)) ([945cff3](https://github.com/googleapis/api-linter/commit/945cff325fe38d4f8e3a7a620059a1e6b04c5107))
+* **integration-tests:** add test harness for cli invocation ([#1493](https://github.com/googleapis/api-linter/issues/1493)) ([35be28f](https://github.com/googleapis/api-linter/commit/35be28f922581bff1f8ad6d2bb9289f6c57e2657))
+
+
+### Bug Fixes
+
+* **AIP-136:** support response msg lint with resource singular aligned field name ([#1499](https://github.com/googleapis/api-linter/issues/1499)) ([8dec010](https://github.com/googleapis/api-linter/commit/8dec01076c4bbeb0506c39610e325fc25bbda6ca))
+* **AIP-158:** clarify pluralized response field finding ([#1498](https://github.com/googleapis/api-linter/issues/1498)) ([f0b7895](https://github.com/googleapis/api-linter/commit/f0b7895da8cd4b437ac0c3a9be2ac442560eeda8))
+* **AIP-203:** field-behavior-required ignore imported request types ([#1504](https://github.com/googleapis/api-linter/issues/1504)) ([bb82f00](https://github.com/googleapis/api-linter/commit/bb82f006b37c85cf255ba8bddb1bf34a07993596)), refs [#1503](https://github.com/googleapis/api-linter/issues/1503)
+* **cli:** unexpected lint warning when providing multiple files ([#1496](https://github.com/googleapis/api-linter/issues/1496)) ([7ecaa42](https://github.com/googleapis/api-linter/commit/7ecaa4200da7b5cbcbf1c273fc77d524f346ae1c)), refs [#1465](https://github.com/googleapis/api-linter/issues/1465)
+
+
+### Documentation
+
+* add comments to lint.Config and configuration page ([#1505](https://github.com/googleapis/api-linter/issues/1505)) ([39d0376](https://github.com/googleapis/api-linter/commit/39d0376281fb03f57b24efe0d82cb842e7316615))
+
 ## [1.69.2](https://github.com/googleapis/api-linter/compare/v1.69.1...v1.69.2) (2025-02-20)
 
 
