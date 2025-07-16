@@ -64,14 +64,14 @@ func TestDurationOffsetComment(t *testing.T) {
 			problems:  testutils.Problems{{Message: "must include a clear comment explaining the relative start point."}},
 		},
 		{
-			name:      "IrrelevantNoOffsetSuffix",
+			name:      "SkipNoOffsetSuffix",
 			Comment:   "",
 			FieldName: "start",
 			FieldType: "google.protobuf.Duration",
 			problems:  nil,
 		},
 		{
-			name:      "IrrelevantNotDuration",
+			name:      "SkipNotDuration",
 			Comment:   "",
 			FieldName: "map_offset",
 			FieldType: "string",
