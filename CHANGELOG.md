@@ -5,7 +5,7 @@
 
 ### Features
 
-* add relative time segments comment rule ([5fab299](https://github.com/googleapis/api-linter/commit/5fab2997d1f81bf60b55c6ae6e3e3605212c9870))
+* **AIP-142:** add relative time segments comment rule ([5fab299](https://github.com/googleapis/api-linter/commit/5fab2997d1f81bf60b55c6ae6e3e3605212c9870))
 * **AIP-142:** add time_offset type rule ([#1506](https://github.com/googleapis/api-linter/issues/1506)) ([945cff3](https://github.com/googleapis/api-linter/commit/945cff325fe38d4f8e3a7a620059a1e6b04c5107))
 * **integration-tests:** add test harness for cli invocation ([#1493](https://github.com/googleapis/api-linter/issues/1493)) ([35be28f](https://github.com/googleapis/api-linter/commit/35be28f922581bff1f8ad6d2bb9289f6c57e2657))
 
