@@ -253,25 +253,36 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 		name             string
 		MessageType      string
 		MessageFieldName string
+		RequestMessage   string
 		problems         testutils.Problems
 	}{
 		{
 			"ValidAnnotatedAndChildAnnotated",
 			"Annotated",
 			"annotated",
+			"UpdateBookRequest",
 			nil,
 		},
 		{
 			"ValidAnnotatedAndChildInOtherPackageUnannotated",
 			"unannotated.NonAnnotated",
 			"non_annotated",
+			"UpdateBookRequest",
 			nil,
 		},
 		{
 			"InvalidChildNotAnnotated",
 			"NonAnnotated",
 			"non_annotated",
+			"UpdateBookRequest",
 			testutils.Problems{{Message: "must be set"}},
+		},
+		{
+			"SkipRequestInOtherPackageUnannotated",
+			"Annotated",                // set this so that the template compiles
+			"annotated",                // set this so that the template compiles
+			"unannotated.NonAnnotated", // unannotated message as request
+			nil,
 		},
 	}
 	for _, tc := range testCases {
@@ -284,7 +295,7 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				import "unannotated.proto";
 
 				service Library {
-					rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
+					rpc UpdateBook({{.RequestMessage}}) returns (UpdateBookResponse) {
 					}
 				}
 
@@ -317,7 +328,11 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				package apilinter.test.unannotated;
 
 				message NonAnnotated {
-					string nested = 1;
+					OtherNonAnnotated nested = 1;
+				}
+
+				message OtherNonAnnotated {
+					string foo = 1;
 				}
 			`
 

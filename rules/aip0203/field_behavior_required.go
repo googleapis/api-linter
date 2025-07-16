@@ -49,6 +49,12 @@ var fieldBehaviorRequired = &lint.MethodRule{
 func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor]bool) []lint.Problem {
 	var ps []lint.Problem
 
+	// Ensure the input type, or recursively visited message, is part of the
+	// same package before linting.
+	if m.GetFile().GetPackage() != pkg {
+		return nil
+	}
+
 	for _, f := range m.GetFields() {
 		// ignore the field if it was already visited
 		if ok := visited[f]; ok {
@@ -68,7 +74,7 @@ func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor
 			}
 		}
 
-		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
+		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() {
 			ps = append(ps, problems(mt, pkg, visited)...)
 		}
 	}
