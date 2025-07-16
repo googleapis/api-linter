@@ -28,8 +28,8 @@ var durationOffsetComment = &lint.FieldRule{
 		return utils.GetTypeName(f) == "google.protobuf.Duration" && strings.HasSuffix(f.GetName(), "_offset")
 	},
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		comment := f.GetSourceInfo().GetLeadingComments()
-		if comment == "" || (!strings.Contains(strings.ToLower(comment), "relative") && !strings.Contains(strings.ToLower(comment), "in respect") && !strings.Contains(strings.ToLower(comment), "of the")) {
+		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())
+		if comment == "" || (!strings.Contains(comment, "relative") && !strings.Contains(comment, "in respect") && !strings.Contains(comment, "of the")) {
 			return []lint.Problem{{
 				Message:    "Duration fields ending in `_offset` must include a clear comment explaining the relative start point.",
 				Descriptor: f,
