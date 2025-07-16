@@ -24,7 +24,7 @@ import (
 )
 
 var timeOffsetType = &lint.FieldRule{
-	Name: lint.NewRuleName(142, "time_offset_type"),
+	Name: lint.NewRuleName(142, "time-offset-type"),
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		if utils.GetTypeName(f) != "google.protobuf.Duration" && strings.HasSuffix(f.GetName(), "_time_offset") {
 			return []lint.Problem{{
