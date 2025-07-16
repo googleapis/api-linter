@@ -15,7 +15,7 @@
 * **AIP-136:** support response msg lint with resource singular aligned field name ([#1499](https://github.com/googleapis/api-linter/issues/1499)) ([8dec010](https://github.com/googleapis/api-linter/commit/8dec01076c4bbeb0506c39610e325fc25bbda6ca))
 * **AIP-158:** clarify pluralized response field finding ([#1498](https://github.com/googleapis/api-linter/issues/1498)) ([f0b7895](https://github.com/googleapis/api-linter/commit/f0b7895da8cd4b437ac0c3a9be2ac442560eeda8))
 * **AIP-203:** field-behavior-required ignore imported request types ([#1504](https://github.com/googleapis/api-linter/issues/1504)) ([bb82f00](https://github.com/googleapis/api-linter/commit/bb82f006b37c85cf255ba8bddb1bf34a07993596)), refs [#1503](https://github.com/googleapis/api-linter/issues/1503)
-* **cli:** unexpected lint warning when providing multiple files ([#1496](https://github.com/googleapis/api-linter/issues/1496)) ([7ecaa42](https://github.com/googleapis/api-linter/commit/7ecaa4200da7b5cbcbf1c273fc77d524f346ae1c))
+* **cli:** unexpected lint warning when providing multiple files ([#1496](https://github.com/googleapis/api-linter/issues/1496)) ([7ecaa42](https://github.com/googleapis/api-linter/commit/7ecaa4200da7b5cbcbf1c273fc77d524f346ae1c)), refs [#1465](https://github.com/googleapis/api-linter/issues/1465)
 
 
 ### Documentation
