@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.70.1](https://github.com/googleapis/api-linter/compare/v1.70.0...v1.70.1) (2025-07-21)
+
+
+### Bug Fixes
+
+* **AIP-191:** fix php ruby casing strcase regression ([#1510](https://github.com/googleapis/api-linter/issues/1510)) ([6bb2d95](https://github.com/googleapis/api-linter/commit/6bb2d9519051bd75c6a668444eb312e4272ac278))
+
 ## [1.70.0](https://github.com/googleapis/api-linter/compare/v1.69.2...v1.70.0) (2025-07-16)
 
 
