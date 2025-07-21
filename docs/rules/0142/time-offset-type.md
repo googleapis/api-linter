@@ -15,7 +15,7 @@ This rule enforces that fields with names ending in `_time_offset` use the
 
 ## Details
 This rule looks at each field with a name ending in `_time_offset` and
-verifies that its type is `google.protobuf.Duration`. 
+verifies that its type is `google.protobuf.Duration`.
 
 
 ## Examples
