@@ -50,7 +50,7 @@ func TestDurationOffsetComment(t *testing.T) {
 			problems:  nil,
 		},
 		{
-			name:      "InvallidOfTheComment",
+			name:      "InvalidOfTheComment",
 			Comment:   "// The duration of the event offset from start.",
 			FieldName: "event_offset",
 			FieldType: "google.protobuf.Duration",
