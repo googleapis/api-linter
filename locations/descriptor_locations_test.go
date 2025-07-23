@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestDescriptorName(t *testing.T) {
@@ -31,12 +31,12 @@ func TestDescriptorName(t *testing.T) {
 
 	tests := []struct {
 		testName string
-		d        desc.Descriptor
+		d        protoreflect.Descriptor
 		wantSpan []int32
 	}{
-		{"Message", f.GetMessageTypes()[0], []int32{2, 8, 11}},
-		{"Field", f.GetMessageTypes()[0].GetFields()[0], []int32{3, 9, 12}},
-		{"MapField", f.GetMessageTypes()[0].GetFields()[1], []int32{4, 22, 25}},
+		{"Message", f.Messages().Get(0), []int32{2, 8, 11}},
+		{"Field", f.Messages().Get(0).Fields().Get(0), []int32{3, 9, 12}},
+		{"MapField", f.Messages().Get(0).Fields().Get(1), []int32{4, 22, 25}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

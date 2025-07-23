@@ -6,6 +6,7 @@ require (
 	bitbucket.org/creachadair/stringset v0.0.12
 	cloud.google.com/go/longrunning v0.6.4
 	github.com/bmatcuk/doublestar/v4 v4.8.1
+	github.com/bufbuild/protocompile v0.14.0
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.6.0
 	github.com/jhump/protoreflect v1.16.0
@@ -21,7 +22,6 @@ require (
 )
 
 require (
-	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.38.0 // indirect
