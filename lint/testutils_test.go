@@ -1,61 +1,53 @@
 package lint
 
 import (
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"testing"
 
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protodesc"
+	"context"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+
+	"github.com/bufbuild/protocompile"
 )
 
 func buildFile(t *testing.T, content string) protoreflect.FileDescriptor {
 	t.Helper()
-	// Create a temporary directory.
-	dir, err := ioutil.TempDir("", "proto-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(dir)
 
-	// Write the proto content to a file.
-	tmpFN := filepath.Join(dir, "test.proto")
-	if err := ioutil.WriteFile(tmpFN, []byte(content), 0644); err != nil {
-		t.Fatalf("Failed to write to temp file: %v", err)
+	protoPath := "test.proto"
+
+	// Create a map to hold our in-memory proto content, keyed by its path.
+	inMemorySources := map[string]string{
+		protoPath: content,
 	}
 
-	// Run protoc to generate the file descriptor set.
-	fdsFile := filepath.Join(dir, "fds.pb")
-	cmd := exec.Command("protoc", "-o", fdsFile, "--include_imports", "--include_source_info", "test.proto")
-	cmd.Dir = dir
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("protoc failed: %s\n%s", err, output)
+	// Create a SourceResolver that will use our in-memory map to access file content.
+	resolver := &protocompile.SourceResolver{
+		Accessor: protocompile.SourceAccessorFromMap(inMemorySources),
+		// No ImportPaths are needed here since we're only resolving "test.proto"
+		// which is directly provided by our Accessor.
 	}
 
-	// Read the file descriptor set.
-	fdsBin, err := ioutil.ReadFile(fdsFile)
-	if err != nil {
-		t.Fatalf("Failed to read fds file: %v", err)
-	}
-	fds := &descriptorpb.FileDescriptorSet{}
-	if err := proto.Unmarshal(fdsBin, fds); err != nil {
-		t.Fatalf("Failed to unmarshal fds: %v", err)
+	// Create a new protocompile.Compiler and set its Resolver.
+	compiler := protocompile.Compiler{
+		Resolver: resolver,
+		// Explicitly set SourceInfoMode to ensure comments and source positions are included.
+		SourceInfoMode: protocompile.SourceInfoStandard,
 	}
 
-	// Create the file descriptor.
-	files, err := protodesc.NewFiles(fds)
+	// Call Compile with the string path of the proto file.
+	// The compiler will use the configured SourceResolver to retrieve the content for "test.proto".
+	fds, err := compiler.Compile(context.Background(), protoPath)
 	if err != nil {
-		t.Fatalf("Failed to create file descriptor: %v", err)
+		t.Fatalf("Failed to compile proto content: %v", err)
 	}
 
-	fd, err := files.FindFileByPath("test.proto")
-	if err != nil {
-		t.Fatalf("Failed to find file descriptor: %v", err)
+	// The Compile method returns a slice of FileDescriptors.
+	// Since we only passed one input file, we expect one output descriptor.
+	if len(fds) == 0 {
+		t.Fatalf("No file descriptors returned after compilation")
 	}
-	return fd
+
+	// The protocompile's protoreflect.FileDescriptor type is an alias for
+	// google.golang.org/protobuf/reflect/protoreflect.FileDescriptor, so it's
+	// directly compatible.
+	return fds[0]
 }
