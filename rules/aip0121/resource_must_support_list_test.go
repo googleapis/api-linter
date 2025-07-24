@@ -150,7 +150,7 @@ func TestResourceMustSupportList(t *testing.T) {
 					string other = 1;
 				 }
 			`, test)
-			s := file.GetServices()[0]
+			s := file.Services().Get(0)
 			got := resourceMustSupportList.Lint(file)
 			if diff := test.problems.SetDescriptor(s).Diff(got); diff != "" {
 				t.Error(diff)

@@ -22,21 +22,21 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 type resourceDef struct {
-	desc desc.Descriptor
+	desc protoreflect.Descriptor
 	idx  int
 }
 
 func (d *resourceDef) String() string {
 	switch d.desc.(type) {
-	case *desc.FileDescriptor:
-		return fmt.Sprintf("`google.api.resource_definition` %d in file `%s`", d.idx, d.desc.GetFullyQualifiedName())
-	case *desc.MessageDescriptor:
-		return fmt.Sprintf("message `%s`", d.desc.GetFullyQualifiedName())
+	case protoreflect.FileDescriptor:
+		return fmt.Sprintf("`google.api.resource_definition` %d in file `%s`", d.idx, d.desc.FullName())
+	case protoreflect.MessageDescriptor:
+		return fmt.Sprintf("message `%s`", d.desc.FullName())
 	default:
 		return fmt.Sprintf("unexpected descriptor type %T", d.desc)
 	}
@@ -44,42 +44,43 @@ func (d *resourceDef) String() string {
 
 func (d *resourceDef) location() *dpb.SourceCodeInfo_Location {
 	switch desc := d.desc.(type) {
-	case *desc.FileDescriptor:
+	case protoreflect.FileDescriptor:
 		return locations.FileResourceDefinition(desc, d.idx)
-	case *desc.MessageDescriptor:
+	case protoreflect.MessageDescriptor:
 		return locations.MessageResource(desc)
 	default:
 		return nil
 	}
 }
 
-func resourceDefsInFile(f *desc.FileDescriptor, defs map[string][]resourceDef) map[string][]resourceDef {
+func resourceDefsInFile(f protoreflect.FileDescriptor, defs map[string][]resourceDef) map[string][]resourceDef {
 	for i, rd := range utils.GetResourceDefinitions(f) {
 		if t := rd.GetType(); t != "" {
 			defs[t] = append(defs[t], resourceDef{f, i})
 		}
 	}
-	for _, m := range f.GetMessageTypes() {
-		resourceDefsInMsg(m, defs)
+	for i := 0; i < f.Messages().Len(); i++ {
+		resourceDefsInMsg(f.Messages().Get(i), defs)
 	}
 	return defs
 }
 
-func resourceDefsInMsg(m *desc.MessageDescriptor, defs map[string][]resourceDef) {
+func resourceDefsInMsg(m protoreflect.MessageDescriptor, defs map[string][]resourceDef) {
 	if t := utils.GetResource(m).GetType(); t != "" {
 		defs[t] = append(defs[t], resourceDef{m, -1})
 	}
-	for _, m := range m.GetNestedMessageTypes() {
-		resourceDefsInMsg(m, defs)
+	for i := 0; i < m.Messages().Len(); i++ {
+		resourceDefsInMsg(m.Messages().Get(i), defs)
 	}
 }
 
-func allDeps(f *desc.FileDescriptor, deps map[string]*desc.FileDescriptor) map[string]*desc.FileDescriptor {
-	for _, f := range f.GetDependencies() {
-		name := f.GetName()
+func allDeps(f protoreflect.FileDescriptor, deps map[string]protoreflect.FileDescriptor) map[string]protoreflect.FileDescriptor {
+	for i := 0; i < f.Imports().Len(); i++ {
+		dep := f.Imports().Get(i)
+		name := dep.Path()
 		if _, ok := deps[name]; !ok {
-			deps[name] = f
-			allDeps(f, deps)
+			deps[name] = dep
+			allDeps(dep, deps)
 		}
 	}
 	return deps
@@ -87,14 +88,14 @@ func allDeps(f *desc.FileDescriptor, deps map[string]*desc.FileDescriptor) map[s
 
 var duplicateResource = &lint.FileRule{
 	Name: lint.NewRuleName(123, "duplicate-resource"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		defsInFile := resourceDefsInFile(f, map[string][]resourceDef{})
 		if len(defsInFile) == 0 {
 			return nil
 		}
 
 		defsInDeps := map[string][]resourceDef{}
-		for _, f := range allDeps(f, map[string]*desc.FileDescriptor{}) {
+		for _, f := range allDeps(f, map[string]protoreflect.FileDescriptor{}) {
 			resourceDefsInFile(f, defsInDeps)
 		}
 

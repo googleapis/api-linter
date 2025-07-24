@@ -20,13 +20,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceDefinitionTypeName = &lint.FileRule{
 	Name:   lint.NewRuleName(123, "resource-definition-type-name"),
 	OnlyIf: hasResourceDefinitionAnnotation,
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		resources := utils.GetResourceDefinitions(f)
 		for ndx, resource := range resources {

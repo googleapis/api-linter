@@ -20,13 +20,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourcePlural = &lint.MessageRule{
 	Name:   lint.NewRuleName(123, "resource-plural"),
 	OnlyIf: hasResourceAnnotation,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		r := utils.GetResource(m)
 		l := locations.MessageResource(m)
 		p := r.GetPlural()

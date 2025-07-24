@@ -143,7 +143,7 @@ func TestResourceMustSupportGet(t *testing.T) {
 					repeated Other others = 1;
 				 }
 			`, test)
-			s := file.GetServices()[0]
+			s := file.Services().Get(0)
 			got := resourceMustSupportGet.Lint(file)
 			if diff := test.problems.SetDescriptor(s).Diff(got); diff != "" {
 				t.Error(diff)

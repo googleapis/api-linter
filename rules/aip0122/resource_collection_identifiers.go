@@ -22,17 +22,17 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var firstCharRegexp = regexp.MustCompile(`^[a-z]`)
 
 var resourceCollectionIdentifiers = &lint.MessageRule{
 	Name: lint.NewRuleName(122, "resource-collection-identifiers"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		return utils.GetResource(m) != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		resource := utils.GetResource(m)
 		for _, p := range resource.GetPattern() {

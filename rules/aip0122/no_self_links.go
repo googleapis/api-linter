@@ -17,18 +17,19 @@ package aip0122
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var noSelfLinks = &lint.MessageRule{
 	Name:   lint.NewRuleName(122, "no-self-links"),
 	OnlyIf: utils.IsResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
-		for _, field := range m.GetFields() {
-			if field.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING &&
-				field.GetName() == "self_link" {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if field.Kind() == protoreflect.StringKind &&
+				field.Name() == "self_link" {
 				problems = append(problems, lint.Problem{
 					Message:    "Resources must not contain self-links.",
 					Descriptor: field,

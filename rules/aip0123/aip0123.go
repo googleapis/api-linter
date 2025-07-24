@@ -22,9 +22,9 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -52,19 +52,19 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func isResourceMessage(m *desc.MessageDescriptor) bool {
+func isResourceMessage(m protoreflect.MessageDescriptor) bool {
 	// If the parent of this message is a message, it is nested and shoudn't
 	// be considered a resource, even if it has a name field.
-	_, nested := m.GetParent().(*desc.MessageDescriptor)
-	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request") &&
-		!strings.HasSuffix(m.GetName(), "Response") && !nested
+	_, nested := m.Parent().(protoreflect.MessageDescriptor)
+	return m.Fields().ByName("name") != nil && !strings.HasSuffix(string(m.Name()), "Request") &&
+		!strings.HasSuffix(string(m.Name()), "Response") && !nested
 }
 
-func hasResourceAnnotation(m *desc.MessageDescriptor) bool {
+func hasResourceAnnotation(m protoreflect.MessageDescriptor) bool {
 	return utils.GetResource(m) != nil
 }
 
-func hasResourceDefinitionAnnotation(f *desc.FileDescriptor) bool {
+func hasResourceDefinitionAnnotation(f protoreflect.FileDescriptor) bool {
 	return len(utils.GetResourceDefinitions(f)) > 0
 }
 

@@ -21,18 +21,18 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceTypeMessage = &lint.MessageRule{
 	Name:   lint.NewRuleName(123, "resource-type-message"),
 	OnlyIf: utils.IsResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		n := m.GetName()
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		n := m.Name()
 		typ := utils.GetResource(m).GetType()
 		typ = typ[strings.LastIndex(typ, "/")+1:]
 
-		if typ != n {
+		if typ != string(n) {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Resource type name %q should match containing message name %q", typ, n),
 				Descriptor: m,

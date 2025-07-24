@@ -1,10 +1,10 @@
 package aip0126
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestUpperSnake(t *testing.T) {
@@ -34,24 +34,25 @@ func TestUpperSnake(t *testing.T) {
 	// Test each permutation.
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			enumBuilder := builder.NewEnum("Number")
-			for _, enumValue := range test.enumValues {
-				enumBuilder.AddValue(builder.NewEnumValue(enumValue))
+			var enumValues string
+			for i, v := range test.enumValues {
+				enumValues += fmt.Sprintf("%s = %d;\n", v, i)
 			}
-
-			enum, err := enumBuilder.Build()
-			if err != nil {
-				t.Fatalf("Could not build an enum with values %v", test.enumValues)
-			}
+			f := testutils.ParseProto3Tmpl(t, `
+				enum Number {
+					{{.EnumValues}}
+				}
+			`, struct{ EnumValues string }{enumValues})
+			enum := f.Enums().Get(0)
 
 			// If this test expects problems, they correspond 1:1 with the
 			// enum value order.
 			for i := range test.problems {
-				test.problems[i].Descriptor = enum.GetValues()[i]
+				test.problems[i].Descriptor = enum.Values().Get(i)
 			}
 
 			// Run the lint rule, and establish that we got the correct problems.
-			problems := enumValueUpperSnakeCase.Lint(enum.GetFile())
+			problems := enumValueUpperSnakeCase.Lint(f)
 			if diff := test.problems.Diff(problems); diff != "" {
 				t.Error(diff)
 			}

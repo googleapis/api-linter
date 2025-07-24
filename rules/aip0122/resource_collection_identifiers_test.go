@@ -43,7 +43,7 @@ func TestResourceCollectionIdentifiers(t *testing.T) {
 				string name = 1;
 			}
 		`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(resourceCollectionIdentifiers.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

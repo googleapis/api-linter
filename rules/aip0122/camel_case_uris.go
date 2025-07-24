@@ -20,13 +20,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // HTTP URL pattern shouldn't include underscore("_")
 var httpURICase = &lint.MethodRule{
 	Name: lint.NewRuleName(122, "camel-case-uris"),
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
 		// Establish that the URI does not include a `_` character.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if strings.Contains(httpRule.GetPlainURI(), "_") {

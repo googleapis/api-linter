@@ -52,10 +52,10 @@ package rules
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/aip0121"
-	// "github.com/googleapis/api-linter/rules/aip0122" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0123" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0124" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0126" //TODO: uncommnet line and migrate rule to new interface
+	"github.com/googleapis/api-linter/rules/aip0122"
+	"github.com/googleapis/api-linter/rules/aip0123"
+	"github.com/googleapis/api-linter/rules/aip0124"
+	"github.com/googleapis/api-linter/rules/aip0126"
 	// "github.com/googleapis/api-linter/rules/aip0127" //TODO: uncommnet line and migrate rule to new interface
 	// "github.com/googleapis/api-linter/rules/aip0128" //TODO: uncommnet line and migrate rule to new interface
 	// "github.com/googleapis/api-linter/rules/aip0131" //TODO: uncommnet line and migrate rule to new interface
@@ -102,10 +102,10 @@ type addRulesFuncType func(lint.RuleRegistry) error
 
 var aipAddRulesFuncs = []addRulesFuncType{
 	aip0121.AddRules,
-	// aip0122.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0123.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0124.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0126.AddRules, //TODO: uncommnet line and migrate rule to new interface
+	aip0122.AddRules,
+	aip0123.AddRules,
+	aip0124.AddRules,
+	aip0126.AddRules,
 	// aip0127.AddRules, //TODO: uncommnet line and migrate rule to new interface
 	// aip0128.AddRules, //TODO: uncommnet line and migrate rule to new interface
 	// aip0131.AddRules, //TODO: uncommnet line and migrate rule to new interface

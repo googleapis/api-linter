@@ -44,7 +44,7 @@ func TestResourceReferenceType(t *testing.T) {
 				}
 				message Author {}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(resourceReferenceType.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

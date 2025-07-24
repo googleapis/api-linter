@@ -22,25 +22,26 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var unspecified = &lint.EnumRule{
 	Name: lint.NewRuleName(126, "unspecified"),
-	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		name := endNum.ReplaceAllString(e.GetName(), "${1}_${2}")
+	LintEnum: func(e protoreflect.EnumDescriptor) []lint.Problem {
+		name := endNum.ReplaceAllString(string(e.Name()), "${1}_${2}")
 		sn := strings.ToUpper(strcase.SnakeCase(name))
 		unspec := sn + "_UNSPECIFIED"
 		allowed := stringset.New(unspec, "UNKNOWN", sn+"_UNKNOWN")
-		for _, element := range e.GetValues() {
-			if allowed.Contains(element.GetName()) && element.GetNumber() == 0 {
+		for i := 0; i < e.Values().Len(); i++ {
+			element := e.Values().Get(i)
+			if allowed.Contains(string(element.Name())) && element.Number() == 0 {
 				return nil
 			}
 		}
 
 		// We did not find the enum value we wanted; complain.
-		firstValue := e.GetValues()[0]
+		firstValue := e.Values().Get(0)
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("The first enum value should be %q", unspec),
 			Suggestion: unspec,

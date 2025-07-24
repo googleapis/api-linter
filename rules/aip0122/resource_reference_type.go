@@ -18,12 +18,12 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceReferenceType = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "resource-reference-type"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if utils.GetResourceReference(f) != nil && utils.GetTypeName(f) != "string" {
 			return []lint.Problem{{
 				Message:    "The resource_reference annotation should only be used on string fields.",

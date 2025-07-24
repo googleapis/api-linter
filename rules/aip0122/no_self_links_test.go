@@ -41,7 +41,7 @@ func TestNoSelfLinks(t *testing.T) {
 				string {{ .FieldName }} = 2;
 			}
 		`, test)
-			field := f.GetMessageTypes()[0].GetFields()[1]
+			field := f.Messages().Get(0).Fields().Get(1)
 			if diff := test.problems.SetDescriptor(field).Diff(noSelfLinks.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

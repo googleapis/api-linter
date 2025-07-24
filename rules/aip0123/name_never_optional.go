@@ -18,26 +18,26 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var nameNeverOptional = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "name-never-optional"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		f := "name"
 		if nf := utils.GetResource(m).GetNameField(); nf != "" {
 			f = nf
 		}
-		return utils.IsResource(m) && m.FindFieldByName(f) != nil
+		return utils.IsResource(m) && m.Fields().ByName(protoreflect.Name(f)) != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f := "name"
 		if nf := utils.GetResource(m).GetNameField(); nf != "" {
 			f = nf
 		}
-		field := m.FindFieldByName(f)
+		field := m.Fields().ByName(protoreflect.Name(f))
 
-		if field.IsProto3Optional() {
+		if field.HasOptionalKeyword() {
 			return []lint.Problem{{
 				Message:    "Resource name fields must never be labeled with proto3_optional",
 				Descriptor: field,

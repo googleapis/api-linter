@@ -89,14 +89,14 @@ func TestEmbeddedResource(t *testing.T) {
 				string name = 1;
 			}
 		`, test)
-			m := f.FindMessage("Book")
+			m := f.Messages().ByName("Book")
 
 			want := test.problems
 			if len(want) > 0 {
-				want[0].Descriptor = m.FindFieldByName("library")
+				want[0].Descriptor = m.Fields().ByName("library")
 			}
 			if len(want) > 1 {
-				want[1].Descriptor = m.FindFieldByName("librarian")
+				want[1].Descriptor = m.Fields().ByName("librarian")
 			}
 			if diff := want.Diff(embeddedResource.Lint(f)); diff != "" {
 				t.Error(diff)
@@ -150,7 +150,7 @@ func TestEmbeddedResource_Revisions(t *testing.T) {
 				string name = 1;
 			}
 		`, test)
-			field := f.FindMessage("BookRevision").FindFieldByName("snapshot")
+			field := f.Messages().ByName("BookRevision").Fields().ByName("snapshot")
 			if diff := test.problems.SetDescriptor(field).Diff(embeddedResource.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

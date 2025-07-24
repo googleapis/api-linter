@@ -43,8 +43,8 @@ func TestResourceReferenceType(t *testing.T) {
 				}
 				message Author {}  // For the failure case, to make compilation work.
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
-			got := resourceReferenceType.Lint(file)
+			field := f.Messages().Get(0).Fields().Get(0)
+			got := resourceReferenceType.Lint(f)
 			if diff := test.problems.SetDescriptor(field).Diff(got); diff != "" {
 				t.Error(diff)
 			}

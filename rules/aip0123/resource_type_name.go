@@ -20,15 +20,15 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceTypeName = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "resource-type-name"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		return utils.GetResource(m) != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		resource := utils.GetResource(m)
 		_, typeName, ok := utils.SplitResourceTypeName(resource.GetType())
 		upperTypeName := utils.ToUpperCamelCase(typeName)

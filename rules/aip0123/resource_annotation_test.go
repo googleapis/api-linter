@@ -71,7 +71,7 @@ func TestResourceAnnotation(t *testing.T) {
 					string {{.FieldName}} = 1;
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(resourceAnnotation.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -17,16 +17,16 @@ package aip0122
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceIdOutputOnly = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "resource-id-output-only"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		var idName string
-		p := f.GetParent().(*desc.MessageDescriptor)
+		p := f.Parent().(protoreflect.MessageDescriptor)
 
 		// Build an expected ID field name based on the Resource `singular`
 		// field or by parsing the `type`.
@@ -42,10 +42,10 @@ var resourceIdOutputOnly = &lint.FieldRule{
 			idName += "_id"
 		}
 
-		isId := f.GetName() == "uid" || f.GetName() == idName
+		isId := f.Name() == "uid" || f.Name() == protoreflect.Name(idName)
 		return isRes && isId
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)
 		if !behaviors.Contains(annotations.FieldBehavior_OUTPUT_ONLY.String()) {
 			return []lint.Problem{
