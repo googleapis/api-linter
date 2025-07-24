@@ -23,7 +23,7 @@ import (
 func TestGetTypeName(t *testing.T) {
 	for _, ty := range []string{"int32", "int64", "string", "bytes", "google.protobuf.Timestamp", "Format"} {
 		t.Run(ty, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/protobuf/timestamp.proto";
 				message Book {
 					{{.Type}} field = 1;
@@ -32,10 +32,11 @@ func TestGetTypeName(t *testing.T) {
 					FORMAT_UNSPECIFIED = 0;
 				}
 			`, struct{ Type string }{ty})
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if got, want := GetTypeName(field), ty; got != want {
 				t.Errorf("Got %q, expected %q.", got, want)
 			}
 		})
 	}
 }
+

@@ -18,19 +18,19 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
-	"github.com/jhump/protoreflect/desc"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	lrpb "google.golang.org/genproto/googleapis/longrunning"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // GetFieldBehavior returns a stringset.Set of FieldBehavior annotations for
 // the given field.
-func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
-	opts := f.GetFieldOptions()
-	if x := proto.GetExtension(opts, apb.E_FieldBehavior); x != nil {
+func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
+	opts := f.Options()
+	if x := proto.GetExtension(opts, annotations.E_FieldBehavior); x != nil {
 		answer := stringset.New()
-		for _, fb := range x.([]apb.FieldBehavior) {
+		for _, fb := range x.([]annotations.FieldBehavior) {
 			answer.Add(fb.String())
 		}
 		return answer
@@ -39,11 +39,11 @@ func GetFieldBehavior(f *desc.FieldDescriptor) stringset.Set {
 }
 
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
-func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
+func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 	if m == nil {
 		return nil
 	}
-	opts := m.GetMethodOptions()
+	opts := m.Options()
 	if x := proto.GetExtension(opts, lrpb.E_OperationInfo); x != nil {
 		return x.(*lrpb.OperationInfo)
 	}
@@ -52,7 +52,7 @@ func GetOperationInfo(m *desc.MethodDescriptor) *lrpb.OperationInfo {
 
 // GetOperationResponseType returns the message referred to by the
 // (google.longrunning.operation_info).response_type annotation.
-func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetOperationResponseType(m protoreflect.MethodDescriptor) protoreflect.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -60,19 +60,19 @@ func GetOperationResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor 
 	if info == nil {
 		return nil
 	}
-	typ := FindMessage(m.GetFile(), info.GetResponseType())
+	typ := FindMessage(m.ParentFile(), info.GetResponseType())
 
 	return typ
 }
 
 // GetResponseType returns the OutputType if the response is
 // not an LRO, or the ResponseType otherwise.
-func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetResponseType(m protoreflect.MethodDescriptor) protoreflect.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
 
-	ot := m.GetOutputType()
+	ot := m.Output()
 	if !isLongRunningOperation(ot) {
 		return ot
 	}
@@ -80,13 +80,13 @@ func GetResponseType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	return GetOperationResponseType(m)
 }
 
-func isLongRunningOperation(m *desc.MessageDescriptor) bool {
-	return m.GetFile().GetPackage() == "google.longrunning" && m.GetName() == "Operation"
+func isLongRunningOperation(m protoreflect.MessageDescriptor) bool {
+	return m.ParentFile().Package() == "google.longrunning" && m.Name() == "Operation"
 }
 
 // GetMetadataType returns the message referred to by the
 // (google.longrunning.operation_info).metadata_type annotation.
-func GetMetadataType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
+func GetMetadataType(m protoreflect.MethodDescriptor) protoreflect.MessageDescriptor {
 	if m == nil {
 		return nil
 	}
@@ -94,16 +94,16 @@ func GetMetadataType(m *desc.MethodDescriptor) *desc.MessageDescriptor {
 	if info == nil {
 		return nil
 	}
-	typ := FindMessage(m.GetFile(), info.GetMetadataType())
+	typ := FindMessage(m.ParentFile(), info.GetMetadataType())
 
 	return typ
 }
 
 // GetMethodSignatures returns the `google.api.method_signature` annotations.
-func GetMethodSignatures(m *desc.MethodDescriptor) [][]string {
+func GetMethodSignatures(m protoreflect.MethodDescriptor) [][]string {
 	answer := [][]string{}
-	opts := m.GetMethodOptions()
-	if x := proto.GetExtension(opts, apb.E_MethodSignature); x != nil {
+	opts := m.Options()
+	if x := proto.GetExtension(opts, annotations.E_MethodSignature); x != nil {
 		for _, sig := range x.([]string) {
 			answer = append(answer, strings.Split(sig, ","))
 		}
@@ -112,20 +112,20 @@ func GetMethodSignatures(m *desc.MethodDescriptor) [][]string {
 }
 
 // GetResource returns the google.api.resource annotation.
-func GetResource(m *desc.MessageDescriptor) *apb.ResourceDescriptor {
+func GetResource(m protoreflect.MessageDescriptor) *annotations.ResourceDescriptor {
 	if m == nil {
 		return nil
 	}
-	opts := m.GetMessageOptions()
-	if x := proto.GetExtension(opts, apb.E_Resource); x != nil {
-		return x.(*apb.ResourceDescriptor)
+	opts := m.Options()
+	if x := proto.GetExtension(opts, annotations.E_Resource); x != nil {
+		return x.(*annotations.ResourceDescriptor)
 	}
 	return nil
 }
 
 // IsResource returns true if the message has a populated google.api.resource
 // annotation with a non-empty "type" field.
-func IsResource(m *desc.MessageDescriptor) bool {
+func IsResource(m protoreflect.MessageDescriptor) bool {
 	if res := GetResource(m); res != nil {
 		return res.GetType() != ""
 	}
@@ -134,7 +134,7 @@ func IsResource(m *desc.MessageDescriptor) bool {
 
 // IsSingletonResource returns true if the given message is a singleton
 // resource according to its pattern.
-func IsSingletonResource(m *desc.MessageDescriptor) bool {
+func IsSingletonResource(m protoreflect.MessageDescriptor) bool {
 	for _, pattern := range GetResource(m).GetPattern() {
 		if IsSingletonResourcePattern(pattern) {
 			return true
@@ -143,7 +143,7 @@ func IsSingletonResource(m *desc.MessageDescriptor) bool {
 	return false
 }
 
-// IsSingletonResource returns true if the given message is a singleton
+// IsSingletonResourcePattern returns true if the given message is a singleton
 // resource according to its pattern.
 func IsSingletonResourcePattern(pattern string) bool {
 	// If the pattern ends in something other than "}", that indicates that this is a singleton.
@@ -156,30 +156,30 @@ func IsSingletonResourcePattern(pattern string) bool {
 
 // GetResourceDefinitions returns the google.api.resource_definition annotations
 // for a file.
-func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
-	opts := f.GetFileOptions()
-	if x := proto.GetExtension(opts, apb.E_ResourceDefinition); x != nil {
-		return x.([]*apb.ResourceDescriptor)
+func GetResourceDefinitions(f protoreflect.FileDescriptor) []*annotations.ResourceDescriptor {
+	opts := f.Options()
+	if x := proto.GetExtension(opts, annotations.E_ResourceDefinition); x != nil {
+		return x.([]*annotations.ResourceDescriptor)
 	}
 	return nil
 }
 
 // HasResourceReference returns if the field has a google.api.resource_reference annotation.
-func HasResourceReference(f *desc.FieldDescriptor) bool {
+func HasResourceReference(f protoreflect.FieldDescriptor) bool {
 	if f == nil {
 		return false
 	}
-	return proto.HasExtension(f.GetFieldOptions(), apb.E_ResourceReference)
+	return proto.HasExtension(f.Options(), annotations.E_ResourceReference)
 }
 
 // GetResourceReference returns the google.api.resource_reference annotation.
-func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+func GetResourceReference(f protoreflect.FieldDescriptor) *annotations.ResourceReference {
 	if f == nil {
 		return nil
 	}
-	opts := f.GetFieldOptions()
-	if x := proto.GetExtension(opts, apb.E_ResourceReference); x != nil {
-		return x.(*apb.ResourceReference)
+	opts := f.Options()
+	if x := proto.GetExtension(opts, annotations.E_ResourceReference); x != nil {
+		return x.(*annotations.ResourceReference)
 	}
 	return nil
 }
@@ -189,7 +189,7 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 // depenedencies, it cannot search within the entire protobuf package.
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
-func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
+func FindResource(reference string, file protoreflect.FileDescriptor) *annotations.ResourceDescriptor {
 	m := FindResourceMessage(reference, file)
 	return GetResource(m)
 }
@@ -200,10 +200,15 @@ func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDesc
 // package. This is especially useful for resolving
 // google.api.resource_reference annotations to the message that owns a
 // resource.
-func FindResourceMessage(reference string, file *desc.FileDescriptor) *desc.MessageDescriptor {
-	files := append(file.GetDependencies(), file)
+func FindResourceMessage(reference string, file protoreflect.FileDescriptor) protoreflect.MessageDescriptor {
+	files := []protoreflect.FileDescriptor{file}
+	for i := 0; i < file.Imports().Len(); i++ {
+		files = append(files, file.Imports().Get(i).FileDescriptor)
+	}
+
 	for _, f := range files {
-		for _, m := range f.GetMessageTypes() {
+		for i := 0; i < f.Messages().Len(); i++ {
+			m := f.Messages().Get(i)
 			if r := GetResource(m); r != nil {
 				if r.GetType() == reference {
 					return m
@@ -231,7 +236,7 @@ func SplitResourceTypeName(typ string) (service string, typeName string, ok bool
 
 // FindResourceChildren attempts to search for other resources defined in the
 // package that are parented by the given resource.
-func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescriptor) []*apb.ResourceDescriptor {
+func FindResourceChildren(parent *annotations.ResourceDescriptor, file protoreflect.FileDescriptor) []*annotations.ResourceDescriptor {
 	pats := parent.GetPattern()
 	if len(pats) == 0 {
 		return nil
@@ -241,10 +246,15 @@ func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescrip
 	// 2. The true first pattern is the one most likely to be used as a parent.
 	first := pats[0]
 
-	var children []*apb.ResourceDescriptor
-	files := append(file.GetDependencies(), file)
+	var children []*annotations.ResourceDescriptor
+	files := []protoreflect.FileDescriptor{file}
+	for i := 0; i < file.Imports().Len(); i++ {
+		files = append(files, file.Imports().Get(i).FileDescriptor)
+	}
+
 	for _, f := range files {
-		for _, m := range f.GetMessageTypes() {
+		for i := 0; i < f.Messages().Len(); i++ {
+			m := f.Messages().Get(i)
 			if r := GetResource(m); r != nil && r.GetType() != parent.GetType() {
 				for _, p := range r.GetPattern() {
 					if strings.HasPrefix(p, first) {
@@ -259,30 +269,30 @@ func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescrip
 	return children
 }
 
-func HasFieldInfo(fd *desc.FieldDescriptor) bool {
-	return fd != nil && proto.HasExtension(fd.GetFieldOptions(), apb.E_FieldInfo)
+func HasFieldInfo(fd protoreflect.FieldDescriptor) bool {
+	return fd != nil && proto.HasExtension(fd.Options(), annotations.E_FieldInfo)
 }
 
-func GetFieldInfo(fd *desc.FieldDescriptor) *apb.FieldInfo {
+func GetFieldInfo(fd protoreflect.FieldDescriptor) *annotations.FieldInfo {
 	if !HasFieldInfo(fd) {
 		return nil
 	}
 
-	return proto.GetExtension(fd.GetFieldOptions(), apb.E_FieldInfo).(*apb.FieldInfo)
+	return proto.GetExtension(fd.Options(), annotations.E_FieldInfo).(*annotations.FieldInfo)
 }
 
-func HasFormat(fd *desc.FieldDescriptor) bool {
+func HasFormat(fd protoreflect.FieldDescriptor) bool {
 	if !HasFieldInfo(fd) {
 		return false
 	}
 
 	fi := GetFieldInfo(fd)
-	return fi.GetFormat() != apb.FieldInfo_FORMAT_UNSPECIFIED
+	return fi.GetFormat() != annotations.FieldInfo_FORMAT_UNSPECIFIED
 }
 
-func GetFormat(fd *desc.FieldDescriptor) apb.FieldInfo_Format {
+func GetFormat(fd protoreflect.FieldDescriptor) annotations.FieldInfo_Format {
 	if !HasFormat(fd) {
-		return apb.FieldInfo_FORMAT_UNSPECIFIED
+		return annotations.FieldInfo_FORMAT_UNSPECIFIED
 	}
 	return GetFieldInfo(fd).GetFormat()
 }

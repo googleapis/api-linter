@@ -33,7 +33,7 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 		{"FalseOtherStyle", "style: STYLE_UNSPECIFIED", false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/resource.proto";
 
 				message Book {
@@ -51,8 +51,9 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 					rpc CreateBook(CreateBookRequest) returns (Book);
 				}
 			`, test)
-			for _, m := range f.GetMessageTypes() {
-				t.Run(m.GetName(), func(t *testing.T) {
+			for i := 0; i < f.Messages().Len(); i++ {
+				m := f.Messages().Get(i)
+				t.Run(string(m.Name()), func(t *testing.T) {
 					if got := IsDeclarativeFriendlyMessage(m); got != test.want {
 						t.Errorf("Got %v, expected %v.", got, test.want)
 					}
@@ -63,7 +64,8 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 
 	// Test the case where the google.api.resource annotation is not present.
 	t.Run("NotResource", func(t *testing.T) {
-		m := testutils.ParseProto3String(t, "message Book {}").GetMessageTypes()[0]
+		f := testutils.Compile(t, "message Book {}", nil)
+		m := f.Messages().Get(0)
 		if IsDeclarativeFriendlyMessage(m) {
 			t.Errorf("Got true, expected false.")
 		}
@@ -153,7 +155,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 					}
 
 					// Parse the template and test the method.
-					f := testutils.ParseProto3Tmpl(t, fmt.Sprintf(`
+					f := testutils.Compile(t, fmt.Sprintf(`
 						import "google/api/resource.proto";
 
 						%s
@@ -165,7 +167,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 							};
 						}
 					`, tmpl), s)
-					m := f.GetServices()[0].GetMethods()[0]
+					m := f.Services().Get(0).Methods().Get(0)
 					if got := IsDeclarativeFriendlyMethod(m); got != test.want {
 						t.Errorf("Got %v, expected %v.", got, test.want)
 					}
@@ -176,7 +178,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 
 	// Test an edge case where the LRO response is not found.
 	t.Run("lro/not-found", func(t *testing.T) {
-		f := testutils.ParseProto3String(t, `
+		f := testutils.Compile(t, `
 			import "google/longrunning/operations.proto";
 			service Library {
 				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
@@ -186,11 +188,12 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 				}
 			}
 			message CreateBookRequest {}
-		`)
-		m := f.GetServices()[0].GetMethods()[0]
+		`, nil)
+		m := f.Services().Get(0).Methods().Get(0)
 		want := false
 		if got := IsDeclarativeFriendlyMethod(m); got != want {
 			t.Errorf("Got %v, expected %v.", got, want)
 		}
 	})
 }
+

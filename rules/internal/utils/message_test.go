@@ -32,10 +32,10 @@ func TestListResponseResourceName(t *testing.T) {
 		{"InvalidNotList", "WriteBook", ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Response {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			got := ListResponseResourceName(m)
 			if diff := cmp.Diff(got, test.want); diff != "" {
 				t.Errorf("got(-),want(+):\n%s", diff)
@@ -73,10 +73,10 @@ func TestIsListResponseMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Response {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsListResponseMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -112,10 +112,10 @@ func TestIsListRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Request {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsListRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -151,10 +151,10 @@ func TestIsListRevisionsResponseMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}RevisionsResponse {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsListRevisionsResponseMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -190,10 +190,10 @@ func TestIsListRevisionsRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}RevisionsRequest {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsListRevisionsRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -229,10 +229,10 @@ func TestIsGetRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Request {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsGetRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -268,10 +268,10 @@ func TestIsCreateRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Request {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsCreateRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -307,10 +307,10 @@ func TestIsUpdateRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Request {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsUpdateRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}
@@ -346,10 +346,10 @@ func TestIsDeleteRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				message {{.RPC}}Request {}
 			`, test)
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 			if got, want := IsDeleteRequestMessage(m), test.want; got != want {
 				t.Errorf("got %v, want %v", got, want)
 			}

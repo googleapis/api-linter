@@ -17,7 +17,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestIsCreateMethod(t *testing.T) {
@@ -34,7 +34,7 @@ func TestIsCreateMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -61,7 +61,7 @@ func TestIsCreateMethod(t *testing.T) {
 					Book book = 2;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got := IsCreateMethod(method)
 			if got != test.want {
 				t.Errorf("IsCreateMethod got %v, want %v", got, test.want)
@@ -84,7 +84,7 @@ func TestIsUpdateMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -107,7 +107,7 @@ func TestIsUpdateMethod(t *testing.T) {
 					google.protobuf.FieldMask update_mask = 2;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got := IsUpdateMethod(method)
 			if got != test.want {
 				t.Errorf("IsUpdateMethod got %v, want %v", got, test.want)
@@ -133,7 +133,7 @@ func TestIsListMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -184,7 +184,7 @@ func TestIsListMethod(t *testing.T) {
 					string next_page_token = 2;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got := IsListMethod(method)
 			if got != test.want {
 				t.Errorf("IsListMethod got %v, want %v", got, test.want)
@@ -214,7 +214,7 @@ func TestIsLegacyListRevisionsMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/annotations.proto";
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
@@ -255,7 +255,7 @@ func TestIsLegacyListRevisionsMethod(t *testing.T) {
 					string next_page_token = 2;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got := IsLegacyListRevisionsMethod(method)
 			if got != test.want {
 				t.Errorf("IsLegacyListRevisionsMethod got %v, want %v", got, test.want)
@@ -278,7 +278,7 @@ func TestGetListResourceMessage(t *testing.T) {
 		`, ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -307,11 +307,11 @@ func TestGetListResourceMessage(t *testing.T) {
 					string next_page_token = 2;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			message := GetListResourceMessage(method)
 			got := ""
 			if message != nil {
-				got = message.GetName()
+				got = string(message.Name())
 			}
 			if got != test.want {
 				t.Errorf("GetListResourceMessage got %q, want %q", got, test.want)
@@ -364,7 +364,7 @@ func TestIsStandardMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				service Foo {
 					{{.RPCs}}
 				}
@@ -374,7 +374,7 @@ func TestIsStandardMethod(t *testing.T) {
 				// check the naming of the rpc against a regex
 				message Book {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			gotIsStandard := IsStandardMethod(method)
 			gotIsCustom := IsCustomMethod(method)
 			if gotIsStandard != test.wantIsStandard {
@@ -392,7 +392,7 @@ func TestIsRevisionMethod(t *testing.T) {
 		name       string
 		MethodName string
 		want       bool
-		is         func(m *desc.MethodDescriptor) bool
+		is         func(m protoreflect.MethodDescriptor) bool
 	}{
 		{
 			"IsRollbackRevisionMethod",
@@ -426,7 +426,7 @@ func TestIsRevisionMethod(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				service Foo {
 					rpc {{.MethodName}}(Book) returns (Book);
 				}
@@ -436,7 +436,7 @@ func TestIsRevisionMethod(t *testing.T) {
 				// check the naming of the rpc against a regex
 				message Book {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got := test.is(method)
 
 			if got != test.want {
@@ -479,7 +479,7 @@ func TestExtractRevisionResource(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				service Foo {
 					rpc {{.MethodName}}(Book) returns (Book);
 				}
@@ -489,7 +489,7 @@ func TestExtractRevisionResource(t *testing.T) {
 				// check the naming of the rpc against a regex
 				message Book {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			got, _ := ExtractRevisionResource(method)
 
 			if got != test.want {
@@ -498,3 +498,4 @@ func TestExtractRevisionResource(t *testing.T) {
 		})
 	}
 }
+

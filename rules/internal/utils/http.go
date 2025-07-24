@@ -17,16 +17,15 @@ package utils
 import (
 	"regexp"
 
-	"github.com/jhump/protoreflect/desc"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // HasHTTPRules returns true when the given method descriptor is annotated with
 // a google.api.http option.
-func HasHTTPRules(m *desc.MethodDescriptor) bool {
-	got := proto.GetExtension(m.GetMethodOptions(), apb.E_Http).(*apb.HttpRule)
-	return got != nil
+func HasHTTPRules(m protoreflect.MethodDescriptor) bool {
+	return proto.HasExtension(m.Options(), annotations.E_Http)
 }
 
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
@@ -35,15 +34,15 @@ func HasHTTPRules(m *desc.MethodDescriptor) bool {
 // and then flattens the values in `additional_bindings`.
 // This allows rule authors to simply range over all of the HTTP rules,
 // since the common case is to want to apply the checks to all of them.
-func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
+func GetHTTPRules(m protoreflect.MethodDescriptor) []*HTTPRule {
 	rules := []*HTTPRule{}
 
 	// Get the method options.
-	opts := m.GetMethodOptions()
+	opts := m.Options()
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if x := proto.GetExtension(opts, apb.E_Http); x != nil {
-		httpRule := x.(*apb.HttpRule)
+	if x := proto.GetExtension(opts, annotations.E_Http); x != nil {
+		httpRule := x.(*annotations.HttpRule)
 		if parsedRule := parseRule(httpRule); parsedRule != nil {
 			rules = append(rules, parsedRule)
 
@@ -58,7 +57,7 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
 	return rules
 }
 
-func parseRule(rule *apb.HttpRule) *HTTPRule {
+func parseRule(rule *annotations.HttpRule) *HTTPRule {
 	oneof := map[string]string{
 		"GET":    rule.GetGet(),
 		"POST":   rule.GetPost(),
@@ -82,7 +81,7 @@ func parseRule(rule *apb.HttpRule) *HTTPRule {
 	return nil
 }
 
-// HTTPRule defines a parsed, easier-to-query equivalent to `apb.HttpRule`.
+// HTTPRule defines a parsed, easier-to-query equivalent to `annotations.HttpRule`.
 type HTTPRule struct {
 	// The HTTP method. Guaranteed to be in all caps.
 	// This is set to "CUSTOM" if the Custom property is set.

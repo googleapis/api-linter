@@ -18,25 +18,25 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetResourceSingular(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		resource *apb.ResourceDescriptor
+		resource *annotations.ResourceDescriptor
 		want     string
 	}{
 		{
 			name: "SingularSpecified",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Singular: "bookShelf",
 			},
 			want: "bookShelf",
 		},
 		{
 			name: "SingularAndTypeSpecified",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Singular: "bookShelf",
 				// NOTE: this is not a correct resource annotation.
 				// it must match singular.
@@ -46,14 +46,14 @@ func TestGetResourceSingular(t *testing.T) {
 		},
 		{
 			name: "TypeSpecified",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type: "library.googleapis.com/bookShelf",
 			},
 			want: "bookShelf",
 		},
 		{
 			name:     "NothingSpecified",
-			resource: &apb.ResourceDescriptor{},
+			resource: &annotations.ResourceDescriptor{},
 			want:     "",
 		},
 		{
@@ -74,19 +74,19 @@ func TestGetResourceSingular(t *testing.T) {
 func TestGetResourcePlural(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		resource *apb.ResourceDescriptor
+		resource *annotations.ResourceDescriptor
 		want     string
 	}{
 		{
 			name: "PluralSpecified",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Plural: "bookShelves",
 			},
 			want: "bookShelves",
 		},
 		{
 			name:     "NothingSpecified",
-			resource: &apb.ResourceDescriptor{},
+			resource: &annotations.ResourceDescriptor{},
 			want:     "",
 		},
 		{
@@ -127,14 +127,14 @@ func TestIsResourceRevision(t *testing.T) {
 			want:     false,
 		},
 	} {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.Compile(t, `
 			import "google/api/resource.proto";
 			message {{.Message}} {
 				{{.Resource}}
 				string name = 1;
 			}
 		`, test)
-		m := f.FindMessage(test.Message)
+		m := f.Messages().Get(0)
 		if got := IsResourceRevision(m); got != test.want {
 			t.Errorf("IsResourceRevision(%+v): got %v, want %v", m, got, test.want)
 		}
@@ -173,8 +173,8 @@ func TestIsRevisionRelationship(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			a := &apb.ResourceDescriptor{Type: test.typeA}
-			b := &apb.ResourceDescriptor{Type: test.typeB}
+			a := &annotations.ResourceDescriptor{Type: test.typeA}
+			b := &annotations.ResourceDescriptor{Type: test.typeB}
 			if got := IsRevisionRelationship(a, b); got != test.want {
 				t.Errorf("IsRevisionRelationship(%s, %s): got %v, want %v", test.typeA, test.typeB, got, test.want)
 			}
@@ -210,9 +210,9 @@ func TestHasParent(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			var in *apb.ResourceDescriptor
+			var in *annotations.ResourceDescriptor
 			if test.pattern != "" {
-				in = &apb.ResourceDescriptor{Pattern: []string{test.pattern}}
+				in = &annotations.ResourceDescriptor{Pattern: []string{test.pattern}}
 			}
 			if got := HasParent(in); got != test.want {
 				t.Errorf("HasParent(%s): got %v, want %v", test.pattern, got, test.want)
@@ -220,3 +220,4 @@ func TestHasParent(t *testing.T) {
 		})
 	}
 }
+

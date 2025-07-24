@@ -20,13 +20,13 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestGetHTTPRules(t *testing.T) {
 	for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
 		t.Run(method, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
@@ -43,7 +43,7 @@ func TestGetHTTPRules(t *testing.T) {
 			`, struct{ M string }{M: strings.ToLower(method)})
 
 			// Get the rules.
-			resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0])
+			resp := GetHTTPRules(file.Services().Get(0).Methods().Get(0))
 
 			// Establish that we get back both HTTP rules, in order.
 			if got, want := resp[0].URI, "/v1/publishers/*/books/*"; got != want {
@@ -62,28 +62,28 @@ func TestGetHTTPRules(t *testing.T) {
 }
 
 func TestGetHTTPRulesEmpty(t *testing.T) {
-	file := testutils.ParseProto3String(t, `
+	file := testutils.Compile(t, `
 		import "google/api/annotations.proto";
 		service Library {
 			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse);
 		}
 		message FrobBookRequest {}
 		message FrobBookResponse {}
-	`)
-	if resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0]); len(resp) > 0 {
+	`, nil)
+	if resp := GetHTTPRules(file.Services().Get(0).Methods().Get(0)); len(resp) > 0 {
 		t.Errorf("Got %v; expected no rules.", resp)
 	}
 }
 
 func TestParseRuleEmpty(t *testing.T) {
-	http := &apb.HttpRule{}
+	http := &annotations.HttpRule{}
 	if got := parseRule(http); got != nil {
 		t.Errorf("Got %v, expected nil.", got)
 	}
 }
 
 func TestGetHTTPRulesCustom(t *testing.T) {
-	file := testutils.ParseProto3String(t, `
+	file := testutils.Compile(t, `
 		import "google/api/annotations.proto";
 		service Library {
 			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
@@ -97,8 +97,8 @@ func TestGetHTTPRulesCustom(t *testing.T) {
 		}
 		message FrobBookRequest {}
 		message FrobBookResponse {}
-	`)
-	rule := GetHTTPRules(file.GetServices()[0].GetMethods()[0])[0]
+	`, nil)
+	rule := GetHTTPRules(file.Services().Get(0).Methods().Get(0))[0]
 	if got, want := rule.Method, "HEAD"; got != want {
 		t.Errorf("Got %q; expected %q.", got, want)
 	}
@@ -158,9 +158,9 @@ func TestHasHTTPRules(t *testing.T) {
 		{"no_rule", ""},
 	} {
 		t.Run(tst.name, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			file := testutils.Compile(t, `
 				import "google/api/annotations.proto";
-					
+
 				service Foo {
 					rpc ListFoos (ListFoosRequest) returns (ListFoosResponse) {
 						{{ .Annotation }}
@@ -172,7 +172,7 @@ func TestHasHTTPRules(t *testing.T) {
 			`, tst)
 			want := tst.Annotation != ""
 
-			got := HasHTTPRules(file.GetServices()[0].GetMethods()[0])
+			got := HasHTTPRules(file.Services().Get(0).Methods().Get(0))
 
 			if got != want {
 				t.Errorf("Got %v, expected %v", got, want)
