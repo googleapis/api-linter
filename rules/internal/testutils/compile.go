@@ -20,6 +20,15 @@ import (
 
 	"github.com/bufbuild/protocompile"
 	"github.com/bufbuild/protocompile/linker"
+	"github.com/jhump/protoreflect/desc"
+
+	// These imports are for populating the global registry
+	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
+	_ "google.golang.org/genproto/googleapis/api/httpbody"
+	_ "google.golang.org/genproto/googleapis/type/date"
+	_ "google.golang.org/genproto/googleapis/type/datetime"
+	_ "google.golang.org/genproto/googleapis/type/timeofday"
 )
 
 var background = context.Background()
@@ -33,23 +42,25 @@ func Compile(t *testing.T, template string, data any) linker.File {
 			"test.proto": "syntax = \"proto3\";\n" + content,
 		}),
 	}
-	// TODO: this is a temp measurement. this requires linking the googleapis locally
-	// and  it also requires depending on them. We might want to figure out a better
-	// approach. maybe we could add it as a git submodule
-	// Create a resolver for googleapis (used for standard API imports).
-	// This assumes the `googleapis` directory exists relative to the project root.
-	googleApisResolver := &protocompile.SourceResolver{
-		ImportPaths: []string{"googleapis"},
-	}
+
+	// Create a custom resolver to ensure that we read from the global registry
+	// which allows us to get the googleapis for our tests
+	registryResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
+		fd, err := desc.LoadFileDescriptor(path)
+		if err != nil {
+			return protocompile.SearchResult{}, err
+		}
+		return protocompile.SearchResult{Proto: fd.AsFileDescriptorProto()}, nil
+	})
 
 	compiler := protocompile.Compiler{
-		// Combine the in-memory resolver with the googleapis resolver.
+		// Combine the in-memory resolver with the resolver for the global registry.
 		// protocompile.WithStandardImports ensures that well-known types are also
 		// resolved correctly.
 		Resolver: protocompile.WithStandardImports(
 			protocompile.CompositeResolver{
 				memResolver,
-				googleApisResolver,
+				registryResolver,
 			},
 		),
 	}
