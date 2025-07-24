@@ -32,13 +32,13 @@ type resourceDef struct {
 }
 
 func (d *resourceDef) String() string {
-	switch d.desc.(type) {
+	switch desc := d.desc.(type) {
 	case protoreflect.FileDescriptor:
-		return fmt.Sprintf("`google.api.resource_definition` %d in file `%s`", d.idx, d.desc.FullName())
+		return fmt.Sprintf("`google.api.resource_definition` %d in file `%s`", d.idx, desc.Path())
 	case protoreflect.MessageDescriptor:
-		return fmt.Sprintf("message `%s`", d.desc.FullName())
+		return fmt.Sprintf("message `%s`", desc.FullName())
 	default:
-		return fmt.Sprintf("unexpected descriptor type %T", d.desc)
+		return fmt.Sprintf("unexpected descriptor type %T", desc)
 	}
 }
 

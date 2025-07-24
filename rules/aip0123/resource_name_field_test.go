@@ -30,7 +30,7 @@ func TestResourceNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"ValidBothPresent", `option (google.api.resource) = { type: "foo" };`, `string name = 1;`, nil},
-		{"InvalidNoField", `option (google.api.resource) = { type: "foo" };`, ``, testutils.Problems{{Message: "`name`"}}},
+		{"InvalidNoField", `option (google.api.resource) = { type: "foo" };`, ``, testutils.Problems{{Message: `Message "Book" has no "name" field.`}}},
 		{"InvalidTypeNotString", `option (google.api.resource) = { type: "foo" };`, `int32 name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidTypeRepeated", `option (google.api.resource) = { type: "foo" };`, `repeated string name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantNoAnnotation", ``, ``, nil},
