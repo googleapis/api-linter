@@ -19,18 +19,18 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var nesting = &lint.EnumRule{
 	Name: lint.NewRuleName(216, "nesting"),
-	OnlyIf: func(e *desc.EnumDescriptor) bool {
-		return strings.HasSuffix(e.GetName(), "State") && e.GetName() != "State"
+	OnlyIf: func(e protoreflect.EnumDescriptor) bool {
+		return strings.HasSuffix(e.Name(), "State") && e.Name() != "State"
 	},
-	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		messageName := strings.TrimSuffix(e.GetName(), "State")
+	LintEnum: func(e protoreflect.EnumDescriptor) []lint.Problem {
+		messageName := strings.TrimSuffix(e.Name(), "State")
 		fqMessageName := messageName
-		file := e.GetFile()
+		file := e.ParentFile()
 		if pkg := file.GetPackage(); pkg != "" {
 			fqMessageName = pkg + "." + messageName
 		}
@@ -38,7 +38,7 @@ var nesting = &lint.EnumRule{
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Nest %q within %q, and name it `State`.",
-					e.GetName(),
+					e.Name(),
 					messageName,
 				),
 				Descriptor: e,

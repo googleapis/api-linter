@@ -20,7 +20,7 @@ import (
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -29,7 +29,7 @@ import (
 var namesField = &lint.MessageRule{
 	Name:   lint.NewRuleName(231, "request-names-field"),
 	OnlyIf: isBatchGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
 		names := m.FindFieldByName("names")
 		getReqMsg := m.FindFieldByName("requests")
@@ -37,7 +37,7 @@ var namesField = &lint.MessageRule{
 		// Rule check: Ensure that the names field is present.
 		if names == nil && getReqMsg == nil {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.GetName()),
+				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.Name()),
 				Descriptor: m,
 			})
 		}
@@ -45,7 +45,7 @@ var namesField = &lint.MessageRule{
 		// Rule check: Ensure that only the suggested names field is present.
 		if names != nil && getReqMsg != nil {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.GetName()),
+				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.Name()),
 				Descriptor: getReqMsg,
 			})
 		}
@@ -79,11 +79,11 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard get request message field is the
-		// correct type. Note: Use m.GetName()[8:len(m.GetName())-7]) to retrieve
+		// correct type. Note: Use m.Name()[8:len(m.Name())-7]) to retrieve
 		// the resource name from the batch get request, for example:
 		// "BatchGetBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.GetName()[8:len(m.GetName())-7]))
-		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().GetName() != rightTypeName) {
+		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.Name()[8:len(m.Name())-7]))
+		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().Name() != rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
 				Descriptor: getReqMsg,

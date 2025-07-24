@@ -20,7 +20,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -73,8 +73,8 @@ var (
 )
 
 // Returns true if this is an AIP-162 Tag Revision request message, false otherwise.
-func isTagRevisionRequestMessage(m *desc.MessageDescriptor) bool {
-	return tagRevisionReqMessageRegexp.MatchString(m.GetName())
+func isTagRevisionRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return tagRevisionReqMessageRegexp.MatchString(m.Name())
 }
 
 var (
@@ -83,8 +83,8 @@ var (
 )
 
 // Returns true if this is an AIP-162 Commit request message, false otherwise.
-func isCommitRequestMessage(m *desc.MessageDescriptor) bool {
-	return commitReqMessageRegexp.MatchString(m.GetName())
+func isCommitRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return commitReqMessageRegexp.MatchString(m.Name())
 }
 
 var (
@@ -93,8 +93,8 @@ var (
 )
 
 // Returns true if this is an AIP-162 Rollback request message, false otherwise.
-func isRollbackRequestMessage(m *desc.MessageDescriptor) bool {
-	return rollbackReqMessageRegexp.MatchString(m.GetName())
+func isRollbackRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return rollbackReqMessageRegexp.MatchString(m.Name())
 }
 
 var (
@@ -103,15 +103,15 @@ var (
 )
 
 // Returns true if this is an AIP-162 Delete Revision request message, false otherwise.
-func isDeleteRevisionRequestMessage(m *desc.MessageDescriptor) bool {
-	return deleteRevisionReqMessageRegexp.MatchString(m.GetName())
+func isDeleteRevisionRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return deleteRevisionReqMessageRegexp.MatchString(m.Name())
 }
 
 // IsListRevisionsRequestMessage returns true if this is an AIP-162 List
 // Revisions request message, false otherwise.
 //
 // Deprecated: Use the same method from the utils package instead.
-func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
+func IsListRevisionsRequestMessage(m protoreflect.MessageDescriptor) bool {
 	return utils.IsListRevisionsRequestMessage(m)
 }
 
@@ -119,6 +119,6 @@ func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
 // Revisions response message, false otherwise.
 //
 // Deprecated: Use the same method from the utils package instead.
-func IsListRevisionsResponseMessage(m *desc.MessageDescriptor) bool {
+func IsListRevisionsResponseMessage(m protoreflect.MessageDescriptor) bool {
 	return utils.IsListRevisionsResponseMessage(m)
 }

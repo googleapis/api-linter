@@ -21,7 +21,7 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -29,7 +29,7 @@ import (
 var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "request-required-fields"),
 	OnlyIf: utils.IsCreateMethodWithResolvedReturnType,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)
 		if ot == nil {
 			return nil
@@ -44,20 +44,20 @@ var requestRequiredFields = &lint.MethodRule{
 		)
 
 		problems := []lint.Problem{}
-		for _, f := range m.GetInputType().GetFields() {
+		for _, f := range m.Input().Fields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// Skip the check with the field that is the resource, which for
 			// Standard Create, is the output type.
-			if t := f.GetMessageType(); t != nil && t.GetName() == ot.GetName() {
+			if t := f.GetMessageType(); t != nil && t.Name() == ot.Name() {
 				continue
 			}
 			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
-			if !allowedRequiredFields.Contains(string(f.GetName())) {
+			if !allowedRequiredFields.Contains(string(f.Name())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.Name()),
 					Descriptor: f,
 				})
 			}

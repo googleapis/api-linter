@@ -17,14 +17,14 @@ package aip0132
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // List methods should have a parent variable if the request has a parent field.
 var httpURIParent = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "http-uri-parent"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return utils.IsListMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
+		return utils.IsListMethod(m) && m.Input().FindFieldByName("parent") != nil
 	},
 	LintMethod: utils.LintHTTPURIHasParentVariable,
 }

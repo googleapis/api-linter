@@ -20,16 +20,16 @@ import (
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var pluralMethodResourceName = &lint.MethodRule{
 	Name:   lint.NewRuleName(231, "plural-method-name"),
 	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		// Note: m.GetName()[8:] is used to retrieve the resource name from the
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		// Note: m.Name()[8:] is used to retrieve the resource name from the
 		// method name. For example, "BatchGetFoos" -> "Foos"
-		pluralMethodResourceName := m.GetName()[8:]
+		pluralMethodResourceName := m.Name()[8:]
 
 		pluralize := pluralize.NewClient()
 
@@ -38,7 +38,7 @@ var pluralMethodResourceName = &lint.MethodRule{
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					`The resource part in method %q should not be %q, but should be its plural form %q`,
-					m.GetName(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
+					m.Name(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
 				),
 				Descriptor: m,
 				Location:   locations.DescriptorName(m),

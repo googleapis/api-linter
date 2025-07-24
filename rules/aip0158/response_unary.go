@@ -17,13 +17,13 @@ package aip0158
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responseUnary = &lint.MethodRule{
 	Name:   lint.NewRuleName(158, "response-unary"),
 	OnlyIf: isPaginatedMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		if m.IsServerStreaming() {
 			return []lint.Problem{{
 				Message:    "Paginated responses must be unary, not streaming.",

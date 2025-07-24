@@ -19,16 +19,16 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestNameRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-name-required"),
 	OnlyIf: utils.IsDeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("name") == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Method %q has no `name` field", m.GetName()),
+				Message:    fmt.Sprintf("Method %q has no `name` field", m.Name()),
 				Descriptor: m,
 			}}
 		}

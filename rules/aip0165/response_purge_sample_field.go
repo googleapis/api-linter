@@ -19,7 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -27,12 +27,12 @@ import (
 var responsePurgeSampleField = &lint.MessageRule{
 	Name:   lint.NewRuleName(165, "response-purge-sample-field"),
 	OnlyIf: isPurgeResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `purge_sample` field is present.
 		field := m.FindFieldByName("purge_sample")
 		if field == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `purge_sample` field.", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `purge_sample` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}

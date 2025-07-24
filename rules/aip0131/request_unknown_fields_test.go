@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 	fpb "google.golang.org/genproto/protobuf/field_mask"
 )
@@ -62,7 +62,7 @@ func TestUnknownFields(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
-			gotProblems := unknownFields.Lint(message.GetFile())
+			gotProblems := unknownFields.Lint(message.ParentFile())
 			if diff := wantProblems.Diff(gotProblems); diff != "" {
 				t.Error(diff)
 			}

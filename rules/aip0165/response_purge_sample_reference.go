@@ -17,13 +17,13 @@ package aip0165
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responsePurgeSampleReference = &lint.FieldRule{
 	Name: lint.NewRuleName(165, "response-purge-sample-reference"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isPurgeResponseMessage(f.GetOwner()) && f.GetName() == "purge_sample"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isPurgeResponseMessage(f.GetOwner()) && f.Name() == "purge_sample"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

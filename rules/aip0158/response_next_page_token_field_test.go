@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -34,7 +34,7 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 		messageName   string
 		messageFields []field
 		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
+		problemDesc   func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Valid",
@@ -55,7 +55,7 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 			"ListFooResponse",
 			[]field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}},
 			testutils.Problems{{Suggestion: "string"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("next_page_token")
 			},
 		},
@@ -79,13 +79,13 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 			}
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = message
+			var problemDesc protoreflect.Descriptor = message
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(message)
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := responsePaginationNextPageToken.Lint(message.GetFile())
+			problems := responsePaginationNextPageToken.Lint(message.ParentFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

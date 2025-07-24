@@ -21,14 +21,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/data"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var noPrepositions = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "prepositions"),
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
-		for _, word := range strings.Split(strcase.SnakeCase(m.GetName()), "_") {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
+		for _, word := range strings.Split(strcase.SnakeCase(m.Name()), "_") {
 			if data.Prepositions.Contains(word) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Method names should not include prepositions (%q).", word),

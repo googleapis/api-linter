@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -31,7 +31,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 		messageFields []field
 		isOneof       bool
 		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
+		problemDesc   func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Valid",
@@ -55,7 +55,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			[]field{{"page_token", builder.FieldTypeDouble()}},
 			false,
 			testutils.Problems{{Suggestion: "string"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("page_token")
 			},
 		},
@@ -73,7 +73,7 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			[]field{{"page_token", builder.FieldTypeString()}},
 			/* isOneof */ true,
 			testutils.Problems{{Message: "oneof"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("page_token")
 			},
 		},
@@ -100,13 +100,13 @@ func TestRequestPaginationPageToken(t *testing.T) {
 			}
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = message
+			var problemDesc protoreflect.Descriptor = message
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(message)
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageToken.Lint(message.GetFile())
+			problems := requestPaginationPageToken.Lint(message.ParentFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

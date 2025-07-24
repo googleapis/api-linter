@@ -19,7 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -27,12 +27,12 @@ import (
 var requestForceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(165, "request-force-field"),
 	OnlyIf: isPurgeRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `force` field is present.
 		forceField := m.FindFieldByName("force")
 		if forceField == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `force` field.", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `force` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}

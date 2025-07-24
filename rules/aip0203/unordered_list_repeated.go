@@ -17,15 +17,15 @@ package aip0203
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var unorderedListRepeated = &lint.FieldRule{
 	Name: lint.NewRuleName(203, "unordered-list-repeated"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return utils.GetFieldBehavior(f).Contains("UNORDERED_LIST")
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if f.IsRepeated() {
 			return nil
 		}

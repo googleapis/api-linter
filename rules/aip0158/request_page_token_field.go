@@ -17,13 +17,13 @@ package aip0158
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestPaginationPageToken = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-token-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f, problems := utils.LintFieldPresent(m, "page_token")
 		if len(problems) > 0 {
 			return problems

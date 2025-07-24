@@ -21,13 +21,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // absoluteLinks ensures that a descriptor has only absolute links.
 var absoluteLinks = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "absolute-links"),
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
 		comment := strings.Join(
 			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
 			"\n",

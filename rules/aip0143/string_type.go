@@ -21,27 +21,27 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(143, "string-type"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return stringset.New(
 			"country_code",
 			"currency_code",
 			"language_code",
 			"mime_type",
 			"time_zone",
-		).Contains(f.GetName())
+		).Contains(f.Name())
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if typeName := utils.GetTypeName(f); typeName != "string" {
-			if f.GetName() == "time_zone" && typeName == "google.type.TimeZone" {
+			if f.Name() == "time_zone" && typeName == "google.type.TimeZone" {
 				return nil
 			}
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Field %q should be a string, not %s.", f.GetName(), typeName),
+				Message:    fmt.Sprintf("Field %q should be a string, not %s.", f.Name(), typeName),
 				Suggestion: "string",
 				Descriptor: f,
 				Location:   locations.FieldType(f),

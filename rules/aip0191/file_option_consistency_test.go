@@ -21,7 +21,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/proto"
@@ -112,7 +112,7 @@ type consistencyTest struct {
 	options map[string]string
 }
 
-func (ct *consistencyTest) getProblems(f *desc.FileDescriptor) testutils.Problems {
+func (ct *consistencyTest) getProblems(f protoreflect.FileDescriptor) testutils.Problems {
 	p := testutils.Problems{}
 	for k := range ct.options {
 		p = append(p, lint.Problem{Message: k, Descriptor: f})

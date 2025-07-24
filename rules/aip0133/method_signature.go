@@ -22,14 +22,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "method-signature"),
 	OnlyIf: utils.IsCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 
 		// Determine what signature we want.
@@ -37,16 +37,16 @@ var methodSignature = &lint.MethodRule{
 		if utils.HasParent(utils.GetResource(utils.GetResponseType(m))) {
 			want = append(want, "parent")
 		}
-		for _, f := range m.GetInputType().GetFields() {
+		for _, f := range m.Input().Fields() {
 			if mt := f.GetMessageType(); mt != nil && utils.IsResource(mt) {
-				want = append(want, f.GetName())
+				want = append(want, f.Name())
 				break
 			}
 		}
 		// The {resource}_id is desired if and only if the field exists on the
 		// request.
 		expectedResourceIDField := strcase.SnakeCase(utils.GetResourceMessageName(m, "Create"))
-		if idField := expectedResourceIDField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
+		if idField := expectedResourceIDField + "_id"; m.Input().FindFieldByName(idField) != nil {
 			want = append(want, idField)
 		}
 

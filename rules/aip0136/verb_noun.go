@@ -19,18 +19,18 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var verbNoun = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "verb-noun"),
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// We can not detect this precisely without a full dictionary (probably
 		// not worth it), but we can catch some common mistakes.
 
 		// Are there at least two words?
-		if wordCount := len(strings.Split(strcase.SnakeCase(m.GetName()), "_")); wordCount == 1 {
+		if wordCount := len(strings.Split(strcase.SnakeCase(m.Name()), "_")); wordCount == 1 {
 			return []lint.Problem{{
 				Message:    "Custom methods should be named using a verb followed by a noun.",
 				Descriptor: m,

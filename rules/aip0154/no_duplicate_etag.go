@@ -18,23 +18,23 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noDuplicateEtag = &lint.FieldRule{
 	Name: lint.NewRuleName(154, "no-duplicate-etag"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "etag" && strings.HasSuffix(f.GetOwner().GetName(), "Request")
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return f.Name() == "etag" && strings.HasSuffix(f.GetOwner().Name(), "Request")
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		for _, otherField := range f.GetOwner().GetFields() {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		for _, otherField := range f.GetOwner().Fields() {
 			if m := otherField.GetMessageType(); m != nil {
 				// if strings.Contains("UpdateBookRequest", "Book")
 				//
 				// If this is a random, unrelated (not the resource) message, we want to ignore it.
 				// Ditto for *other* resources, which could be relevant for custom methods,
 				// which is why we do a string check and not a google.api.resource check.
-				if strings.Contains(f.GetOwner().GetName(), m.GetName()) && m.FindFieldByName("etag") != nil {
+				if strings.Contains(f.GetOwner().Name(), m.Name()) && m.FindFieldByName("etag") != nil {
 					return []lint.Problem{{
 						Message:    "Request messages that include the resource should omit etag.",
 						Descriptor: f,

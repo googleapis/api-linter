@@ -20,19 +20,19 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 // The Batch Update request message should have parent field.
 var requestParentField = &lint.MessageRule{
 	Name: lint.NewRuleName(234, "request-parent-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// In order to parse out the pattern, we get the resource message
 		// from the response, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
-		plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "BatchUpdate")
-		if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("BatchUpdate%sResponse", plural)); resp != nil {
+		plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "BatchUpdate")
+		if resp := utils.FindMessage(m.ParentFile(), fmt.Sprintf("BatchUpdate%sResponse", plural)); resp != nil {
 			if resField := resp.FindFieldByName(strcase.SnakeCase(plural)); resField != nil {
 				if !utils.HasParent(utils.GetResource(resField.GetMessageType())) {
 					return false

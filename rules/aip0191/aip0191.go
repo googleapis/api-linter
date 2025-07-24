@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-191 rules to the provided registry.
@@ -41,7 +41,7 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func hasPackage(f *desc.FileDescriptor) bool {
+func hasPackage(f protoreflect.FileDescriptor) bool {
 	return f.GetPackage() != ""
 }
 

@@ -18,14 +18,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Commit methods should have a proper HTTP pattern.
 var commitHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "commit-http-uri-suffix"),
 	OnlyIf: utils.IsCommitRevisionMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !commitURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{

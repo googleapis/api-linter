@@ -19,13 +19,13 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldNames = &lint.FieldRule{
 	Name:   lint.NewRuleName(142, "time-field-names"),
 	OnlyIf: isTimestamp,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{
 			"created":  "create_time",
@@ -36,7 +36,7 @@ var fieldNames = &lint.FieldRule{
 			"purged":   "purge_time",
 		}
 		for got, want := range mistakes {
-			if strings.Contains(f.GetName(), got) {
+			if strings.Contains(f.Name(), got) {
 				return []lint.Problem{{
 					Message:    "Use the imperative mood and a `_time` suffix for timestamps.",
 					Descriptor: f,
@@ -47,14 +47,14 @@ var fieldNames = &lint.FieldRule{
 		}
 
 		// Look for timestamps that do not end in `_time` or, if repeated, `_times`.
-		if !strings.HasSuffix(f.GetName(), "_time") {
+		if !strings.HasSuffix(f.Name(), "_time") {
 			if !f.IsRepeated() {
 				return []lint.Problem{{
 					Message:    "Timestamp fields should end in `_time`.",
 					Descriptor: f,
 					Location:   locations.DescriptorName(f),
 				}}
-			} else if !strings.HasSuffix(f.GetName(), "_times") {
+			} else if !strings.HasSuffix(f.Name(), "_times") {
 				return []lint.Problem{{
 					Message:    "Repeated Timestamp fields should end in `_time` or `_times`.",
 					Descriptor: f,

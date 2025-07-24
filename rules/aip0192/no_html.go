@@ -19,15 +19,15 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noHTML = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "no-html"),
-	OnlyIf: func(d desc.Descriptor) bool {
+	OnlyIf: func(d protoreflect.Descriptor) bool {
 		return d.GetSourceInfo() != nil
 	},
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
 		for _, comment := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
 			if htmlTag.MatchString(comment) {
 				return []lint.Problem{{

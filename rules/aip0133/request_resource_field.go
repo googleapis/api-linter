@@ -20,7 +20,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -28,15 +28,15 @@ import (
 var resourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-resource-field"),
 	OnlyIf: utils.IsCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// The rule (resource field name must map to the POST body) is
 		// checked by AIP-0133 ("core::0133::http-body")
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
+		for _, fieldDesc := range m.Fields() {
+			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
 				// Rule check: Is the field named properly?
-				if want := strcase.SnakeCase(resourceMsgName); fieldDesc.GetName() != want {
+				if want := strcase.SnakeCase(resourceMsgName); fieldDesc.Name() != want {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("Resource field should be named %q.", want),
 						Descriptor: fieldDesc,
@@ -50,7 +50,7 @@ var resourceField = &lint.MessageRule{
 
 		// Rule check: Establish that a resource field must be included.
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
+			Message:    fmt.Sprintf("Message %q has no %q type field", m.Name(), resourceMsgName),
 			Descriptor: m,
 		}}
 	},

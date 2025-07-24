@@ -143,7 +143,7 @@ func TestForeignTypeReference(t *testing.T) {
 				`,
 			}, tc)
 			file := files["calling.proto"]
-			field := file.GetMessageTypes()[0].GetFields()[1]
+			field := file.Messages()[0].Fields()[1]
 			if diff := tc.problems.SetDescriptor(field).Diff(foreignTypeReference.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

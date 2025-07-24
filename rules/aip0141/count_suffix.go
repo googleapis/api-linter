@@ -20,13 +20,13 @@ import (
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var count = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "count-suffix"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if n := f.GetName(); strings.HasPrefix(n, "num_") {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if n := f.Name(); strings.HasPrefix(n, "num_") {
 			want := pluralize.NewClient().Singular(n[4:]) + "_count"
 			return []lint.Problem{{
 				Message:    "Quantities: Use a _count suffix, not a num_ prefix.",

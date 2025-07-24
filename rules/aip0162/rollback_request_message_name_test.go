@@ -42,7 +42,7 @@ func TestRollbackRequestMessageName(t *testing.T) {
 				message Book {}
 				message {{.ReqMessageName}} {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(rollbackRequestMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

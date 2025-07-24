@@ -20,13 +20,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var tagRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "tag-revision-response-message-name"),
 	OnlyIf: utils.IsTagRevisionMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `TagBookRevision`, the response
 		// message is `Book`.
 		want, ok := utils.ExtractRevisionResource(m)
@@ -37,7 +37,7 @@ var tagRevisionResponseMessageName = &lint.MethodRule{
 		if response == nil {
 			return nil
 		}
-		got := response.GetName()
+		got := response.Name()
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 

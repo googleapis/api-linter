@@ -48,7 +48,7 @@ func TestDeleteRevisionHTTPURISuffix(t *testing.T) {
 				`, test)
 
 			problems := deleteRevisionHTTPURISuffix.Lint(file)
-			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Services()[0].Methods()[0]).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

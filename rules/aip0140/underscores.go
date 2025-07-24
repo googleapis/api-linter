@@ -20,13 +20,13 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var underscores = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "underscores"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		n := f.GetName()
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		n := f.Name()
 		if strings.HasPrefix(n, "_") || strings.HasSuffix(n, "_") || strings.Contains(n, "__") {
 			return []lint.Problem{{
 				Message:    "Field names must not begin or end with underscore, or have adjacent underscores.",

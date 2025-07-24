@@ -20,7 +20,7 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var minimumRequiredFieldBehavior = stringset.New(
@@ -34,10 +34,10 @@ var excusedResourceFields = stringset.New(
 
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		req := m.GetInputType()
-		p := m.GetFile().GetPackage()
-		ps := problems(req, p, map[desc.Descriptor]bool{})
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		req := m.Input()
+		p := m.ParentFile().GetPackage()
+		ps := problems(req, p, map[protoreflect.Descriptor]bool{})
 		if len(ps) == 0 {
 			return nil
 		}
@@ -46,23 +46,23 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	},
 }
 
-func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor]bool) []lint.Problem {
+func problems(m protoreflect.MessageDescriptor, pkg string, visited map[protoreflect.Descriptor]bool) []lint.Problem {
 	var ps []lint.Problem
 
 	// Ensure the input type, or recursively visited message, is part of the
 	// same package before linting.
-	if m.GetFile().GetPackage() != pkg {
+	if m.ParentFile().GetPackage() != pkg {
 		return nil
 	}
 
-	for _, f := range m.GetFields() {
+	for _, f := range m.Fields() {
 		// ignore the field if it was already visited
 		if ok := visited[f]; ok {
 			continue
 		}
 		visited[f] = true
 
-		if utils.IsResource(m) && excusedResourceFields.Contains(f.GetName()) {
+		if utils.IsResource(m) && excusedResourceFields.Contains(f.Name()) {
 			continue
 		}
 
@@ -82,12 +82,12 @@ func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor
 	return ps
 }
 
-func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
+func checkFieldBehavior(f protoreflect.FieldDescriptor) *lint.Problem {
 	fb := utils.GetFieldBehavior(f)
 
 	if len(fb) == 0 {
 		return &lint.Problem{
-			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
+			Message:    fmt.Sprintf("google.api.field_behavior annotation must be set on %q and contain one of, \"%v\"", f.Name(), minimumRequiredFieldBehavior),
 			Descriptor: f,
 		}
 	}
@@ -96,7 +96,7 @@ func checkFieldBehavior(f *desc.FieldDescriptor) *lint.Problem {
 		// check for at least one valid annotation
 		return &lint.Problem{
 			Message: fmt.Sprintf(
-				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.GetName(), minimumRequiredFieldBehavior),
+				"google.api.field_behavior on field %q must contain at least one, \"%v\"", f.Name(), minimumRequiredFieldBehavior),
 			Descriptor: f,
 		}
 	}

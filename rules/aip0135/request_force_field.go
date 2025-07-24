@@ -17,13 +17,13 @@ package aip0135
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestForceField = &lint.FieldRule{
 	Name: lint.NewRuleName(135, "request-force-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "force"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.Name() == "force"
 	},
 	LintField: utils.LintSingularBoolField,
 }

@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -36,6 +36,6 @@ func AddRules(r lint.RuleRegistry) error {
 var addRemoveMethodRegexp = regexp.MustCompile("^(?:Add|Remove)(?:[A-Z]|$)")
 
 // Returns true if this is an AIP-144 Add/Remove method, false otherwise.
-func isAddRemoveMethod(m *desc.MethodDescriptor) bool {
-	return addRemoveMethodRegexp.MatchString(m.GetName())
+func isAddRemoveMethod(m protoreflect.MethodDescriptor) bool {
+	return addRemoveMethodRegexp.MatchString(m.Name())
 }

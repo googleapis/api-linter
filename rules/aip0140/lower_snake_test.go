@@ -48,8 +48,8 @@ func TestLowerSnake(t *testing.T) {
 
 			// Run the lint rule and verify that we got the expected set
 			// of problems.
-			problems := lowerSnake.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(message.GetFields()[0]).Diff(problems); diff != "" {
+			problems := lowerSnake.Lint(message.ParentFile())
+			if diff := test.problems.SetDescriptor(message.Fields()[0]).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

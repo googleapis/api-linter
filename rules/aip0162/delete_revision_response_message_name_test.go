@@ -40,7 +40,7 @@ func TestDeleteRevisionResponseMessageName(t *testing.T) {
 				message {{.ResponseType}} {}
 			`, test)
 
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services()[0].Methods()[0]
 			problems := deleteRevisionResponseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -76,7 +76,7 @@ func TestDeleteRevisionResponseMessageNameLRO(t *testing.T) {
 				message OperationMetadata {}
 			`, test)
 
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services()[0].Methods()[0]
 			problems := deleteRevisionResponseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

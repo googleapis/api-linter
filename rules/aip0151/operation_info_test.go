@@ -47,7 +47,7 @@ func TestAnnotationExistsInvalid(t *testing.T) {
 		message WriteBookRequest {}
 	`)
 	want := testutils.Problems{{
-		Descriptor: f.GetServices()[0].GetMethods()[0],
+		Descriptor: f.Services()[0].Methods()[0],
 		Message:    "operation_info annotation",
 	}}
 	if diff := want.Diff(lroAnnotationExists.Lint(f)); diff != "" {

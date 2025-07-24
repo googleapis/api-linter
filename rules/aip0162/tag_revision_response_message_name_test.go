@@ -39,7 +39,7 @@ func TestTagRevisionResponseMessageName(t *testing.T) {
 				message TagBookRevisionRequest {}
 				message {{.ResponseType}} {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(tagRevisionResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -73,7 +73,7 @@ func TestTagRevisionResponseMessageNameLRO(t *testing.T) {
 				message {{.ResponseType}} {}
 				message OperationMetadata {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(tagRevisionResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

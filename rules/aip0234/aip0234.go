@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -50,16 +50,16 @@ var (
 )
 
 // Returns true if this is a AIP-234 Batch Update method, false otherwise.
-func isBatchUpdateMethod(m *desc.MethodDescriptor) bool {
-	return batchUpdateMethodRegexp.MatchString(m.GetName())
+func isBatchUpdateMethod(m protoreflect.MethodDescriptor) bool {
+	return batchUpdateMethodRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-234 Batch Update request message, false otherwise.
-func isBatchUpdateRequestMessage(m *desc.MessageDescriptor) bool {
-	return batchUpdateReqMessageRegexp.MatchString(m.GetName())
+func isBatchUpdateRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return batchUpdateReqMessageRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-234 Batch Update request message, false otherwise.
-func isBatchUpdateResponseMessage(m *desc.MessageDescriptor) bool {
-	return batchUpdateResMessageRegexp.MatchString(m.GetName())
+func isBatchUpdateResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return batchUpdateResMessageRegexp.MatchString(m.Name())
 }

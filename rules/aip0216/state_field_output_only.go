@@ -17,14 +17,14 @@ package aip0216
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"strings"
 )
 
 var stateFieldOutputOnly = &lint.FieldRule{
 	Name: lint.NewRuleName(216, "state-field-output-only"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		// We care about the name of the State enum type.
 		// AIP 0216 makes no mention of the state field name.
 		et := f.GetEnumType()
@@ -32,13 +32,13 @@ var stateFieldOutputOnly = &lint.FieldRule{
 			return false
 		}
 
-		if !strings.HasSuffix(et.GetName(), "State") {
+		if !strings.HasSuffix(et.Name(), "State") {
 			return false
 		}
 
 		return true
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)
 		if !behaviors.Contains(annotations.FieldBehavior_OUTPUT_ONLY.String()) {
 			return []lint.Problem{

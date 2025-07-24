@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequestRequestsField(t *testing.T) {
@@ -27,7 +27,7 @@ func TestRequestRequestsField(t *testing.T) {
 		testName    string
 		Field       string
 		problems    testutils.Problems
-		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			testName: "Valid",
@@ -43,7 +43,7 @@ func TestRequestRequestsField(t *testing.T) {
 			testName: "Invalid-RequestsFieldIsNotRepeated",
 			Field:    "CreateBookRequest requests = 1;",
 			problems: testutils.Problems{{Message: "repeated"}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("requests")
 			},
 		},
@@ -53,7 +53,7 @@ func TestRequestRequestsField(t *testing.T) {
 			problems: testutils.Problems{{
 				Suggestion: "CreateBookRequest",
 			}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("requests")
 			},
 		},
@@ -66,7 +66,7 @@ func TestRequestRequestsField(t *testing.T) {
 					Suggestion: "CreateBookRequest",
 				},
 			},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("requests")
 			},
 		},
@@ -83,10 +83,10 @@ func TestRequestRequestsField(t *testing.T) {
 				message CreateBookRequest {}
 				`, test)
 
-			m := file.GetMessageTypes()[0]
+			m := file.Messages()[0]
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = m
+			var problemDesc protoreflect.Descriptor = m
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(m)
 			}

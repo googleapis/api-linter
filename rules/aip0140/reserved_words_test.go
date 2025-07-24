@@ -29,8 +29,8 @@ func TestReservedWords(t *testing.T) {
 					string {{.N}} = 2;
 				}
 			`, struct{ N string }{N: s})
-			field := f.GetMessageTypes()[0].GetFields()[1]
-			want := testutils.Problems{{Message: field.GetName(), Descriptor: field}}
+			field := f.Messages()[0].Fields()[1]
+			want := testutils.Problems{{Message: field.Name(), Descriptor: field}}
 			if diff := want.Diff(reservedWords.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

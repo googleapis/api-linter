@@ -20,17 +20,17 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Get messages should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(131, "response-message-name"),
 	OnlyIf: utils.IsGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `GetFoo`, the response
 		// message is named `Foo`.
-		if got, want := m.GetOutputType().GetName(), m.GetName()[3:]; got != want {
+		if got, want := m.Output().Name(), m.Name()[3:]; got != want {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have the corresponding resource as the response message, such as %q.",

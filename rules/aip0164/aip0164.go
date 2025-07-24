@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-164 rules to the provided registry.
@@ -47,11 +47,11 @@ var (
 )
 
 // Returns true if this is a AIP-164 Undelete method, false otherwise.
-func isUndeleteMethod(m *desc.MethodDescriptor) bool {
-	return undeleteMethodRegexp.MatchString(m.GetName())
+func isUndeleteMethod(m protoreflect.MethodDescriptor) bool {
+	return undeleteMethodRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-164 Undelete request message, false otherwise.
-func isUndeleteRequestMessage(m *desc.MessageDescriptor) bool {
-	return undeleteReqMessageRegexp.MatchString(m.GetName())
+func isUndeleteRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return undeleteReqMessageRegexp.MatchString(m.Name())
 }

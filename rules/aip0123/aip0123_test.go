@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/lint"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestAddRules(t *testing.T) {
@@ -30,12 +30,12 @@ func TestAddRules(t *testing.T) {
 func TestIsNestedName(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		resource *apb.ResourceDescriptor
+		resource *annotations.ResourceDescriptor
 		want     bool
 	}{
 		{
 			name: "top level",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/Project",
 				Pattern:  []string{"projects/{project}"},
 				Singular: "project",
@@ -45,7 +45,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "non-nested child collection",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/Location",
 				Pattern:  []string{"projects/{project}/locations/{location}"},
 				Singular: "location",
@@ -55,7 +55,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "non-nested child collection multi-word",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/BillingAccount",
 				Pattern:  []string{"projects/{project}/billingAccounts/{billing_account}"},
 				Singular: "billingAccount",
@@ -65,7 +65,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "nested child collection full",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserEvent",
 				Pattern:  []string{"projects/{project}/users/{user}/userEvents/{user_event}"},
 				Singular: "userEvent",
@@ -75,7 +75,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "nested child collection reduced",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserEvent",
 				Pattern:  []string{"projects/{project}/users/{user}/events/{event}"},
 				Singular: "userEvent",
@@ -85,7 +85,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "nested singleton full",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserConfig",
 				Pattern:  []string{"projects/{project}/users/{user}/userConfig"},
 				Singular: "userConfig",
@@ -95,7 +95,7 @@ func TestIsNestedName(t *testing.T) {
 		},
 		{
 			name: "nested singleton reduced",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserConfig",
 				Pattern:  []string{"projects/{project}/users/{user}/config"},
 				Singular: "userConfig",
@@ -115,12 +115,12 @@ func TestIsNestedName(t *testing.T) {
 func TestNestedSingular(t *testing.T) {
 	for _, test := range []struct {
 		name     string
-		resource *apb.ResourceDescriptor
+		resource *annotations.ResourceDescriptor
 		want     string
 	}{
 		{
 			name: "top level",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/Project",
 				Pattern:  []string{"projects/{project}"},
 				Singular: "project",
@@ -129,7 +129,7 @@ func TestNestedSingular(t *testing.T) {
 		},
 		{
 			name: "non-nested child collection",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/Location",
 				Pattern:  []string{"projects/{project}/locations/{location}"},
 				Singular: "location",
@@ -138,7 +138,7 @@ func TestNestedSingular(t *testing.T) {
 		},
 		{
 			name: "non-nested child collection multi-word",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/BillingAccount",
 				Pattern:  []string{"projects/{project}/billingAccounts/{billing_account}"},
 				Singular: "billingAccount",
@@ -147,7 +147,7 @@ func TestNestedSingular(t *testing.T) {
 		},
 		{
 			name: "nested child collection full",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserEvent",
 				Pattern:  []string{"projects/{project}/users/{user}/userEvents/{user_event}"},
 				Singular: "userEvent",
@@ -157,7 +157,7 @@ func TestNestedSingular(t *testing.T) {
 		},
 		{
 			name: "nested singleton full",
-			resource: &apb.ResourceDescriptor{
+			resource: &annotations.ResourceDescriptor{
 				Type:     "example.googleapis.com/UserConfig",
 				Pattern:  []string{"projects/{project}/users/{user}/userConfig"},
 				Singular: "userConfig",

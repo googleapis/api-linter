@@ -18,14 +18,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Rollback methods should have a proper HTTP pattern.
 var rollbackHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "rollback-http-uri-suffix"),
 	OnlyIf: utils.IsRollbackRevisionMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !rollbackURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{

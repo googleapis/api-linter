@@ -61,7 +61,7 @@ func TestOutputMessageName(t *testing.T) {
 			// Run the lint rule, and establish that it returns the correct
 			// number of problems.
 			problems := outputName.Lint(file)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
@@ -120,7 +120,7 @@ func TestResponseMessageName_FullyQualified(t *testing.T) {
 			}, test)
 			file := files["service.proto"]
 			got := outputName.Lint(file)
-			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(got); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Services()[0].Methods()[0]).Diff(got); diff != "" {
 				t.Error(diff)
 			}
 		})

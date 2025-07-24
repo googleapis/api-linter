@@ -22,22 +22,22 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "method-signature"),
 	OnlyIf: utils.IsDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
-		in := m.GetInputType()
+		in := m.Input()
 
 		fields := []string{"name"}
 		if etag := in.FindFieldByName("etag"); etag != nil {
-			fields = append(fields, etag.GetName())
+			fields = append(fields, etag.Name())
 		}
 		if force := in.FindFieldByName("force"); force != nil {
-			fields = append(fields, force.GetName())
+			fields = append(fields, force.Name())
 		}
 		want := strings.Join(fields, ",")
 

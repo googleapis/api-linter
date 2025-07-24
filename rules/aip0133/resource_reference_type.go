@@ -18,25 +18,25 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Create methods should reference the target resource via `child_type` or the
 // parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "resource-reference-type"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		ot := utils.GetResponseType(m)
 		// Unresolvable response_type for an Operation results in nil here.
 		resource := utils.GetResource(ot)
-		p := m.GetInputType().FindFieldByName("parent")
+		p := m.Input().FindFieldByName("parent")
 		return utils.IsCreateMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
 		ot := utils.GetResponseType(m)
 		resource := utils.GetResource(ot)
-		parent := m.GetInputType().FindFieldByName("parent")
+		parent := m.Input().FindFieldByName("parent")
 		ref := utils.GetResourceReference(parent)
 
 		if resource.GetType() == ref.GetType() {

@@ -17,13 +17,13 @@ package aip0162
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var rollbackRequestRevisionIDBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "rollback-request-revision-id-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isRollbackRequestMessage(f.GetOwner()) && f.GetName() == "revision_id"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isRollbackRequestMessage(f.GetOwner()) && f.Name() == "revision_id"
 	},
 	LintField: utils.LintRequiredField,
 }

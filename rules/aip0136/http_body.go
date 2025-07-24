@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -30,18 +30,18 @@ var allowedBodyTypes = stringset.New("google.api.HttpBody")
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-body"),
 	OnlyIf: utils.IsCustomMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			noBody := stringset.New("GET", "DELETE")
 			if !noBody.Contains(httpRule.Method) {
 				// Determine the name of the resource.
 				// This entails some guessing; we assume that the verb is a single
 				// word and that the resource is everything else.
-				resource := strings.Join(strings.Split(strcase.SnakeCase(m.GetName()), "_")[1:], "_")
+				resource := strings.Join(strings.Split(strcase.SnakeCase(m.Name()), "_")[1:], "_")
 				if !stringset.New(resource, "*").Contains(httpRule.Body) {
 					// Some field types make sense to use as a body instead of the entire request message,
 					// e.g. google.api.HttpBody.
-					b := m.GetInputType().FindFieldByName(httpRule.Body)
+					b := m.Input().FindFieldByName(httpRule.Body)
 					isMessageType := b != nil && b.GetMessageType() != nil
 					if isMessageType && allowedBodyTypes.Contains(b.GetMessageType().GetFullyQualifiedName()) {
 						continue

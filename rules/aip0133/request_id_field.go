@@ -20,15 +20,15 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var requestIDField = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-id-field"),
 	OnlyIf: utils.IsCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "Create")) + "_id"
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "Create")) + "_id"
 		if field := m.FindFieldByName(idField); field == nil || utils.GetTypeName(field) != "string" || field.IsRepeated() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("create methods should contain a singular `string %s` field.", idField),

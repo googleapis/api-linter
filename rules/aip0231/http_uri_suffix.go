@@ -18,14 +18,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Get methods should have a proper HTTP pattern.
 var uriSuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(231, "http-uri-suffix"),
 	OnlyIf: isBatchGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchGetURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{

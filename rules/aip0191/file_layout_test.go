@@ -40,7 +40,7 @@ func TestFileLayout(t *testing.T) {
 			message Book {}
 			service Library {}
 		`)
-		want := testutils.Problems{{Descriptor: f.GetServices()[0]}}
+		want := testutils.Problems{{Descriptor: f.Services()[0]}}
 		if diff := want.Diff(fileLayout.Lint(f)); diff != "" {
 			t.Error(diff)
 		}
@@ -53,7 +53,7 @@ func TestFileLayout(t *testing.T) {
 			}
 			message Book {}
 		`)
-		want := testutils.Problems{{Descriptor: f.GetEnumTypes()[0]}}
+		want := testutils.Problems{{Descriptor: f.Enums()[0]}}
 		if diff := want.Diff(fileLayout.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

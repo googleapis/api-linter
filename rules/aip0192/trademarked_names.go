@@ -21,7 +21,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var trademarkAliases = map[string][]string{
@@ -63,7 +63,7 @@ var tmRegexes = defaultTrademarkTypos()
 
 var trademarkedNames = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "trademarked-names"),
-	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
+	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
 		c := strings.Join(
 			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
 			"\n",

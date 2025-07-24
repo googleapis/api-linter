@@ -20,25 +20,25 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The get request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(131, "request-required-fields"),
 	OnlyIf: utils.IsGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New("name")
 
-		for _, f := range m.GetFields() {
+		for _, f := range m.Fields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// add a problem.
-			if !allowedRequiredFields.Contains(string(f.GetName())) {
+			if !allowedRequiredFields.Contains(string(f.Name())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Get RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Get RPCs must only require fields explicitly described in AIPs, not %q.", f.Name()),
 					Descriptor: f,
 				})
 			}

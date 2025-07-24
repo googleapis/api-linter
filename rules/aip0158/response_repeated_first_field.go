@@ -16,29 +16,29 @@ package aip0158
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responseRepeatedFirstField = &lint.MessageRule{
 	Name: lint.NewRuleName(158, "response-repeated-first-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return isPaginatedResponseMessage(m) && len(m.GetFields()) > 0
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		return isPaginatedResponseMessage(m) && len(m.Fields()) > 0
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Sanity check: Is the first field (positionally) and the field with
 		// an ID of 1 actually the same field?
-		if m.GetFields()[0] != m.FindFieldByNumber(1) {
+		if m.Fields()[0] != m.FindFieldByNumber(1) {
 			return []lint.Problem{{
 				Message:    "The first field of paginated RPCs must have a protobuf ID of 1.",
-				Descriptor: m.GetFields()[0],
+				Descriptor: m.Fields()[0],
 			}}
 		}
 
 		// Make sure the field is repeated.
-		if !m.GetFields()[0].IsRepeated() {
+		if !m.Fields()[0].IsRepeated() {
 			return []lint.Problem{{
 				Message:    "The first field of a paginated response should be repeated.",
-				Descriptor: m.GetFields()[0],
+				Descriptor: m.Fields()[0],
 			}}
 		}
 

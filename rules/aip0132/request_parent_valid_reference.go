@@ -21,26 +21,26 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestParentValidReference = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-valid-reference"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		ref := utils.GetResourceReference(f)
-		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent" && ref != nil && ref.GetType() != ""
+		return utils.IsListRequestMessage(f.GetOwner()) && f.Name() == "parent" && ref != nil && ref.GetType() != ""
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		p := f.GetParent()
-		msg := p.(*desc.MessageDescriptor)
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		p := f.Parent()
+		msg := p.(protoreflect.MessageDescriptor)
 		res := utils.GetResourceReference(f).GetType()
 
-		response := utils.FindMessage(f.GetFile(), strings.Replace(msg.GetName(), "Request", "Response", 1))
+		response := utils.FindMessage(f.ParentFile(), strings.Replace(msg.Name(), "Request", "Response", 1))
 		if response == nil {
 			return nil
 		}
 
-		for _, field := range response.GetFields() {
+		for _, field := range response.Fields() {
 			typ := field.GetMessageType()
 			if !field.IsRepeated() && typ == nil {
 				continue
@@ -48,7 +48,7 @@ var requestParentValidReference = &lint.FieldRule{
 
 			if r := utils.GetResource(typ); r != nil && r.GetType() == res {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The `google.api.resource_reference` on `%s` field should reference the parent(s) of `%s`.", f.GetName(), res),
+					Message:    fmt.Sprintf("The `google.api.resource_reference` on `%s` field should reference the parent(s) of `%s`.", f.Name(), res),
 					Descriptor: f,
 					Location:   locations.FieldResourceReference(f),
 				}}

@@ -48,7 +48,7 @@ func TestHttpVerb(t *testing.T) {
 				message {{.MethodName}}Request {}
 				message {{.MethodName}}Response {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services()[0].Methods()[0]
 			problems := httpVerb.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

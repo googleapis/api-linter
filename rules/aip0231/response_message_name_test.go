@@ -51,7 +51,7 @@ func TestOutputName(t *testing.T) {
 				message {{.OutputName}} {}
 			`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services()[0].Methods()[0]
 
 			problems := outputName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {

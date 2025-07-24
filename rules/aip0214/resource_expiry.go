@@ -17,17 +17,17 @@ package aip0214
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceExpiry = &lint.FieldRule{
 	Name: lint.NewRuleName(214, "resource-expiry"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		isResource := utils.IsResource(f.GetParent().(*desc.MessageDescriptor))
-		isExpireTime := f.GetName() == "expire_time"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		isResource := utils.IsResource(f.Parent().(protoreflect.MessageDescriptor))
+		isExpireTime := f.Name() == "expire_time"
 		return isResource && isExpireTime
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// If this field is output only, then there is no user input permitted
 		// and therefore having a `ttl` field does not matter.
 		if utils.GetFieldBehavior(f).Contains("OUTPUT_ONLY") {

@@ -42,7 +42,7 @@ func TestRequestForceField(t *testing.T) {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages()[0].Fields()[0]
 			problems := requestForceField.Lint(f)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

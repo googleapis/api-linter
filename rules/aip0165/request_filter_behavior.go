@@ -17,13 +17,13 @@ package aip0165
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestFilterBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(165, "request-filter-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isPurgeRequestMessage(f.GetOwner()) && f.GetName() == "filter"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isPurgeRequestMessage(f.GetOwner()) && f.Name() == "filter"
 	},
 	LintField: utils.LintRequiredField,
 }

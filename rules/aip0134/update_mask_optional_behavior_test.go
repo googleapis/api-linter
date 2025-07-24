@@ -41,7 +41,7 @@ func TestUpdateMaskOptionalBehavior(t *testing.T) {
 				}
 				message Book {}
 			`, test)
-			field := file.GetMessageTypes()[0].FindFieldByName("update_mask")
+			field := file.Messages()[0].FindFieldByName("update_mask")
 			problems := updateMaskOptionalBehavior.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

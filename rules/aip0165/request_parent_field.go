@@ -20,22 +20,22 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 // The Purge request message should have parent field.
 var requestParentField = &lint.MessageRule{
 	Name: lint.NewRuleName(165, "request-parent-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// Sanity check: If the resource has a pattern, and that pattern
 		// contains no variables, then a parent field is not expected.
 		//
 		// In order to parse out the pattern, we get the resource message
 		// from the response, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
-		plural := strings.TrimPrefix(strings.TrimSuffix(m.GetName(), "Request"), "Purge")
-		if resp := utils.FindMessage(m.GetFile(), fmt.Sprintf("Purge%sResponse", plural)); resp != nil {
+		plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "Purge")
+		if resp := utils.FindMessage(m.ParentFile(), fmt.Sprintf("Purge%sResponse", plural)); resp != nil {
 			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
 				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
 					for _, pattern := range resource.GetPattern() {

@@ -51,7 +51,7 @@ func TestHTTPParentVariable(t *testing.T) {
 				}
 				message {{.MethodName}}Response {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpParentVariable.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

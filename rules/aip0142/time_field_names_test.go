@@ -45,7 +45,7 @@ func TestFieldName(t *testing.T) {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages()[0].Fields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(fieldNames.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

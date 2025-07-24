@@ -54,7 +54,7 @@ func TestNesting(t *testing.T) {
 						UNSPECIFIED = 0;
 					}
 				`, test)
-				e := f.GetEnumTypes()[0]
+				e := f.Enums()[0]
 				if diff := test.problems.SetDescriptor(e).Diff(nesting.Lint(f)); diff != "" {
 					t.Error(diff)
 				}

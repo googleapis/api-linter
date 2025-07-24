@@ -20,17 +20,17 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The resource name used in the Create method's URI should match the name used
 // in the resource definition.
 var httpURIResource = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "http-uri-resource"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return utils.IsCreateMethod(m) && len(utils.GetHTTPRules(m)) > 0
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 
 		// Extract the suffix of the URI path as the collection identifier.
@@ -54,12 +54,12 @@ var httpURIResource = &lint.MethodRule{
 		// Go through each pattern in the resource and make sure it contains the
 		// collection identifier.
 		collectionName += "/"
-		resource := utils.GetResource(m.GetOutputType())
+		resource := utils.GetResource(m.Output())
 		for _, pattern := range resource.GetPattern() {
 			if !strings.Contains(pattern, collectionName) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Resource pattern should contain the collection identifier %q.", collectionName),
-					Descriptor: m.GetOutputType(),
+					Descriptor: m.Output(),
 				})
 			}
 		}

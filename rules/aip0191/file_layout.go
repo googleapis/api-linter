@@ -16,16 +16,16 @@ package aip0191
 
 import (
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fileLayout = &lint.FileRule{
 	Name: lint.NewRuleName(191, "file-layout"),
-	LintFile: func(f *desc.FileDescriptor) (problems []lint.Problem) {
+	LintFile: func(f protoreflect.FileDescriptor) (problems []lint.Problem) {
 		// Verify that services precede messages.
-		if len(f.GetMessageTypes()) > 0 {
-			firstMessage := f.GetMessageTypes()[0]
-			for _, service := range f.GetServices() {
+		if len(f.Messages()) > 0 {
+			firstMessage := f.Messages()[0]
+			for _, service := range f.Services() {
 				if isAfter(firstMessage, service) {
 					problems = append(problems, lint.Problem{
 						Message:    "Services should precede all messages.",
@@ -36,9 +36,9 @@ var fileLayout = &lint.FileRule{
 		}
 
 		// Verify that messages precede top-level enums.
-		if len(f.GetEnumTypes()) > 0 {
-			firstEnum := f.GetEnumTypes()[0]
-			for _, message := range f.GetMessageTypes() {
+		if len(f.Enums()) > 0 {
+			firstEnum := f.Enums()[0]
+			for _, message := range f.Messages() {
 				if isBefore(message, firstEnum) {
 					problems = append(problems, lint.Problem{
 						Message:    "Messages should precede all top-level enums.",
@@ -58,7 +58,7 @@ var fileLayout = &lint.FileRule{
 // NOTE: A false value here may indicate that there is no source info at all;
 //
 //	use `isAfter` if the goal is to know that `d` comes after `anchor`.
-func isBefore(anchor desc.Descriptor, d desc.Descriptor) bool {
+func isBefore(anchor protoreflect.Descriptor, d protoreflect.Descriptor) bool {
 	return d.GetSourceInfo().GetSpan()[0] < anchor.GetSourceInfo().GetSpan()[0]
 }
 
@@ -67,6 +67,6 @@ func isBefore(anchor desc.Descriptor, d desc.Descriptor) bool {
 // NOTE: A false value here may indicate that there is no source info at all;
 //
 //	use `isBefore` if the goal is to know that `d` comes before `anchor`.
-func isAfter(anchor desc.Descriptor, d desc.Descriptor) bool {
+func isAfter(anchor protoreflect.Descriptor, d protoreflect.Descriptor) bool {
 	return d.GetSourceInfo().GetSpan()[0] > anchor.GetSourceInfo().GetSpan()[0]
 }

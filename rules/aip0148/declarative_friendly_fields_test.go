@@ -93,7 +93,7 @@ func TestDeclarativeFriendlyFields(t *testing.T) {
 						Fields string
 						Style  string
 					}{Fields: fields, Style: subtest.style})
-					m := f.GetMessageTypes()[0]
+					m := f.Messages()[0]
 					got := declarativeFriendlyRequired.Lint(f)
 					if diff := subtest.problems.SetDescriptor(m).Diff(got); diff != "" {
 						t.Error(diff)
@@ -133,7 +133,7 @@ func TestDeclarativeFriendlyFieldsSingleton(t *testing.T) {
 					{{.Fields}}
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages()[0]
 			got := declarativeFriendlyRequired.Lint(f)
 			if diff := test.want.SetDescriptor(m).Diff(got); diff != "" {
 				t.Error(diff)

@@ -63,7 +63,7 @@ option (google.api.resource) = {
 					string name = 1;
 				}
 			`, test)
-			field := file.GetServices()[0].GetMethods()[0].GetInputType().FindFieldByName("parent")
+			field := file.Services()[0].Methods()[0].Input().FindFieldByName("parent")
 			problems := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

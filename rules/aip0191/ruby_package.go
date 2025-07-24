@@ -21,17 +21,17 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var rubyPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "ruby-package"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
+	OnlyIf: func(f protoreflect.FileDescriptor) bool {
 		fops := f.GetFileOptions()
 		return fops != nil && fops.GetRubyPackage() != ""
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		ns := f.GetFileOptions().GetRubyPackage()
 		delim := "::"
 
@@ -66,8 +66,8 @@ var rubyPackage = &lint.FileRule{
 			}}
 		}
 
-		for _, s := range f.GetServices() {
-			n := s.GetName()
+		for _, s := range f.Services() {
+			n := s.Name()
 			if !packagingServiceNameEquals(n, ns, delim) {
 				msg := fmt.Sprintf("Case of Ruby package and service name %q must match.", n)
 				return []lint.Problem{{

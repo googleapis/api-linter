@@ -5,14 +5,14 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var requestParentRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-parent-required"),
 	OnlyIf: utils.IsCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		if m.FindFieldByName("parent") == nil {
 			// Sanity check: If the resource has a pattern, and that pattern
 			// contains only one variable, then a parent field is not expected.
@@ -29,7 +29,7 @@ var requestParentRequired = &lint.MessageRule{
 
 			// Nope, this is not the unusual case, and a parent field is expected.
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `parent` field", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `parent` field", m.Name()),
 				Descriptor: m,
 			}}
 		}

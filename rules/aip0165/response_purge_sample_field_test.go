@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestResponsePurgeSampleField(t *testing.T) {
@@ -42,9 +42,9 @@ func TestResponsePurgeSampleField(t *testing.T) {
 					int32 purge_count = 2;
 				}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages()[0]
 			if strings.HasPrefix(test.name, "InvalidType") {
-				d = f.GetMessageTypes()[0].GetFields()[0]
+				d = f.Messages()[0].Fields()[0]
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(responsePurgeSampleField.Lint(f)); diff != "" {
 				t.Error(diff)

@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of this AIP's rules to it.
@@ -30,6 +30,6 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func isRequestMessage(m *desc.MessageDescriptor) bool {
-	return strings.HasSuffix(m.GetName(), "Request")
+func isRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return strings.HasSuffix(m.Name(), "Request")
 }

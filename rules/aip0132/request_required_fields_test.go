@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequiredFieldTests(t *testing.T) {
@@ -96,7 +96,7 @@ func TestRequiredFieldTests(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("ListBooksRequest")
+			var dbr protoreflect.Descriptor = f.FindMessage("ListBooksRequest")
 			if test.problematicFieldName != "" {
 				dbr = f.FindMessage("ListBooksRequest").FindFieldByName(test.problematicFieldName)
 			}

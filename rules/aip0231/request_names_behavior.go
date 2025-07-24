@@ -17,13 +17,13 @@ package aip0231
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestNamesBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(231, "request-names-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isBatchGetRequestMessage(f.GetOwner()) && f.GetName() == "names"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isBatchGetRequestMessage(f.GetOwner()) && f.Name() == "names"
 	},
 	LintField: utils.LintRequiredField,
 }

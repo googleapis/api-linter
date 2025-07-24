@@ -18,16 +18,16 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responseLRO = &lint.MethodRule{
 	Name: lint.NewRuleName(164, "response-lro"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return isUndeleteMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		if m.GetOutputType().GetFullyQualifiedName() != "google.longrunning.Operation" {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		if m.Output().GetFullyQualifiedName() != "google.longrunning.Operation" {
 			return []lint.Problem{{
 				Message:    "Declarative-friendly undelete methods should use an LRO.",
 				Descriptor: m,

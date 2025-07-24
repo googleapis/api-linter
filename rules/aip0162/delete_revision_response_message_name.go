@@ -20,14 +20,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Delete Revision methods should return the resource itself.
 var deleteRevisionResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "delete-revision-response-message-name"),
 	OnlyIf: utils.IsDeleteRevisionMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		want, ok := utils.ExtractRevisionResource(m)
 		if !ok {
 			return nil
@@ -36,7 +36,7 @@ var deleteRevisionResponseMessageName = &lint.MethodRule{
 		if response == nil {
 			return nil
 		}
-		got := response.GetName()
+		got := response.Name()
 
 		loc := locations.MethodResponseType(m)
 		suggestion := want

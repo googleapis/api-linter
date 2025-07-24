@@ -20,13 +20,13 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var reservedWords = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "reserved-words"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if name := f.GetName(); reservedWordsSet.Contains(name) {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if name := f.Name(); reservedWordsSet.Contains(name) {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("%q is a reserved word in a common language and should not be used.", name),
 				Descriptor: f,

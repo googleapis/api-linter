@@ -20,17 +20,17 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var standardMethodsOnly = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "declarative-standard-methods-only"),
 	OnlyIf: utils.IsDeclarativeFriendlyMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Standard methods are fine.
 		standard := stringset.New("Get", "List", "Create", "Update", "Delete", "Undelete", "Batch")
 		for s := range standard {
-			if strings.HasPrefix(m.GetName(), s) {
+			if strings.HasPrefix(m.Name(), s) {
 				return nil
 			}
 		}

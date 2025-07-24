@@ -20,15 +20,15 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(154, "field-type"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "etag"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return f.Name() == "etag"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if t := utils.GetTypeName(f); t != "string" || f.IsRepeated() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The etag field should be a singular string, not %s.", t),

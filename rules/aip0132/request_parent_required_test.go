@@ -27,7 +27,7 @@ func TestRequestParentRequired(t *testing.T) {
 				}
 			`, test)
 			problems := requestParentRequired.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(f.Messages()[0]).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

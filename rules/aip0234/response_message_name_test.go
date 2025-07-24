@@ -68,7 +68,7 @@ func TestResponseMessageName(t *testing.T) {
 				message {{.Response}}{}
 				`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services()[0].Methods()[0]
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
@@ -119,7 +119,7 @@ func TestLongRunningResponse(t *testing.T) {
 				message BatchUpdateBooksResponse{}
 				`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services()[0].Methods()[0]
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {

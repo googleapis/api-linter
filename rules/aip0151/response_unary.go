@@ -17,13 +17,13 @@ package aip0151
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responseUnary = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "response-unary"),
 	OnlyIf: isLRO,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		if m.IsServerStreaming() {
 			return []lint.Problem{{
 				Message:    "LRO responses must be unary, not streaming.",

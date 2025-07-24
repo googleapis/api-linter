@@ -20,27 +20,27 @@ import (
 	"bitbucket.org/creachadair/stringset"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Create methods should not have unrecognized fields.
 var requestUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(233, "request-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return isBatchCreateRequestMessage(f.GetOwner())
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
 			"parent",        // AIP-233
 			"request_id",    // AIP-155
 			"requests",      // AIP-233
 			"validate_only", // AIP-163
 		)
-		if !allowedFields.Contains(field.GetName()) {
+		if !allowedFields.Contains(field.Name()) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Unexpected field: Batch Create RPCs must only contain fields explicitly described in https://aip.dev/233, not %q.",
-					string(field.GetName()),
+					string(field.Name()),
 				),
 				Descriptor: field,
 			}}

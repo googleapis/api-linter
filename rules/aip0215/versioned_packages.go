@@ -21,12 +21,12 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var versionedPackages = &lint.FileRule{
 	Name: lint.NewRuleName(215, "versioned-packages"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
+	OnlyIf: func(f protoreflect.FileDescriptor) bool {
 		// Common protos are exempt.
 		if utils.IsCommonProto(f) {
 			return false
@@ -48,7 +48,7 @@ var versionedPackages = &lint.FileRule{
 		// Everything else should follow the rule.
 		return true
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		if !version.MatchString(f.GetPackage()) {
 			return []lint.Problem{{
 				Message:    "API components should be in versioned packages.",

@@ -17,13 +17,13 @@ package aip0133
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestParentBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(133, "request-parent-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsCreateRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return utils.IsCreateRequestMessage(f.GetOwner()) && f.Name() == "parent"
 	},
 	LintField: utils.LintRequiredField,
 }

@@ -22,22 +22,22 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // All fields annotated as REQUIRED must be in every method_signature.
 var requiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(4232, "required-fields"),
 	OnlyIf: hasMethodSignatures,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		sigs := utils.GetMethodSignatures(m)
-		in := m.GetInputType()
+		in := m.Input()
 
 		requiredFields := []string{}
-		for _, f := range in.GetFields() {
+		for _, f := range in.Fields() {
 			if utils.GetFieldBehavior(f).Contains("REQUIRED") {
-				requiredFields = append(requiredFields, f.GetName())
+				requiredFields = append(requiredFields, f.Name())
 			}
 		}
 		for i, sig := range sigs {

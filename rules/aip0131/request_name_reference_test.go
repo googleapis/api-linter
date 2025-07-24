@@ -50,7 +50,7 @@ func TestRequestNameReference(t *testing.T) {
 						string {{.FieldName}} = 1;
 					}
 				`, test)
-				field := f.GetMessageTypes()[0].GetFields()[0]
+				field := f.Messages()[0].Fields()[0]
 				if diff := test.problems.SetDescriptor(field).Diff(requestNameReference.Lint(f)); diff != "" {
 					t.Error(diff)
 				}

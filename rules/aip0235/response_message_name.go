@@ -21,22 +21,22 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Delete method should have a properly named response message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(235, "response-message-name"),
 	OnlyIf: isBatchDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		got := m.GetOutputType().GetFullyQualifiedName()
-		if utils.IsOperation(m.GetOutputType()) {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		got := m.Output().GetFullyQualifiedName()
+		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		} else if got != "google.protobuf.Empty" {
-			got = m.GetOutputType().GetName()
+			got = m.Output().Name()
 		}
 
-		wantSoftDelete := m.GetName() + "Response"
+		wantSoftDelete := m.Name() + "Response"
 		want := stringset.New(
 			"google.protobuf.Empty",
 			wantSoftDelete,

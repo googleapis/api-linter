@@ -36,7 +36,7 @@ func TestTtlType(t *testing.T) {
 				{{.Type}} ttl = 2;
 			}
 		`, test)
-		field := f.GetMessageTypes()[0].GetFields()[1]
+		field := f.Messages()[0].Fields()[1]
 		if diff := test.problems.SetDescriptor(field).Diff(ttlType.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

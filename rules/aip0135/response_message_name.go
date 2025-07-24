@@ -22,7 +22,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Delete messages should use google.protobuf.Empty,
@@ -31,20 +31,20 @@ import (
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "response-message-name"),
 	OnlyIf: utils.IsDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		resource := strings.Replace(m.GetName(), "Delete", "", 1)
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		resource := strings.Replace(m.Name(), "Delete", "", 1)
 
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
 		// message is `google.protobuf.Empty` or `Foo`.
-		got := m.GetOutputType().GetName()
+		got := m.Output().Name()
 		if stringset.New("Empty", "Operation").Contains(got) {
-			got = m.GetOutputType().GetFullyQualifiedName()
+			got = m.Output().GetFullyQualifiedName()
 		}
 		want := stringset.New(resource, "google.protobuf.Empty")
 
 		// If the return type is an Operation, use the annotated response type.
 		lro := false
-		if utils.IsOperation(m.GetOutputType()) {
+		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 			lro = true
 		}

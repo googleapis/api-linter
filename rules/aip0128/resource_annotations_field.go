@@ -20,17 +20,17 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceAnnotationsField = &lint.MessageRule{
 	Name:   lint.NewRuleName(128, "resource-annotations-field"),
 	OnlyIf: isDeclarativeFriendlyResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f := m.FindFieldByName("annotations")
 		if f == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Declarative-friendly %q has no `annotations` field.", m.GetName()),
+				Message:    fmt.Sprintf("Declarative-friendly %q has no `annotations` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}

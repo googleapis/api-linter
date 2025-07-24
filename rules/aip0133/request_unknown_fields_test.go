@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -34,7 +34,7 @@ func TestUnknownFields(t *testing.T) {
 		messageName   string
 		messageFields []field
 		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
+		problemDesc   func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Parent",
@@ -79,7 +79,7 @@ func TestUnknownFields(t *testing.T) {
 			"CreateBookRequest",
 			[]field{{"name", builder.FieldTypeString()}},
 			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"name\"."}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("name")
 			},
 		},
@@ -88,7 +88,7 @@ func TestUnknownFields(t *testing.T) {
 			"CreateBookStoreRequest",
 			[]field{{"book_id", builder.FieldTypeString()}},
 			testutils.Problems{{Message: "Create RPCs must only contain fields explicitly described in AIPs, not \"book_id\"."}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m.FindFieldByName("book_id")
 			},
 		},
@@ -117,13 +117,13 @@ func TestUnknownFields(t *testing.T) {
 			}
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = message
+			var problemDesc protoreflect.Descriptor = message
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(message)
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := unknownFields.Lint(message.GetFile())
+			problems := unknownFields.Lint(message.ParentFile())
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

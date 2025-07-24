@@ -18,14 +18,14 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Undelete methods should not have unrecognized fields.
 var requestUnknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(164, "request-unknown-fields"),
 	OnlyIf: isUndeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
 			"name":          {}, // AIP-164
@@ -33,12 +33,12 @@ var requestUnknownFields = &lint.MessageRule{
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
 		}
-		for _, field := range m.GetFields() {
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+		for _, field := range m.Fields() {
+			if _, ok := allowedFields[string(field.Name())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Undelete requests must only contain fields explicitly described in AIPs, not %q.",
-						string(field.GetName()),
+						string(field.Name()),
 					),
 					Descriptor: field,
 				})

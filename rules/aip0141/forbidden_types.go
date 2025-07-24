@@ -21,12 +21,12 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var forbiddenTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "forbidden-types"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		nope := stringset.New("fixed32", "fixed64", "uint32", "uint64")
 		if typeName := utils.GetTypeName(f); nope.Contains(typeName) {
 			// Preserve original intent w/r/t 32-bit vs. 64-bit.

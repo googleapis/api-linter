@@ -17,26 +17,26 @@ package aip0135
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Delete methods for resources that are parents should have a bool force field.
 var forceField = &lint.MessageRule{
 	Name: lint.NewRuleName(135, "force-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		name := m.FindFieldByName("name")
 		ref := utils.GetResourceReference(name)
-		validRef := ref != nil && ref.GetType() != "" && utils.FindResource(ref.GetType(), m.GetFile()) != nil
+		validRef := ref != nil && ref.GetType() != "" && utils.FindResource(ref.GetType(), m.ParentFile()) != nil
 
 		return utils.IsDeleteRequestMessage(m) && validRef
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		force := m.FindFieldByName("force")
 		name := m.FindFieldByName("name")
 		ref := utils.GetResourceReference(name)
-		res := utils.FindResource(ref.GetType(), m.GetFile())
+		res := utils.FindResource(ref.GetType(), m.ParentFile())
 
-		children := utils.FindResourceChildren(res, m.GetFile())
+		children := utils.FindResourceChildren(res, m.ParentFile())
 		if len(children) > 0 && force == nil {
 			return []lint.Problem{
 				{

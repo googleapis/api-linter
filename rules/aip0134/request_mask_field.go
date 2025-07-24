@@ -17,13 +17,13 @@ package aip0134
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestMaskField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-mask-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return utils.IsUpdateRequestMessage(f.GetOwner()) && f.Name() == "update_mask"
 	},
 	LintField: utils.LintFieldMask,
 }

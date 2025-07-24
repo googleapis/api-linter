@@ -21,7 +21,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -41,7 +41,7 @@ var consistentOptions = map[string]func(*dpb.FileOptions) string{
 var fileOptionConsistency = &lint.FileRule{
 	Name:   lint.NewRuleName(191, "file-option-consistency"),
 	OnlyIf: hasPackage,
-	LintFile: func(f *desc.FileDescriptor) (problems []lint.Problem) {
+	LintFile: func(f protoreflect.FileDescriptor) (problems []lint.Problem) {
 		opts := f.GetFileOptions()
 		for _, dep := range f.GetDependencies() {
 			// We only need to look at files that are in the same package

@@ -20,14 +20,14 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Get methods should not generally use synonyms for "get".
 var synonyms = &lint.MethodRule{
 	Name: lint.NewRuleName(131, "synonyms"),
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		name := m.GetName()
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		name := m.Name()
 		for _, syn := range []string{"Acquire", "Fetch", "Lookup", "Read", "Retrieve"} {
 			if strings.HasPrefix(name, syn) {
 				return []lint.Problem{{

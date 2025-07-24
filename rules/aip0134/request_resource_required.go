@@ -5,18 +5,18 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The create request message should have resource field.
 var requestResourceRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-resource-required"),
 	OnlyIf: utils.IsUpdateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		resourceMsgName := extractResource(m.GetName())
-		for _, fieldDesc := range m.GetFields() {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		resourceMsgName := extractResource(m.Name())
+		for _, fieldDesc := range m.Fields() {
 			msgDesc := fieldDesc.GetMessageType()
-			if msgDesc != nil && msgDesc.GetName() == resourceMsgName {
+			if msgDesc != nil && msgDesc.Name() == resourceMsgName {
 				// found the resource field.
 				return nil
 			}
@@ -24,7 +24,7 @@ var requestResourceRequired = &lint.MessageRule{
 
 		// No resource field.
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
+			Message:    fmt.Sprintf("Message %q has no %q type field", m.Name(), resourceMsgName),
 			Descriptor: m,
 		}}
 	},

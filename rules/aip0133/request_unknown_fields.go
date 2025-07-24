@@ -20,7 +20,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
@@ -29,7 +29,7 @@ import (
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-unknown-fields"),
 	OnlyIf: utils.IsCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// Rule check: Establish that there are no unexpected fields.
@@ -40,17 +40,17 @@ var unknownFields = &lint.MessageRule{
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
-		for _, field := range m.GetFields() {
+		for _, field := range m.Fields() {
 			// Skip the check with the field that is the body.
-			if t := field.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+			if t := field.GetMessageType(); t != nil && t.Name() == resourceMsgName {
 				continue
 			}
 			// Check the remaining fields.
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+			if _, ok := allowedFields[string(field.Name())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",
-						field.GetName(),
+						field.Name(),
 					),
 					Descriptor: field,
 				})

@@ -20,23 +20,23 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 // The resource field in a update method should named properly.
 var requestResourceField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-resource-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		message := f.GetOwner()
 		return utils.IsUpdateRequestMessage(message) &&
 			f.GetMessageType() != nil &&
-			f.GetMessageType().GetName() == extractResource(message.GetName())
+			f.GetMessageType().Name() == extractResource(message.Name())
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		resourceName := extractResource(f.GetOwner().GetName())
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		resourceName := extractResource(f.GetOwner().Name())
 		wantFieldName := strcase.SnakeCase(resourceName)
-		if f.GetName() != wantFieldName {
+		if f.Name() != wantFieldName {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Resource field should be named %q.", wantFieldName),
 				Descriptor: f,

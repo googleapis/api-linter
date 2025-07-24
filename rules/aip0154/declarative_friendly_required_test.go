@@ -45,7 +45,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 					{{.Etag}}
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(declarativeFriendlyRequired.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

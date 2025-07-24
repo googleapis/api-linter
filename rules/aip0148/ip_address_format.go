@@ -19,7 +19,7 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -32,10 +32,10 @@ var ipAddressFormats = []annotations.FieldInfo_Format{
 
 var ipAddressFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "ip-address-format"),
-	OnlyIf: func(fd *desc.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING && (fd.GetName() == "ip_address" || strings.HasSuffix(fd.GetName(), "_ip_address"))
+	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
+		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING && (fd.Name() == "ip_address" || strings.HasSuffix(fd.Name(), "_ip_address"))
 	},
-	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		if !utils.HasFormat(fd) || !oneofFormats(utils.GetFormat(fd), ipAddressFormats) {
 			return []lint.Problem{{
 				Message:    "IP Address fields must specify one of the `(google.api.field_info).format` values `IPV4`, `IPV6`, or `IPV4_OR_IPV6`",

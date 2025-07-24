@@ -17,14 +17,14 @@ package aip0165
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Purge methods should have a parent variable in the URI unless the resource is top-level.
 var httpParentVariable = &lint.MethodRule{
 	Name: lint.NewRuleName(165, "http-parent-variable"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		return isPurgeMethod(m) && m.GetInputType().FindFieldByName("parent") != nil
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
+		return isPurgeMethod(m) && m.Input().FindFieldByName("parent") != nil
 	},
 	LintMethod: utils.LintHTTPURIHasParentVariable,
 }

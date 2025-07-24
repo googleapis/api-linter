@@ -21,17 +21,17 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Update methods should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "response-message-name"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := strings.Replace(m.GetName(), "Update", "", 1)
+		want := strings.Replace(m.Name(), "Update", "", 1)
 
 		// Load the response type, resolving the
 		// `google.longrunning.OperationInfo.response_type` if necessary.
@@ -40,7 +40,7 @@ var responseMessageName = &lint.MethodRule{
 			// If we can't resolve it, let the AIP-151 rule warn about this.
 			return nil
 		}
-		got := resp.GetName()
+		got := resp.Name()
 
 		// Return a problem if we did not get the expected return name.
 		//

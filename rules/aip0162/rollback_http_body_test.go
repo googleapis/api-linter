@@ -47,7 +47,7 @@ func TestRollbackHTTPBody(t *testing.T) {
 				message Book {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services()[0].Methods()[0]
 			problems := rollbackHTTPBody.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

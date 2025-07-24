@@ -20,14 +20,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(165, "response-message-name"),
 	OnlyIf: isPurgeMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		if m.GetOutputType().GetFullyQualifiedName() != "google.longrunning.Operation" {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		if m.Output().GetFullyQualifiedName() != "google.longrunning.Operation" {
 			return []lint.Problem{{
 				Message:    "Purge methods should use an LRO.",
 				Descriptor: m,
@@ -43,7 +43,7 @@ var responseMessageName = &lint.MethodRule{
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
 		got := utils.GetOperationInfo(m).GetResponseType()
-		want := m.GetName() + "Response"
+		want := m.Name() + "Response"
 		if got != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(

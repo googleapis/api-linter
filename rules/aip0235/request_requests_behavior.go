@@ -17,13 +17,13 @@ package aip0235
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestRequestsBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(235, "request-requests-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isBatchDeleteRequestMessage(f.GetOwner()) && f.GetName() == "requests"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isBatchDeleteRequestMessage(f.GetOwner()) && f.Name() == "requests"
 	},
 	LintField: utils.LintRequiredField,
 }

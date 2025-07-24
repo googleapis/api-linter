@@ -55,7 +55,7 @@ func TestHTTPURIParent(t *testing.T) {
 					};
 				}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -83,7 +83,7 @@ func TestHTTPURIParent(t *testing.T) {
 					};
 				}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -113,7 +113,7 @@ func TestHTTPURIParent(t *testing.T) {
 				};
 			}
 		`)
-		method := f.GetServices()[0].GetMethods()[0]
+		method := f.Services()[0].Methods()[0]
 		problems := testutils.Problems{}
 		if diff := problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 			t.Error(diff)

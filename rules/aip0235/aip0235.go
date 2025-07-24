@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -52,16 +52,16 @@ var (
 )
 
 // Returns true if this is a AIP-235 Batch Delete method, false otherwise.
-func isBatchDeleteMethod(m *desc.MethodDescriptor) bool {
-	return batchDeleteMethodRegexp.MatchString(m.GetName())
+func isBatchDeleteMethod(m protoreflect.MethodDescriptor) bool {
+	return batchDeleteMethodRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-235 Batch Delete request message, false otherwise.
-func isBatchDeleteRequestMessage(m *desc.MessageDescriptor) bool {
-	return batchDeleteReqMessageRegexp.MatchString(m.GetName())
+func isBatchDeleteRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return batchDeleteReqMessageRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-235 Batch Delete response message, false otherwise.
-func isBatchDeleteResponseMessage(m *desc.MessageDescriptor) bool {
-	return batchDeleteResponseMessageRegexp.MatchString(m.GetName())
+func isBatchDeleteResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return batchDeleteResponseMessageRegexp.MatchString(m.Name())
 }

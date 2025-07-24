@@ -17,13 +17,13 @@ package aip0191
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // APIs must use proto3.
 var syntax = &lint.FileRule{
 	Name: lint.NewRuleName(191, "proto-version"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		if !f.IsProto3() {
 			return []lint.Problem{{
 				Message:    "All API proto files must use proto3 syntax.",

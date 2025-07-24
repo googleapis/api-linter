@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
@@ -28,7 +28,7 @@ func TestResourceField(t *testing.T) {
 		testName     string
 		messageName  string
 		messageField *field
-		descriptor   func(*desc.MessageDescriptor) desc.Descriptor
+		descriptor   func(protoreflect.MessageDescriptor) protoreflect.Descriptor
 		problems     testutils.Problems
 	}{
 		{
@@ -49,8 +49,8 @@ func TestResourceField(t *testing.T) {
 			"WrongName",
 			"CreateBookRequest",
 			&field{"payload", builder.FieldTypeMessage(builder.NewMessage("Book"))},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.GetFields()[0]
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
+				return m.Fields()[0]
 			},
 			testutils.Problems{{Suggestion: "book"}},
 		},
@@ -73,13 +73,13 @@ func TestResourceField(t *testing.T) {
 				t.Fatalf("Could not build %s message.", test.messageName)
 			}
 
-			var d desc.Descriptor = message
+			var d protoreflect.Descriptor = message
 			if test.descriptor != nil {
 				d = test.descriptor(message)
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := resourceField.Lint(message.GetFile())
+			problems := resourceField.Lint(message.ParentFile())
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

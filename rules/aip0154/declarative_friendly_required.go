@@ -20,12 +20,12 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var declarativeFriendlyRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(154, "declarative-friendly-required"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// Sanity check: If the resource is not declarative-friendly, none of
 		// this logic applies.
 		if resource := utils.DeclarativeFriendlyResource(m); resource != nil {
@@ -39,11 +39,11 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 
 			// If this is a request message, then make several more checks based on
 			// what the method looks like.
-			if name := m.GetName(); strings.HasSuffix(name, "Request") {
+			if name := m.Name(); strings.HasSuffix(name, "Request") {
 				name = strings.TrimSuffix(name, "Request")
 
 				// If this is a GET request, then this message is exempt.
-				if method := utils.FindMethod(m.GetFile(), name); method != nil {
+				if method := utils.FindMethod(m.ParentFile(), name); method != nil {
 					for _, rule := range utils.GetHTTPRules(method) {
 						if rule.Method == "GET" {
 							return false
@@ -52,7 +52,7 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 				}
 
 				// If the message contains the resource, then this message is exempt.
-				for _, field := range m.GetFields() {
+				for _, field := range m.Fields() {
 					if field.GetMessageType() == resource {
 						return false
 					}
@@ -65,15 +65,15 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 
 		return false
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		for _, field := range m.GetFields() {
-			if field.GetName() == "etag" {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		for _, field := range m.Fields() {
+			if field.Name() == "etag" {
 				return nil
 			}
 		}
 
 		whoami := "resources"
-		if strings.HasSuffix(m.GetName(), "Request") {
+		if strings.HasSuffix(m.Name(), "Request") {
 			whoami = "mutation requests without the resource"
 		}
 		return []lint.Problem{{

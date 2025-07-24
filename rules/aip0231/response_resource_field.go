@@ -20,23 +20,23 @@ import (
 
 	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The Batch Get response message should have resource field.
 var resourceField = &lint.MessageRule{
 	Name:   lint.NewRuleName(231, "response-resource-field"),
 	OnlyIf: isBatchGetResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// The singular form the resource message name; the first letter capitalized.
-		plural := strings.TrimSuffix(strings.TrimPrefix(m.GetName(), "BatchGet"), "Response")
+		plural := strings.TrimSuffix(strings.TrimPrefix(m.Name(), "BatchGet"), "Response")
 		resourceMsgName := pluralize.NewClient().Singular(plural)
 
-		for _, fieldDesc := range m.GetFields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
+		for _, fieldDesc := range m.Fields() {
+			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
 				if !fieldDesc.IsRepeated() {
 					return []lint.Problem{{
-						Message:    fmt.Sprintf("The %q type field on Batch Get Response message should be repeated", msgDesc.GetName()),
+						Message:    fmt.Sprintf("The %q type field on Batch Get Response message should be repeated", msgDesc.Name()),
 						Descriptor: fieldDesc,
 					}}
 				}
@@ -47,7 +47,7 @@ var resourceField = &lint.MessageRule{
 
 		// Rule check: Establish that a resource field must be included.
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q type field", m.GetName(), resourceMsgName),
+			Message:    fmt.Sprintf("Message %q has no %q type field", m.Name(), resourceMsgName),
 			Descriptor: m,
 		}}
 	},

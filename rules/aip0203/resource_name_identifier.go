@@ -18,16 +18,16 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	fpb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 var resourceNameIdentifier = &lint.MessageRule{
 	Name: lint.NewRuleName(203, "resource-name-identifier"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		return utils.IsResource(m) && m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m))) != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f := m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m)))
 		fb := utils.GetFieldBehavior(f)
 		if len(fb) == 0 || !fb.Contains(fpb.FieldBehavior_IDENTIFIER.String()) {

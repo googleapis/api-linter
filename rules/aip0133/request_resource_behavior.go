@@ -17,18 +17,18 @@ package aip0133
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestResourceBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(133, "request-resource-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		message := f.GetOwner()
 		if !utils.IsCreateRequestMessage(message) {
 			return false
 		}
 		resourceMsgName := getResourceMsgNameFromReq(message)
-		if m := f.GetMessageType(); m != nil && m.GetName() == resourceMsgName {
+		if m := f.GetMessageType(); m != nil && m.Name() == resourceMsgName {
 			return true
 		}
 		return false

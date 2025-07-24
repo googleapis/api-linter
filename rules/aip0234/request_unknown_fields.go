@@ -20,16 +20,16 @@ import (
 	"bitbucket.org/creachadair/stringset"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Update methods should not have unrecognized fields.
 var requestUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(234, "request-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return isBatchUpdateRequestMessage(f.GetOwner())
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
 			"allow_missing", // AIP-134
 			"parent",        // AIP-234
@@ -38,11 +38,11 @@ var requestUnknownFields = &lint.FieldRule{
 			"update_mask",   // AIP-134
 			"validate_only", // AIP-163
 		)
-		if !allowedFields.Contains(field.GetName()) {
+		if !allowedFields.Contains(field.Name()) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Unexpected field: Batch Update RPCs must only contain fields explicitly described in https://aip.dev/234, not %q.",
-					string(field.GetName()),
+					string(field.Name()),
 				),
 				Descriptor: field,
 			}}

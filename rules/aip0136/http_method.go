@@ -20,16 +20,16 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var httpMethod = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-method"),
 	OnlyIf: utils.IsCustomMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// DeleteFooRevision is still a custom method, but delete is expected
 		// (enforced in AIP-162 rules).
-		n := m.GetName()
+		n := m.Name()
 		if strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision") {
 			return nil
 		}

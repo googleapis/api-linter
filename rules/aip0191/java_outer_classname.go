@@ -21,17 +21,17 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var javaOuterClassname = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-outer-classname"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
+	OnlyIf: func(f protoreflect.FileDescriptor) bool {
 		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		filename := filepath.Base(f.GetName())
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
+		filename := filepath.Base(f.Name())
 		want := strcase.UpperCamelCase(strings.ReplaceAll(filename, ".", "_"))
 
 		// We ignore case on the comparisons to not be too pedantic on compound

@@ -21,21 +21,21 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The name of the resource must end with the word "Job".
 var requestResourceSuffix = &lint.FieldRule{
 	Name: lint.NewRuleName(152, "request-resource-suffix"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isRunRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isRunRequestMessage(f.GetOwner()) && f.Name() == "name"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// Rule check: Establish that the `resource_reference` annotation's
 		// type ends in "Job".
 		ref := utils.GetResourceReference(f)
 		if ref != nil && !strings.HasSuffix(ref.GetType(), "Job") {
-			suggestion := strings.TrimPrefix(f.GetOwner().GetName(), "Run")
+			suggestion := strings.TrimPrefix(f.GetOwner().Name(), "Run")
 			suggestion = strings.TrimSuffix(suggestion, "Request")
 
 			return []lint.Problem{{

@@ -17,15 +17,15 @@ package aip0132
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The type of the parent field in the List request message should
 // be string.
 var requestParentField = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return utils.IsListRequestMessage(f.GetOwner()) && f.Name() == "parent"
 	},
 	LintField: utils.LintSingularStringField,
 }

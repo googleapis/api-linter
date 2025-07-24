@@ -17,13 +17,13 @@ package aip0128
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceReconcilingBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(128, "resource-reconciling-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isDeclarativeFriendlyResource(f.GetOwner()) && f.GetName() == "reconciling"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isDeclarativeFriendlyResource(f.GetOwner()) && f.Name() == "reconciling"
 	},
 	LintField: utils.LintOutputOnlyField,
 }

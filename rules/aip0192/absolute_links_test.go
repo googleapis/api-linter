@@ -35,7 +35,7 @@ func TestAbsoluteLinks(t *testing.T) {
 			  // This is [a link]({{.URI}}).
 				message Foo {}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages()[0]
 			problems := absoluteLinks.Lint(f)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 				t.Error(diff)

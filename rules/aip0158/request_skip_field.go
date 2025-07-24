@@ -17,16 +17,16 @@ package aip0158
 import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var requestSkipField = &lint.FieldRule{
 	Name: lint.NewRuleName(158, "request-skip-field"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isPaginatedRequestMessage(f.GetOwner()) && f.GetName() == "skip"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return isPaginatedRequestMessage(f.GetOwner()) && f.Name() == "skip"
 	},
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
+	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
 		// Rule check: Ensure that the name page_size is the correct type.
 		if f.GetType() != builder.FieldTypeInt32().GetType() || f.IsRepeated() {
 			return []lint.Problem{{

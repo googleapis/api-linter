@@ -39,7 +39,7 @@ func TestSynonyms(t *testing.T) {
 				message {{.MethodName}}Request {}
 				message Book {}
 			`, test)
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(synonyms.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

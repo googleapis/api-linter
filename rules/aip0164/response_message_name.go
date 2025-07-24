@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Undelete messages should use google.longrunning.Operation
@@ -29,14 +29,14 @@ import (
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(164, "response-message-name"),
 	OnlyIf: isUndeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UndeleteFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := strings.Replace(m.GetName(), "Undelete", "", 1)
-		got := m.GetOutputType().GetName()
+		want := strings.Replace(m.Name(), "Undelete", "", 1)
+		got := m.Output().Name()
 
 		// If the return type is an LRO, use the annotated response type instead.
-		if utils.IsOperation(m.GetOutputType()) {
+		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		}
 

@@ -30,7 +30,7 @@ func TestRequestResourceFieldRequired(t *testing.T) {
 				}
 				message {{.ResourceName}} {}
 			`, test)
-			message := file.GetMessageTypes()[0]
+			message := file.Messages()[0]
 			problems := requestResourceRequired.Lint(file)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Error(diff)

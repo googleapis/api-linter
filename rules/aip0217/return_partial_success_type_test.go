@@ -38,7 +38,7 @@ func TestReturnPartialSuccessType(t *testing.T) {
 					{{.Type}} return_partial_success = 4;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].FindFieldByName("return_partial_success")
+			field := f.Messages()[0].FindFieldByName("return_partial_success")
 			if diff := test.problems.SetDescriptor(field).Diff(returnPartialSuccessType.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -21,25 +21,25 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var lroResponseReachable = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "lro-response-reachable"),
 	OnlyIf: isAnnotatedLRO,
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
 		return checkReachable(m, utils.GetOperationInfo(m).GetResponseType())
 	},
 }
 
-func checkReachable(m *desc.MethodDescriptor, name string) []lint.Problem {
+func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem {
 	// Ignore types defined in other packages.
 	if name == "" || strings.Contains(name, ".") {
 		return nil
 	}
 
 	// Make this the fully qualified type name.
-	f := m.GetFile()
+	f := m.ParentFile()
 	if pkg := f.GetPackage(); pkg != "" {
 		name = pkg + "." + name
 	}

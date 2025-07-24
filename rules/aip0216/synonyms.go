@@ -19,16 +19,16 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var synonyms = &lint.EnumRule{
 	Name: lint.NewRuleName(216, "synonyms"),
-	LintEnum: func(e *desc.EnumDescriptor) []lint.Problem {
-		if strings.HasSuffix(e.GetName(), "Status") {
+	LintEnum: func(e protoreflect.EnumDescriptor) []lint.Problem {
+		if strings.HasSuffix(e.Name(), "Status") {
 			return []lint.Problem{{
 				Message:    `Prefer "State" over "Status" for lifecycle state enums.`,
-				Suggestion: strings.Replace(e.GetName(), "Status", "State", 1),
+				Suggestion: strings.Replace(e.Name(), "Status", "State", 1),
 				Descriptor: e,
 				Location:   locations.DescriptorName(e),
 			}}

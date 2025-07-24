@@ -20,12 +20,12 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noMarkdownTables = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "no-markdown-tables"),
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
 		for _, cmt := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
 			for _, line := range strings.Split(cmt, "\n") {
 				line = strings.TrimSpace(line)

@@ -20,15 +20,15 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var javaPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-package"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
+	OnlyIf: func(f protoreflect.FileDescriptor) bool {
 		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		javaPkg := f.GetFileOptions().GetJavaPackage()
 		if javaPkg == "" {
 			return []lint.Problem{{

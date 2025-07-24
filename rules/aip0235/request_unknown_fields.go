@@ -20,16 +20,16 @@ import (
 	"bitbucket.org/creachadair/stringset"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Delete methods should not have unrecognized fields.
 var requestUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(235, "request-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return isBatchDeleteRequestMessage(f.GetOwner())
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
 			"allow_missing", // AIP-135
 			"force",         // AIP-135
@@ -39,11 +39,11 @@ var requestUnknownFields = &lint.FieldRule{
 			"requests",      // AIP-235
 			"validate_only", // AIP-163
 		)
-		if !allowedFields.Contains(field.GetName()) {
+		if !allowedFields.Contains(field.Name()) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Unexpected field: Batch Delete RPCs must only contain fields explicitly described in https://aip.dev/235, not %q.",
-					string(field.GetName()),
+					string(field.Name()),
 				),
 				Descriptor: field,
 			}}

@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var (
@@ -43,7 +43,7 @@ var (
 var httpTemplateSyntax = &lint.MethodRule{
 	Name:   lint.NewRuleName(127, "http-template-syntax"),
 	OnlyIf: utils.HasHTTPRules,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			// Replace the API Versioning template if it matches exactly so as

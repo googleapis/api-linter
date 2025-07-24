@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -46,11 +46,11 @@ var (
 )
 
 // Returns true if this is an AIP-152 Run method, false otherwise.
-func isRunMethod(m *desc.MethodDescriptor) bool {
-	return runMethodRegexp.MatchString(m.GetName())
+func isRunMethod(m protoreflect.MethodDescriptor) bool {
+	return runMethodRegexp.MatchString(m.Name())
 }
 
 // Returns true if this is an AIP-152 Run request message, false otherwise.
-func isRunRequestMessage(m *desc.MessageDescriptor) bool {
-	return runReqMessageRegexp.MatchString(m.GetName())
+func isRunRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return runReqMessageRegexp.MatchString(m.Name())
 }

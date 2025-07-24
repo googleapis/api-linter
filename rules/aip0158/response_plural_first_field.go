@@ -18,21 +18,21 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var responsePluralFirstField = &lint.MessageRule{
 	Name: lint.NewRuleName(158, "response-plural-first-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return isPaginatedResponseMessage(m) && len(m.GetFields()) > 0
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		return isPaginatedResponseMessage(m) && len(m.Fields()) > 0
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 
 		var message string
 		// Throw a linter warning if, the first field in the message is not named
 		// according to plural(message_name.to_snake().split('_')[1:-1]).
-		firstField := m.GetFields()[0]
+		firstField := m.Fields()[0]
 
 		// If the field is a resource, use the `plural` annotation to decide the
 		// appropriate plural field name.
@@ -41,11 +41,11 @@ var responsePluralFirstField = &lint.MessageRule{
 			want = strcase.SnakeCase(want)
 			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation."
 		} else {
-			want = utils.ToPlural(firstField.GetName())
+			want = utils.ToPlural(firstField.Name())
 			message = "First field of Paginated RPCs' response should be plural."
 		}
 
-		if want != firstField.GetName() {
+		if want != firstField.Name() {
 			return []lint.Problem{{
 				Message:    message,
 				Suggestion: want,

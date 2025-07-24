@@ -48,7 +48,7 @@ func TestHttpNameField(t *testing.T) {
 				message Book {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

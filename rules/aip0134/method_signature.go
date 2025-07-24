@@ -22,17 +22,17 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "method-signature"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 		want := []string{
-			strcase.SnakeCase(strings.TrimPrefix(m.GetName(), "Update")),
+			strcase.SnakeCase(strings.TrimPrefix(m.Name(), "Update")),
 			"update_mask",
 		}
 

@@ -39,7 +39,7 @@ func TestFieldHasComments(t *testing.T) {
 			string title = 2;
 		}
 	`, tst)
-		problems := tst.problems.SetDescriptor(file.GetMessageTypes()[0].GetFields()[1])
+		problems := tst.problems.SetDescriptor(file.Messages()[0].Fields()[1])
 		if diff := problems.Diff(hasComments.Lint(file)); diff != "" {
 			t.Errorf("%s: got(+),want(-):\n%s", tst.testName, diff)
 		}
@@ -63,7 +63,7 @@ func TestMessageHasComments(t *testing.T) {
 			string name = 1;
 		}
 	`, tst)
-		problems := tst.problems.SetDescriptor(file.GetMessageTypes()[0])
+		problems := tst.problems.SetDescriptor(file.Messages()[0])
 		if diff := problems.Diff(hasComments.Lint(file)); diff != "" {
 			t.Errorf("%s: got(+),want(-):\n%s", tst.testName, diff)
 		}

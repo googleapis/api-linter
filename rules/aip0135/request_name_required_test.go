@@ -44,7 +44,7 @@ func TestRequestNameRequired(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := requestNameRequired.Lint(f)
-			message := f.GetMessageTypes()[0]
+			message := f.Messages()[0]
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}

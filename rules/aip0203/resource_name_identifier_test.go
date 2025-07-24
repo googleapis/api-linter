@@ -68,7 +68,7 @@ func TestResourceNameIdentifier(t *testing.T) {
 
 					{{.Field}}
 				}`, test)
-			f := file.GetMessageTypes()[0].GetFields()[0]
+			f := file.Messages()[0].Fields()[0]
 			problems := resourceNameIdentifier.Lint(file)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Error(diff)

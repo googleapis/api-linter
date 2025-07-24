@@ -21,13 +21,13 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(131, "method-signature"),
 	OnlyIf: utils.IsGetMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 
 		// Check if the signature is missing.

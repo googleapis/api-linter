@@ -45,7 +45,7 @@ func TestBase64(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, tmpl, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages()[0].Fields()[0]
 			problems := base64.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

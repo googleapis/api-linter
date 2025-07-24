@@ -20,17 +20,17 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Only the last field in a method signature can be repeated.
 var repeatedFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(4232, "repeated-fields"),
 	OnlyIf: hasMethodSignatures,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		sigs := utils.GetMethodSignatures(m)
-		in := m.GetInputType()
+		in := m.Input()
 
 		for _, sig := range sigs {
 			for _, name := range sig {

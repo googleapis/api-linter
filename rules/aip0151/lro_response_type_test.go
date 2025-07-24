@@ -49,7 +49,7 @@ func TestLROResponse(t *testing.T) {
 				message {{.MethodName}}Request {}
 			`, test)
 			problems := lroResponse.Lint(f)
-			d := f.GetServices()[0].GetMethods()[0]
+			d := f.Services()[0].Methods()[0]
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

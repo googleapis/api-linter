@@ -18,14 +18,14 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // BatchCreate methods should reference the target resource via `child_type` or
 // the parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(233, "resource-reference-type"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		// Return type of the RPC.
 		ot := utils.GetResponseType(m)
 		if ot == nil {
@@ -40,17 +40,17 @@ var resourceReferenceType = &lint.MethodRule{
 		resMsg := repeated[0].GetMessageType()
 		resource := utils.GetResource(resMsg)
 
-		parent := m.GetInputType().FindFieldByName("parent")
+		parent := m.Input().FindFieldByName("parent")
 		return isBatchCreateMethod(m) && parent != nil && utils.GetResourceReference(parent) != nil && resource != nil
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
 		ot := utils.GetResponseType(m)
 		repeated := utils.GetRepeatedMessageFields(ot)
 		resMsg := repeated[0].GetMessageType()
 
 		resource := utils.GetResource(resMsg)
-		parent := m.GetInputType().FindFieldByName("parent")
+		parent := m.Input().FindFieldByName("parent")
 		ref := utils.GetResourceReference(parent)
 
 		if resource.GetType() == ref.GetType() {

@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -50,18 +50,18 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 // get resource message type name from request message
-func getResourceMsgNameFromReq(m *desc.MessageDescriptor) string {
+func getResourceMsgNameFromReq(m protoreflect.MessageDescriptor) string {
 	// retrieve the string between the prefix "Create" and suffix "Request" from
 	// the name "Create<XXX>Request", and this part will usually be the resource
 	// message name(if its naming follows the right principle)
-	resourceMsgName := m.GetName()[6 : len(m.GetName())-7]
+	resourceMsgName := m.Name()[6 : len(m.Name())-7]
 
 	// Get the resource field of the request message if it exist, this part will
 	// be exactly the resource message name (make a double check here to avoid the
 	// issues when request message naming doesn't follow the right principles)
-	for _, fieldDesc := range m.GetFields() {
-		if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && strings.Contains(resourceMsgName, msgDesc.GetName()) {
-			resourceMsgName = msgDesc.GetName()
+	for _, fieldDesc := range m.Fields() {
+		if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && strings.Contains(resourceMsgName, msgDesc.Name()) {
+			resourceMsgName = msgDesc.Name()
 		}
 	}
 
