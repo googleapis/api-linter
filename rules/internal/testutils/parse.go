@@ -16,14 +16,16 @@ package testutils
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
 	"text/template"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/bufbuild/protocompile"
 	"github.com/lithammer/dedent"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 
 	// These imports cause the common protos to be registered with
 	// the protocol buffer registry, and therefore make the call to
@@ -40,26 +42,39 @@ import (
 // a slice of FileDescriptors.
 //
 // It dedents the string before parsing.
-func ParseProtoStrings(t *testing.T, src map[string]string) map[string]*desc.FileDescriptor {
+func ParseProtoStrings(t *testing.T, src map[string]string) map[string]protoreflect.FileDescriptor {
 	filenames := []string{}
 	for k, v := range src {
 		filenames = append(filenames, k)
 		src[k] = strings.TrimSpace(dedent.Dedent(v))
 	}
 
-	// Parse the file.
-	parser := protoparse.Parser{
-		Accessor:              protoparse.FileContentsFromMap(src),
-		IncludeSourceCodeInfo: true,
-		LookupImport:          desc.LoadFileDescriptor,
+	// Create a resolver for the in-memory files.
+	memResolver := &protocompile.SourceResolver{
+		Accessor: protocompile.SourceAccessorFromMap(src),
 	}
-	fds, err := parser.ParseFiles(filenames...)
+
+	// Create a resolver for imports.
+	importResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
+		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
+		if err != nil {
+			return protocompile.SearchResult{}, err
+		}
+		return protocompile.SearchResult{Desc: fd}, nil
+	})
+
+	compiler := protocompile.Compiler{
+		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver{memResolver, importResolver}),
+		SourceInfoMode: protocompile.SourceInfoStandard,
+	}
+	files, err := compiler.Compile(context.Background(), filenames...)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	answer := map[string]*desc.FileDescriptor{}
-	for _, fd := range fds {
-		answer[fd.GetName()] = fd
+
+	answer := map[string]protoreflect.FileDescriptor{}
+	for _, fd := range files {
+		answer[fd.Path()] = fd
 	}
 	return answer
 }
@@ -69,7 +84,7 @@ func ParseProtoStrings(t *testing.T, src map[string]string) map[string]*desc.Fil
 //
 // It adds the `syntax = "proto3";` line to the beginning of the file and
 // chooses a filename, and then calls ParseProtoStrings.
-func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
+func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
 	return ParseProtoStrings(t, map[string]string{
 		"test.proto": fmt.Sprintf(
 			"syntax = \"proto3\";\n\n%s",
@@ -83,7 +98,7 @@ func ParseProto3String(t *testing.T, src string) *desc.FileDescriptor {
 //
 // It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3String.
-func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescriptor {
+func ParseProto3Tmpl(t *testing.T, src string, data interface{}) protoreflect.FileDescriptor {
 	return ParseProto3Tmpls(t, map[string]string{
 		"test.proto": src,
 	}, data)["test.proto"]
@@ -94,7 +109,7 @@ func ParseProto3Tmpl(t *testing.T, src string, data interface{}) *desc.FileDescr
 //
 // It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3Strings.
-func ParseProto3Tmpls(t *testing.T, srcs map[string]string, data interface{}) map[string]*desc.FileDescriptor {
+func ParseProto3Tmpls(t *testing.T, srcs map[string]string, data interface{}) map[string]protoreflect.FileDescriptor {
 	strs := map[string]string{}
 	for fn, src := range srcs {
 		// Create a new template object.

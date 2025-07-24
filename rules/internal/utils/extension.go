@@ -18,8 +18,8 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	lrpb "google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	lrpb "google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -28,14 +28,18 @@ import (
 // the given field.
 func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
 	opts := f.Options()
-	if x := proto.GetExtension(opts, annotations.E_FieldBehavior); x != nil {
-		answer := stringset.New()
-		for _, fb := range x.([]annotations.FieldBehavior) {
-			answer.Add(fb.String())
-		}
-		return answer
+	if !opts.ProtoReflect().Has(annotations.E_FieldBehavior.TypeDescriptor()) {
+		return stringset.New()
 	}
-	return nil
+	extValue := opts.ProtoReflect().Get(annotations.E_FieldBehavior.TypeDescriptor())
+	extList := extValue.List()
+
+	answer := stringset.New()
+	for i := 0; i < extList.Len(); i++ {
+		fb := annotations.FieldBehavior(extList.Get(i).Enum())
+		answer.Add(fb.String())
+	}
+	return answer
 }
 
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
@@ -44,10 +48,23 @@ func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 		return nil
 	}
 	opts := m.Options()
-	if x := proto.GetExtension(opts, lrpb.E_OperationInfo); x != nil {
-		return x.(*lrpb.OperationInfo)
+	if !opts.ProtoReflect().Has(lrpb.E_OperationInfo.TypeDescriptor()) {
+		return nil
 	}
-	return nil
+	ext := opts.ProtoReflect().Get(lrpb.E_OperationInfo.TypeDescriptor()).Message().Interface()
+	if opInfo, ok := ext.(*lrpb.OperationInfo); ok {
+		return opInfo
+	}
+	// It may be a dynamic message, so we need to marshal and unmarshal.
+	b, err := proto.Marshal(ext)
+	if err != nil {
+		return nil
+	}
+	opInfo := &lrpb.OperationInfo{}
+	if err := proto.Unmarshal(b, opInfo); err != nil {
+		return nil
+	}
+	return opInfo
 }
 
 // GetOperationResponseType returns the message referred to by the
@@ -101,12 +118,17 @@ func GetMetadataType(m protoreflect.MethodDescriptor) protoreflect.MessageDescri
 
 // GetMethodSignatures returns the `google.api.method_signature` annotations.
 func GetMethodSignatures(m protoreflect.MethodDescriptor) [][]string {
-	answer := [][]string{}
 	opts := m.Options()
-	if x := proto.GetExtension(opts, annotations.E_MethodSignature); x != nil {
-		for _, sig := range x.([]string) {
-			answer = append(answer, strings.Split(sig, ","))
-		}
+	if !opts.ProtoReflect().Has(annotations.E_MethodSignature.TypeDescriptor()) {
+		return [][]string{}
+	}
+	extValue := opts.ProtoReflect().Get(annotations.E_MethodSignature.TypeDescriptor())
+	extList := extValue.List()
+
+	answer := [][]string{}
+	for i := 0; i < extList.Len(); i++ {
+		sig := extList.Get(i).String()
+		answer = append(answer, strings.Split(sig, ","))
 	}
 	return answer
 }
@@ -117,10 +139,23 @@ func GetResource(m protoreflect.MessageDescriptor) *annotations.ResourceDescript
 		return nil
 	}
 	opts := m.Options()
-	if x := proto.GetExtension(opts, annotations.E_Resource); x != nil {
-		return x.(*annotations.ResourceDescriptor)
+	if !opts.ProtoReflect().Has(annotations.E_Resource.TypeDescriptor()) {
+		return nil
 	}
-	return nil
+	ext := opts.ProtoReflect().Get(annotations.E_Resource.TypeDescriptor()).Message().Interface()
+	if res, ok := ext.(*annotations.ResourceDescriptor); ok {
+		return res
+	}
+	// It may be a dynamic message, so we need to marshal and unmarshal.
+	b, err := proto.Marshal(ext)
+	if err != nil {
+		return nil
+	}
+	res := &annotations.ResourceDescriptor{}
+	if err := proto.Unmarshal(b, res); err != nil {
+		return nil
+	}
+	return res
 }
 
 // IsResource returns true if the message has a populated google.api.resource
@@ -158,10 +193,31 @@ func IsSingletonResourcePattern(pattern string) bool {
 // for a file.
 func GetResourceDefinitions(f protoreflect.FileDescriptor) []*annotations.ResourceDescriptor {
 	opts := f.Options()
-	if x := proto.GetExtension(opts, annotations.E_ResourceDefinition); x != nil {
-		return x.([]*annotations.ResourceDescriptor)
+	if !opts.ProtoReflect().Has(annotations.E_ResourceDefinition.TypeDescriptor()) {
+		return nil
 	}
-	return nil
+	extValue := opts.ProtoReflect().Get(annotations.E_ResourceDefinition.TypeDescriptor())
+	extList := extValue.List()
+
+	answer := []*annotations.ResourceDescriptor{}
+	for i := 0; i < extList.Len(); i++ {
+		msg := extList.Get(i).Message().Interface()
+		if rd, ok := msg.(*annotations.ResourceDescriptor); ok {
+			answer = append(answer, rd)
+		} else {
+			// It may be a dynamic message, so we need to marshal and unmarshal.
+			b, err := proto.Marshal(msg)
+			if err != nil {
+				continue
+			}
+			rd := &annotations.ResourceDescriptor{}
+			if err := proto.Unmarshal(b, rd); err != nil {
+				continue
+			}
+			answer = append(answer, rd)
+		}
+	}
+	return answer
 }
 
 // HasResourceReference returns if the field has a google.api.resource_reference annotation.
@@ -169,7 +225,7 @@ func HasResourceReference(f protoreflect.FieldDescriptor) bool {
 	if f == nil {
 		return false
 	}
-	return proto.HasExtension(f.Options(), annotations.E_ResourceReference)
+	return f.Options().ProtoReflect().Has(annotations.E_ResourceReference.TypeDescriptor())
 }
 
 // GetResourceReference returns the google.api.resource_reference annotation.
@@ -178,10 +234,23 @@ func GetResourceReference(f protoreflect.FieldDescriptor) *annotations.ResourceR
 		return nil
 	}
 	opts := f.Options()
-	if x := proto.GetExtension(opts, annotations.E_ResourceReference); x != nil {
-		return x.(*annotations.ResourceReference)
+	if !opts.ProtoReflect().Has(annotations.E_ResourceReference.TypeDescriptor()) {
+		return nil
 	}
-	return nil
+	ext := opts.ProtoReflect().Get(annotations.E_ResourceReference.TypeDescriptor()).Message().Interface()
+	if res, ok := ext.(*annotations.ResourceReference); ok {
+		return res
+	}
+	// It may be a dynamic message, so we need to marshal and unmarshal.
+	b, err := proto.Marshal(ext)
+	if err != nil {
+		return nil
+	}
+	res := &annotations.ResourceReference{}
+	if err := proto.Unmarshal(b, res); err != nil {
+		return nil
+	}
+	return res
 }
 
 // FindResource returns first resource of type matching the reference param.
@@ -270,15 +339,27 @@ func FindResourceChildren(parent *annotations.ResourceDescriptor, file protorefl
 }
 
 func HasFieldInfo(fd protoreflect.FieldDescriptor) bool {
-	return fd != nil && proto.HasExtension(fd.Options(), annotations.E_FieldInfo)
+	return fd != nil && fd.Options().ProtoReflect().Has(annotations.E_FieldInfo.TypeDescriptor())
 }
 
 func GetFieldInfo(fd protoreflect.FieldDescriptor) *annotations.FieldInfo {
 	if !HasFieldInfo(fd) {
 		return nil
 	}
-
-	return proto.GetExtension(fd.Options(), annotations.E_FieldInfo).(*annotations.FieldInfo)
+	ext := fd.Options().ProtoReflect().Get(annotations.E_FieldInfo.TypeDescriptor()).Message().Interface()
+	if fi, ok := ext.(*annotations.FieldInfo); ok {
+		return fi
+	}
+	// It may be a dynamic message, so we need to marshal and unmarshal.
+	b, err := proto.Marshal(ext)
+	if err != nil {
+		return nil
+	}
+	fi := &annotations.FieldInfo{}
+	if err := proto.Unmarshal(b, fi); err != nil {
+		return nil
+	}
+	return fi
 }
 
 func HasFormat(fd protoreflect.FieldDescriptor) bool {

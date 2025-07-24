@@ -20,7 +20,7 @@ import (
 
 	"github.com/bufbuild/protocompile"
 	"github.com/bufbuild/protocompile/linker"
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoregistry"
 
 	// These imports are for populating the global registry
 	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
@@ -46,11 +46,11 @@ func Compile(t *testing.T, template string, data any) linker.File {
 	// Create a custom resolver to ensure that we read from the global registry
 	// which allows us to get the googleapis for our tests
 	registryResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
-		fd, err := desc.LoadFileDescriptor(path)
+		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
 		if err != nil {
 			return protocompile.SearchResult{}, err
 		}
-		return protocompile.SearchResult{Proto: fd.AsFileDescriptorProto()}, nil
+		return protocompile.SearchResult{Desc: fd}, nil
 	})
 
 	compiler := protocompile.Compiler{

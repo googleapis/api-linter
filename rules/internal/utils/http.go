@@ -25,7 +25,7 @@ import (
 // HasHTTPRules returns true when the given method descriptor is annotated with
 // a google.api.http option.
 func HasHTTPRules(m protoreflect.MethodDescriptor) bool {
-	return proto.HasExtension(m.Options(), annotations.E_Http)
+	return m.Options().ProtoReflect().Has(annotations.E_Http.TypeDescriptor())
 }
 
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
@@ -41,8 +41,22 @@ func GetHTTPRules(m protoreflect.MethodDescriptor) []*HTTPRule {
 	opts := m.Options()
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if x := proto.GetExtension(opts, annotations.E_Http); x != nil {
-		httpRule := x.(*annotations.HttpRule)
+	if opts.ProtoReflect().Has(annotations.E_Http.TypeDescriptor()) {
+		ext := opts.ProtoReflect().Get(annotations.E_Http.TypeDescriptor()).Message().Interface()
+		var httpRule *annotations.HttpRule
+		if r, ok := ext.(*annotations.HttpRule); ok {
+			httpRule = r
+		} else {
+			b, err := proto.Marshal(ext)
+			if err != nil {
+				return nil
+			}
+			httpRule = &annotations.HttpRule{}
+			if err := proto.Unmarshal(b, httpRule); err != nil {
+				return nil
+			}
+		}
+
 		if parsedRule := parseRule(httpRule); parsedRule != nil {
 			rules = append(rules, parsedRule)
 

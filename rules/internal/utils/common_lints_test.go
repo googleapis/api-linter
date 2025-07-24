@@ -46,13 +46,11 @@ func TestLintRequiredField(t *testing.T) {
 	} {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.Compile(t, `
-				syntax= "proto3";
-
 				import "google/api/field_behavior.proto";
 				message Message {
 					string foo = 1 {{.Annotation}};
 				}
-			`, `[(google.api.field_behavior) = REQUIRED]`)
+			`, test)
 			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintRequiredField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
