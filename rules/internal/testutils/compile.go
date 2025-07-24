@@ -33,9 +33,25 @@ func Compile(t *testing.T, template string, data any) linker.File {
 			"test.proto": "syntax = \"proto3\";\n" + content,
 		}),
 	}
+	// TODO: this is a temp measurement. this requires linking the googleapis locally
+	// and  it also requires depending on them. We might want to figure out a better
+	// approach. maybe we could add it as a git submodule
+	// Create a resolver for googleapis (used for standard API imports).
+	// This assumes the `googleapis` directory exists relative to the project root.
+	googleApisResolver := &protocompile.SourceResolver{
+		ImportPaths: []string{"googleapis"},
+	}
 
 	compiler := protocompile.Compiler{
-		Resolver: protocompile.WithStandardImports(memResolver),
+		// Combine the in-memory resolver with the googleapis resolver.
+		// protocompile.WithStandardImports ensures that well-known types are also
+		// resolved correctly.
+		Resolver: protocompile.WithStandardImports(
+			protocompile.CompositeResolver{
+				memResolver,
+				googleApisResolver,
+			},
+		),
 	}
 	files, err := compiler.Compile(
 		background,
