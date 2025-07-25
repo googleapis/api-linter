@@ -31,7 +31,8 @@ var requestRequiredFields = &lint.MessageRule{
 		// Rule check: Establish that there are no unexpected fields.
 		allowedRequiredFields := stringset.New("parent")
 
-		for _, f := range m.Fields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			f := m.Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}

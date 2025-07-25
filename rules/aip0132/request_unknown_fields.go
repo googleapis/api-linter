@@ -39,10 +39,13 @@ var allowedFields = stringset.New(
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-unknown-fields"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner())
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m)
+		}
+		return false
 	},
 	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
-		if !allowedFields.Contains(field.Name()) {
+		if !allowedFields.Contains(string(field.Name())) {
 			return []lint.Problem{{
 				Message:    "List RPCs should only contain fields explicitly described in AIPs.",
 				Descriptor: field,

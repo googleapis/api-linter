@@ -16,14 +16,14 @@ var requestParentRequired = &lint.MessageRule{
 	OnlyIf: utils.IsListRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `parent` field is present.
-		if m.FindFieldByName("parent") == nil {
+		if m.Fields().ByName("parent") == nil {
 			// In order to parse out the pattern, we get the resource message
 			// from the response, then get the resource annotation from that,
 			// and then inspect the pattern there (oy!).
-			plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "List")
+			plural := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "List")
 			if resp := utils.FindMessage(m.ParentFile(), fmt.Sprintf("List%sResponse", plural)); resp != nil {
-				if resField := resp.FindFieldByName(strcase.SnakeCase(plural)); resField != nil {
-					if !utils.HasParent(utils.GetResource(resField.GetMessageType())) {
+				if resField := resp.Fields().ByName(protoreflect.Name(strcase.SnakeCase(plural))); resField != nil {
+					if !utils.HasParent(utils.GetResource(resField.Message())) {
 						return nil
 					}
 				}

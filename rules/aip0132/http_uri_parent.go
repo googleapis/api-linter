@@ -24,7 +24,7 @@ import (
 var httpURIParent = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "http-uri-parent"),
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
-		return utils.IsListMethod(m) && m.Input().FindFieldByName("parent") != nil
+		return utils.IsListMethod(m) && m.Input().Fields().ByName("parent") != nil
 	},
 	LintMethod: utils.LintHTTPURIHasParentVariable,
 }

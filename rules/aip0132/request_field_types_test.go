@@ -49,7 +49,7 @@ func TestRequestFieldTypes(t *testing.T) {
 					{{.Field}} = 1;
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := requestFieldTypes.Lint(f)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

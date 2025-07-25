@@ -42,7 +42,7 @@ func TestResponseUnknownFields(t *testing.T) {
 				}
 				message Book {}
 			`, test)
-			field := f.Messages()[0].Fields()[2]
+			field := f.Messages().Get(0).Fields().Get(2)
 			if diff := test.problems.SetDescriptor(field).Diff(responseUnknownFields.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

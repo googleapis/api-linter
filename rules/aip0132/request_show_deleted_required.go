@@ -20,17 +20,17 @@ var requestShowDeletedRequired = &lint.MessageRule{
 		}
 		// Check for soft-delete support by getting the resource name
 		// from the corresponding response message.
-		plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "List")
+		plural := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "List")
 		if resp := utils.FindMessage(m.ParentFile(), fmt.Sprintf("List%sResponse", plural)); resp != nil {
-			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil && paged.GetMessageType() != nil {
-				singular := paged.GetMessageType().Name()
-				return utils.FindMethod(m.ParentFile(), "Undelete"+singular) != nil
+			if paged := resp.Fields().ByName(protoreflect.Name(strcase.SnakeCase(plural))); paged != nil && paged.Message() != nil {
+				singular := paged.Message().Name()
+				return utils.FindMethod(m.ParentFile(), "Undelete"+string(singular)) != nil
 			}
 		}
 		return false
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		if m.FindFieldByName("show_deleted") != nil {
+		if m.Fields().ByName("show_deleted") != nil {
 			return nil
 		}
 		return []lint.Problem{{

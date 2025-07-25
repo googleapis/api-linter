@@ -30,9 +30,12 @@ var knownFields = map[string]func(protoreflect.FieldDescriptor) []lint.Problem{
 var requestFieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-field-types"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner()) && knownFields[f.Name()] != nil
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m) && knownFields[string(f.Name())] != nil
+		}
+		return false
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		return knownFields[f.Name()](f)
+		return knownFields[string(f.Name())](f)
 	},
 }

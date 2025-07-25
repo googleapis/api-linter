@@ -28,21 +28,25 @@ var requestParentValidReference = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-valid-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		ref := utils.GetResourceReference(f)
-		return utils.IsListRequestMessage(f.GetOwner()) && f.Name() == "parent" && ref != nil && ref.GetType() != ""
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m) && f.Name() == "parent" && ref != nil && ref.GetType() != ""
+		}
+		return false
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		p := f.Parent()
 		msg := p.(protoreflect.MessageDescriptor)
 		res := utils.GetResourceReference(f).GetType()
 
-		response := utils.FindMessage(f.ParentFile(), strings.Replace(msg.Name(), "Request", "Response", 1))
+		response := utils.FindMessage(f.ParentFile(), strings.Replace(string(msg.Name()), "Request", "Response", 1))
 		if response == nil {
 			return nil
 		}
 
-		for _, field := range response.Fields() {
-			typ := field.GetMessageType()
-			if !field.IsRepeated() && typ == nil {
+		for i := 0; i < response.Fields().Len(); i++ {
+			field := response.Fields().Get(i)
+			typ := field.Message()
+			if !field.IsList() && typ == nil {
 				continue
 			}
 

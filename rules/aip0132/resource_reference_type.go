@@ -27,7 +27,7 @@ import (
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "resource-reference-type"),
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
-		p := m.Input().FindFieldByName("parent")
+		p := m.Input().Fields().ByName("parent")
 
 		var resource *annotations.ResourceDescriptor
 		resourceField := utils.GetListResourceMessage(m)
@@ -39,9 +39,9 @@ var resourceReferenceType = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// The first repeated message field must be the paginated resource.
 		repeated := utils.GetRepeatedMessageFields(m.Output())
-		resource := utils.GetResource(repeated[0].GetMessageType())
+		resource := utils.GetResource(repeated[0].Message())
 
-		parent := m.Input().FindFieldByName("parent")
+		parent := m.Input().Fields().ByName("parent")
 		ref := utils.GetResourceReference(parent)
 
 		if resource.GetType() == ref.GetType() {

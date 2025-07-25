@@ -27,7 +27,7 @@ import (
 var methodSignature = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "method-signature"),
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
-		return utils.IsListMethod(m) && m.Input().FindFieldByName("parent") != nil
+		return utils.IsListMethod(m) && m.Input().Fields().ByName("parent") != nil
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
