@@ -24,9 +24,9 @@ func TestUnknownFields(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
-		messageName string
-		fieldName   string
-		fieldType   string
+		MessageName string
+		FieldName   string
+		FieldType   string
 		problems    testutils.Problems
 	}{
 		{"Force", "DeleteBookRequest", "force", "bool", testutils.Problems{}},
@@ -44,9 +44,9 @@ func TestUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				message {{.messageName}} {
+				message {{.MessageName}} {
 					string name = 1;
-					{{.fieldType}} {{.fieldName}} = 2;
+					{{.FieldType}} {{.FieldName}} = 2;
 				}
 			`, test)
 

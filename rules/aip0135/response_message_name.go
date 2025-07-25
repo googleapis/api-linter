@@ -38,7 +38,7 @@ var responseMessageName = &lint.MethodRule{
 		// message is `google.protobuf.Empty` or `Foo`.
 		got := m.Output().Name()
 		if stringset.New("Empty", "Operation").Contains(string(got)) {
-			got = m.Output().FullName()
+			got = protoreflect.Name(string(m.Output().FullName()))
 		}
 		want := stringset.New(resource, "google.protobuf.Empty")
 
@@ -81,3 +81,4 @@ var responseMessageName = &lint.MethodRule{
 		return nil
 	},
 }
+
