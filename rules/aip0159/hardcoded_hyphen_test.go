@@ -41,7 +41,7 @@ func TestHardcodedHyphen(t *testing.T) {
 			message ListBooksRequest {}
 			message ListBooksResponse {}
 		`, test)
-		method := f.Services()[0].Methods()[0]
+		method := f.Services().Get(0).Methods().Get(0)
 		if diff := test.problems.SetDescriptor(method).Diff(hardcodedHyphen.Lint(f)); diff != "" {
 			t.Error(diff)
 		}
