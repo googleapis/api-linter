@@ -62,7 +62,7 @@ func TestRepeatedFields(t *testing.T) {
 				}
 				message ArchiveBookResponse {}
 			`, test)
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(repeatedFields.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

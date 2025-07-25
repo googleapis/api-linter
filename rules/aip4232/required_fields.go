@@ -35,9 +35,10 @@ var requiredFields = &lint.MethodRule{
 		in := m.Input()
 
 		requiredFields := []string{}
-		for _, f := range in.Fields() {
+		for i := 0; i < in.Fields().Len(); i++ {
+			f := in.Fields().Get(i)
 			if utils.GetFieldBehavior(f).Contains("REQUIRED") {
-				requiredFields = append(requiredFields, f.Name())
+				requiredFields = append(requiredFields, string(f.Name()))
 			}
 		}
 		for i, sig := range sigs {

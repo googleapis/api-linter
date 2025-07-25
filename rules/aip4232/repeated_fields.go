@@ -42,7 +42,7 @@ var repeatedFields = &lint.MethodRule{
 				// Exclude the last one from the look up since it can be repeated.
 				for i := range chain[:len(chain)-1] {
 					n := strings.Join(chain[:i+1], ".")
-					if f := utils.FindFieldDotNotation(in, n); f != nil && f.IsRepeated() {
+					if f := utils.FindFieldDotNotation(in, n); f != nil && f.IsList() {
 						problems = append(problems, lint.Problem{
 							Message:    fmt.Sprintf("Field %q in method_signature %q: only the last field in a signature argument can be repeated.", name, strings.Join(sig, ",")),
 							Descriptor: m,
