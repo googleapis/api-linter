@@ -19,13 +19,12 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var requestIdFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(155, "request-id-format"),
 	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING &&
+		return fd.Kind() == protoreflect.StringKind &&
 			fd.Name() == "request_id"
 	},
 	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
