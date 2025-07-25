@@ -93,6 +93,20 @@ func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
 	})["test.proto"]
 }
 
+// ParseProto2String parses a string representing a proto file, and returns
+// a FileDescriptor.
+//
+// It adds the `syntax = "proto2";` line to the beginning of the file and
+// chooses a filename, and then calls ParseProtoStrings.
+func ParseProto2String(t *testing.T, src string) protoreflect.FileDescriptor {
+	return ParseProtoStrings(t, map[string]string{
+		"test.proto": fmt.Sprintf(
+			"syntax = \"proto2\";\n\n%s",
+			strings.TrimSpace(dedent.Dedent(src)),
+		),
+	})["test.proto"]
+}
+
 // ParseProto3Tmpl parses a template string representing a proto file, and
 // returns a FileDescriptor.
 //
