@@ -49,7 +49,7 @@ func TestHTTPVariables(t *testing.T) {
 				message {{.MethodName}}Request {}
 				message {{.MethodName}}Response {}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(httpNameVariable.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -37,13 +37,13 @@ var httpBody = &lint.MethodRule{
 				// Determine the name of the resource.
 				// This entails some guessing; we assume that the verb is a single
 				// word and that the resource is everything else.
-				resource := strings.Join(strings.Split(strcase.SnakeCase(m.Name()), "_")[1:], "_")
+				resource := strings.Join(strings.Split(strcase.SnakeCase(string(m.Name())), "_")[1:], "_")
 				if !stringset.New(resource, "*").Contains(httpRule.Body) {
 					// Some field types make sense to use as a body instead of the entire request message,
 					// e.g. google.api.HttpBody.
-					b := m.Input().FindFieldByName(httpRule.Body)
-					isMessageType := b != nil && b.GetMessageType() != nil
-					if isMessageType && allowedBodyTypes.Contains(b.GetMessageType().GetFullyQualifiedName()) {
+					b := m.Input().Fields().ByName(protoreflect.Name(httpRule.Body))
+					isMessageType := b != nil && b.Message() != nil
+					if isMessageType && allowedBodyTypes.Contains(string(b.Message().FullName())) {
 						continue
 					}
 

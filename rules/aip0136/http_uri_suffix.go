@@ -52,12 +52,12 @@ var uriSuffix = &lint.MethodRule{
 			// ----------------------------------------------------------------------
 			// If the URI contains `{name=` or `{parent=`, expect `:verb`.
 			if strings.Contains(httpRule.URI, ":batch") {
-				rpcSlice := strings.Split(strcase.SnakeCase(m.Name()), "_")
+				rpcSlice := strings.Split(strcase.SnakeCase(string(m.Name())), "_")
 				want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
 			} else {
 				for key := range httpRule.GetVariables() {
 					if key == "name" || key == "parent" || strings.HasSuffix(key, ".name") {
-						rpcSlice := strings.Split(strcase.SnakeCase(m.Name()), "_")
+						rpcSlice := strings.Split(strcase.SnakeCase(string(m.Name())), "_")
 						want = ":" + rpcSlice[0]
 						break
 					}
@@ -67,15 +67,15 @@ var uriSuffix = &lint.MethodRule{
 			// AIP-162 introduces some special cases around revisions, where
 			// `ListFooRevisions` gets a suffix of `:listRevisions` (and the same for
 			// `Delete` and `Tag`).
-			n := m.Name()
-			if strings.HasPrefix(n, "List") && strings.HasSuffix(m.Name(), "Revisions") {
+			n := string(m.Name())
+			if strings.HasPrefix(n, "List") && strings.HasSuffix(n, "Revisions") {
 				want = ":listRevisions"
 			}
-			if strings.HasSuffix(m.Name(), "Revision") {
-				if strings.HasPrefix(m.Name(), "Tag") {
+			if strings.HasSuffix(n, "Revision") {
+				if strings.HasPrefix(n, "Tag") {
 					want = ":tagRevision"
 				}
-				if strings.HasPrefix(m.Name(), "Delete") {
+				if strings.HasPrefix(n, "Delete") {
 					want = ":deleteRevision"
 				}
 			}
@@ -95,7 +95,7 @@ var uriSuffix = &lint.MethodRule{
 
 			// Nothing else applied; expect `:verbNoun`.
 			if len(want) == 0 {
-				want = ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.Name()))
+				want = ":" + strcase.LowerCamelCase(strcase.SnakeCase(n))
 			}
 
 			// Do we have the suffix we expect?

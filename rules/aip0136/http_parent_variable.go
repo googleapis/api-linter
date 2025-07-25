@@ -43,7 +43,7 @@ var httpParentVariable = &lint.MethodRule{
 
 				// Does the RPC name end in the singular or plural name of the resource?
 				// If not, complain.
-				snakeName := strcase.SnakeCase(m.Name())
+				snakeName := strcase.SnakeCase(string(m.Name()))
 				if !strings.HasSuffix(snakeName, plural) && !strings.HasSuffix(snakeName, singular) {
 					return []lint.Problem{{
 						Message:    "The parent variable should only be used if the RPC noun matches the URI.",

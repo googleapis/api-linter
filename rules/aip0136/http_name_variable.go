@@ -35,7 +35,7 @@ var httpNameVariable = &lint.MethodRule{
 
 			// Special case: AIP-162 describes "revision" methods; the `name`
 			// variable is appropriate (and mandated) for those.
-			if strings.HasSuffix(m.Name(), "Revision") || strings.HasSuffix(m.Name(), "Revisions") {
+			if strings.HasSuffix(string(m.Name()), "Revision") || strings.HasSuffix(string(m.Name()), "Revisions") {
 				return nil
 			}
 
@@ -49,7 +49,7 @@ var httpNameVariable = &lint.MethodRule{
 
 				// Does the RPC name end in the singular name of the resource?
 				// If not, complain.
-				if !strings.HasSuffix(strcase.SnakeCase(m.Name()), resource) {
+				if !strings.HasSuffix(strcase.SnakeCase(string(m.Name())), resource) {
 					return []lint.Problem{{
 						Message:    "The name variable should only be used if the RPC noun matches the URI.",
 						Descriptor: m,

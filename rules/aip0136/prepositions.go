@@ -28,7 +28,7 @@ import (
 var noPrepositions = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "prepositions"),
 	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
-		for _, word := range strings.Split(strcase.SnakeCase(m.Name()), "_") {
+		for _, word := range strings.Split(strcase.SnakeCase(string(m.Name())), "_") {
 			if data.Prepositions.Contains(word) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Method names should not include prepositions (%q).", word),

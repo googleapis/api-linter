@@ -58,7 +58,7 @@ func TestDeclarativeFriendly(t *testing.T) {
 					};
 				}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(standardMethodsOnly.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

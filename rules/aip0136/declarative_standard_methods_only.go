@@ -30,7 +30,7 @@ var standardMethodsOnly = &lint.MethodRule{
 		// Standard methods are fine.
 		standard := stringset.New("Get", "List", "Create", "Update", "Delete", "Undelete", "Batch")
 		for s := range standard {
-			if strings.HasPrefix(m.Name(), s) {
+			if strings.HasPrefix(string(m.Name()), s) {
 				return nil
 			}
 		}
@@ -40,7 +40,7 @@ var standardMethodsOnly = &lint.MethodRule{
 		//
 		// Therefore, we allow "Imperative only." in an internal comment to make
 		// this not complain.
-		if cmt := m.GetSourceInfo().GetLeadingComments(); strings.Contains(strings.ToLower(cmt), "imperative only") {
+		if cmt := m.ParentFile().SourceLocations().ByDescriptor(m).LeadingComments; strings.Contains(strings.ToLower(string(cmt)), "imperative only") {
 			return nil
 		}
 

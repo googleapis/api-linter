@@ -55,12 +55,12 @@ var responseMessageName = &lint.MethodRule{
 		}
 		res := utils.GetResource(response)
 		responseResourceType := res.GetType()
-		requestResourceType := utils.GetResourceReference(m.Input().FindFieldByName("name")).GetType()
+		requestResourceType := utils.GetResourceReference(m.Input().Fields().ByName("name")).GetType()
 
 		// Check to see if the custom method uses the resource type name as the target
 		// field name and use that instead if `name` is not present as well.
 		// AIP-144 methods recommend this naming style.
-		resourceFieldType := utils.GetResourceReference(m.Input().FindFieldByName(utils.GetResourceSingular(res))).GetType()
+		resourceFieldType := utils.GetResourceReference(m.Input().Fields().ByName(protoreflect.Name(utils.GetResourceSingular(res)))).GetType()
 		if requestResourceType == "" && resourceFieldType != "" {
 			requestResourceType = resourceFieldType
 		}
