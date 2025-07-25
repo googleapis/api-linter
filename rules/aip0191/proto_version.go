@@ -24,7 +24,7 @@ import (
 var syntax = &lint.FileRule{
 	Name: lint.NewRuleName(191, "proto-version"),
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		if !f.IsProto3() {
+		if f.Syntax() != protoreflect.Proto3 {
 			return []lint.Problem{{
 				Message:    "All API proto files must use proto3 syntax.",
 				Suggestion: "syntax = \"proto3\";",

@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestFilename(t *testing.T) {
@@ -30,26 +29,26 @@ func TestFilename(t *testing.T) {
 		{"Valid", "library.proto", testutils.Problems{}},
 		{"ValidDirectory", "google/library.proto", testutils.Problems{}},
 		{"ValidFileNameWithSnakeCase", "library_test.proto", testutils.Problems{}},
-		{"InvalidFileNameNotSnakeCase", "library.test.proto", testutils.Problems{{Message: "invalid characters"}}},
-		{"InvalidCharacterUpperCase", "library_Test.proto", testutils.Problems{{Message: "invalid characters"}}},
-		{"InvalidCharacterDollar", "library_$test.proto", testutils.Problems{{Message: "invalid characters"}}},
-		{"InvalidCharacterSpace", "library test.proto", testutils.Problems{{Message: "invalid characters"}}},
-		{"InvalidCharacterHash", "library_#test.proto", testutils.Problems{{Message: "invalid characters"}}},
-		{"InvalidStable", "v1.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidBigStable", "v20.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidStableDirectory", "google/library/v1.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidAlphaUnnumbered", "v1alpha.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidAlphaNumbered", "v1alpha1.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidBetaUnnumbered", "v1beta.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidBetaNumbered", "v1beta1.proto", testutils.Problems{{Message: "proto version"}}},
-		{"InvalidPoint", "v1p1beta1.proto", testutils.Problems{{Message: "proto version"}}},
+		{"InvalidFileNameNotSnakeCase", "library.test.proto", testutils.Problems{{Message: "The filename has invalid characters."}}},
+		{"InvalidCharacterUpperCase", "library_Test.proto", testutils.Problems{{Message: "The filename has invalid characters."}}},
+		{"InvalidCharacterDollar", "library_$test.proto", testutils.Problems{{Message: "The filename has invalid characters."}}},
+		{"InvalidCharacterSpace", "library test.proto", testutils.Problems{{Message: "The filename has invalid characters."}}},
+		{"InvalidCharacterHash", "library_#test.proto", testutils.Problems{{Message: "The filename has invalid characters."}}},
+		{"InvalidStable", "v1.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidBigStable", "v20.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidStableDirectory", "google/library/v1.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidAlphaUnnumbered", "v1alpha.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidAlphaNumbered", "v1alpha1.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidBetaUnnumbered", "v1beta.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidBetaNumbered", "v1beta1.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
+		{"InvalidPoint", "v1p1beta1.proto", testutils.Problems{{Message: "The proto version must not be used as the filename."}}},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := builder.NewFile(test.filename).Build()
-			if err != nil {
-				t.Fatalf("Failed to build file.")
-			}
+			files := testutils.ParseProtoStrings(t, map[string]string{
+				test.filename: "",
+			})
+			f := files[test.filename]
 			if diff := test.problems.SetDescriptor(f).Diff(filename.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

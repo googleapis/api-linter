@@ -23,9 +23,10 @@ var fileLayout = &lint.FileRule{
 	Name: lint.NewRuleName(191, "file-layout"),
 	LintFile: func(f protoreflect.FileDescriptor) (problems []lint.Problem) {
 		// Verify that services precede messages.
-		if len(f.Messages()) > 0 {
-			firstMessage := f.Messages()[0]
-			for _, service := range f.Services() {
+		if f.Messages().Len() > 0 {
+			firstMessage := f.Messages().Get(0)
+			for i := 0; i < f.Services().Len(); i++ {
+				service := f.Services().Get(i)
 				if isAfter(firstMessage, service) {
 					problems = append(problems, lint.Problem{
 						Message:    "Services should precede all messages.",
@@ -36,9 +37,10 @@ var fileLayout = &lint.FileRule{
 		}
 
 		// Verify that messages precede top-level enums.
-		if len(f.Enums()) > 0 {
-			firstEnum := f.Enums()[0]
-			for _, message := range f.Messages() {
+		if f.Enums().Len() > 0 {
+			firstEnum := f.Enums().Get(0)
+			for i := 0; i < f.Messages().Len(); i++ {
+				message := f.Messages().Get(i)
 				if isBefore(message, firstEnum) {
 					problems = append(problems, lint.Problem{
 						Message:    "Messages should precede all top-level enums.",
@@ -59,14 +61,20 @@ var fileLayout = &lint.FileRule{
 //
 //	use `isAfter` if the goal is to know that `d` comes after `anchor`.
 func isBefore(anchor protoreflect.Descriptor, d protoreflect.Descriptor) bool {
-	return d.GetSourceInfo().GetSpan()[0] < anchor.GetSourceInfo().GetSpan()[0]
+	return d.ParentFile().SourceLocations().ByDescriptor(d).StartLine < anchor.ParentFile().SourceLocations().ByDescriptor(anchor).StartLine
 }
 
-// isBefore returns true if `d` is known to follow `anchor` in the file.
+// isAfter returns true if `d` is known to follow `anchor` in the file.
 //
 // NOTE: A false value here may indicate that there is no source info at all;
 //
 //	use `isBefore` if the goal is to know that `d` comes before `anchor`.
 func isAfter(anchor protoreflect.Descriptor, d protoreflect.Descriptor) bool {
-	return d.GetSourceInfo().GetSpan()[0] > anchor.GetSourceInfo().GetSpan()[0]
+	locs := d.ParentFile().SourceLocations()
+	dLoc := locs.ByDescriptor(d)
+	anchorLoc := locs.ByDescriptor(anchor)
+	if len(dLoc.Path) > 0 && len(anchorLoc.Path) > 0 {
+		return dLoc.StartLine > anchorLoc.StartLine
+	}
+	return false
 }

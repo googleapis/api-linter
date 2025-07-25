@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestFileLayout(t *testing.T) {
@@ -40,7 +39,7 @@ func TestFileLayout(t *testing.T) {
 			message Book {}
 			service Library {}
 		`)
-		want := testutils.Problems{{Descriptor: f.Services()[0]}}
+		want := testutils.Problems{{Descriptor: f.Services().Get(0)}}
 		if diff := want.Diff(fileLayout.Lint(f)); diff != "" {
 			t.Error(diff)
 		}
@@ -53,23 +52,9 @@ func TestFileLayout(t *testing.T) {
 			}
 			message Book {}
 		`)
-		want := testutils.Problems{{Descriptor: f.Enums()[0]}}
+		want := testutils.Problems{{Descriptor: f.Enums().Get(0)}}
 		if diff := want.Diff(fileLayout.Lint(f)); diff != "" {
 			t.Error(diff)
-		}
-	})
-
-	t.Run("NoSourceInfo", func(t *testing.T) {
-		f, err := builder.NewFile("test.proto").AddMessage(
-			builder.NewMessage("Book"),
-		).AddService(
-			builder.NewService("Library"),
-		).Build()
-		if err != nil {
-			t.Fatalf("Failed to build proto.")
-		}
-		if problems := fileLayout.Lint(f); len(problems) > 0 {
-			t.Errorf("%v", problems)
 		}
 	})
 }

@@ -42,11 +42,12 @@ var fileOptionConsistency = &lint.FileRule{
 	Name:   lint.NewRuleName(191, "file-option-consistency"),
 	OnlyIf: hasPackage,
 	LintFile: func(f protoreflect.FileDescriptor) (problems []lint.Problem) {
-		opts := f.GetFileOptions()
-		for _, dep := range f.GetDependencies() {
+		opts := f.Options().(*dpb.FileOptions)
+		for i := 0; i < f.Imports().Len(); i++ {
+			dep := f.Imports().Get(i)
 			// We only need to look at files that are in the same package
 			// as the proto we are linting.
-			if dep.GetPackage() != f.GetPackage() {
+			if dep.Package() != f.Package() {
 				continue
 			}
 
@@ -56,7 +57,7 @@ var fileOptionConsistency = &lint.FileRule{
 			// We will naively complain on *this* file, even though either one
 			// might be the one that is wrong, and trust the API producer to do
 			// the right thing.
-			depOpts := dep.GetFileOptions()
+			depOpts := dep.Options().(*dpb.FileOptions)
 			for opt, valueFunc := range consistentOptions {
 				if valueFunc(opts) != valueFunc(depOpts) {
 					problems = append(problems, lint.Problem{

@@ -20,15 +20,16 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaMultipleFiles = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-multiple-files"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
+		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		if !f.GetFileOptions().GetJavaMultipleFiles() {
+		if !f.Options().(*descriptorpb.FileOptions).GetJavaMultipleFiles() {
 			return []lint.Problem{{
 				Descriptor: f,
 				Location:   locations.FilePackage(f),

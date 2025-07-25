@@ -21,22 +21,23 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaOuterClassname = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-outer-classname"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
+		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		filename := filepath.Base(f.Name())
+		filename := filepath.Base(string(f.Path()))
 		want := strcase.UpperCamelCase(strings.ReplaceAll(filename, ".", "_"))
 
 		// We ignore case on the comparisons to not be too pedantic on compound
 		// word protos without underscores in the filename.
-		if !strings.EqualFold(f.GetFileOptions().GetJavaOuterClassname(), strings.ToUpper(want)) {
+		if !strings.EqualFold(f.Options().(*descriptorpb.FileOptions).GetJavaOuterClassname(), strings.ToUpper(want)) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Proto files should set `option java_outer_classname = %q`.",

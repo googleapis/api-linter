@@ -21,18 +21,18 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var phpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "php-namespace"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		fops := f.GetFileOptions()
-		return fops != nil && fops.GetPhpNamespace() != ""
+		return f.Options().(*descriptorpb.FileOptions).GetPhpNamespace() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		ns := f.GetFileOptions().GetPhpNamespace()
+		ns := f.Options().(*descriptorpb.FileOptions).GetPhpNamespace()
 		delim := `\`
 
 		// Check for invalid characters.
@@ -73,8 +73,9 @@ var phpNamespace = &lint.FileRule{
 			}}
 		}
 
-		for _, s := range f.Services() {
-			n := s.Name()
+		for i := 0; i < f.Services().Len(); i++ {
+			s := f.Services().Get(i)
+			n := string(s.Name())
 			if !packagingServiceNameEquals(n, ns, delim) {
 				msg := fmt.Sprintf("Case of PHP namespace and service name %q must match.", n)
 				return []lint.Problem{{

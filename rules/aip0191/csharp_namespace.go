@@ -21,20 +21,20 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var csharpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "csharp-namespace"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		fops := f.GetFileOptions()
-		return fops != nil && fops.GetCsharpNamespace() != ""
+		return f.Options().(*descriptorpb.FileOptions).GetCsharpNamespace() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		ns := f.GetFileOptions().GetCsharpNamespace()
+		ns := f.Options().(*descriptorpb.FileOptions).GetCsharpNamespace()
 		delim := "."
 
 		// Check for invalid characters.
@@ -72,8 +72,9 @@ var csharpNamespace = &lint.FileRule{
 			}}
 		}
 
-		for _, s := range f.Services() {
-			n := s.Name()
+		for i := 0; i < f.Services().Len(); i++ {
+			s := f.Services().Get(i)
+			n := string(s.Name())
 			if !packagingServiceNameEquals(n, ns, delim) {
 				msg := fmt.Sprintf("Case of C# namespace and service name %q must match.", n)
 				return []lint.Problem{{

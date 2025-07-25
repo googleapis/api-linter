@@ -26,7 +26,7 @@ import (
 var filename = &lint.FileRule{
 	Name: lint.NewRuleName(191, "filenames"),
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.Name()), ".proto", "")
+		fn := strings.ReplaceAll(filepath.Base(string(f.Path())), ".proto", "")
 		if versionRegexp.MatchString(fn) {
 			return []lint.Problem{{
 				Message:    "The proto version must not be used as the filename.",

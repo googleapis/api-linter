@@ -18,14 +18,13 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestProtoPkg(t *testing.T) {
 	tests := []struct {
 		testName string
 		filename string
-		pkg      string
+		Pkg      string
 		problems testutils.Problems
 	}{
 		{"Valid", "google/example/library/v1/library.proto", "google.example.library.v1", testutils.Problems{}},
@@ -35,10 +34,10 @@ func TestProtoPkg(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := builder.NewFile(test.filename).SetPackageName(test.pkg).Build()
-			if err != nil {
-				t.Fatalf("Failed to build file: %s", err)
-			}
+			files := testutils.ParseProto3Tmpls(t, map[string]string{
+				test.filename: `package {{.Pkg}};`,
+			}, test)
+			f := files[test.filename]
 			if diff := test.problems.SetDescriptor(f).Diff(protoPkg.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

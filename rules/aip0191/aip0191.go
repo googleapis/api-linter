@@ -42,7 +42,7 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 func hasPackage(f protoreflect.FileDescriptor) bool {
-	return f.GetPackage() != ""
+	return f.Package() != ""
 }
 
 func packagingServiceNameEquals(serv, pkg, sep string) bool {
