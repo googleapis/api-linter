@@ -28,7 +28,7 @@ var httpNameField = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "http-uri-name"),
 	OnlyIf: utils.IsUpdateMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		fieldName := strcase.SnakeCase(m.Name()[6:])
+		fieldName := strcase.SnakeCase(string(m.Name()[6:]))
 		want := fmt.Sprintf("%s.name", fieldName)
 		return utils.LintHTTPURIHasVariable(m, want)
 	},

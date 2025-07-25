@@ -32,27 +32,27 @@ func TestHttpNameField(t *testing.T) {
 		{
 			"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "`big_book.name`"}},
+			testutils.Problems{{Message: `HTTP URI should include a "big_book.name" variable.`}},
 		},
 		{
 			"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "`big_book.name`"}},
+			testutils.Problems{{Message: `HTTP URI should include a "big_book.name" variable.`}},
 		},
 		{
 			"InvalidVarNameName", "/v1/{name=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "`big_book.name`"}},
+			testutils.Problems{{Message: `HTTP URI should include a "big_book.name" variable.`}},
 		},
 		{
 			"InvalidVarNameReversed", "/v1/{name.big_book=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "`big_book.name`"}},
+			testutils.Problems{{Message: `HTTP URI should include a "big_book.name" variable.`}},
 		},
 		{
 			"NoVarName", "/v1/publishers/*/books/*",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "`big_book.name`"}},
+			testutils.Problems{{Message: `HTTP URI should include a "big_book.name" variable.`}},
 		},
 		{
 			"Irrelevant", "/v1/{book=publishers/*/books/*}",
@@ -74,7 +74,7 @@ func TestHttpNameField(t *testing.T) {
 				message BigBook {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

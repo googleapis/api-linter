@@ -23,7 +23,10 @@ import (
 var requestMaskField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-mask-field"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsUpdateRequestMessage(f.GetOwner()) && f.Name() == "update_mask"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsUpdateRequestMessage(m) && f.Name() == "update_mask"
+		}
+		return false
 	},
 	LintField: utils.LintFieldMask,
 }

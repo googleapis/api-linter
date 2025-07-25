@@ -110,9 +110,9 @@ func TestRequiredFieldTests(t *testing.T) {
 
 				message Foo {}
 			`, test)
-			var dbr protoreflect.Descriptor = f.FindMessage("UpdateBookShelfRequest")
+			var dbr protoreflect.Descriptor = f.Messages().Get(1)
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("UpdateBookShelfRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.Messages().Get(1).Fields().ByName(protoreflect.Name(test.problematicFieldName))
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Error(diff)

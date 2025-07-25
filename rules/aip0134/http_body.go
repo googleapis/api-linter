@@ -29,7 +29,7 @@ var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "http-body"),
 	OnlyIf: utils.IsUpdateMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		fieldName := strcase.SnakeCase(m.Name()[6:])
+		fieldName := strcase.SnakeCase(string(m.Name()[6:]))
 		// Establish that the RPC has HTTP body equal to fieldName.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.Body != fieldName {

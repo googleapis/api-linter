@@ -30,8 +30,9 @@ var allowMissing = &lint.MessageRule{
 		return r != nil && !utils.IsSingletonResource(r)
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		for _, field := range m.Fields() {
-			if field.Name() == "allow_missing" && utils.GetTypeName(field) == "bool" && !field.IsRepeated() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if field.Name() == "allow_missing" && utils.GetTypeName(field) == "bool" && !field.IsList() {
 				return nil
 			}
 		}

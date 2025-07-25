@@ -36,13 +36,14 @@ var requestRequiredFields = &lint.MethodRule{
 
 		allowedRequiredFields := stringset.New("update_mask")
 
-		for _, f := range it.Fields() {
+		for i := 0; i < it.Fields().Len(); i++ {
+			f := it.Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// Skip the check with the field that is the resource, which for
 			// Standard Update, is the output type.
-			if t := f.GetMessageType(); t != nil && t.Name() == ot.Name() {
+			if t := f.Message(); t != nil && t.Name() == ot.Name() {
 				continue
 			}
 			// add a problem.

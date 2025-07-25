@@ -24,7 +24,7 @@ var requestMaskRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-mask-required"),
 	OnlyIf: utils.IsUpdateRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		updateMask := m.FindFieldByName("update_mask")
+		updateMask := m.Fields().ByName("update_mask")
 		if updateMask == nil {
 			return []lint.Problem{{
 				Message:    "Update methods should have an `update_mask` field.",

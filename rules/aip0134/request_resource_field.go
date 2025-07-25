@@ -28,15 +28,17 @@ import (
 var requestResourceField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-resource-field"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		message := f.GetOwner()
-		return utils.IsUpdateRequestMessage(message) &&
-			f.GetMessageType() != nil &&
-			f.GetMessageType().Name() == extractResource(message.Name())
+		if message, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsUpdateRequestMessage(message) &&
+				f.Message() != nil &&
+				string(f.Message().Name()) == extractResource(string(message.Name()))
+		}
+		return false
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		resourceName := extractResource(f.GetOwner().Name())
+		resourceName := extractResource(string(f.Parent().(protoreflect.MessageDescriptor).Name()))
 		wantFieldName := strcase.SnakeCase(resourceName)
-		if f.Name() != wantFieldName {
+		if string(f.Name()) != wantFieldName {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Resource field should be named %q.", wantFieldName),
 				Descriptor: f,

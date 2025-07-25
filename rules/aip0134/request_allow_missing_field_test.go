@@ -59,7 +59,7 @@ func TestAllowMissing(t *testing.T) {
 					};
 				}
 			`, test)
-			m := f.Messages()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(allowMissing.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

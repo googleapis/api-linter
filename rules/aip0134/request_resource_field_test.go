@@ -46,7 +46,7 @@ func TestResourceField(t *testing.T) {
 				}
 				message {{.ResourceName}} {}
 			`, test)
-			field := file.Messages()[0].Fields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := requestResourceField.Lint(file)

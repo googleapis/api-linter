@@ -13,10 +13,11 @@ var requestResourceRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-resource-required"),
 	OnlyIf: utils.IsUpdateRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		resourceMsgName := extractResource(m.Name())
-		for _, fieldDesc := range m.Fields() {
-			msgDesc := fieldDesc.GetMessageType()
-			if msgDesc != nil && msgDesc.Name() == resourceMsgName {
+		resourceMsgName := extractResource(string(m.Name()))
+		for i := 0; i < m.Fields().Len(); i++ {
+			fieldDesc := m.Fields().Get(i)
+			msgDesc := fieldDesc.Message()
+			if msgDesc != nil && string(msgDesc.Name()) == resourceMsgName {
 				// found the resource field.
 				return nil
 			}

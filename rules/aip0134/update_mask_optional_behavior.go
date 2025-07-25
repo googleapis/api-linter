@@ -24,7 +24,10 @@ import (
 var updateMaskOptionalBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "update-mask-optional-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return f.Name() == "update_mask" && utils.IsUpdateRequestMessage(f.GetOwner())
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return f.Name() == "update_mask" && utils.IsUpdateRequestMessage(m)
+		}
+		return false
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)

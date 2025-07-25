@@ -30,7 +30,7 @@ var synonyms = &lint.MethodRule{
 		return m.Name() != "SetIamPolicy"
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		name := m.Name()
+		name := string(m.Name())
 		for _, syn := range []string{"Patch", "Put", "Set"} {
 			if strings.HasPrefix(name, syn) {
 				return []lint.Problem{{

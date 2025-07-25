@@ -32,7 +32,7 @@ var methodSignature = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 		want := []string{
-			strcase.SnakeCase(strings.TrimPrefix(m.Name(), "Update")),
+			strcase.SnakeCase(strings.TrimPrefix(string(m.Name()), "Update")),
 			"update_mask",
 		}
 

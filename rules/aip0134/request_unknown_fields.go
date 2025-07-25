@@ -28,7 +28,7 @@ var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-unknown-fields"),
 	OnlyIf: utils.IsUpdateRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
-		resource := extractResource(m.Name())
+		resource := extractResource(string(m.Name()))
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := stringset.New(
 			fieldNameFromResource(resource), // AIP-134
@@ -37,8 +37,9 @@ var unknownFields = &lint.MessageRule{
 			"update_mask",                   // AIP-134
 			"validate_only",                 // AIP-163
 		)
-		for _, field := range m.Fields() {
-			if !allowedFields.Contains(field.Name()) {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if !allowedFields.Contains(string(field.Name())) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Update RPCs must only contain fields explicitly described in AIPs, not %q.",
