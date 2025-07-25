@@ -82,7 +82,7 @@ func TestMethodSignature(t *testing.T) {
 				  };
 				}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(methodSignature.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -177,7 +177,7 @@ func TestMethodSignature(t *testing.T) {
 			{
 				Message:    "not_book,book",
 				Suggestion: `option (google.api.method_signature) = "not_book,book_id";`,
-				Descriptor: file.Services()[0].Methods()[0],
+				Descriptor: file.Services().Get(0).Methods().Get(0),
 			},
 		}
 		if diff := want.Diff(methodSignature.Lint(file)); diff != "" {

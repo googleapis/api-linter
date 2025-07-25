@@ -29,7 +29,7 @@ func TestRequestParentFieldRequired(t *testing.T) {
 			`, test)
 
 			problems := requestParentRequired.Lint(f)
-			message := f.Messages()[0]
+			message := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

@@ -57,7 +57,7 @@ func TestHTTPURIResource(t *testing.T) {
 				}
 			`, test)
 
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			var d protoreflect.Descriptor = method
 			if strings.HasPrefix(test.testName, "Resource") {
 				d = method.Output()

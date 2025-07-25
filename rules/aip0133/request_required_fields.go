@@ -44,13 +44,14 @@ var requestRequiredFields = &lint.MethodRule{
 		)
 
 		problems := []lint.Problem{}
-		for _, f := range m.Input().Fields() {
+		for i := 0; i < m.Input().Fields().Len(); i++ {
+			f := m.Input().Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// Skip the check with the field that is the resource, which for
 			// Standard Create, is the output type.
-			if t := f.GetMessageType(); t != nil && t.Name() == ot.Name() {
+			if t := f.Message(); t != nil && t.Name() == ot.Name() {
 				continue
 			}
 			// Iterate remaining fields. If they're not in the allowed list,

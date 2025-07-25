@@ -19,38 +19,43 @@ import (
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 func TestResourceField(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName     string
-		messageName  string
-		messageField *field
-		descriptor   func(protoreflect.MessageDescriptor) protoreflect.Descriptor
-		problems     testutils.Problems
+		testName    string
+		MessageName string
+		FieldName   string
+		FieldType   string
+		descriptor  func(protoreflect.FileDescriptor) protoreflect.Descriptor
+		problems    testutils.Problems
 	}{
 		{
 			"Valid",
 			"CreateBookRequest",
-			&field{"book", builder.FieldTypeMessage(builder.NewMessage("Book"))},
+			"book",
+			"Book",
 			nil,
 			testutils.Problems{},
 		},
 		{
 			"MissingField",
 			"CreateBookRequest",
-			nil,
-			nil,
+			"",
+			"",
+			func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Messages().Get(0)
+			},
 			testutils.Problems{{Message: "Message \"CreateBookRequest\" has no \"Book\" type field"}},
 		},
 		{
 			"WrongName",
 			"CreateBookRequest",
-			&field{"payload", builder.FieldTypeMessage(builder.NewMessage("Book"))},
-			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.Fields()[0]
+			"payload",
+			"Book",
+			func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Messages().Get(0).Fields().Get(0)
 			},
 			testutils.Problems{{Suggestion: "book"}},
 		},
@@ -59,27 +64,27 @@ func TestResourceField(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			messageBuilder := builder.NewMessage(test.messageName)
-
-			if test.messageField != nil {
-				messageBuilder.AddField(
-					builder.NewField(test.messageField.fieldName, test.messageField.fieldType),
-				)
+			template := `
+				message {{.MessageName}} {
+					{{.FieldType}} {{.FieldName}} = 1;
+				}
+				message Book {}
+			`
+			if test.FieldName == "" {
+				template = `
+					message {{.MessageName}} {}
+					message Book {}
+				`
 			}
+			f := testutils.ParseProto3Tmpl(t, template, test)
 
-			message, err := messageBuilder.Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
-			var d protoreflect.Descriptor = message
+			var d protoreflect.Descriptor
 			if test.descriptor != nil {
-				d = test.descriptor(message)
+				d = test.descriptor(f)
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := resourceField.Lint(message.ParentFile())
+			problems := resourceField.Lint(f)
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

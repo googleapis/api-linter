@@ -37,16 +37,17 @@ var methodSignature = &lint.MethodRule{
 		if utils.HasParent(utils.GetResource(utils.GetResponseType(m))) {
 			want = append(want, "parent")
 		}
-		for _, f := range m.Input().Fields() {
-			if mt := f.GetMessageType(); mt != nil && utils.IsResource(mt) {
-				want = append(want, f.Name())
+		for i := 0; i < m.Input().Fields().Len(); i++ {
+			f := m.Input().Fields().Get(i)
+			if mt := f.Message(); mt != nil && utils.IsResource(mt) {
+				want = append(want, string(f.Name()))
 				break
 			}
 		}
 		// The {resource}_id is desired if and only if the field exists on the
 		// request.
 		expectedResourceIDField := strcase.SnakeCase(utils.GetResourceMessageName(m, "Create"))
-		if idField := expectedResourceIDField + "_id"; m.Input().FindFieldByName(idField) != nil {
+		if idField := expectedResourceIDField + "_id"; m.Input().Fields().ByName(protoreflect.Name(idField)) != nil {
 			want = append(want, idField)
 		}
 

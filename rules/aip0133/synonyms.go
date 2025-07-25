@@ -27,7 +27,7 @@ import (
 var synonyms = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "synonyms"),
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		name := m.Name()
+		name := string(m.Name())
 		for _, syn := range []string{"Insert", "Make", "Post"} {
 			if strings.HasPrefix(name, syn) {
 				return []lint.Problem{{

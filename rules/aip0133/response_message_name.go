@@ -45,7 +45,7 @@ var outputName = &lint.MethodRule{
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if got != want && got != "" {
+		if string(got) != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Create RPCs should have the corresponding resource as the response message, such as %q.",

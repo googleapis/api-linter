@@ -54,7 +54,7 @@ func TestResourceReferenceType(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			field := file.Services()[0].Methods()[0].Input().FindFieldByName("parent")
+			field := file.Services().Get(0).Methods().Get(0).Input().Fields().ByName("parent")
 			problems := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -105,7 +105,7 @@ func TestResourceReferenceTypeLRO(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			field := file.Services()[0].Methods()[0].Input().FindFieldByName("parent")
+			field := file.Services().Get(0).Methods().Get(0).Input().Fields().ByName("parent")
 			problems := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

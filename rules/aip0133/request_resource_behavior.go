@@ -23,13 +23,14 @@ import (
 var requestResourceBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(133, "request-resource-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		message := f.GetOwner()
-		if !utils.IsCreateRequestMessage(message) {
-			return false
-		}
-		resourceMsgName := getResourceMsgNameFromReq(message)
-		if m := f.GetMessageType(); m != nil && m.Name() == resourceMsgName {
-			return true
+		if message, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			if !utils.IsCreateRequestMessage(message) {
+				return false
+			}
+			resourceMsgName := getResourceMsgNameFromReq(message)
+			if m := f.Message(); m != nil && string(m.Name()) == resourceMsgName {
+				return true
+			}
 		}
 		return false
 	},

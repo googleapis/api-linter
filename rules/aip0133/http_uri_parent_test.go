@@ -29,8 +29,8 @@ func TestHTTPURIParent(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", nil},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
-		{"NoVarParent", "/v1/publishers/*/books/*", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "`parent` variable"}}},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: `HTTP URI should include a "parent" variable.`}}},
+		{"NoVarParent", "/v1/publishers/*/books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: `HTTP URI should include a "parent" variable.`}}},
 		{"NoParent", "/v1/books/*", "CreateBook", "books/{book}", nil},
 		{"MultipleVars", "/v1/{parent=publishers/*}/{book=books/*}", "CreateBook", "publishers/{publisher}/books/{book}", testutils.Problems{{Message: "1 variable"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "publishers/{publisher}/books/{book}", nil},
@@ -55,7 +55,7 @@ func TestHTTPURIParent(t *testing.T) {
 					};
 				}
 			`, test)
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -83,7 +83,7 @@ func TestHTTPURIParent(t *testing.T) {
 					};
 				}
 			`, test)
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -113,7 +113,7 @@ func TestHTTPURIParent(t *testing.T) {
 				};
 			}
 		`)
-		method := f.Services()[0].Methods()[0]
+		method := f.Services().Get(0).Methods().Get(0)
 		problems := testutils.Problems{}
 		if diff := problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 			t.Error(diff)

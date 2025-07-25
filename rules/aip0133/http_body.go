@@ -31,12 +31,13 @@ var httpBody = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		resourceMsgName := utils.GetResourceMessageName(m, "Create")
 		resourceFieldName := strings.ToLower(resourceMsgName)
-		for _, fieldDesc := range m.Input().Fields() {
+		for i := 0; i < m.Input().Fields().Len(); i++ {
+			fieldDesc := m.Input().Fields().Get(i)
 			// when msgDesc is nil, the resource field in the request message is
 			// missing. A lint warning for the rule `resourceField` will be generated.
 			// For here, we will use the lower case resource message name as default
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
-				resourceFieldName = fieldDesc.Name()
+			if msgDesc := fieldDesc.Message(); msgDesc != nil && string(msgDesc.Name()) == resourceMsgName {
+				resourceFieldName = string(fieldDesc.Name())
 			}
 		}
 

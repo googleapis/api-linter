@@ -33,10 +33,11 @@ var resourceField = &lint.MessageRule{
 
 		// The rule (resource field name must map to the POST body) is
 		// checked by AIP-0133 ("core::0133::http-body")
-		for _, fieldDesc := range m.Fields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
+		for i := 0; i < m.Fields().Len(); i++ {
+			fieldDesc := m.Fields().Get(i)
+			if msgDesc := fieldDesc.Message(); msgDesc != nil && string(msgDesc.Name()) == resourceMsgName {
 				// Rule check: Is the field named properly?
-				if want := strcase.SnakeCase(resourceMsgName); fieldDesc.Name() != want {
+				if want := strcase.SnakeCase(resourceMsgName); string(fieldDesc.Name()) != want {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("Resource field should be named %q.", want),
 						Descriptor: fieldDesc,

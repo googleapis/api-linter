@@ -53,7 +53,7 @@ func TestHttpBody(t *testing.T) {
 					{{.ResourceField}}
 				}
 			`, test)
-			method := file.Services()[0].Methods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			problems := httpBody.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
