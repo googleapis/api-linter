@@ -33,7 +33,7 @@ var versionedPackages = &lint.FileRule{
 		}
 
 		// Ignore this if there is no package.
-		segments := strings.Split(f.GetPackage(), ".")
+		segments := strings.Split(string(f.Package()), ".")
 		if len(segments) == 1 && segments[0] == "" {
 			return false
 		}
@@ -49,7 +49,7 @@ var versionedPackages = &lint.FileRule{
 		return true
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		if !version.MatchString(f.GetPackage()) {
+		if !version.MatchString(string(f.Package())) {
 			return []lint.Problem{{
 				Message:    "API components should be in versioned packages.",
 				Descriptor: f,

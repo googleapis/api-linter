@@ -22,20 +22,19 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var foreignTypeReference = &lint.FieldRule{
 	Name: lint.NewRuleName(215, "foreign-type-reference"),
 	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE
+		return fd.Kind() == protoreflect.MessageKind
 	},
 	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		curPkg := getNormalizedPackage(fd)
 		if curPkg == "" {
 			return nil // Empty or unavailable package.
 		}
-		msg := fd.GetMessageType()
+		msg := fd.Message()
 		if msg == nil {
 			return nil // Couldn't resolve type.
 		}
@@ -74,7 +73,7 @@ func getNormalizedPackage(d protoreflect.Descriptor) string {
 	if f == nil {
 		return ""
 	}
-	pkg := f.GetPackage()
+	pkg := string(f.Package())
 	if normPkg := versionedPrefix.FindString(pkg); normPkg != "" {
 		pkg = normPkg
 	}
