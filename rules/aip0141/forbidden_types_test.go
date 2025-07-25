@@ -39,7 +39,7 @@ func TestForbiddenTypes(t *testing.T) {
 					{{.TypeName}} pages = 1;
 				}
 			`, test)
-			field := file.Messages()[0].Fields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			problems := forbiddenTypes.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

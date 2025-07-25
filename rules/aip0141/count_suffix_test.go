@@ -41,7 +41,7 @@ func TestCount(t *testing.T) {
 				int32 {{.FieldName}} = 1;
 			}
 		`, test)
-		field := file.Messages()[0].Fields()[0]
+		field := file.Messages().Get(0).Fields().Get(0)
 		wantProblems := testutils.Problems{}
 		if test.err {
 			wantProblems = append(wantProblems, lint.Problem{

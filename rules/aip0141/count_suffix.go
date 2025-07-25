@@ -26,7 +26,7 @@ import (
 var count = &lint.FieldRule{
 	Name: lint.NewRuleName(141, "count-suffix"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if n := f.Name(); strings.HasPrefix(n, "num_") {
+		if n := string(f.Name()); strings.HasPrefix(n, "num_") {
 			want := pluralize.NewClient().Singular(n[4:]) + "_count"
 			return []lint.Problem{{
 				Message:    "Quantities: Use a _count suffix, not a num_ prefix.",
