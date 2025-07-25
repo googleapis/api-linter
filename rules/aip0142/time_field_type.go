@@ -27,7 +27,7 @@ import (
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-field-type"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		tokens := strings.Split(f.Name(), "_")
+		tokens := strings.Split(string(f.Name()), "_")
 		suffix := tokens[len(tokens)-1]
 		typeName := utils.GetTypeName(f)
 		suffixes := stringset.New(

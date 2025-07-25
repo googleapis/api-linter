@@ -36,7 +36,7 @@ var fieldNames = &lint.FieldRule{
 			"purged":   "purge_time",
 		}
 		for got, want := range mistakes {
-			if strings.Contains(f.Name(), got) {
+			if strings.Contains(string(f.Name()), got) {
 				return []lint.Problem{{
 					Message:    "Use the imperative mood and a `_time` suffix for timestamps.",
 					Descriptor: f,
@@ -47,14 +47,14 @@ var fieldNames = &lint.FieldRule{
 		}
 
 		// Look for timestamps that do not end in `_time` or, if repeated, `_times`.
-		if !strings.HasSuffix(f.Name(), "_time") {
-			if !f.IsRepeated() {
+		if !strings.HasSuffix(string(f.Name()), "_time") {
+			if !f.IsList() {
 				return []lint.Problem{{
 					Message:    "Timestamp fields should end in `_time`.",
 					Descriptor: f,
 					Location:   locations.DescriptorName(f),
 				}}
-			} else if !strings.HasSuffix(f.Name(), "_times") {
+			} else if !strings.HasSuffix(string(f.Name()), "_times") {
 				return []lint.Problem{{
 					Message:    "Repeated Timestamp fields should end in `_time` or `_times`.",
 					Descriptor: f,
