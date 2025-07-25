@@ -44,7 +44,7 @@ var forbiddenMethods = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Singletons should not use Create, or Delete.
 		for _, badPrefix := range []string{"Create", "Delete"} {
-			if strings.HasPrefix(m.Name(), badPrefix) {
+			if strings.HasPrefix(string(m.Name()), badPrefix) {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Singletons must not define %q methods.", badPrefix),
 					Descriptor: m,
