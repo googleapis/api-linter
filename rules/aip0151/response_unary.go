@@ -24,7 +24,7 @@ var responseUnary = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "response-unary"),
 	OnlyIf: isLRO,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		if m.IsServerStreaming() {
+		if m.IsStreamingServer() {
 			return []lint.Problem{{
 				Message:    "LRO responses must be unary, not streaming.",
 				Descriptor: m,

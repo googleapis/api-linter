@@ -54,7 +54,7 @@ func TestLROResponseReachable(t *testing.T) {
 					message OperationMetadata {}
 				`, test)
 				problems := lroResponseReachable.Lint(f)
-				m := f.Services()[0].Methods()[0]
+				m := f.Services().Get(0).Methods().Get(0)
 				if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 					t.Error(diff)
 				}
@@ -93,7 +93,7 @@ func TestLROResponseReachable(t *testing.T) {
 					`,
 				})
 				problems := lroResponseReachable.Lint(files["test.proto"])
-				method := files["test.proto"].Services()[0].Methods()[0]
+				method := files["test.proto"].Services().Get(0).Methods().Get(0)
 				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 					t.Error(diff)
 				}
@@ -136,7 +136,7 @@ func TestLROResponseReachable(t *testing.T) {
 					`,
 				})
 				problems := lroResponseReachable.Lint(files["test.proto"])
-				method := files["test.proto"].Services()[0].Methods()[0]
+				method := files["test.proto"].Services().Get(0).Methods().Get(0)
 				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 					t.Error(diff)
 				}

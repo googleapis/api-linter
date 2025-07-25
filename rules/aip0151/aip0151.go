@@ -35,7 +35,7 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 func isLRO(m protoreflect.MethodDescriptor) bool {
-	return m.Output().GetFullyQualifiedName() == "google.longrunning.Operation"
+	return m.Output().FullName() == "google.longrunning.Operation"
 }
 
 func isAnnotatedLRO(m protoreflect.MethodDescriptor) bool {

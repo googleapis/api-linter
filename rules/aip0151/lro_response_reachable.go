@@ -40,13 +40,16 @@ func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem
 
 	// Make this the fully qualified type name.
 	f := m.ParentFile()
-	if pkg := f.GetPackage(); pkg != "" {
-		name = pkg + "." + name
+	if pkg := f.Package(); pkg != "" {
+		name = string(pkg) + "." + name
 	}
 
 	// If the message is defined in the file, we are good to go.
-	for _, file := range utils.GetAllDependencies(f) {
-		if file.FindMessage(name) != nil {
+	if findMessage(m.ParentFile(), protoreflect.FullName(name)) != nil {
+		return nil
+	}
+	for _, file := range utils.GetAllDependencies(m.ParentFile()) {
+		if findMessage(file, protoreflect.FullName(name)) != nil {
 			return nil
 		}
 	}
@@ -60,4 +63,25 @@ func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem
 		Descriptor: m,
 		Location:   locations.MethodOperationInfo(m),
 	}}
+}
+
+func findMessage(d protoreflect.Descriptor, name protoreflect.FullName) protoreflect.MessageDescriptor {
+	switch d := d.(type) {
+	case protoreflect.FileDescriptor:
+		for i := 0; i < d.Messages().Len(); i++ {
+			if md := findMessage(d.Messages().Get(i), name); md != nil {
+				return md
+			}
+		}
+	case protoreflect.MessageDescriptor:
+		if d.FullName() == name {
+			return d
+		}
+		for i := 0; i < d.Messages().Len(); i++ {
+			if md := findMessage(d.Messages().Get(i), name); md != nil {
+				return md
+			}
+		}
+	}
+	return nil
 }
