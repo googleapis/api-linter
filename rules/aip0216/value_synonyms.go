@@ -26,7 +26,7 @@ import (
 var valueSynonyms = &lint.EnumValueRule{
 	Name: lint.NewRuleName(216, "value-synonyms"),
 	OnlyIf: func(v protoreflect.EnumValueDescriptor) bool {
-		return strings.HasSuffix(v.GetEnum().Name(), "State")
+		return strings.HasSuffix(string(v.Parent().(protoreflect.EnumDescriptor).Name()), "State")
 	},
 	LintEnumValue: func(v protoreflect.EnumValueDescriptor) []lint.Problem {
 		for bad, good := range map[string]string{
@@ -38,7 +38,7 @@ var valueSynonyms = &lint.EnumValueRule{
 			"SUCCESS":    "SUCCEEDED",
 			"SUCCESSFUL": "SUCCEEDED",
 		} {
-			if v.Name() == bad {
+			if string(v.Name()) == bad {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Prefer %q over %q for state names.", good, bad),
 					Suggestion: good,

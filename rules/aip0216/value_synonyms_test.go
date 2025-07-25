@@ -44,7 +44,7 @@ func TestValueSynonyms(t *testing.T) {
 					{{.ValueName}} = 1;
 				}
 			`, test)
-			ev := file.Enums()[0].Values()[1]
+			ev := file.Enums().Get(0).Values().Get(1)
 			if diff := test.problems.SetDescriptor(ev).Diff(valueSynonyms.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

@@ -25,16 +25,12 @@ import (
 var nesting = &lint.EnumRule{
 	Name: lint.NewRuleName(216, "nesting"),
 	OnlyIf: func(e protoreflect.EnumDescriptor) bool {
-		return strings.HasSuffix(e.Name(), "State") && e.Name() != "State"
+		return strings.HasSuffix(string(e.Name()), "State") && e.Name() != "State"
 	},
 	LintEnum: func(e protoreflect.EnumDescriptor) []lint.Problem {
-		messageName := strings.TrimSuffix(e.Name(), "State")
-		fqMessageName := messageName
+		messageName := strings.TrimSuffix(string(e.Name()), "State")
 		file := e.ParentFile()
-		if pkg := file.GetPackage(); pkg != "" {
-			fqMessageName = pkg + "." + messageName
-		}
-		if file.FindMessage(fqMessageName) != nil {
+		if file.Messages().ByName(protoreflect.Name(messageName)) != nil {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Nest %q within %q, and name it `State`.",

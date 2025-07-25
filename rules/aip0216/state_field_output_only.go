@@ -27,12 +27,12 @@ var stateFieldOutputOnly = &lint.FieldRule{
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		// We care about the name of the State enum type.
 		// AIP 0216 makes no mention of the state field name.
-		et := f.GetEnumType()
+		et := f.Enum()
 		if et == nil {
 			return false
 		}
 
-		if !strings.HasSuffix(et.Name(), "State") {
+		if !strings.HasSuffix(string(et.Name()), "State") {
 			return false
 		}
 
