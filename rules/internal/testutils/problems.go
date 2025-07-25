@@ -60,7 +60,7 @@ func (problems Problems) Diff(other []lint.Problem) string {
 		x, y := problems[i], other[i]
 
 		// The descriptors must have the same full name, otherwise the problems are unequal.
-		if x.Descriptor.FullName() != y.Descriptor.FullName() {
+		if x.Descriptor != y.Descriptor {
 			return cmp.Diff(problems, other)
 		}
 

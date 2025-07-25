@@ -45,7 +45,7 @@ func Compile(t *testing.T, template string, data any) linker.File {
 
 	// Create a custom resolver to ensure that we read from the global registry
 	// which allows us to get the googleapis for our tests
-	registryResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
+	googleAPIRegistryResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
 		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
 		if err != nil {
 			return protocompile.SearchResult{}, err
@@ -60,7 +60,7 @@ func Compile(t *testing.T, template string, data any) linker.File {
 		Resolver: protocompile.WithStandardImports(
 			protocompile.CompositeResolver{
 				memResolver,
-				registryResolver,
+				googleAPIRegistryResolver,
 			},
 		),
 	}

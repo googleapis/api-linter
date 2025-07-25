@@ -49,8 +49,8 @@ func TestDiffEquivalent(t *testing.T) {
 
 func TestDiffNotEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	m1 := Compile(t, "message Foo {}", nil)
-	m2 := Compile(t, "message Bar {}", nil)
+	m1 := Compile(t, "message Foo {}", nil).Messages().Get(0)
+	m2 := Compile(t, "message Bar {}", nil).Messages().Get(0)
 
 	// Declare a series of tests that should all be equal.
 	tests := []struct {
