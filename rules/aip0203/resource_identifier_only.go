@@ -27,7 +27,7 @@ var resourceIdentifierOnly = &lint.FieldRule{
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		m := f.Parent().(protoreflect.MessageDescriptor)
-		if nf := utils.GetResourceNameField(utils.GetResource(m)); utils.IsResource(m) && f.Name() == nf {
+		if nf := utils.GetResourceNameField(utils.GetResource(m)); utils.IsResource(m) && string(f.Name()) == nf {
 			return nil
 		}
 

@@ -55,7 +55,7 @@ func TestUnorderedList(t *testing.T) {
 				message Book {
 					{{.Field}}
 				}`, test)
-			f := file.Messages()[0].Fields()[0]
+			f := file.Messages().Get(0).Fields().Get(0)
 			problems := unorderedListRepeated.Lint(file)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Error(diff)

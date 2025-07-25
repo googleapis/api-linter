@@ -26,7 +26,7 @@ var unorderedListRepeated = &lint.FieldRule{
 		return utils.GetFieldBehavior(f).Contains("UNORDERED_LIST")
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if f.IsRepeated() {
+		if f.IsList() {
 			return nil
 		}
 		return []lint.Problem{{

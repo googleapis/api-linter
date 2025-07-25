@@ -121,7 +121,7 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 					string etag = 2;
 				}
 			`, tc)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Error(diff)
@@ -174,7 +174,7 @@ func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
 				}
 			`, tc)
 
-			field := f.Messages()[1].Fields()[1]
+			field := f.Messages().Get(1).Fields().Get(1)
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Error(diff)
@@ -238,8 +238,8 @@ func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
 				}
 			`, tc)
 
-			it := f.Services()[0].Methods()[0].Input()
-			nestedField := it.Fields()[0].GetMessageType().Fields()[0]
+			it := f.Services().Get(0).Methods().Get(0).Input()
+			nestedField := it.Fields().Get(0).Message().Fields().Get(0)
 
 			if diff := tc.problems.SetDescriptor(nestedField).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Error(diff)
@@ -344,8 +344,8 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 
 			ds := testutils.ParseProto3Tmpls(t, srcs, tc)
 			f := ds["service.proto"]
-			it := f.Services()[0].Methods()[0].Input()
-			fd := it.Fields()[0].GetMessageType().Fields()[0]
+			it := f.Services().Get(0).Methods().Get(0).Input()
+			fd := it.Fields().Get(0).Message().Fields().Get(0)
 
 			if diff := tc.problems.SetDescriptor(fd).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
 				t.Error(diff)
@@ -353,7 +353,7 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 
 			if tc.problems != nil {
 				want := "resource.proto"
-				if got := fd.ParentFile().Name(); got != want {
+				if got := fd.ParentFile().Path(); got != want {
 					t.Fatalf("got file name %q for location of field but wanted %q", got, want)
 				}
 			}

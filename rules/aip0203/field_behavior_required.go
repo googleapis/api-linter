@@ -36,7 +36,7 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		req := m.Input()
-		p := m.ParentFile().GetPackage()
+		p := string(m.ParentFile().Package())
 		ps := problems(req, p, map[protoreflect.Descriptor]bool{})
 		if len(ps) == 0 {
 			return nil
@@ -51,30 +51,31 @@ func problems(m protoreflect.MessageDescriptor, pkg string, visited map[protoref
 
 	// Ensure the input type, or recursively visited message, is part of the
 	// same package before linting.
-	if m.ParentFile().GetPackage() != pkg {
+	if string(m.ParentFile().Package()) != pkg {
 		return nil
 	}
 
-	for _, f := range m.Fields() {
+	for i := 0; i < m.Fields().Len(); i++ {
+		f := m.Fields().Get(i)
 		// ignore the field if it was already visited
 		if ok := visited[f]; ok {
 			continue
 		}
 		visited[f] = true
 
-		if utils.IsResource(m) && excusedResourceFields.Contains(f.Name()) {
+		if utils.IsResource(m) && excusedResourceFields.Contains(string(f.Name())) {
 			continue
 		}
 
 		// Ignore a field if it is a OneOf (do not ignore children)
-		if f.AsFieldDescriptorProto().OneofIndex == nil {
+		if f.ContainingOneof() == nil {
 			p := checkFieldBehavior(f)
 			if p != nil {
 				ps = append(ps, *p)
 			}
 		}
 
-		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() {
+		if mt := f.Message(); mt != nil && !mt.IsMapEntry() {
 			ps = append(ps, problems(mt, pkg, visited)...)
 		}
 	}
