@@ -40,7 +40,7 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 			if singleton && singletonExceptions.Contains(name) {
 				continue
 			}
-			f := m.FindFieldByName(name)
+			f := m.Fields().ByName(protoreflect.Name(name))
 			if f == nil || utils.GetTypeName(f) != typ {
 				missingFields.Add(fmt.Sprintf("%s %s", typ, name))
 			}

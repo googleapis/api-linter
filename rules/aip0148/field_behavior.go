@@ -24,7 +24,10 @@ import (
 var fieldBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "field-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsResource(f.GetOwner()) && outputOnlyFields.Contains(f.Name())
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsResource(m) && outputOnlyFields.Contains(string(f.Name()))
+		}
+		return false
 	},
 	LintField: utils.LintOutputOnlyField,
 }

@@ -43,7 +43,7 @@ func TestUseUid(t *testing.T) {
 					string {{.FieldName}} = 2;
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[1]
+			field := f.Messages().Get(0).Fields().Get(1)
 			if diff := test.problems.SetDescriptor(field).Diff(useUid.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

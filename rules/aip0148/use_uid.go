@@ -31,7 +31,10 @@ const (
 var useUid = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "use-uid"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsResource(f.GetOwner())
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsResource(m)
+		}
+		return false
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if f.Name() == idStr {

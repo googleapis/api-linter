@@ -19,13 +19,12 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var uidFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "uid-format"),
 	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING && fd.Name() == uidStr
+		return fd.Kind() == protoreflect.StringKind && fd.Name() == uidStr
 	},
 	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		if !utils.HasFormat(fd) || utils.GetFormat(fd) != annotations.FieldInfo_UUID4 {

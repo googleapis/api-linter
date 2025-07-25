@@ -53,7 +53,7 @@ func TestFieldBehavior(t *testing.T) {
 					{{.Field}} = 1 {{.FieldOpts}};
 				}
 			`, test)
-			field := file.Messages()[0].Fields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(fieldBehavior.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

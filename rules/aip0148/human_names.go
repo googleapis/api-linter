@@ -26,7 +26,7 @@ var humanNames = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "human-names"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		for got, want := range corrections {
-			if f.Name() == got {
+			if string(f.Name()) == got {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Use %s instead of %s.", want, got),
 					Descriptor: f,
