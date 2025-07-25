@@ -18,6 +18,7 @@ package aip0192
 import (
 	"github.com/googleapis/api-linter/lint"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // AddRules adds all of the AIP-192 rules to the provided registry.
@@ -39,17 +40,17 @@ func AddRules(r lint.RuleRegistry) error {
 func isDeprecated(d protoreflect.Descriptor) bool {
 	switch d := d.(type) {
 	case protoreflect.MethodDescriptor:
-		return d.GetMethodOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.MethodOptions).GetDeprecated()
 	case protoreflect.ServiceDescriptor:
-		return d.GetServiceOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.ServiceOptions).GetDeprecated()
 	case protoreflect.FieldDescriptor:
-		return d.GetFieldOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.FieldOptions).GetDeprecated()
 	case protoreflect.EnumDescriptor:
-		return d.GetEnumOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.EnumOptions).GetDeprecated()
 	case protoreflect.EnumValueDescriptor:
-		return d.GetEnumValueOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.EnumValueOptions).GetDeprecated()
 	case protoreflect.MessageDescriptor:
-		return d.GetMessageOptions().GetDeprecated()
+		return d.Options().(*descriptorpb.MessageOptions).GetDeprecated()
 	default:
 		return false
 	}

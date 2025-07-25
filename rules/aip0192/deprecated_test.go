@@ -68,7 +68,7 @@ func TestDeprecatedMethod(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Services()[0].Methods()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Services().Get(0).Methods().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -98,7 +98,7 @@ func TestDeprecatedService(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Services()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Services().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -125,7 +125,7 @@ func TestDeprecatedField(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Messages()[0].Fields()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Messages().Get(0).Fields().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -154,7 +154,7 @@ func TestDeprecatedEnum(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Enums()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Enums().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -181,7 +181,7 @@ func TestDeprecatedEnumValue(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Enums()[0].Values()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Enums().Get(0).Values().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -210,7 +210,7 @@ func TestDeprecatedMessage(t *testing.T) {
       `, test)
 
 			problems := deprecatedComment.Lint(file)
-			if diff := test.problems.SetDescriptor(file.Messages()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Messages().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

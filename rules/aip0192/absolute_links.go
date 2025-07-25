@@ -29,7 +29,7 @@ var absoluteLinks = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "absolute-links"),
 	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
 		comment := strings.Join(
-			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
+			utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External,
 			"\n",
 		)
 

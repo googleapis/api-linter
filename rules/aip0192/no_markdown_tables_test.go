@@ -41,7 +41,7 @@ func TestNoMarkdownTables(t *testing.T) {
 			  // {{.Comment}}
 			  message Foo {}
 			`, test)
-			m := f.Messages()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(noMarkdownTables.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

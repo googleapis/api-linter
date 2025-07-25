@@ -27,7 +27,7 @@ import (
 var hasComments = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "has-comments"),
 	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
-		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
+		comment := utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments)
 		if len(comment.External) == 0 {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf("Missing comment over %q.", d.Name()),

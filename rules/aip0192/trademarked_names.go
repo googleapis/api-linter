@@ -65,7 +65,7 @@ var trademarkedNames = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "trademarked-names"),
 	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
 		c := strings.Join(
-			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
+			utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External,
 			"\n",
 		)
 		for want, badThings := range tmRegexes {

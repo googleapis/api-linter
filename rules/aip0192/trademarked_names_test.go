@@ -40,7 +40,7 @@ func TestTrademarkedNames(t *testing.T) {
 			// This is a comment that says {{.Token}}.
 			message Foo {}
 		`, test)
-		m := f.Messages()[0]
+		m := f.Messages().Get(0)
 		if diff := test.problems.SetDescriptor(m).Diff(trademarkedNames.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

@@ -26,7 +26,7 @@ var deprecatedComment = &lint.DescriptorRule{
 	Name:   lint.NewRuleName(192, "deprecated-comment"),
 	OnlyIf: isDeprecated,
 	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
-		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
+		comment := utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments)
 		if len(comment.External) > 0 && strings.HasPrefix(comment.External[0], "Deprecated:") {
 			return nil
 		}

@@ -25,10 +25,10 @@ import (
 var noHTML = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "no-html"),
 	OnlyIf: func(d protoreflect.Descriptor) bool {
-		return d.GetSourceInfo() != nil
+		return len(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments) > 0
 	},
 	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
-		for _, comment := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
+		for _, comment := range utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External {
 			if htmlTag.MatchString(comment) {
 				return []lint.Problem{{
 					Message:    "Comments must not include raw HTML.",

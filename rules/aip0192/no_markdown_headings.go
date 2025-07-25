@@ -26,7 +26,7 @@ import (
 var noMarkdownHeadings = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "no-markdown-headings"),
 	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
-		for _, cmt := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
+		for _, cmt := range utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External {
 			for _, line := range strings.Split(cmt, "\n") {
 				if heading.FindString(line) != "" {
 					return []lint.Problem{{
