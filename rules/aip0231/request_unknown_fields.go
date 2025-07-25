@@ -27,7 +27,10 @@ import (
 var requestUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(231, "request-unknown-fields"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isBatchGetRequestMessage(f.GetOwner())
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchGetRequestMessage(m)
+		}
+		return false
 	},
 	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
@@ -37,7 +40,7 @@ var requestUnknownFields = &lint.FieldRule{
 			"requests",  // AIP-231
 			"view",      // AIP-157
 		)
-		if !allowedFields.Contains(field.Name()) {
+		if !allowedFields.Contains(string(field.Name())) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Unexpected field: Batch Get RPCs must only contain fields explicitly described in https://aip.dev/231, not %q.",

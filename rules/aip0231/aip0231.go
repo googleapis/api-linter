@@ -52,15 +52,15 @@ var (
 
 // Returns true if this is a AIP-231 Get method, false otherwise.
 func isBatchGetMethod(m protoreflect.MethodDescriptor) bool {
-	return batchGetMethodRegexp.MatchString(m.Name())
+	return batchGetMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-231 Get request message, false otherwise.
 func isBatchGetRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return batchGetReqMessageRegexp.MatchString(m.Name())
+	return batchGetReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-231 Get request message, false otherwise.
 func isBatchGetResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return batchGetResMessageRegexp.MatchString(m.Name())
+	return batchGetResMessageRegexp.MatchString(string(m.Name()))
 }

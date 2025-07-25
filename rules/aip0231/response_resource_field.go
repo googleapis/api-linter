@@ -29,12 +29,13 @@ var resourceField = &lint.MessageRule{
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// The singular form the resource message name; the first letter capitalized.
-		plural := strings.TrimSuffix(strings.TrimPrefix(m.Name(), "BatchGet"), "Response")
+		plural := strings.TrimSuffix(strings.TrimPrefix(string(m.Name()), "BatchGet"), "Response")
 		resourceMsgName := pluralize.NewClient().Singular(plural)
 
-		for _, fieldDesc := range m.Fields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
-				if !fieldDesc.IsRepeated() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			fieldDesc := m.Fields().Get(i)
+			if msgDesc := fieldDesc.Message(); msgDesc != nil && string(msgDesc.Name()) == resourceMsgName {
+				if !fieldDesc.IsList() {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("The %q type field on Batch Get Response message should be repeated", msgDesc.Name()),
 						Descriptor: fieldDesc,

@@ -21,7 +21,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The Batch Get standard method should have repeated name field or repeated
@@ -31,8 +30,8 @@ var namesField = &lint.MessageRule{
 	OnlyIf: isBatchGetRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
-		names := m.FindFieldByName("names")
-		getReqMsg := m.FindFieldByName("requests")
+		names := m.Fields().ByName("names")
+		getReqMsg := m.Fields().ByName("requests")
 
 		// Rule check: Ensure that the names field is present.
 		if names == nil && getReqMsg == nil {
@@ -51,7 +50,7 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the names field is repeated.
-		if names != nil && !names.IsRepeated() {
+		if names != nil && !names.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "names" field should be repeated`,
 				Suggestion: "repeated string",
@@ -61,7 +60,7 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the names field is the correct type.
-		if names != nil && names.GetType() != builder.FieldTypeString().GetType() {
+		if names != nil && names.Kind() != protoreflect.StringKind {
 			problems = append(problems, lint.Problem{
 				Message:    `"names" field on Batch Get Request should be a "string" type`,
 				Suggestion: "string",
@@ -71,7 +70,7 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard get request message field is repeated.
-		if getReqMsg != nil && !getReqMsg.IsRepeated() {
+		if getReqMsg != nil && !getReqMsg.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "requests" field should be repeated`,
 				Descriptor: getReqMsg,
@@ -82,8 +81,8 @@ var namesField = &lint.MessageRule{
 		// correct type. Note: Use m.Name()[8:len(m.Name())-7]) to retrieve
 		// the resource name from the batch get request, for example:
 		// "BatchGetBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.Name()[8:len(m.Name())-7]))
-		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().Name() != rightTypeName) {
+		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(string(m.Name())[8:len(m.Name())-7]))
+		if getReqMsg != nil && (getReqMsg.Message() == nil || getReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
 				Descriptor: getReqMsg,

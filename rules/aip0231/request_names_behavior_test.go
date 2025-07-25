@@ -40,7 +40,7 @@ func TestRequestNamesBehavior(t *testing.T) {
 					repeated string {{.FieldName}} = 1{{.FieldBehavior}};
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestNamesBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

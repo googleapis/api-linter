@@ -70,7 +70,7 @@ func TestNamesField(t *testing.T) {
 			`,
 			problems: testutils.Problems{{Message: `Message "BatchGetBooksRequest" should delete "requests" field, only keep the "names" field`}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 		{
@@ -81,7 +81,7 @@ func TestNamesField(t *testing.T) {
 				}`,
 			problems: testutils.Problems{{Suggestion: "repeated string"}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("names")
+				return m.Fields().ByName("names")
 			},
 		},
 		{
@@ -93,7 +93,7 @@ func TestNamesField(t *testing.T) {
 			`,
 			problems: testutils.Problems{{Suggestion: "string"}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("names")
+				return m.Fields().ByName("names")
 			},
 		},
 		{
@@ -107,7 +107,7 @@ func TestNamesField(t *testing.T) {
 			`,
 			problems: testutils.Problems{{Message: `The "requests" field should be repeated`}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 		{
@@ -119,7 +119,7 @@ func TestNamesField(t *testing.T) {
 			`,
 			problems: testutils.Problems{{Message: `The "requests" field on Batch Get Request should be a "GetBookRequest" type`}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 		{
@@ -134,7 +134,7 @@ func TestNamesField(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3String(t, test.src)
 
-			m := file.Messages()[0]
+			m := file.Messages().Get(0)
 
 			// Determine the descriptor that a failing test will attach to.
 			var problemDesc protoreflect.Descriptor = m

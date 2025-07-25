@@ -78,10 +78,10 @@ func TestResourceField(t *testing.T) {
 			`
 			file := testutils.ParseProto3Tmpl(t, template, struct{ Src string }{test.src})
 
-			m := file.Messages()[0]
+			m := file.Messages().Get(0)
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc protoreflect.Descriptor = m.Fields()[0]
+			var problemDesc protoreflect.Descriptor = m.Fields().Get(0)
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(m)
 			}

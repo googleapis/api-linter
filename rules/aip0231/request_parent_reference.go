@@ -23,7 +23,10 @@ import (
 var requestParentReference = &lint.FieldRule{
 	Name: lint.NewRuleName(231, "request-parent-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isBatchGetRequestMessage(f.GetOwner()) && f.Name() == "parent"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchGetRequestMessage(m) && f.Name() == "parent"
+		}
+		return false
 	},
 	LintField: utils.LintFieldResourceReference,
 }
