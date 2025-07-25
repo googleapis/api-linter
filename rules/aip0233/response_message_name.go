@@ -30,13 +30,15 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Proper response name should be the concatenation of the method name and
 		// "Response"
-		want := m.Name() + "Response"
+		want := string(m.Name()) + "Response"
 
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.
-		got := m.Output().Name()
+		var got string
 		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
+		} else {
+			got = string(m.Output().Name())
 		}
 
 		// Rule check: Establish that for methods such as `BatchCreateFoos`, the

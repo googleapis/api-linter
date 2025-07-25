@@ -44,7 +44,7 @@ func TestRequestRequestsField(t *testing.T) {
 			Field:    "CreateBookRequest requests = 1;",
 			problems: testutils.Problems{{Message: "repeated"}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 		{
@@ -54,7 +54,7 @@ func TestRequestRequestsField(t *testing.T) {
 				Suggestion: "CreateBookRequest",
 			}},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 		{
@@ -67,7 +67,7 @@ func TestRequestRequestsField(t *testing.T) {
 				},
 			},
 			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("requests")
+				return m.Fields().ByName("requests")
 			},
 		},
 	}
@@ -83,7 +83,7 @@ func TestRequestRequestsField(t *testing.T) {
 				message CreateBookRequest {}
 				`, test)
 
-			m := file.Messages()[0]
+			m := file.Messages().Get(0)
 
 			// Determine the descriptor that a failing test will attach to.
 			var problemDesc protoreflect.Descriptor = m

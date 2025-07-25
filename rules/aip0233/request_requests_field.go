@@ -31,7 +31,7 @@ var requestRequestsField = &lint.MessageRule{
 	OnlyIf: isBatchCreateRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a "requests" field is present.
-		requests := m.FindFieldByName("requests")
+		requests := m.Fields().ByName("requests")
 
 		// Rule check: Ensure that the "requests" field is existed.
 		if requests == nil {
@@ -42,7 +42,7 @@ var requestRequestsField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard create request message field "requests" is repeated.
-		if !requests.IsRepeated() {
+		if !requests.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "requests" field should be repeated`,
 				Descriptor: requests,
@@ -53,8 +53,8 @@ var requestRequestsField = &lint.MessageRule{
 		// correct type. Note: Retrieve the resource name from the the batch create
 		// request, for example: "BatchCreateBooksRequest" -> "Books"
 		rightTypeName := fmt.Sprintf("Create%sRequest",
-			pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "BatchCreate")))
-		if requests.GetMessageType() == nil || requests.GetMessageType().Name() != rightTypeName {
+			pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchCreate")))
+		if requests.Message() == nil || requests.Message().Name() != protoreflect.Name(rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Create Request should be a %q type`, rightTypeName),
 				Descriptor: requests,

@@ -37,20 +37,20 @@ var resourceReferenceType = &lint.MethodRule{
 		if len(repeated) == 0 {
 			return false
 		}
-		resMsg := repeated[0].GetMessageType()
+		resMsg := repeated[0].Message()
 		resource := utils.GetResource(resMsg)
 
-		parent := m.Input().FindFieldByName("parent")
+		parent := m.Input().Fields().ByName("parent")
 		return isBatchCreateMethod(m) && parent != nil && utils.GetResourceReference(parent) != nil && resource != nil
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Return type of the RPC.
 		ot := utils.GetResponseType(m)
 		repeated := utils.GetRepeatedMessageFields(ot)
-		resMsg := repeated[0].GetMessageType()
+		resMsg := repeated[0].Message()
 
 		resource := utils.GetResource(resMsg)
-		parent := m.Input().FindFieldByName("parent")
+		parent := m.Input().Fields().ByName("parent")
 		ref := utils.GetResourceReference(parent)
 
 		if resource.GetType() == ref.GetType() {

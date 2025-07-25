@@ -52,15 +52,15 @@ var (
 
 // Returns true if this is a AIP-233 Batch Create method, false otherwise.
 func isBatchCreateMethod(m protoreflect.MethodDescriptor) bool {
-	return batchCreateMethodRegexp.MatchString(m.Name())
+	return batchCreateMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-233 Batch Create request message, false otherwise.
 func isBatchCreateRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return batchCreateReqMessageRegexp.MatchString(m.Name())
+	return batchCreateReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-233 Batch Create response message, false otherwise.
 func isBatchCreateResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return batchCreateResMessageRegexp.MatchString(m.Name())
+	return batchCreateResMessageRegexp.MatchString(string(m.Name()))
 }
