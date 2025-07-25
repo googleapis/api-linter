@@ -23,7 +23,7 @@ import (
 var synonyms = &lint.FieldRule{
 	Name: lint.NewRuleName(163, "synonyms"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if f.Name() == "dry_run" {
+		if string(f.Name()) == "dry_run" {
 			return []lint.Problem{{
 				Message:    `Prefer "validate_only" over "dry_run".`,
 				Suggestion: "validate_only",

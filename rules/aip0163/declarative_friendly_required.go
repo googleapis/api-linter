@@ -26,10 +26,10 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(163, "declarative-friendly-required"),
 	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// We only want to look at request methods, not the resources themselves.
-		if name := m.Name(); strings.HasSuffix(name, "Request") && utils.IsDeclarativeFriendlyMessage(m) {
+		if name := string(m.Name()); strings.HasSuffix(name, "Request") && utils.IsDeclarativeFriendlyMessage(m) {
 			// If the corresponding method is a GET method, it does not need
 			// validate_only.
-			method := utils.FindMethod(m.ParentFile(), strings.TrimSuffix(name, "Request"))
+			method := utils.FindMethod(m.Parent().(protoreflect.FileDescriptor), strings.TrimSuffix(name, "Request"))
 			for _, http := range utils.GetHTTPRules(method) {
 				if http.Method == "GET" {
 					return false
@@ -40,7 +40,7 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		return false
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		if vo := m.FindFieldByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" || vo.IsRepeated() {
+		if vo := m.Fields().ByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" || vo.IsList() {
 			return []lint.Problem{{
 				Message:    "Declarative-friendly mutate requests should include a singular `bool validate_only` field.",
 				Descriptor: m,
