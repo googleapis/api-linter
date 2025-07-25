@@ -44,7 +44,7 @@ func TestResourceNameExtraction(t *testing.T) {
 				message GetBookRequest {}
 				message Book {}
 			`, "{{.URI}}", test.uri))
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := resourceNameExtraction.Lint(f)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

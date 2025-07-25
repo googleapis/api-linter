@@ -25,14 +25,14 @@ var hasAnnotation = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "http-annotation"),
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		hasHTTPRule := len(utils.GetHTTPRules(m)) > 0
-		if hasHTTPRule && m.IsClientStreaming() && m.IsServerStreaming() {
+		if hasHTTPRule && m.IsStreamingClient() && m.IsStreamingServer() {
 			return []lint.Problem{{
 				Message:    "Bi-directional streaming RPCs should omit `google.api.http`.",
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
-		if !hasHTTPRule && !(m.IsClientStreaming() && m.IsServerStreaming()) {
+		if !hasHTTPRule && !(m.IsStreamingClient() && m.IsStreamingServer()) {
 			return []lint.Problem{{
 				Message:    "RPCs must include HTTP definitions using the `google.api.http` annotation.",
 				Descriptor: m,
