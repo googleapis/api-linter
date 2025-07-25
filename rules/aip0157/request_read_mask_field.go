@@ -23,7 +23,8 @@ import (
 var requestReadMaskField = &lint.FieldRule{
 	Name: lint.NewRuleName(157, "request-read-mask-field"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isRequestMessage(f.GetOwner()) && f.Name() == "read_mask"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isRequestMessage(msg) && string(f.Name()) == "read_mask"
 	},
 	LintField: utils.LintFieldMask,
 }

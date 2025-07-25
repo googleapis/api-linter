@@ -31,5 +31,5 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 func isRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return strings.HasSuffix(m.Name(), "Request")
+	return strings.HasSuffix(string(m.Name()), "Request")
 }
