@@ -20,7 +20,6 @@ import (
 
 	"github.com/googleapis/api-linter/lint"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -46,5 +45,5 @@ func toLowerSnakeCase(s string) string {
 
 // isStringField returns true if the field is a string field.
 func isStringField(f protoreflect.FieldDescriptor) bool {
-	return f.GetType() == builder.FieldTypeString().GetType()
+	return f.Kind() == protoreflect.StringKind
 }

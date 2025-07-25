@@ -26,7 +26,7 @@ var base64 = &lint.FieldRule{
 	Name:   lint.NewRuleName(140, "base64"),
 	OnlyIf: isStringField,
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())
+		comment := strings.ToLower(string(f.ParentFile().SourceLocations().ByDescriptor(f).LeadingComments))
 		if strings.Contains(comment, "base64") || strings.Contains(comment, "base-64") {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.", f.Name()),

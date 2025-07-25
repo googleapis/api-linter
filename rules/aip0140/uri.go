@@ -26,13 +26,13 @@ import (
 var uri = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "uri"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		nameSegments := stringset.New(strings.Split(f.Name(), "_")...)
+		nameSegments := stringset.New(strings.Split(string(f.Name()), "_")...)
 		if nameSegments.Contains("url") {
 			return []lint.Problem{{
 				Message:    "Use `uri` instead of `url` in field names.",
 				Descriptor: f,
 				Location:   locations.DescriptorName(f),
-				Suggestion: strings.ReplaceAll(f.Name(), "url", "uri"),
+				Suggestion: strings.ReplaceAll(string(f.Name()), "url", "uri"),
 			}}
 		}
 		return nil

@@ -26,7 +26,7 @@ import (
 var lowerSnake = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "lower-snake"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if got, want := f.Name(), toLowerSnakeCase(f.Name()); got != want {
+		if got, want := f.Name(), toLowerSnakeCase(string(f.Name())); string(got) != want {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field `%s` must use lower_snake_case.", got),
 				Suggestion: want,

@@ -28,10 +28,10 @@ import (
 var noPrepositions = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "prepositions"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return !stringset.New("order_by", "group_by", "hour_of_day", "day_of_week").Contains(f.Name())
+		return !stringset.New("order_by", "group_by", "hour_of_day", "day_of_week").Contains(string(f.Name()))
 	},
 	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
-		for _, word := range strings.Split(f.Name(), "_") {
+		for _, word := range strings.Split(string(f.Name()), "_") {
 			if data.Prepositions.Contains(word) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Avoid using %q in field names.", word),

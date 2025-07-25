@@ -54,7 +54,7 @@ var abbreviations = &lint.DescriptorRule{
 		// Iterate over each abbreviation and determine whether the descriptor's
 		// name includes the long name.
 		for long, short := range expectedAbbreviations {
-			for _, segment := range strings.Split(strcase.SnakeCase(d.Name()), "_") {
+			for _, segment := range strings.Split(strcase.SnakeCase(string(d.Name())), "_") {
 				if segment == long {
 					problems = append(problems, lint.Problem{
 						Message: fmt.Sprintf(
@@ -62,7 +62,7 @@ var abbreviations = &lint.DescriptorRule{
 							caseFunc(short),
 							caseFunc(long),
 						),
-						Suggestion: strings.ReplaceAll(d.Name(), caseFunc(long), caseFunc(short)),
+						Suggestion: strings.ReplaceAll(string(d.Name()), caseFunc(long), caseFunc(short)),
 						Descriptor: d,
 						Location:   locations.DescriptorName(d),
 					})

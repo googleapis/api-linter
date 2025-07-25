@@ -26,7 +26,7 @@ import (
 var reservedWords = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "reserved-words"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if name := f.Name(); reservedWordsSet.Contains(name) {
+		if name := f.Name(); reservedWordsSet.Contains(string(name)) {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("%q is a reserved word in a common language and should not be used.", name),
 				Descriptor: f,

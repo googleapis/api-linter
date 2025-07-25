@@ -26,7 +26,7 @@ import (
 var numbers = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "numbers"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		for _, segment := range strings.Split(f.Name(), "_") {
+		for _, segment := range strings.Split(string(f.Name()), "_") {
 			if numberStart.MatchString(segment) {
 				return []lint.Problem{{
 					Message:    "No word in a field name should start with a number.",

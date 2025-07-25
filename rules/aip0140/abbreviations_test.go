@@ -35,7 +35,7 @@ func TestAbbreviations(t *testing.T) {
 			tmpl:     `message Book { string {{.Name}} = 1; }`,
 			caseFunc: strcase.SnakeCase,
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Messages()[0].Fields()[0]
+				return f.Messages().Get(0).Fields().Get(0)
 			},
 		},
 		{
@@ -43,7 +43,7 @@ func TestAbbreviations(t *testing.T) {
 			tmpl:     `message {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Messages()[0]
+				return f.Messages().Get(0)
 			},
 		},
 		{
@@ -51,7 +51,7 @@ func TestAbbreviations(t *testing.T) {
 			tmpl:     `service {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Services()[0]
+				return f.Services().Get(0)
 			},
 		},
 		{
@@ -66,7 +66,7 @@ func TestAbbreviations(t *testing.T) {
 			`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Services()[0].Methods()[0]
+				return f.Services().Get(0).Methods().Get(0)
 			},
 		},
 		{
@@ -74,7 +74,7 @@ func TestAbbreviations(t *testing.T) {
 			tmpl:     `enum {{.Name}} { UNSPECIFIED = 0; }`,
 			caseFunc: strcase.UpperCamelCase,
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Enums()[0]
+				return f.Enums().Get(0)
 			},
 		},
 		{
@@ -84,7 +84,7 @@ func TestAbbreviations(t *testing.T) {
 				return strings.ToUpper(strcase.SnakeCase(s))
 			},
 			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
-				return f.Enums()[0].Values()[0]
+				return f.Enums().Get(0).Values().Get(0)
 			},
 		},
 	}
