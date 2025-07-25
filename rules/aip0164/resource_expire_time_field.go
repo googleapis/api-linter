@@ -10,16 +10,20 @@ import (
 var resourceExpireTimeField = &lint.MessageRule{
 	Name: lint.NewRuleName(164, "resource-expire-time-field"),
 	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
-		resource := m.Name()
-		return utils.FindMethod(m.ParentFile(), "Undelete"+resource) != nil
+		resource := string(m.Name())
+		file, ok := m.Parent().(protoreflect.FileDescriptor)
+		if !ok {
+			return false
+		}
+		return utils.FindMethod(file, "Undelete"+resource) != nil
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// for backwards compatibility, do not lint on expire_time.
 		// previously expire_time was the recommended term.
-		if m.FindFieldByName("expire_time") != nil {
+		if m.Fields().ByName("expire_time") != nil {
 			return nil
 		}
-		if m.FindFieldByName("purge_time") != nil {
+		if m.Fields().ByName("purge_time") != nil {
 			return nil
 		}
 		return []lint.Problem{{

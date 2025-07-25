@@ -32,12 +32,12 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UndeleteFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := strings.Replace(m.Name(), "Undelete", "", 1)
+		want := strings.Replace(string(m.Name()), "Undelete", "", 1)
 		got := m.Output().Name()
 
 		// If the return type is an LRO, use the annotated response type instead.
 		if utils.IsOperation(m.Output()) {
-			got = utils.GetOperationInfo(m).GetResponseType()
+			got = protoreflect.Name(utils.GetOperationInfo(m).GetResponseType())
 		}
 
 		// Return a problem if we did not get the expected return name.
@@ -45,7 +45,7 @@ var responseMessageName = &lint.MethodRule{
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if got != want && got != "" {
+		if string(got) != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Undelete RPCs should have response message type %q, not %q.",

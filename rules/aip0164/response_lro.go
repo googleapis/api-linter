@@ -27,7 +27,7 @@ var responseLRO = &lint.MethodRule{
 		return isUndeleteMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		if m.Output().GetFullyQualifiedName() != "google.longrunning.Operation" {
+		if m.Output().FullName() != "google.longrunning.Operation" {
 			return []lint.Problem{{
 				Message:    "Declarative-friendly undelete methods should use an LRO.",
 				Descriptor: m,

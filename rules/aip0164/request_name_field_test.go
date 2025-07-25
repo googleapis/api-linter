@@ -42,9 +42,9 @@ func TestRequestNameField(t *testing.T) {
 					bytes other_field = 2;
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			problems := requestNameField.Lint(f)
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {

@@ -29,7 +29,7 @@ func TestResourceExpireTimeField(t *testing.T) {
 				}
 				message {{.MethodName}}Request {}
 			`, test)
-			message := file.Messages()[0]
+			message := file.Messages().Get(0)
 			problems := resourceExpireTimeField.Lint(file)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Error(diff)

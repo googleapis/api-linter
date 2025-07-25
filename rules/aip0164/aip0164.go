@@ -48,10 +48,10 @@ var (
 
 // Returns true if this is a AIP-164 Undelete method, false otherwise.
 func isUndeleteMethod(m protoreflect.MethodDescriptor) bool {
-	return undeleteMethodRegexp.MatchString(m.Name())
+	return undeleteMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-164 Undelete request message, false otherwise.
 func isUndeleteRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return undeleteReqMessageRegexp.MatchString(m.Name())
+	return undeleteReqMessageRegexp.MatchString(string(m.Name()))
 }
