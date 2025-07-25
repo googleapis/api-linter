@@ -26,10 +26,10 @@ import (
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(154, "field-type"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return f.Name() == "etag"
+		return string(f.Name()) == "etag"
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
-		if t := utils.GetTypeName(f); t != "string" || f.IsRepeated() {
+		if t := utils.GetTypeName(f); t != "string" || f.IsList() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The etag field should be a singular string, not %s.", t),
 				Descriptor: f,

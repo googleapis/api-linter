@@ -45,7 +45,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 					{{.Etag}}
 				}
 			`, test)
-			m := f.Messages()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(declarativeFriendlyRequired.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -107,7 +107,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 						{{.Etag}}
 					}
 				`, test)
-				m := f.FindMessage("DeleteBookRequest")
+				m := f.Messages().ByName("DeleteBookRequest")
 				if diff := test.problems.SetDescriptor(m).Diff(declarativeFriendlyRequired.Lint(f)); diff != "" {
 					t.Error(diff)
 				}

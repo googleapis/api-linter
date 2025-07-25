@@ -39,11 +39,11 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 
 			// If this is a request message, then make several more checks based on
 			// what the method looks like.
-			if name := m.Name(); strings.HasSuffix(name, "Request") {
-				name = strings.TrimSuffix(name, "Request")
+			if name := string(m.Name()); strings.HasSuffix(name, "Request") {
+				methodName := strings.TrimSuffix(name, "Request")
 
 				// If this is a GET request, then this message is exempt.
-				if method := utils.FindMethod(m.ParentFile(), name); method != nil {
+				if method := utils.FindMethod(m.Parent().(protoreflect.FileDescriptor), methodName); method != nil {
 					for _, rule := range utils.GetHTTPRules(method) {
 						if rule.Method == "GET" {
 							return false
@@ -52,8 +52,9 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 				}
 
 				// If the message contains the resource, then this message is exempt.
-				for _, field := range m.Fields() {
-					if field.GetMessageType() == resource {
+				for i := 0; i < m.Fields().Len(); i++ {
+					field := m.Fields().Get(i)
+					if field.Message() == resource {
 						return false
 					}
 				}
@@ -66,14 +67,15 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		return false
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		for _, field := range m.Fields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
 			if field.Name() == "etag" {
 				return nil
 			}
 		}
 
 		whoami := "resources"
-		if strings.HasSuffix(m.Name(), "Request") {
+		if strings.HasSuffix(string(m.Name()), "Request") {
 			whoami = "mutation requests without the resource"
 		}
 		return []lint.Problem{{
