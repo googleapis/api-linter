@@ -23,7 +23,8 @@ import (
 var requestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(152, "request-name-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isRunRequestMessage(f.GetOwner()) && f.Name() == "name"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isRunRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

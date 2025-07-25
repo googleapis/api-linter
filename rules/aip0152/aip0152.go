@@ -47,10 +47,10 @@ var (
 
 // Returns true if this is an AIP-152 Run method, false otherwise.
 func isRunMethod(m protoreflect.MethodDescriptor) bool {
-	return runMethodRegexp.MatchString(m.Name())
+	return runMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-152 Run request message, false otherwise.
 func isRunRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return runReqMessageRegexp.MatchString(m.Name())
+	return runReqMessageRegexp.MatchString(string(m.Name()))
 }

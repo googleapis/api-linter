@@ -27,7 +27,7 @@ var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(152, "response-message-name"),
 	OnlyIf: isRunMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		if m.Output().GetFullyQualifiedName() != "google.longrunning.Operation" {
+		if m.Output().FullName() != "google.longrunning.Operation" {
 			return []lint.Problem{{
 				Message:    "Run methods should use an LRO.",
 				Descriptor: m,
@@ -43,7 +43,7 @@ var responseMessageName = &lint.MethodRule{
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
 		got := utils.GetOperationInfo(m).GetResponseType()
-		want := m.Name() + "Response"
+		want := string(m.Name()) + "Response"
 		if got != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
