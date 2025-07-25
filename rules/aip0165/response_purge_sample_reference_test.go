@@ -40,7 +40,7 @@ func TestResponsePurgeSampleReference(t *testing.T) {
 					repeated string {{.FieldName}} = 1{{.FieldOpts}};
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(responsePurgeSampleReference.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

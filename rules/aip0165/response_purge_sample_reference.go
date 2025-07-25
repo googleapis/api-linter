@@ -23,7 +23,7 @@ import (
 var responsePurgeSampleReference = &lint.FieldRule{
 	Name: lint.NewRuleName(165, "response-purge-sample-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isPurgeResponseMessage(f.GetOwner()) && f.Name() == "purge_sample"
+		return isPurgeResponseMessage(f.Parent().(protoreflect.MessageDescriptor)) && string(f.Name()) == "purge_sample"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

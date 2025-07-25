@@ -46,7 +46,7 @@ func TestResponseMessageName(t *testing.T) {
 				message PurgeBooksRequest {}
 				message PurgeBooksResponse {}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(responseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

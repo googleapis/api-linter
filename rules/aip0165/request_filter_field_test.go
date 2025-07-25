@@ -30,7 +30,7 @@ func TestFilterField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "PurgeBooksRequest", "string filter = 1;", nil},
-		{"Missing", "PurgeBooksRequest", "", testutils.Problems{{Message: "no `filter`"}}},
+		{"Missing", "PurgeBooksRequest", "", testutils.Problems{{Message: `Message "PurgeBooksRequest" has no "filter" field.`}}},
 		{"InvalidType", "PurgeBooksRequest", "int32 filter = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidTypeRepeated", "PurgeBooksRequest", "repeated string filter = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantMessage", "EnumerateBooksRequest", "", nil},
@@ -42,9 +42,9 @@ func TestFilterField(t *testing.T) {
 					repeated string names = 2;
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if strings.HasPrefix(test.name, "InvalidType") {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(requestFilterField.Lint(f)); diff != "" {
 				t.Error(diff)

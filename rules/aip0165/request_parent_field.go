@@ -34,10 +34,10 @@ var requestParentField = &lint.MessageRule{
 		// In order to parse out the pattern, we get the resource message
 		// from the response, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
-		plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "Purge")
+		plural := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "Purge")
 		if resp := utils.FindMessage(m.ParentFile(), fmt.Sprintf("Purge%sResponse", plural)); resp != nil {
-			if paged := resp.FindFieldByName(strcase.SnakeCase(plural)); paged != nil {
-				if resource := utils.GetResource(paged.GetMessageType()); resource != nil {
+			if paged := resp.Fields().ByName(protoreflect.Name(strcase.SnakeCase(plural))); paged != nil {
+				if resource := utils.GetResource(paged.Message()); resource != nil {
 					for _, pattern := range resource.GetPattern() {
 						if strings.Count(pattern, "{") == 0 {
 							return false

@@ -29,8 +29,8 @@ func TestHTTPParentVariable(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", nil},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "`parent`"}}},
-		{"NoVarParent", "/v1/publishers/*/books/*", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "`parent`"}}},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: `HTTP URI should include a "parent" variable.`}}},
+		{"NoVarParent", "/v1/publishers/*/books/*", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: `HTTP URI should include a "parent" variable.`}}},
 		{"NoParent", "/v1/books/*", "PurgeBooks", "", nil},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "string parent = 1;", nil},
 	}
@@ -51,7 +51,7 @@ func TestHTTPParentVariable(t *testing.T) {
 				}
 				message {{.MethodName}}Response {}
 			`, test)
-			method := f.Services()[0].Methods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpParentVariable.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

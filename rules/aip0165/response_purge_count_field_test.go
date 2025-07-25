@@ -42,9 +42,9 @@ func TestResponsePurgeCountField(t *testing.T) {
 					repeated string names = 2;
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if strings.HasPrefix(test.name, "InvalidType") {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(responsePurgeCountField.Lint(f)); diff != "" {
 				t.Error(diff)

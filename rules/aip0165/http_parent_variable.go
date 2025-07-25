@@ -24,7 +24,7 @@ import (
 var httpParentVariable = &lint.MethodRule{
 	Name: lint.NewRuleName(165, "http-parent-variable"),
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
-		return isPurgeMethod(m) && m.Input().FindFieldByName("parent") != nil
+		return isPurgeMethod(m) && m.Input().Fields().ByName("parent") != nil
 	},
 	LintMethod: utils.LintHTTPURIHasParentVariable,
 }

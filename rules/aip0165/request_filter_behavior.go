@@ -23,7 +23,7 @@ import (
 var requestFilterBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(165, "request-filter-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isPurgeRequestMessage(f.GetOwner()) && f.Name() == "filter"
+		return isPurgeRequestMessage(f.Parent().(protoreflect.MessageDescriptor)) && string(f.Name()) == "filter"
 	},
 	LintField: utils.LintRequiredField,
 }

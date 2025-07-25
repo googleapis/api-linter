@@ -53,15 +53,15 @@ var (
 
 // Returns true if this is a AIP-165 Purge method, false otherwise.
 func isPurgeMethod(m protoreflect.MethodDescriptor) bool {
-	return purgeMethodRegexp.MatchString(m.Name())
+	return purgeMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-165 Purge request message, false otherwise.
 func isPurgeRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return purgeReqMessageRegexp.MatchString(m.Name())
+	return purgeReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-165 Purge response message, false otherwise.
 func isPurgeResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return purgeRespMessageRegexp.MatchString(m.Name())
+	return purgeRespMessageRegexp.MatchString(string(m.Name()))
 }

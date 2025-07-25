@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The Purge request message should have force field.
@@ -29,7 +28,7 @@ var requestForceField = &lint.MessageRule{
 	OnlyIf: isPurgeRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `force` field is present.
-		forceField := m.FindFieldByName("force")
+		forceField := m.Fields().ByName("force")
 		if forceField == nil {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Message %q has no `force` field.", m.Name()),
@@ -38,7 +37,7 @@ var requestForceField = &lint.MessageRule{
 		}
 
 		// Rule check: Establish that the force field is a bool.
-		if forceField.GetType() != builder.FieldTypeBool().GetType() || forceField.IsRepeated() {
+		if forceField.Kind() != protoreflect.BoolKind || forceField.Cardinality() == protoreflect.Repeated {
 			return []lint.Problem{{
 				Message:    "`force` field on Purge request message must be a singular bool.",
 				Descriptor: forceField,

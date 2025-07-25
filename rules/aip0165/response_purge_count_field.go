@@ -20,7 +20,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The Purge response message should have purge_count field.
@@ -29,7 +28,7 @@ var responsePurgeCountField = &lint.MessageRule{
 	OnlyIf: isPurgeResponseMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `purge_count` field is present.
-		field := m.FindFieldByName("purge_count")
+		field := m.Fields().ByName("purge_count")
 		if field == nil {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Message %q has no `purge_count` field.", m.Name()),
@@ -38,7 +37,7 @@ var responsePurgeCountField = &lint.MessageRule{
 		}
 
 		// Rule check: Establish that the purge_count field is a singular int32.
-		if field.GetType() != builder.FieldTypeInt32().GetType() || field.IsRepeated() {
+		if field.Kind() != protoreflect.Int32Kind || field.Cardinality() == protoreflect.Repeated {
 			return []lint.Problem{{
 				Message:    "`purge_count` field on Purge response message must be a singular int32.",
 				Descriptor: field,

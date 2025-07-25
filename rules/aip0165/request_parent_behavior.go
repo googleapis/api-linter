@@ -23,7 +23,7 @@ import (
 var requestParentBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(165, "request-parent-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isPurgeRequestMessage(f.GetOwner()) && f.Name() == "parent"
+		return isPurgeRequestMessage(f.Parent().(protoreflect.MessageDescriptor)) && string(f.Name()) == "parent"
 	},
 	LintField: utils.LintRequiredField,
 }
