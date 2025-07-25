@@ -44,19 +44,19 @@ var (
 
 // Return true if this is an AIP-158 List request message, false otherwise.
 func isPaginatedRequestMessage(m protoreflect.MessageDescriptor) bool {
-	if paginatedReq.MatchString(m.Name()) {
+	if paginatedReq.MatchString(string(m.Name())) {
 		return true
 	}
 	// Ignore messages that happen to have these fields but are not requests.
-	if !strings.HasSuffix(m.Name(), "Request") {
+	if !strings.HasSuffix(string(m.Name()), "Request") {
 		return false
 	}
-	return m.FindFieldByName("page_size") != nil || m.FindFieldByName("page_token") != nil
+	return m.Fields().ByName("page_size") != nil || m.Fields().ByName("page_token") != nil
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
 func isPaginatedResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return paginatedRes.MatchString(m.Name()) || m.FindFieldByName("next_page_token") != nil
+	return paginatedRes.MatchString(string(m.Name())) || m.Fields().ByName("next_page_token") != nil
 }
 
 func isPaginatedMethod(m protoreflect.MethodDescriptor) bool {

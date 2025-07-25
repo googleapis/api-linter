@@ -18,17 +18,16 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var requestSkipField = &lint.FieldRule{
 	Name: lint.NewRuleName(158, "request-skip-field"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isPaginatedRequestMessage(f.GetOwner()) && f.Name() == "skip"
+		return isPaginatedRequestMessage(f.Parent().(protoreflect.MessageDescriptor)) && f.Name() == "skip"
 	},
 	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
 		// Rule check: Ensure that the name page_size is the correct type.
-		if f.GetType() != builder.FieldTypeInt32().GetType() || f.IsRepeated() {
+		if f.Kind() != protoreflect.Int32Kind || f.IsList() {
 			return []lint.Problem{{
 				Message:    "`skip` field on List RPCs should be a singular int32",
 				Suggestion: "int32",

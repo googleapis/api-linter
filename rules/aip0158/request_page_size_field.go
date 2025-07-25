@@ -18,7 +18,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 var requestPaginationPageSize = &lint.MessageRule{
@@ -31,7 +30,7 @@ var requestPaginationPageSize = &lint.MessageRule{
 		}
 		// Checks that page_size is of type int32 and is not a oneof. These are
 		// noops if page_size is not a oneof and is a int32.
-		problems = append(problems, utils.LintSingularField(f, builder.FieldTypeInt32(), "int32")...)
+		problems = append(problems, utils.LintSingularField(f, protoreflect.Int32Kind, "int32")...)
 		problems = append(problems, utils.LintNotOneof(f)...)
 
 		return problems

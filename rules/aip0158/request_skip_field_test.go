@@ -45,7 +45,7 @@ func TestRequestSkipField(t *testing.T) {
 			`, test)
 			var d protoreflect.Descriptor = nil
 			if len(test.problems) > 0 {
-				d = f.Messages()[0].Fields()[1]
+				d = f.Messages().Get(0).Fields().Get(1)
 			}
 			problems := requestSkipField.Lint(f)
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {

@@ -19,44 +19,38 @@ import (
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
-
-type field struct {
-	fieldName string
-	fieldType *builder.FieldType
-}
 
 func TestResponsePaginationNextPageToken(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName      string
-		messageName   string
-		messageFields []field
+		MessageName   string
+		Fields        string
 		problems      testutils.Problems
 		problemDesc   func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Valid",
 			"ListBooksResponse",
-			[]field{{"books", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeString()}},
+			"repeated string books = 1; string next_page_token = 2;",
 			testutils.Problems{},
 			nil,
 		},
 		{
 			"MissingField",
 			"ListBooksResponse",
-			[]field{{"books", builder.FieldTypeString()}},
+			"repeated string books = 1;",
 			testutils.Problems{{Message: "next_page_token"}},
 			nil,
 		},
 		{
 			"InvalidType",
 			"ListFooResponse",
-			[]field{{"name", builder.FieldTypeString()}, {"next_page_token", builder.FieldTypeDouble()}},
+			"string name = 1; double next_page_token = 2;",
 			testutils.Problems{{Suggestion: "string"}},
 			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
-				return m.FindFieldByName("next_page_token")
+				return m.Fields().ByName("next_page_token")
 			},
 		},
 	}
@@ -64,28 +58,19 @@ func TestResponsePaginationNextPageToken(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			messageBuilder := builder.NewMessage(test.messageName)
-
-			for _, f := range test.messageFields {
-				messageBuilder.AddField(
-					builder.NewField(f.fieldName, f.fieldType),
-				)
-			}
-
-			message, err := messageBuilder.Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					{{.Fields}}
+				}
+			`, test)
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc protoreflect.Descriptor = message
+			var problemDesc protoreflect.Descriptor = f.Messages().Get(0)
 			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(message)
+				problemDesc = test.problemDesc(f.Messages().Get(0))
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := responsePaginationNextPageToken.Lint(message.ParentFile())
+			problems := responsePaginationNextPageToken.Lint(f)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

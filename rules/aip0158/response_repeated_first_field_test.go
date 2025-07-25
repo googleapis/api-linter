@@ -46,8 +46,8 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			`, test)
 
 			// Determine the descriptor that a failing test will attach to.
-			if m := f.Messages()[1]; len(m.Fields()) > 0 {
-				test.problems.SetDescriptor(m.Fields()[0])
+			if m := f.Messages().Get(1); m.Fields().Len() > 0 {
+				test.problems.SetDescriptor(m.Fields().Get(0))
 			}
 
 			// Run the lint rule and establish we get the correct problems.

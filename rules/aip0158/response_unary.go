@@ -24,7 +24,7 @@ var responseUnary = &lint.MethodRule{
 	Name:   lint.NewRuleName(158, "response-unary"),
 	OnlyIf: isPaginatedMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		if m.IsServerStreaming() {
+		if m.IsStreamingServer() {
 			return []lint.Problem{{
 				Message:    "Paginated responses must be unary, not streaming.",
 				Descriptor: m,

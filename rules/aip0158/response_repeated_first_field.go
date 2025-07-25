@@ -22,23 +22,23 @@ import (
 var responseRepeatedFirstField = &lint.MessageRule{
 	Name: lint.NewRuleName(158, "response-repeated-first-field"),
 	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
-		return isPaginatedResponseMessage(m) && len(m.Fields()) > 0
+		return isPaginatedResponseMessage(m) && m.Fields().Len() > 0
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Sanity check: Is the first field (positionally) and the field with
 		// an ID of 1 actually the same field?
-		if m.Fields()[0] != m.FindFieldByNumber(1) {
+		if m.Fields().Get(0) != m.Fields().ByNumber(1) {
 			return []lint.Problem{{
 				Message:    "The first field of paginated RPCs must have a protobuf ID of 1.",
-				Descriptor: m.Fields()[0],
+				Descriptor: m.Fields().Get(0),
 			}}
 		}
 
 		// Make sure the field is repeated.
-		if !m.Fields()[0].IsRepeated() {
+		if !m.Fields().Get(0).IsList() {
 			return []lint.Problem{{
 				Message:    "The first field of a paginated response should be repeated.",
-				Descriptor: m.Fields()[0],
+				Descriptor: m.Fields().Get(0),
 			}}
 		}
 
