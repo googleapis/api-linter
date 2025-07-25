@@ -37,7 +37,7 @@ var fieldNames = &lint.FieldRule{
 			"tz":           "time_zone",
 			"timezone":     "time_zone",
 		}
-		if want, ok := variants[f.Name()]; ok {
+		if want, ok := variants[string(f.Name())]; ok {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Use %q in place of %q.", want, f.Name()),
 				Descriptor: f,

@@ -33,7 +33,7 @@ var fieldTypes = &lint.FieldRule{
 			"language_code",
 			"mime_type",
 			"time_zone",
-		).Contains(f.Name())
+		).Contains(string(f.Name()))
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		if typeName := utils.GetTypeName(f); typeName != "string" {
