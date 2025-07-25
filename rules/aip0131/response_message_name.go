@@ -30,13 +30,13 @@ var responseMessageName = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `GetFoo`, the response
 		// message is named `Foo`.
-		if got, want := m.Output().Name(), m.Name()[3:]; got != want {
+		if got, want := m.Output().Name(), m.Name()[3:]; got != protoreflect.Name(want) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Get RPCs should have the corresponding resource as the response message, such as %q.",
 					want,
 				),
-				Suggestion: want,
+				Suggestion: string(want),
 				Descriptor: m,
 				Location:   locations.MethodResponseType(m),
 			}}

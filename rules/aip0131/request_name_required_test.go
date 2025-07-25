@@ -43,7 +43,7 @@ func TestRequestHasNameField(t *testing.T) {
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := requestNameRequired.Lint(f)
-			if diff := test.problems.SetDescriptor(f.Messages()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(f.Messages().Get(0)).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
 		})
