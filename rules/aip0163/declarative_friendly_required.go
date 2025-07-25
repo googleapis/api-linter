@@ -29,7 +29,11 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		if name := string(m.Name()); strings.HasSuffix(name, "Request") && utils.IsDeclarativeFriendlyMessage(m) {
 			// If the corresponding method is a GET method, it does not need
 			// validate_only.
-			method := utils.FindMethod(m.Parent().(protoreflect.FileDescriptor), strings.TrimSuffix(name, "Request"))
+			file, ok := m.Parent().(protoreflect.FileDescriptor)
+			if !ok {
+				return false
+			}
+			method := utils.FindMethod(file, strings.TrimSuffix(name, "Request"))
 			for _, http := range utils.GetHTTPRules(method) {
 				if http.Method == "GET" {
 					return false
