@@ -35,7 +35,7 @@ var resourceExpiry = &lint.FieldRule{
 		}
 
 		// If this message does not have a `ttl` field, suggest one.
-		if f.GetOwner().FindFieldByName("ttl") == nil {
+		if f.Parent().(protoreflect.MessageDescriptor).Fields().ByName("ttl") == nil {
 			return []lint.Problem{{
 				Message:    "Resources that let users set expire_time should include an input only `ttl` field.",
 				Descriptor: f,

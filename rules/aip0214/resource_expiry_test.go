@@ -49,7 +49,7 @@ func TestResourceExpiry(t *testing.T) {
 					{{.AddtlField}}
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[1]
+			field := f.Messages().Get(0).Fields().Get(1)
 			if diff := test.problems.SetDescriptor(field).Diff(resourceExpiry.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
