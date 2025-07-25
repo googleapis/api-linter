@@ -31,13 +31,13 @@ func TestParentField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "", "BatchUpdateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"Missing", "", "BatchUpdateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"Missing", "", "BatchUpdateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchUpdateBooksRequest" has no "parent" field.`}}},
 		{"InvalidType", "", "BatchUpdateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"IrrelevantNoParent", "", "BatchUpdateBooks", "", "books/{b}", nil},
 
 		{"PackageValid", "package foo;", "BatchUpdateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"PackageMissing", "package foo;", "BatchUpdateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"PackageMissing", "package foo;", "BatchUpdateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchUpdateBooksRequest" has no "parent" field.`}}},
 		{"PackageInvalidType", "package foo;", "BatchUpdateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"PackageIrrelevantNoParent", "package foo;", "BatchUpdateBooks", "", "books/{b}", nil},
@@ -67,9 +67,9 @@ func TestParentField(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" || test.name == "PackageInvalidType" {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(requestParentField.Lint(f)); diff != "" {
 				t.Error(diff)

@@ -74,10 +74,10 @@ func TestRequestRequestsField(t *testing.T) {
 
 			// Determine the descriptor that a failing test will attach to.
 			var problemDesc protoreflect.Descriptor
-			if requests := file.Messages()[0].FindFieldByName("requests"); requests != nil {
+			if requests := file.Messages().Get(0).Fields().ByName("requests"); requests != nil {
 				problemDesc = requests
 			} else {
-				problemDesc = file.Messages()[0]
+				problemDesc = file.Messages().Get(0)
 			}
 
 			problems := requestRequestsField.Lint(file)

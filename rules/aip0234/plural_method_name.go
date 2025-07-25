@@ -30,7 +30,7 @@ var pluralMethodName = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Note: Retrieve the resource name from the method name. For example,
 		// "BatchUpdateFoos" -> "Foos"
-		pluralMethodResourceName := strings.TrimPrefix(m.Name(), "BatchUpdate")
+		pluralMethodResourceName := strings.TrimPrefix(string(m.Name()), "BatchUpdate")
 
 		pluralize := pluralize.NewClient()
 

@@ -51,15 +51,15 @@ var (
 
 // Returns true if this is a AIP-234 Batch Update method, false otherwise.
 func isBatchUpdateMethod(m protoreflect.MethodDescriptor) bool {
-	return batchUpdateMethodRegexp.MatchString(m.Name())
+	return batchUpdateMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-234 Batch Update request message, false otherwise.
 func isBatchUpdateRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return batchUpdateReqMessageRegexp.MatchString(m.Name())
+	return batchUpdateReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-234 Batch Update request message, false otherwise.
 func isBatchUpdateResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return batchUpdateResMessageRegexp.MatchString(m.Name())
+	return batchUpdateResMessageRegexp.MatchString(string(m.Name()))
 }
