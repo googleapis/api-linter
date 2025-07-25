@@ -23,7 +23,8 @@ import (
 var deleteRevisionRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "delete-revision-request-name-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isDeleteRevisionRequestMessage(f.GetOwner()) && f.Name() == "name"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isDeleteRevisionRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintRequiredField,
 }

@@ -34,10 +34,10 @@ var commitResponseMessageName = &lint.MethodRule{
 			return nil
 		}
 		response := utils.GetResponseType(m)
-		if response == nil {
+				if response == nil {
 			return nil
 		}
-		got := response.Name()
+		got := string(response.Name())
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 

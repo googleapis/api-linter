@@ -74,7 +74,7 @@ var (
 
 // Returns true if this is an AIP-162 Tag Revision request message, false otherwise.
 func isTagRevisionRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return tagRevisionReqMessageRegexp.MatchString(m.Name())
+	return tagRevisionReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 var (
@@ -84,7 +84,7 @@ var (
 
 // Returns true if this is an AIP-162 Commit request message, false otherwise.
 func isCommitRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return commitReqMessageRegexp.MatchString(m.Name())
+	return commitReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 var (
@@ -94,7 +94,7 @@ var (
 
 // Returns true if this is an AIP-162 Rollback request message, false otherwise.
 func isRollbackRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return rollbackReqMessageRegexp.MatchString(m.Name())
+	return rollbackReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 var (
@@ -104,7 +104,7 @@ var (
 
 // Returns true if this is an AIP-162 Delete Revision request message, false otherwise.
 func isDeleteRevisionRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return deleteRevisionReqMessageRegexp.MatchString(m.Name())
+	return deleteRevisionReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // IsListRevisionsRequestMessage returns true if this is an AIP-162 List

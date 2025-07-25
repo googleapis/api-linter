@@ -23,7 +23,8 @@ import (
 var commitRequestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "commit-request-name-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isCommitRequestMessage(f.GetOwner()) && f.Name() == "name"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isCommitRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

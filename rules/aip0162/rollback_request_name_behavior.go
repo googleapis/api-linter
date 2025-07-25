@@ -23,7 +23,8 @@ import (
 var rollbackRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "rollback-request-name-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isRollbackRequestMessage(f.GetOwner()) && f.Name() == "name"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isRollbackRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintRequiredField,
 }

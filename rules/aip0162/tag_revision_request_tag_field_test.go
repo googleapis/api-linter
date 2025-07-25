@@ -29,7 +29,7 @@ func TestTagRevisionRequestTagField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "TagBookRevision", "string tag = 1;", nil},
-		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: "no `tag`"}}},
+		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: `Message "TagBookRevisionRequest" has no "tag" field.`}}},
 		{"InvalidType", "TagBookRevision", "int32 tag = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
@@ -39,9 +39,9 @@ func TestTagRevisionRequestTagField(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(tagRevisionRequestTagField.Lint(f)); diff != "" {
 				t.Error(diff)

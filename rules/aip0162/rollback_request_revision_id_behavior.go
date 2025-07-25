@@ -23,7 +23,8 @@ import (
 var rollbackRequestRevisionIDBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "rollback-request-revision-id-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isRollbackRequestMessage(f.GetOwner()) && f.Name() == "revision_id"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isRollbackRequestMessage(msg) && string(f.Name()) == "revision_id"
 	},
 	LintField: utils.LintRequiredField,
 }

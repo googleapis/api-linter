@@ -29,7 +29,7 @@ func TestRollbackRequestRevisionIDField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "RollbackBook", "string revision_id = 1;", nil},
-		{"Missing", "RollbackBook", "", testutils.Problems{{Message: "no `revision_id`"}}},
+		{"Missing", "RollbackBook", "", testutils.Problems{{Message: `Message "RollbackBookRequest" has no "revision_id" field.`}}},
 		{"InvalidType", "RollbackBook", "int32 revision_id = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
@@ -39,9 +39,9 @@ func TestRollbackRequestRevisionIDField(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" {
-				d = f.Messages()[0].Fields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(rollbackRequestRevisionIDField.Lint(f)); diff != "" {
 				t.Error(diff)

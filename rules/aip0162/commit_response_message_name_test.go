@@ -39,7 +39,7 @@ func TestCommitResponseMessageName(t *testing.T) {
 				message CommitBookRequest {}
 				message {{.ResponseType}} {}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -73,7 +73,7 @@ func TestCommitResponseMessageNameLRO(t *testing.T) {
 				message {{.ResponseType}} {}
 				message OperationMetadata{}
 			`, test)
-			m := f.Services()[0].Methods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

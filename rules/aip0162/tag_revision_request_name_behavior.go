@@ -23,7 +23,8 @@ import (
 var tagRevisionRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "tag-revision-request-name-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isTagRevisionRequestMessage(f.GetOwner()) && f.Name() == "name"
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isTagRevisionRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintRequiredField,
 }
