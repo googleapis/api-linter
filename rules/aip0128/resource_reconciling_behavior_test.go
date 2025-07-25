@@ -44,7 +44,7 @@ func TestResourceReconcilingBehavior(t *testing.T) {
 					bool {{.FieldName}} = 1 {{.FieldBehavior}};
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(resourceReconcilingBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

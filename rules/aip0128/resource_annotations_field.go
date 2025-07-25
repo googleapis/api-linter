@@ -27,7 +27,7 @@ var resourceAnnotationsField = &lint.MessageRule{
 	Name:   lint.NewRuleName(128, "resource-annotations-field"),
 	OnlyIf: isDeclarativeFriendlyResource,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		f := m.FindFieldByName("annotations")
+		f := m.Fields().ByName("annotations")
 		if f == nil {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Declarative-friendly %q has no `annotations` field.", m.Name()),

@@ -23,7 +23,10 @@ import (
 var resourceReconcilingBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(128, "resource-reconciling-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isDeclarativeFriendlyResource(f.GetOwner()) && f.Name() == "reconciling"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isDeclarativeFriendlyResource(m) && f.Name() == "reconciling"
+		}
+		return false
 	},
 	LintField: utils.LintOutputOnlyField,
 }

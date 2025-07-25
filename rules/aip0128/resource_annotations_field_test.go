@@ -48,9 +48,9 @@ func TestResourceAnnotationsField(t *testing.T) {
 				}
 				message DeleteBookRequest {}
 			`, test)
-			var d protoreflect.Descriptor = f.Messages()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidBadTypeDF" {
-				d = f.Messages()[0].Fields()[1]
+				d = f.Messages().Get(0).Fields().Get(1)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(resourceAnnotationsField.Lint(f)); diff != "" {
 				t.Error(diff)
