@@ -53,7 +53,7 @@ func TestStringOnlyFormat(t *testing.T) {
 				}];
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			problems := stringOnlyFormat.Lint(file)
 			if diff := tc.problems.SetDescriptor(fd).Diff(problems); diff != "" {
 				t.Error(diff)
