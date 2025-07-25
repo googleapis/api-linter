@@ -31,11 +31,12 @@ var responseResourceField = &lint.MessageRule{
 		// the singular form the resource name, the first letter is Capitalized.
 		// Note: Retrieve the resource name from the the batch update response,
 		// for example: "BatchDeleteBooksResponse" -> "Books"
-		resourceMsgName := pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Response"), "BatchDelete"))
+		resourceMsgName := pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchDelete"))
 
-		for _, fieldDesc := range m.Fields() {
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.Name() == resourceMsgName {
-				if !fieldDesc.IsRepeated() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			fieldDesc := m.Fields().Get(i)
+			if msgDesc := fieldDesc.Message(); msgDesc != nil && msgDesc.Name() == protoreflect.Name(resourceMsgName) {
+				if !fieldDesc.IsList() {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("The %q type field on Batch Delete Response message should be repeated", msgDesc.Name()),
 						Descriptor: fieldDesc,

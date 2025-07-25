@@ -23,7 +23,10 @@ import (
 var requestNamesReference = &lint.FieldRule{
 	Name: lint.NewRuleName(235, "request-names-reference"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isBatchDeleteRequestMessage(f.GetOwner()) && f.Name() == "names"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchDeleteRequestMessage(m) && f.Name() == "names"
+		}
+		return false
 	},
 	LintField: utils.LintFieldResourceReference,
 }

@@ -69,10 +69,10 @@ func TestResponseResourceField(t *testing.T) {
 				message Book {
 				}`, test)
 
-			m := file.Messages()[0]
+			m := file.Messages().Get(0)
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc protoreflect.Descriptor = m.Fields()[0]
+			var problemDesc protoreflect.Descriptor = m.Fields().Get(0)
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(m)
 			}

@@ -29,7 +29,7 @@ var requestParentField = &lint.MessageRule{
 		// In order to parse out the pattern, we get the resource message
 		// from the request name, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
-		plural := strings.TrimPrefix(strings.TrimSuffix(m.Name(), "Request"), "BatchDelete")
+		plural := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchDelete")
 		singular := utils.ToSingular(plural)
 		if msg := utils.FindMessage(m.ParentFile(), singular); msg != nil {
 			if !utils.HasParent(utils.GetResource(msg)) {

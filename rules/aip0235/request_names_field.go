@@ -21,7 +21,6 @@ import (
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"github.com/jhump/protoreflect/desc/builder"
 )
 
 // The Batch Delete standard method should have repeated name field or repeated
@@ -31,8 +30,8 @@ var requestNamesField = &lint.MessageRule{
 	OnlyIf: isBatchDeleteRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
-		names := m.FindFieldByName("names")
-		deleteReqMsg := m.FindFieldByName("requests")
+		names := m.Fields().ByName("names")
+		deleteReqMsg := m.Fields().ByName("requests")
 
 		// Rule check: Ensure that the names field is present.
 		if names == nil && deleteReqMsg == nil {
@@ -51,7 +50,7 @@ var requestNamesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the names field is repeated.
-		if names != nil && !names.IsRepeated() {
+		if names != nil && !names.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "names" field should be repeated`,
 				Suggestion: "repeated string",
@@ -61,7 +60,7 @@ var requestNamesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the names field is the correct type.
-		if names != nil && names.GetType() != builder.FieldTypeString().GetType() {
+		if names != nil && names.Kind() != protoreflect.StringKind {
 			problems = append(problems, lint.Problem{
 				Message:    `"names" field on Batch Delete Request should be a "string" type`,
 				Suggestion: "string",
@@ -71,7 +70,7 @@ var requestNamesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard delete request message field is repeated.
-		if deleteReqMsg != nil && !deleteReqMsg.IsRepeated() {
+		if deleteReqMsg != nil && !deleteReqMsg.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "requests" field should be repeated`,
 				Descriptor: deleteReqMsg,
@@ -82,8 +81,8 @@ var requestNamesField = &lint.MessageRule{
 		// correct type. Note: Use m.Name()[11:len(m.Name())-7]) to retrieve
 		// the resource name from the batch delete request, for example:
 		// "BatchDeleteBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Delete%sRequest", pluralize.NewClient().Singular(m.Name()[11:len(m.Name())-7]))
-		if deleteReqMsg != nil && (deleteReqMsg.GetMessageType() == nil || deleteReqMsg.GetMessageType().Name() != rightTypeName) {
+		rightTypeName := fmt.Sprintf("Delete%sRequest", pluralize.NewClient().Singular(string(m.Name())[11:len(m.Name())-7]))
+		if deleteReqMsg != nil && (deleteReqMsg.Message() == nil || deleteReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Delete Request should be a %q type`, rightTypeName),
 				Descriptor: deleteReqMsg,

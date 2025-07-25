@@ -29,14 +29,14 @@ var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(235, "response-message-name"),
 	OnlyIf: isBatchDeleteMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		got := m.Output().GetFullyQualifiedName()
+		got := string(m.Output().FullName())
 		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		} else if got != "google.protobuf.Empty" {
-			got = m.Output().Name()
+			got = string(m.Output().Name())
 		}
 
-		wantSoftDelete := m.Name() + "Response"
+		wantSoftDelete := string(m.Name()) + "Response"
 		want := stringset.New(
 			"google.protobuf.Empty",
 			wantSoftDelete,

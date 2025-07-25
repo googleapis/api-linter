@@ -23,7 +23,10 @@ import (
 var requestRequestsBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(235, "request-requests-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return isBatchDeleteRequestMessage(f.GetOwner()) && f.Name() == "requests"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchDeleteRequestMessage(m) && f.Name() == "requests"
+		}
+		return false
 	},
 	LintField: utils.LintRequiredField,
 }

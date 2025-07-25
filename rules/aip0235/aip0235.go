@@ -53,15 +53,15 @@ var (
 
 // Returns true if this is a AIP-235 Batch Delete method, false otherwise.
 func isBatchDeleteMethod(m protoreflect.MethodDescriptor) bool {
-	return batchDeleteMethodRegexp.MatchString(m.Name())
+	return batchDeleteMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-235 Batch Delete request message, false otherwise.
 func isBatchDeleteRequestMessage(m protoreflect.MessageDescriptor) bool {
-	return batchDeleteReqMessageRegexp.MatchString(m.Name())
+	return batchDeleteReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-235 Batch Delete response message, false otherwise.
 func isBatchDeleteResponseMessage(m protoreflect.MessageDescriptor) bool {
-	return batchDeleteResponseMessageRegexp.MatchString(m.Name())
+	return batchDeleteResponseMessageRegexp.MatchString(string(m.Name()))
 }

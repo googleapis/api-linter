@@ -111,7 +111,7 @@ func TestResponseMessageName(t *testing.T) {
 				{{ if not .ResponseExternal }}message {{.Response}} {}{{ end }}
 				`, test)
 
-			m := file.Services()[0].Methods()[0]
+			m := file.Services().Get(0).Methods().Get(0)
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
