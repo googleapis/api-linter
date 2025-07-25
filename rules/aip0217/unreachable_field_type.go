@@ -27,7 +27,7 @@ var unreachableFieldType = &lint.FieldRule{
 		return f.Name() == "unreachable"
 	},
 	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
-		if !f.IsRepeated() {
+		if !f.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    "unreachable field should be repeated.",
 				Descriptor: f,

@@ -41,7 +41,7 @@ func TestUnreachableFieldType(t *testing.T) {
 				message ErrorMetadata {}
 				message Book {}
 			`, test)
-			field := f.Messages()[0].Fields()[2]
+			field := f.Messages().Get(0).Fields().Get(2)
 			if diff := test.problems.SetDescriptor(field).Diff(unreachableFieldType.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

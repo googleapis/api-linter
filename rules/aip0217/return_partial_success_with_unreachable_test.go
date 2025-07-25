@@ -46,7 +46,7 @@ func TestReturnPartialSuccessWithUnreachable(t *testing.T) {
 					{{.ResponseField}}
 				}
 			`, test)
-			field := f.Messages()[0].FindFieldByName("return_partial_success")
+			field := f.Messages().Get(0).Fields().ByName("return_partial_success")
 			if diff := test.problems.SetDescriptor(field).Diff(returnPartialSuccessWithUnreachable.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

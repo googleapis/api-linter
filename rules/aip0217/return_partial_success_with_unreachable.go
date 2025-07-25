@@ -22,13 +22,13 @@ import (
 var returnPartialSuccessWithUnreachable = &lint.MethodRule{
 	Name: lint.NewRuleName(217, "return-partial-success-with-unreachable"),
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
-		return m.Input().FindFieldByName("return_partial_success") != nil
+		return m.Input().Fields().ByName("return_partial_success") != nil
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
-		if m.Output().FindFieldByName("unreachable") == nil {
+		if m.Output().Fields().ByName("unreachable") == nil {
 			problems = append(problems, lint.Problem{
 				Message:    "`return_partial_success` must be added in conjunction with response field `repeated string unreachable`.",
-				Descriptor: m.Input().FindFieldByName("return_partial_success"),
+				Descriptor: m.Input().Fields().ByName("return_partial_success"),
 			})
 		}
 		return

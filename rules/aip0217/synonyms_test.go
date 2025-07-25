@@ -43,7 +43,7 @@ func TestSynonyms(t *testing.T) {
 					repeated string unreachable_locations = 1;
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[2]
+			field := f.Messages().Get(0).Fields().Get(2)
 			if diff := test.problems.SetDescriptor(field).Diff(synonyms.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
