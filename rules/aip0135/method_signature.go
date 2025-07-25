@@ -33,11 +33,11 @@ var methodSignature = &lint.MethodRule{
 		in := m.Input()
 
 		fields := []string{"name"}
-		if etag := in.FindFieldByName("etag"); etag != nil {
-			fields = append(fields, etag.Name())
+		if etag := in.Fields().ByName("etag"); etag != nil {
+			fields = append(fields, string(etag.Name()))
 		}
-		if force := in.FindFieldByName("force"); force != nil {
-			fields = append(fields, force.Name())
+		if force := in.Fields().ByName("force"); force != nil {
+			fields = append(fields, string(force.Name()))
 		}
 		want := strings.Join(fields, ",")
 

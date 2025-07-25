@@ -36,7 +36,8 @@ var unknownFields = &lint.MessageRule{
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
 		}
-		for _, field := range m.Fields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
 			if _, ok := allowedFields[string(field.Name())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(

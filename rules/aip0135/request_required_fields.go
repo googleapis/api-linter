@@ -33,7 +33,8 @@ var requestRequiredFields = &lint.MessageRule{
 		// * etag: optional or required by both AIP-135 and AIP-154
 		allowedRequiredFields := stringset.New("name", "etag")
 
-		for _, f := range m.Fields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			f := m.Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}

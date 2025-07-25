@@ -41,7 +41,7 @@ func TestRequestNameField(t *testing.T) {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
 			`, test)
-			field := f.Messages()[0].Fields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := requestNameField.Lint(f)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)

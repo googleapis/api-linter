@@ -24,15 +24,15 @@ import (
 var forceField = &lint.MessageRule{
 	Name: lint.NewRuleName(135, "force-field"),
 	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
-		name := m.FindFieldByName("name")
+		name := m.Fields().ByName("name")
 		ref := utils.GetResourceReference(name)
 		validRef := ref != nil && ref.GetType() != "" && utils.FindResource(ref.GetType(), m.ParentFile()) != nil
 
 		return utils.IsDeleteRequestMessage(m) && validRef
 	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		force := m.FindFieldByName("force")
-		name := m.FindFieldByName("name")
+		force := m.Fields().ByName("force")
+		name := m.Fields().ByName("name")
 		ref := utils.GetResourceReference(name)
 		res := utils.FindResource(ref.GetType(), m.ParentFile())
 

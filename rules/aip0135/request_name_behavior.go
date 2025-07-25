@@ -23,7 +23,10 @@ import (
 var requestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(135, "request-name-behavior"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.Name() == "name"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsDeleteRequestMessage(m) && f.Name() == "name"
+		}
+		return false
 	},
 	LintField: utils.LintRequiredField,
 }

@@ -23,7 +23,10 @@ import (
 var requestForceField = &lint.FieldRule{
 	Name: lint.NewRuleName(135, "request-force-field"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
-		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.Name() == "force"
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsDeleteRequestMessage(m) && f.Name() == "force"
+		}
+		return false
 	},
 	LintField: utils.LintSingularBoolField,
 }

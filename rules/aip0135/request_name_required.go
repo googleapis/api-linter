@@ -26,7 +26,7 @@ var requestNameRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-name-required"),
 	OnlyIf: utils.IsDeleteRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
-		if m.FindFieldByName("name") == nil {
+		if m.Fields().ByName("name") == nil {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Method %q has no `name` field", m.Name()),
 				Descriptor: m,

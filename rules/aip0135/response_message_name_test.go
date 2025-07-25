@@ -104,7 +104,7 @@ func TestResponseMessageName(t *testing.T) {
 					file := testutils.ParseProto3Tmpl(t, tmpl[tmplName], test)
 
 					// Run the lint rule, and establish that it returns the expected problems.
-					method := file.Services()[0].Methods()[0]
+					method := file.Services().Get(0).Methods()[0]
 					problems := responseMessageName.Lint(file)
 					if diff := test.problems[tmplName].SetDescriptor(method).Diff(problems); diff != "" {
 						t.Error(diff)
