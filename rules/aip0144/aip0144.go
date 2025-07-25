@@ -37,5 +37,5 @@ var addRemoveMethodRegexp = regexp.MustCompile("^(?:Add|Remove)(?:[A-Z]|$)")
 
 // Returns true if this is an AIP-144 Add/Remove method, false otherwise.
 func isAddRemoveMethod(m protoreflect.MethodDescriptor) bool {
-	return addRemoveMethodRegexp.MatchString(m.Name())
+	return addRemoveMethodRegexp.MatchString(string(m.Name()))
 }
