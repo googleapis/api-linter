@@ -219,7 +219,7 @@ func LintHTTPURIHasVariable(m protoreflect.MethodDescriptor, v string) []lint.Pr
 	for _, httpRule := range GetHTTPRules(m) {
 		if _, ok := httpRule.GetVariables()[v]; !ok {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("HTTP URI should include a %q variable.", v),
+				Message:    fmt.Sprintf("HTTP URI should include a `%s` variable.", v),
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
