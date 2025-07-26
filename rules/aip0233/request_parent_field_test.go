@@ -31,13 +31,13 @@ func TestParentField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "", "BatchCreateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"Missing", "", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchCreateBooksRequest" has no "parent" field.`}}},
+		{"Missing", "", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchCreateBooksRequest` has no `parent` field."}}},
 		{"InvalidType", "", "BatchCreateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"IrrelevantNoParent", "", "BatchCreateBooks", "", "books/{b}", nil},
 
 		{"PackageValid", "package foo;", "BatchCreateBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"PackageMissing", "package foo;", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchCreateBooksRequest" has no "parent" field.`}}},
+		{"PackageMissing", "package foo;", "BatchCreateBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchCreateBooksRequest` has no `parent` field."}}},
 		{"PackageInvalidType", "package foo;", "BatchCreateBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"PackageIrrelevantNoParent", "package foo;", "BatchCreateBooks", "", "books/{b}", nil},

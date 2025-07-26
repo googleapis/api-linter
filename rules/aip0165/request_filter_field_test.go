@@ -30,7 +30,7 @@ func TestFilterField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "PurgeBooksRequest", "string filter = 1;", nil},
-		{"Missing", "PurgeBooksRequest", "", testutils.Problems{{Message: `Message "PurgeBooksRequest" has no "filter" field.`}}},
+		{"Missing", "PurgeBooksRequest", "", testutils.Problems{{Message: "Message `PurgeBooksRequest` has no `filter` field."}}},
 		{"InvalidType", "PurgeBooksRequest", "int32 filter = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidTypeRepeated", "PurgeBooksRequest", "repeated string filter = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantMessage", "EnumerateBooksRequest", "", nil},

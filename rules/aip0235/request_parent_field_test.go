@@ -31,13 +31,13 @@ func TestParentField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"Missing", "", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchDeleteBooksRequest" has no "parent" field.`}}},
+		{"Missing", "", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchDeleteBooksRequest` has no `parent` field."}}},
 		{"InvalidType", "", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"IrrelevantNoParent", "", "BatchDeleteBooks", "", "books/{b}", nil},
 
 		{"PackageValid", "package foo;", "BatchDeleteBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"PackageMissing", "package foo;", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: `Message "BatchDeleteBooksRequest" has no "parent" field.`}}},
+		{"PackageMissing", "package foo;", "BatchDeleteBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchDeleteBooksRequest` has no `parent` field."}}},
 		{"PackageInvalidType", "package foo;", "BatchDeleteBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"PackageIrrelevantNoParent", "package foo;", "BatchDeleteBooks", "", "books/{b}", nil},

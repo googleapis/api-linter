@@ -27,7 +27,7 @@ func LintFieldPresent(m protoreflect.MessageDescriptor, field string) (protorefl
 	f := m.Fields().ByName(protoreflect.Name(field))
 	if f == nil {
 		return nil, []lint.Problem{{
-			Message:    fmt.Sprintf("Message %q has no %q field.", m.Name(), field),
+			Message:    fmt.Sprintf("Message `%s` has no `%s` field.", m.Name(), field),
 			Descriptor: m,
 		}}
 	}
@@ -43,7 +43,7 @@ func LintSingularStringField(f protoreflect.FieldDescriptor) []lint.Problem {
 func LintSingularField(f protoreflect.FieldDescriptor, t protoreflect.Kind, want string) []lint.Problem {
 	if f.Kind() != t || f.IsList() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The %q field must be a singular %s.", f.Name(), want),
+			Message:    fmt.Sprintf("The `%s` field must be a singular %s.", f.Name(), want),
 			Suggestion: want,
 			Descriptor: f,
 			Location:   locations.FieldType(f),
@@ -62,7 +62,7 @@ func LintFieldMask(f protoreflect.FieldDescriptor) []lint.Problem {
 	const want = "google.protobuf.FieldMask"
 	if t := f.Message(); t == nil || t.FullName() != want || f.IsList() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The %q field should be a singular %s.", f.Name(), want),
+			Message:    fmt.Sprintf("The `%s` field should be a singular %s.", f.Name(), want),
 			Suggestion: want,
 			Descriptor: f,
 			Location:   locations.FieldType(f),
@@ -75,7 +75,7 @@ func LintFieldMask(f protoreflect.FieldDescriptor) []lint.Problem {
 func LintNotOneof(f protoreflect.FieldDescriptor) []lint.Problem {
 	if f.ContainingOneof() != nil && !f.HasOptionalKeyword() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The %q field should not be a oneof field.", f.Name()),
+			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.Name()),
 			Descriptor: f,
 		}}
 	}
@@ -96,7 +96,7 @@ func LintFieldPresentAndSingularString(field string) func(protoreflect.MessageDe
 func lintFieldBehavior(f protoreflect.FieldDescriptor, want string) []lint.Problem {
 	if !GetFieldBehavior(f).Contains(want) {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The %q field should include `(google.api.field_behavior) = %s`.", f.Name(), want),
+			Message:    fmt.Sprintf("The `%s` field should include `(google.api.field_behavior) = %s`.", f.Name(), want),
 			Descriptor: f,
 		}}
 	}
@@ -117,7 +117,7 @@ func LintOutputOnlyField(f protoreflect.FieldDescriptor) []lint.Problem {
 func LintFieldResourceReference(f protoreflect.FieldDescriptor) []lint.Problem {
 	if ref := GetResourceReference(f); ref == nil {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The %q field should include a `google.api.resource_reference` annotation.", f.Name()),
+			Message:    fmt.Sprintf("The `%s` field should include a `google.api.resource_reference` annotation.", f.Name()),
 			Descriptor: f,
 		}}
 	}
@@ -128,7 +128,7 @@ func lintHTTPBody(m protoreflect.MethodDescriptor, want, msg string) []lint.Prob
 	for _, httpRule := range GetHTTPRules(m) {
 		if httpRule.Body != want {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("The %q method should %s HTTP body.", m.Name(), msg),
+				Message:    fmt.Sprintf("The `%s` method should %s HTTP body.", m.Name(), msg),
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
@@ -153,7 +153,7 @@ func LintHTTPMethod(verb string) func(protoreflect.MethodDescriptor) []lint.Prob
 		for _, httpRule := range GetHTTPRules(m) {
 			if httpRule.Method != verb {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The %q method should use the HTTP %s verb.", m.Name(), verb),
+					Message:    fmt.Sprintf("The `%s` method should use the HTTP %s verb.", m.Name(), verb),
 					Descriptor: m,
 					Location:   locations.MethodHTTPRule(m),
 				}}

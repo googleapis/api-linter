@@ -29,7 +29,7 @@ func TestRollbackRequestRevisionIDField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "RollbackBook", "string revision_id = 1;", nil},
-		{"Missing", "RollbackBook", "", testutils.Problems{{Message: `Message "RollbackBookRequest" has no "revision_id" field.`}}},
+		{"Missing", "RollbackBook", "", testutils.Problems{{Message: "Message `RollbackBookRequest` has no `revision_id` field."}}},
 		{"InvalidType", "RollbackBook", "int32 revision_id = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
