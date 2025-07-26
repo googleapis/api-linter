@@ -15,21 +15,23 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
+	"github.com/bufbuild/protocompile"
 	"github.com/googleapis/api-linter/internal"
 	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/spf13/pflag"
 	"google.golang.org/protobuf/proto"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
 
@@ -138,60 +140,46 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	configs = append(configs, lint.Config{
 		DisabledRules: c.DisabledRules,
 	})
-	// Prepare proto import lookup.
-	fs, err := loadFileDescriptors(c.ProtoDescPath...)
+
+	// Create resolver for descriptor sets.
+	descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
 	if err != nil {
 		return err
 	}
-	lookupImport := func(name string) (*desc.FileDescriptor, error) {
-		if f, found := fs[name]; found {
-			return f, nil
-		}
-		return nil, fmt.Errorf("%q is not found", name)
-	}
-	var errorsWithPos []protoparse.ErrorWithPos
-	var lock sync.Mutex
 
+	// Create resolver for source files.
 	imports := resolveImports(c.ProtoImportPaths)
+	sourceResolver := &protocompile.SourceResolver{
+		ImportPaths: imports,
+	}
 
-	// Parse proto files into `protoreflect` file descriptors.
-	p := protoparse.Parser{
-		ImportPaths:           imports,
-		IncludeSourceCodeInfo: true,
-		LookupImport:          lookupImport,
-		ErrorReporter: func(errorWithPos protoparse.ErrorWithPos) error {
-			// Protoparse isn't concurrent right now but just to be safe for the future.
-			lock.Lock()
-			errorsWithPos = append(errorsWithPos, errorWithPos)
-			lock.Unlock()
-			// Continue parsing. The error returned will be protoparse.ErrInvalidSource.
-			return nil
-		},
+	// Combine resolvers.
+	var resolvers []protocompile.Resolver
+	if descResolver != nil {
+		resolvers = append(resolvers, descResolver)
 	}
-	// Resolve file absolute paths to relative ones.
-	protoFiles, err := protoparse.ResolveFilenames(p.ImportPaths, c.ProtoFiles...)
+	resolvers = append(resolvers, sourceResolver)
+
+	compiler := protocompile.Compiler{
+		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver(resolvers)),
+		SourceInfoMode: protocompile.SourceInfoStandard,
+	}
+
+	// Compile files.
+	files, err := compiler.Compile(context.Background(), c.ProtoFiles...)
 	if err != nil {
 		return err
 	}
-	fd, err := p.ParseFiles(protoFiles...)
-	if err != nil {
-		if err == protoparse.ErrInvalidSource {
-			if len(errorsWithPos) == 0 {
-				return errors.New("got protoparse.ErrInvalidSource but no ErrorWithPos errors")
-			}
-			// TODO: There's multiple ways to deal with this but this prints all the errors at least
-			errStrings := make([]string, len(errorsWithPos))
-			for i, errorWithPos := range errorsWithPos {
-				errStrings[i] = errorWithPos.Error()
-			}
-			return errors.New(strings.Join(errStrings, "\n"))
-		}
-		return err
+
+	// Convert linker.Files to []protoreflect.FileDescriptor
+	var fileDescriptors []protoreflect.FileDescriptor
+	for _, f := range files {
+		fileDescriptors = append(fileDescriptors, f)
 	}
 
 	// Create a linter to lint the file descriptors.
 	l := lint.New(rules, configs, lint.Debug(c.DebugFlag), lint.IgnoreCommentDisables(c.IgnoreCommentDisablesFlag))
-	results, err := l.LintProtos(fd...)
+	results, err := l.LintProtos(fileDescriptors...)
 	if err != nil {
 		return err
 	}
@@ -239,24 +227,43 @@ func anyProblems(results []lint.Response) bool {
 	return false
 }
 
-func loadFileDescriptors(filePaths ...string) (map[string]*desc.FileDescriptor, error) {
-	fds := []*dpb.FileDescriptorProto{}
+type resolver struct {
+	files *protoregistry.Files
+}
+
+func (r *resolver) FindFileByPath(path string) (protocompile.SearchResult, error) {
+	fd, err := r.files.FindFileByPath(path)
+	if err != nil {
+		return protocompile.SearchResult{}, err
+	}
+	return protocompile.SearchResult{Desc: fd}, nil
+}
+
+func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, error) {
+	if len(filePaths) == 0 {
+		return nil, nil
+	}
+	fds := &descriptorpb.FileDescriptorSet{}
 	for _, filePath := range filePaths {
 		fs, err := readFileDescriptorSet(filePath)
 		if err != nil {
 			return nil, err
 		}
-		fds = append(fds, fs.GetFile()...)
+		fds.File = append(fds.File, fs.GetFile()...)
 	}
-	return desc.CreateFileDescriptors(fds)
+	files, err := protodesc.NewFiles(fds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create protoregistry.Files: %w", err)
+	}
+	return &resolver{files: files}, nil
 }
 
-func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
+func readFileDescriptorSet(filePath string) (*descriptorpb.FileDescriptorSet, error) {
 	in, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	fs := &dpb.FileDescriptorSet{}
+	fs := &descriptorpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(in, fs); err != nil {
 		return nil, err
 	}

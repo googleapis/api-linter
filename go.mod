@@ -9,7 +9,6 @@ require (
 	github.com/bufbuild/protocompile v0.14.0
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.6.0
-	github.com/jhump/protoreflect v1.16.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.5
@@ -22,7 +21,6 @@ require (
 )
 
 require (
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect

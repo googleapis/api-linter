@@ -56,46 +56,46 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0123"
 	"github.com/googleapis/api-linter/rules/aip0124"
 	"github.com/googleapis/api-linter/rules/aip0126"
-	// "github.com/googleapis/api-linter/rules/aip0127" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0128" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0131" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0132" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0133" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0134" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0135" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0136" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0140" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0141" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0142" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0143" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0144" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0146" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0148" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0151" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0152" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0154" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0155" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0156" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0157" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0158" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0159" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0162" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0163" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0164" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0165" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0191" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0192" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0202" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0203" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0214" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0215" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0216" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0217" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0231" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0233" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0234" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip0235" //TODO: uncommnet line and migrate rule to new interface
-	// "github.com/googleapis/api-linter/rules/aip4232" //TODO: uncommnet line and migrate rule to new interface
+	"github.com/googleapis/api-linter/rules/aip0127"
+	"github.com/googleapis/api-linter/rules/aip0128"
+	"github.com/googleapis/api-linter/rules/aip0131"
+	"github.com/googleapis/api-linter/rules/aip0132"
+	"github.com/googleapis/api-linter/rules/aip0133"
+	"github.com/googleapis/api-linter/rules/aip0134"
+	"github.com/googleapis/api-linter/rules/aip0135"
+	"github.com/googleapis/api-linter/rules/aip0136"
+	"github.com/googleapis/api-linter/rules/aip0140"
+	"github.com/googleapis/api-linter/rules/aip0141"
+	"github.com/googleapis/api-linter/rules/aip0142"
+	"github.com/googleapis/api-linter/rules/aip0143"
+	"github.com/googleapis/api-linter/rules/aip0144"
+	"github.com/googleapis/api-linter/rules/aip0146"
+	"github.com/googleapis/api-linter/rules/aip0148"
+	"github.com/googleapis/api-linter/rules/aip0151"
+	"github.com/googleapis/api-linter/rules/aip0152"
+	"github.com/googleapis/api-linter/rules/aip0154"
+	"github.com/googleapis/api-linter/rules/aip0155"
+	"github.com/googleapis/api-linter/rules/aip0156"
+	"github.com/googleapis/api-linter/rules/aip0157"
+	"github.com/googleapis/api-linter/rules/aip0158"
+	"github.com/googleapis/api-linter/rules/aip0159"
+	"github.com/googleapis/api-linter/rules/aip0162"
+	"github.com/googleapis/api-linter/rules/aip0163"
+	"github.com/googleapis/api-linter/rules/aip0164"
+	"github.com/googleapis/api-linter/rules/aip0165"
+	"github.com/googleapis/api-linter/rules/aip0191"
+	"github.com/googleapis/api-linter/rules/aip0192"
+	"github.com/googleapis/api-linter/rules/aip0202"
+	"github.com/googleapis/api-linter/rules/aip0203"
+	"github.com/googleapis/api-linter/rules/aip0214"
+	"github.com/googleapis/api-linter/rules/aip0215"
+	"github.com/googleapis/api-linter/rules/aip0216"
+	"github.com/googleapis/api-linter/rules/aip0217"
+	"github.com/googleapis/api-linter/rules/aip0231"
+	"github.com/googleapis/api-linter/rules/aip0233"
+	"github.com/googleapis/api-linter/rules/aip0234"
+	"github.com/googleapis/api-linter/rules/aip0235"
+	"github.com/googleapis/api-linter/rules/aip4232"
 )
 
 type addRulesFuncType func(lint.RuleRegistry) error
@@ -106,46 +106,46 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0123.AddRules,
 	aip0124.AddRules,
 	aip0126.AddRules,
-	// aip0127.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0128.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0131.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0132.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0133.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0134.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0135.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0136.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0140.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0141.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0142.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0143.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0144.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0146.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0148.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0151.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0152.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0154.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0155.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0156.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0157.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0158.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0159.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0162.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0163.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0164.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0165.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0191.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0192.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0202.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0203.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0214.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0215.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0216.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0217.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0231.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0233.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0234.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip0235.AddRules, //TODO: uncommnet line and migrate rule to new interface
-	// aip4232.AddRules, //TODO: uncommnet line and migrate rule to new interface
+	aip0127.AddRules,
+	aip0128.AddRules,
+	aip0131.AddRules,
+	aip0132.AddRules,
+	aip0133.AddRules,
+	aip0134.AddRules,
+	aip0135.AddRules,
+	aip0136.AddRules,
+	aip0140.AddRules,
+	aip0141.AddRules,
+	aip0142.AddRules,
+	aip0143.AddRules,
+	aip0144.AddRules,
+	aip0146.AddRules,
+	aip0148.AddRules,
+	aip0151.AddRules,
+	aip0152.AddRules,
+	aip0154.AddRules,
+	aip0155.AddRules,
+	aip0156.AddRules,
+	aip0157.AddRules,
+	aip0158.AddRules,
+	aip0159.AddRules,
+	aip0162.AddRules,
+	aip0163.AddRules,
+	aip0164.AddRules,
+	aip0165.AddRules,
+	aip0191.AddRules,
+	aip0192.AddRules,
+	aip0202.AddRules,
+	aip0203.AddRules,
+	aip0214.AddRules,
+	aip0215.AddRules,
+	aip0216.AddRules,
+	aip0217.AddRules,
+	aip0231.AddRules,
+	aip0233.AddRules,
+	aip0234.AddRules,
+	aip0235.AddRules,
+	aip4232.AddRules,
 }
 
 // Add all rules to the given registry.
