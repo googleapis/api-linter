@@ -53,6 +53,12 @@ var responseMessageName = &lint.MethodRule{
 			// just exit.
 			return nil
 		}
+
+		// Let AIP-151 handle LRO responses that are Empty.
+		if utils.IsOperation(m.Output()) && response.FullName() == "google.protobuf.Empty" {
+			return nil
+		}
+
 		res := utils.GetResource(response)
 		responseResourceType := res.GetType()
 		requestResourceType := utils.GetResourceReference(m.Input().Fields().ByName("name")).GetType()
