@@ -46,7 +46,11 @@ func FindMessage(f protoreflect.FileDescriptor, name string) protoreflect.Messag
 	// Attempt to find the message in the file provided.
 	if d, err := files.FindDescriptorByName(protoreflect.FullName(name)); err == nil {
 		if m, ok := d.(protoreflect.MessageDescriptor); ok {
-			return m
+			// If the message's package is not what we expect, then it is
+			// the wrong message.
+			if m.ParentFile().Package() == pkg {
+				return m
+			}
 		}
 	}
 

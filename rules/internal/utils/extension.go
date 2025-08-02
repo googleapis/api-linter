@@ -18,8 +18,8 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
+	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	lrpb "google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -377,3 +377,4 @@ func GetFormat(fd protoreflect.FieldDescriptor) annotations.FieldInfo_Format {
 	}
 	return GetFieldInfo(fd).GetFormat()
 }
+

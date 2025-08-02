@@ -15,12 +15,9 @@
 package utils
 
 import (
-	"context"
 	"testing"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/bufbuild/protocompile"
-	"github.com/bufbuild/protocompile/linker"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -755,28 +752,4 @@ func TestGetFormat(t *testing.T) {
 			}
 		})
 	}
-}
-
-func compileStrings(t *testing.T, files map[string]string) linker.Files {
-	t.Helper()
-	var fileNames []string
-	for name := range files {
-		fileNames = append(fileNames, name)
-	}
-	resolver := &protocompile.SourceResolver{
-		Accessor: protocompile.SourceAccessorFromMap(files),
-	}
-	compiler := protocompile.Compiler{
-		Resolver: protocompile.WithStandardImports(resolver),
-	}
-
-	compiled, err := compiler.Compile(
-		context.Background(),
-		fileNames...,
-	)
-
-	if err != nil {
-		t.Fatalf("Failed to compile: %v", err)
-	}
-	return compiled
 }

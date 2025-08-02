@@ -1,14 +1,11 @@
 package utils
 
 import (
-	"context"
 	"testing"
 
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
-
-var background = context.Background()
 
 func TestLintSingularStringField(t *testing.T) {
 	for _, test := range []struct {
