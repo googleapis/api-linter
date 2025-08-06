@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.70.2](https://github.com/googleapis/api-linter/compare/v1.70.1...v1.70.2) (2025-08-06)
+
+
+### Bug Fixes
+
+* **AIP-123:** handle errant slash in pattern parsing ([#1517](https://github.com/googleapis/api-linter/issues/1517)) ([40a69bd](https://github.com/googleapis/api-linter/commit/40a69bd75b7eddfa5c16e58aa0c73e441342512e)), refs [#1514](https://github.com/googleapis/api-linter/issues/1514)
+
+
+### Documentation
+
+* **config:** fix incorrect rule flags ([#1516](https://github.com/googleapis/api-linter/issues/1516)) ([2454606](https://github.com/googleapis/api-linter/commit/2454606c87d4f5c9a12647b13c0f7e8fe945219f))
+
 ## [1.70.1](https://github.com/googleapis/api-linter/compare/v1.70.0...v1.70.1) (2025-07-21)
 
 
