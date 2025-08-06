@@ -18,17 +18,17 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Update methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-unknown-fields"),
 	OnlyIf: utils.IsUpdateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
-		resource := extractResource(m.GetName())
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
+		resource := extractResource(string(m.Name()))
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := stringset.New(
 			fieldNameFromResource(resource), // AIP-134
@@ -37,12 +37,13 @@ var unknownFields = &lint.MessageRule{
 			"update_mask",                   // AIP-134
 			"validate_only",                 // AIP-163
 		)
-		for _, field := range m.GetFields() {
-			if !allowedFields.Contains(field.GetName()) {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if !allowedFields.Contains(string(field.Name())) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Update RPCs must only contain fields explicitly described in AIPs, not %q.",
-						field.GetName(),
+						field.Name(),
 					),
 					Descriptor: field,
 				})

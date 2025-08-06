@@ -19,8 +19,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-158 rules to the provided registry.
@@ -43,22 +43,22 @@ var (
 )
 
 // Return true if this is an AIP-158 List request message, false otherwise.
-func isPaginatedRequestMessage(m *desc.MessageDescriptor) bool {
-	if paginatedReq.MatchString(m.GetName()) {
+func isPaginatedRequestMessage(m protoreflect.MessageDescriptor) bool {
+	if paginatedReq.MatchString(string(m.Name())) {
 		return true
 	}
 	// Ignore messages that happen to have these fields but are not requests.
-	if !strings.HasSuffix(m.GetName(), "Request") {
+	if !strings.HasSuffix(string(m.Name()), "Request") {
 		return false
 	}
-	return m.FindFieldByName("page_size") != nil || m.FindFieldByName("page_token") != nil
+	return m.Fields().ByName("page_size") != nil || m.Fields().ByName("page_token") != nil
 }
 
 // Return true if this is an AIP-158 List response message, false otherwise.
-func isPaginatedResponseMessage(m *desc.MessageDescriptor) bool {
-	return paginatedRes.MatchString(m.GetName()) || m.FindFieldByName("next_page_token") != nil
+func isPaginatedResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return paginatedRes.MatchString(string(m.Name())) || m.Fields().ByName("next_page_token") != nil
 }
 
-func isPaginatedMethod(m *desc.MethodDescriptor) bool {
-	return isPaginatedRequestMessage(m.GetInputType()) && isPaginatedResponseMessage(m.GetOutputType())
+func isPaginatedMethod(m protoreflect.MethodDescriptor) bool {
+	return isPaginatedRequestMessage(m.Input()) && isPaginatedResponseMessage(m.Output())
 }

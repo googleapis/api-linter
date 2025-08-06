@@ -17,16 +17,16 @@ package aip0123
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceDefinitionTypeName = &lint.FileRule{
 	Name:   lint.NewRuleName(123, "resource-definition-type-name"),
 	OnlyIf: hasResourceDefinitionAnnotation,
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		resources := utils.GetResourceDefinitions(f)
 		for ndx, resource := range resources {

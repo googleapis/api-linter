@@ -15,18 +15,18 @@
 package aip0217
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var returnPartialSuccessType = &lint.FieldRule{
 	Name: lint.NewRuleName(217, "return-partial-success-type"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "return_partial_success"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return f.Name() == "return_partial_success"
 	},
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
+	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
 		if utils.GetTypeName(f) != "bool" {
 			problems = append(problems, lint.Problem{
 				Message:    "`return_partial_success` field must be a `bool`.",

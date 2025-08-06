@@ -17,20 +17,20 @@ package aip0192
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // hasComments complains if there is no comment above something.
 var hasComments = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "has-comments"),
-	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
-		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
+	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
+		comment := utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments)
 		if len(comment.External) == 0 {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf("Missing comment over %q.", d.GetName()),
+				Message:    fmt.Sprintf("Missing comment over %q.", d.Name()),
 				Descriptor: d,
 				Location:   locations.DescriptorName(d),
 			})

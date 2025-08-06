@@ -18,30 +18,31 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noMutableCycles = &lint.MessageRule{
 	Name:   lint.NewRuleName(121, "no-mutable-cycles"),
 	OnlyIf: utils.IsResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		res := utils.GetResource(m)
 
 		return findCycles(res.GetType(), m, stringset.New(), nil)
 	},
 }
 
-func findCycles(start string, node *desc.MessageDescriptor, seen stringset.Set, chain []string) []lint.Problem {
+func findCycles(start string, node protoreflect.MessageDescriptor, seen stringset.Set, chain []string) []lint.Problem {
 	var problems []lint.Problem
 	nodeRes := utils.GetResource(node)
 
 	chain = append(chain, nodeRes.GetType())
 	seen.Add(nodeRes.GetType())
 
-	for _, f := range node.GetFields() {
+	for i := 0; i < node.Fields().Len(); i++ {
+		f := node.Fields().Get(i)
 		if !isMutableReference(f) {
 			continue
 		}
@@ -58,7 +59,7 @@ func findCycles(start string, node *desc.MessageDescriptor, seen stringset.Set, 
 				Location:   locations.FieldResourceReference(f),
 			})
 		} else if !seen.Contains(ref.GetType()) {
-			next := utils.FindResourceMessage(ref.GetType(), node.GetFile())
+			next := utils.FindResourceMessage(ref.GetType(), node.ParentFile())
 			// Skip unresolvable references.
 			if next == nil {
 				continue
@@ -84,7 +85,7 @@ func findCycles(start string, node *desc.MessageDescriptor, seen stringset.Set, 
 	return problems
 }
 
-func isMutableReference(f *desc.FieldDescriptor) bool {
+func isMutableReference(f protoreflect.FieldDescriptor) bool {
 	behaviors := utils.GetFieldBehavior(f)
 	return utils.HasResourceReference(f) && !behaviors.Contains("OUTPUT_ONLY")
 }

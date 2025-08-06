@@ -17,7 +17,7 @@ package aip0134
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHttpMethod(t *testing.T) {
@@ -52,7 +52,7 @@ func TestHttpMethod(t *testing.T) {
 					Book book = 1;
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			problems := httpMethod.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

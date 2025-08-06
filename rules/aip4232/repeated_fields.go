@@ -18,19 +18,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Only the last field in a method signature can be repeated.
 var repeatedFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(4232, "repeated-fields"),
 	OnlyIf: hasMethodSignatures,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		sigs := utils.GetMethodSignatures(m)
-		in := m.GetInputType()
+		in := m.Input()
 
 		for _, sig := range sigs {
 			for _, name := range sig {
@@ -42,7 +42,7 @@ var repeatedFields = &lint.MethodRule{
 				// Exclude the last one from the look up since it can be repeated.
 				for i := range chain[:len(chain)-1] {
 					n := strings.Join(chain[:i+1], ".")
-					if f := utils.FindFieldDotNotation(in, n); f != nil && f.IsRepeated() {
+					if f := utils.FindFieldDotNotation(in, n); f != nil && f.IsList() {
 						problems = append(problems, lint.Problem{
 							Message:    fmt.Sprintf("Field %q in method_signature %q: only the last field in a signature argument can be repeated.", name, strings.Join(sig, ",")),
 							Descriptor: m,

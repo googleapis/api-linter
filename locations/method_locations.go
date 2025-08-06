@@ -16,40 +16,40 @@ package locations
 
 import (
 	lrpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // MethodRequestType returns the precise location of the method's input type.
-func MethodRequestType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+func MethodRequestType(m protoreflect.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 2) // MethodDecriptor.input_type == 2
 }
 
 // MethodResponseType returns the precise location of the method's output type.
-func MethodResponseType(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+func MethodResponseType(m protoreflect.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 3) // MethodDescriptor.output_type == 3
 }
 
 // MethodHTTPRule returns the precise location of the method's `google.api.http`
 // rule, if any.
-func MethodHTTPRule(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+func MethodHTTPRule(m protoreflect.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return MethodOption(m, int(apb.E_Http.TypeDescriptor().Number()))
 }
 
 // MethodOperationInfo returns the precise location of the method's
 // `google.longrunning.operation_info` annotation, if any.
-func MethodOperationInfo(m *desc.MethodDescriptor) *dpb.SourceCodeInfo_Location {
+func MethodOperationInfo(m protoreflect.MethodDescriptor) *dpb.SourceCodeInfo_Location {
 	return MethodOption(m, int(lrpb.E_OperationInfo.TypeDescriptor().Number()))
 }
 
 // MethodSignature returns the precise location of the method's
 // `google.api.method_signature` annotation, if any.
-func MethodSignature(m *desc.MethodDescriptor, index int) *dpb.SourceCodeInfo_Location {
+func MethodSignature(m protoreflect.MethodDescriptor, index int) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 4, int(apb.E_MethodSignature.TypeDescriptor().Number()), index) // MethodDescriptor.options == 4
 }
 
 // MethodOption returns the precise location of the method's option with the given field number, if any.
-func MethodOption(m *desc.MethodDescriptor, fieldNumber int) *dpb.SourceCodeInfo_Location {
+func MethodOption(m protoreflect.MethodDescriptor, fieldNumber int) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 4, fieldNumber) // MethodDescriptor.options == 4
 }

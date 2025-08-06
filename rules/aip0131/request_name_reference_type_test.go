@@ -17,7 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestNameReferenceType(t *testing.T) {
@@ -36,7 +36,7 @@ func TestRequestNameReferenceType(t *testing.T) {
 					string name = 1 [(google.api.resource_reference).{{.Reference}} = "library.googleapis.com/Book"];
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestNameReferenceType.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

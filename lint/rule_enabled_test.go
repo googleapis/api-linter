@@ -15,18 +15,17 @@
 package lint
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: RuleName("a::b::c"),
-		LintFile: func(fd *desc.FileDescriptor) []Problem {
+		LintFile: func(fd protoreflect.FileDescriptor) []Problem {
 			return []Problem{}
 		},
 	}
@@ -43,39 +42,35 @@ func TestRuleIsEnabled(t *testing.T) {
 		enabled        bool
 	}{
 		{"Enabled", "", "", true},
-		{"FileDisabled", "api-linter: a::b::c=disabled", "", false},
-		{"MessageDisabled", "", "api-linter: a::b::c=disabled", false},
-		{"NameNotMatch", "", "api-linter: other=disabled", true},
-		{"RegexpNotMatch", "", "api-lint: a::b::c=disabled", true},
-		{"AliasDisabled", "", "api-linter: d::e::f=disabled", false},
-		{"FileComments_PrefixMatched_Disabled", "api-linter: a=disabled", "", false},
-		{"FileComments_MiddleMatched_Disabled", "api-linter: b=disabled", "", false},
-		{"FileComments_SuffixMatched_Disabled", "api-linter: c=disabled", "", false},
-		{"FileComments_MultipleLinesMatched_Disabled", "api-linter: x=disabled\napi-linter: a=disabled", "", false},
-		{"MessageComments_PrefixMatched_Disabled", "", "api-linter: a=disabled", false},
-		{"MessageComments_MiddleMatched_Disabled", "", "api-linter: b=disabled", false},
-		{"MessageComments_SuffixMatched_Disabled", "", "api-linter: c=disabled", false},
-		{"MessageComments_MultipleLinesMatched_Disabled", "", "api-linter: x=disabled\napi-linter: a=disabled", false},
+		{"FileDisabled", "// api-linter: a::b::c=disabled", "", false},
+		{"MessageDisabled", "", "// api-linter: a::b::c=disabled", false},
+		{"NameNotMatch", "", "// api-linter: other=disabled", true},
+		{"RegexpNotMatch", "", "// api-lint: a::b::c=disabled", true},
+		{"AliasDisabled", "", "// api-linter: d::e::f=disabled", false},
+		{"FileComments_PrefixMatched_Disabled", "// api-linter: a=disabled", "", false},
+		{"FileComments_MiddleMatched_Disabled", "// api-linter: b=disabled", "", false},
+		{"FileComments_SuffixMatched_Disabled", "// api-linter: c=disabled", "", false},
+		{"FileComments_MultipleLinesMatched_Disabled", "// api-linter: x=disabled\n// api-linter: a=disabled", "", false},
+		{"MessageComments_PrefixMatched_Disabled", "", "// api-linter: a=disabled", false},
+		{"MessageComments_MiddleMatched_Disabled", "", "// api-linter: b=disabled", false},
+		{"MessageComments_SuffixMatched_Disabled", "", "// api-linter: c=disabled", false},
+		{"MessageComments_MultipleLinesMatched_Disabled", "", "// api-linter: x=disabled\n// api-linter: a=disabled", false},
 	}
 
 	// Run the specific tests individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := builder.NewFile("test.proto").SetSyntaxComments(builder.Comments{
-				LeadingComment: test.fileComment,
-			}).AddMessage(
-				builder.NewMessage("MyMessage").SetComments(builder.Comments{
-					LeadingComment: test.messageComment,
-				}),
-			).Build()
-			if err != nil {
-				t.Fatalf("Error building test message")
-			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, false), test.enabled; got != want {
+			f := buildFile(t, fmt.Sprintf(`
+				syntax = "proto3";
+				%s
+				package test;
+				%s
+				message MyMessage {}`, test.fileComment, test.messageComment))
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, false), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 			if !test.enabled {
-				if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, true), true; got != want {
+				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, true), true; got != want {
 					t.Errorf("Expected the test rule with ignoreCommentDisables true to return %v from ruleIsEnabled, got %v", want, got)
 				}
 			}
@@ -87,26 +82,22 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: RuleName("test"),
-		LintFile: func(fd *desc.FileDescriptor) []Problem {
+		LintFile: func(fd protoreflect.FileDescriptor) []Problem {
 			return []Problem{}
 		},
 	}
 
 	// Build a proto and check that ruleIsEnabled does the right thing.
-	f, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("FirstMessage").SetComments(builder.Comments{
-			LeadingComment: "api-linter: test=disabled",
-		}),
-	).AddMessage(
-		builder.NewMessage("SecondMessage"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Error building test file: %q", err)
-	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, nil, false), false; got != want {
+	f := buildFile(t, `
+		syntax = "proto3";
+		// api-linter: test=disabled
+		message FirstMessage {}
+		message SecondMessage {}
+	`)
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil, nil, false), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(1), nil, nil, false), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
 	}
 }
@@ -115,27 +106,27 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	// Create a rule that we can check enabled status on.
 	rule := &FieldRule{
 		Name: RuleName("test"),
-		LintField: func(f *desc.FieldDescriptor) []Problem {
+		LintField: func(f protoreflect.FieldDescriptor) []Problem {
 			return nil
 		},
 	}
 
 	// Build a proto with two messages, one of which disables the rule.
-	f, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Foo").SetComments(builder.Comments{
-			LeadingComment: "api-linter: test=disabled",
-		}).AddField(builder.NewField("foo", builder.FieldTypeBool())),
-	).AddMessage(
-		builder.NewMessage("Bar").AddField(builder.NewField("bar", builder.FieldTypeBool())),
-	).Build()
-	if err != nil {
-		t.Fatalf("Error building test file: %q", err)
-	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), false; got != want {
+	f := buildFile(t, `
+		syntax = "proto3";
+		// api-linter: test=disabled
+		message Foo {
+			bool foo = 1;
+		}
+		message Bar {
+			bool bar = 1;
+		}
+	`)
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil, nil, false), true; got != want {
-		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(1).Fields().Get(0), nil, nil, false), true; got != want {
+		t.Errorf("Expected the bar field to return %v from ruleIsEnabled; got %v", want, got)
 	}
 }
 
@@ -143,35 +134,30 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 	// Create a rule that we can check enabled status on.
 	rule := &FieldRule{
 		Name: RuleName("test"),
-		LintField: func(f *desc.FieldDescriptor) []Problem {
+		LintField: func(f protoreflect.FieldDescriptor) []Problem {
 			return nil
 		},
 	}
 
 	for _, test := range []struct {
-		name            string
-		msgDeprecated   bool
-		fieldDeprecated bool
-		enabled         bool
+		name    string
+		options string
+		enabled bool
 	}{
-		{"Both", true, true, false},
-		{"Message", true, false, false},
-		{"Field", false, true, false},
-		{"Neither", false, false, true},
+		{"Both", "option deprecated = true; bool bar = 1 [deprecated = true];", false},
+		{"Message", "option deprecated = true; bool bar = 1;", false},
+		{"Field", "bool bar = 1 [deprecated = true];", false},
+		{"Neither", "bool bar = 1;", true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
-			f, err := builder.NewFile("test.proto").AddMessage(
-				builder.NewMessage("Foo").SetOptions(&dpb.MessageOptions{
-					Deprecated: &test.msgDeprecated,
-				}).AddField(builder.NewField("bar", builder.FieldTypeBool()).SetOptions(
-					&dpb.FieldOptions{Deprecated: &test.fieldDeprecated},
-				)),
-			).Build()
-			if err != nil {
-				t.Fatalf("Error building test file: %q", err)
-			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), test.enabled; got != want {
+			f := buildFile(t, fmt.Sprintf(`
+				syntax = "proto3";
+				message Foo {
+					%s
+				}
+			`, test.options))
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
 				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 			}
 		})

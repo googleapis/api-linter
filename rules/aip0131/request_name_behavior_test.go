@@ -17,7 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestNameBehavior(t *testing.T) {
@@ -38,7 +38,7 @@ func TestRequestNameBehavior(t *testing.T) {
 					string {{.FieldName}} = 1{{.FieldBehavior}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestNameBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

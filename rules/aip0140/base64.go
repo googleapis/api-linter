@@ -18,18 +18,18 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var base64 = &lint.FieldRule{
 	Name:   lint.NewRuleName(140, "base64"),
 	OnlyIf: isStringField,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		comment := strings.ToLower(f.GetSourceInfo().GetLeadingComments())
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		comment := strings.ToLower(string(f.ParentFile().SourceLocations().ByDescriptor(f).LeadingComments))
 		if strings.Contains(comment, "base64") || strings.Contains(comment, "base-64") {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.", f.GetName()),
+				Message:    fmt.Sprintf("Field %q mentions base64 encoding in comments, so it should probably be type `bytes`, not `string`.", f.Name()),
 				Descriptor: f,
 			}}
 		}

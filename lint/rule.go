@@ -18,7 +18,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -35,7 +36,7 @@ type ProtoRule interface {
 
 	// Lint accepts a FileDescriptor and lints it,
 	// returning a slice of Problem objects it finds.
-	Lint(*desc.FileDescriptor) []Problem
+	Lint(protoreflect.FileDescriptor) []Problem
 }
 
 // FileRule defines a lint rule that checks a file as a whole.
@@ -44,11 +45,11 @@ type FileRule struct {
 
 	// LintFile accepts a FileDescriptor and lints it, returning a slice of
 	// Problems it finds.
-	LintFile func(*desc.FileDescriptor) []Problem
+	LintFile func(protoreflect.FileDescriptor) []Problem
 
 	// OnlyIf accepts a FileDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.FileDescriptor) bool
+	OnlyIf func(protoreflect.FileDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -61,7 +62,7 @@ func (r *FileRule) GetName() RuleName {
 
 // Lint forwards the FileDescriptor to the LintFile method defined on the
 // FileRule.
-func (r *FileRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *FileRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	if r.OnlyIf == nil || r.OnlyIf(fd) {
 		return r.LintFile(fd)
 	}
@@ -76,11 +77,11 @@ type MessageRule struct {
 
 	// LintMessage accepts a MessageDescriptor and lints it, returning a slice
 	// of Problems it finds.
-	LintMessage func(*desc.MessageDescriptor) []Problem
+	LintMessage func(protoreflect.MessageDescriptor) []Problem
 
 	// OnlyIf accepts a MessageDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.MessageDescriptor) bool
+	OnlyIf func(protoreflect.MessageDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -95,7 +96,7 @@ func (r *MessageRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // message, and if it returns false, the `LintMessage` function is not called.
-func (r *MessageRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *MessageRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Iterate over each message and process rules for each message.
@@ -113,11 +114,11 @@ type FieldRule struct {
 
 	// LintField accepts a FieldDescriptor and lints it, returning a slice of
 	// Problems it finds.
-	LintField func(*desc.FieldDescriptor) []Problem
+	LintField func(protoreflect.FieldDescriptor) []Problem
 
 	// OnlyIf accepts a FieldDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.FieldDescriptor) bool
+	OnlyIf func(protoreflect.FieldDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -132,13 +133,14 @@ func (r *FieldRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // field, and if it returns false, the `LintField` function is not called.
-func (r *FieldRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *FieldRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Iterate over each message and process rules for each field in that
 	// message.
 	for _, message := range GetAllMessages(fd) {
-		for _, field := range message.GetFields() {
+		for i := 0; i < message.Fields().Len(); i++ {
+			field := message.Fields().Get(i)
 			if r.OnlyIf == nil || r.OnlyIf(field) {
 				problems = append(problems, r.LintField(field)...)
 			}
@@ -152,11 +154,11 @@ type ServiceRule struct {
 	Name RuleName
 
 	// LintService accepts a ServiceDescriptor and lints it.
-	LintService func(*desc.ServiceDescriptor) []Problem
+	LintService func(protoreflect.ServiceDescriptor) []Problem
 
 	// OnlyIf accepts a ServiceDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.ServiceDescriptor) bool
+	OnlyIf func(protoreflect.ServiceDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -171,9 +173,10 @@ func (r *ServiceRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // service, and if it returns false, the `LintService` function is not called.
-func (r *ServiceRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *ServiceRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
-	for _, service := range fd.GetServices() {
+	for i := 0; i < fd.Services().Len(); i++ {
+		service := fd.Services().Get(i)
 		if r.OnlyIf == nil || r.OnlyIf(service) {
 			problems = append(problems, r.LintService(service)...)
 		}
@@ -186,11 +189,11 @@ type MethodRule struct {
 	Name RuleName
 
 	// LintMethod accepts a MethodDescriptor and lints it.
-	LintMethod func(*desc.MethodDescriptor) []Problem
+	LintMethod func(protoreflect.MethodDescriptor) []Problem
 
 	// OnlyIf accepts a MethodDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.MethodDescriptor) bool
+	OnlyIf func(protoreflect.MethodDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -205,10 +208,12 @@ func (r *MethodRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // method, and if it returns false, the `LintMethod` function is not called.
-func (r *MethodRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *MethodRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
-	for _, service := range fd.GetServices() {
-		for _, method := range service.GetMethods() {
+	for i := 0; i < fd.Services().Len(); i++ {
+		service := fd.Services().Get(i)
+		for j := 0; j < service.Methods().Len(); j++ {
+			method := service.Methods().Get(j)
 			if r.OnlyIf == nil || r.OnlyIf(method) {
 				problems = append(problems, r.LintMethod(method)...)
 			}
@@ -222,11 +227,11 @@ type EnumRule struct {
 	Name RuleName
 
 	// LintEnum accepts a EnumDescriptor and lints it.
-	LintEnum func(*desc.EnumDescriptor) []Problem
+	LintEnum func(protoreflect.EnumDescriptor) []Problem
 
 	// OnlyIf accepts an EnumDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.EnumDescriptor) bool
+	OnlyIf func(protoreflect.EnumDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -241,7 +246,7 @@ func (r *EnumRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // enum, and if it returns false, the `LintEnum` function is not called.
-func (r *EnumRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *EnumRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Lint all enums, either at the top of the file, or nested within messages.
@@ -258,11 +263,11 @@ type EnumValueRule struct {
 	Name RuleName
 
 	// LintEnumValue accepts a EnumValueDescriptor and lints it.
-	LintEnumValue func(*desc.EnumValueDescriptor) []Problem
+	LintEnumValue func(protoreflect.EnumValueDescriptor) []Problem
 
 	// OnlyIf accepts an EnumValueDescriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(*desc.EnumValueDescriptor) bool
+	OnlyIf func(protoreflect.EnumValueDescriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -277,12 +282,13 @@ func (r *EnumValueRule) GetName() RuleName {
 //
 // If an `OnlyIf` function is provided on the rule, it is run against each
 // enum value, and if it returns false, the `LintEnum` function is not called.
-func (r *EnumValueRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *EnumValueRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Lint all enums, either at the top of the file, or nested within messages.
 	for _, enum := range getAllEnums(fd) {
-		for _, value := range enum.GetValues() {
+		for i := 0; i < enum.Values().Len(); i++ {
+			value := enum.Values().Get(i)
 			if r.OnlyIf == nil || r.OnlyIf(value) {
 				problems = append(problems, r.LintEnumValue(value)...)
 			}
@@ -300,11 +306,11 @@ type DescriptorRule struct {
 	//
 	// Note: Unless the descriptor is typecast to a more specific type,
 	// only a subset of methods are available to it.
-	LintDescriptor func(desc.Descriptor) []Problem
+	LintDescriptor func(protoreflect.Descriptor) []Problem
 
 	// OnlyIf accepts a Descriptor and determines whether this rule
 	// is applicable.
-	OnlyIf func(desc.Descriptor) bool
+	OnlyIf func(protoreflect.Descriptor) bool
 
 	//lint:ignore U1000 ignored via golint previously
 	noPositional struct{}
@@ -319,15 +325,17 @@ func (r *DescriptorRule) GetName() RuleName {
 //
 // It visits every service, method, message, field, enum, and enum value.
 // This order is not guaranteed. It does NOT visit the file itself.
-func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
+func (r *DescriptorRule) Lint(fd protoreflect.FileDescriptor) []Problem {
 	problems := []Problem{}
 
 	// Iterate over all services and methods.
-	for _, service := range fd.GetServices() {
+	for i := 0; i < fd.Services().Len(); i++ {
+		service := fd.Services().Get(i)
 		if r.OnlyIf == nil || r.OnlyIf(service) {
 			problems = append(problems, r.LintDescriptor(service)...)
 		}
-		for _, method := range service.GetMethods() {
+		for j := 0; j < service.Methods().Len(); j++ {
+			method := service.Methods().Get(j)
 			if r.OnlyIf == nil || r.OnlyIf(method) {
 				problems = append(problems, r.LintDescriptor(method)...)
 			}
@@ -339,7 +347,8 @@ func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 		if r.OnlyIf == nil || r.OnlyIf(message) {
 			problems = append(problems, r.LintDescriptor(message)...)
 		}
-		for _, field := range message.GetFields() {
+		for i := 0; i < message.Fields().Len(); i++ {
+			field := message.Fields().Get(i)
 			if r.OnlyIf == nil || r.OnlyIf(field) {
 				problems = append(problems, r.LintDescriptor(field)...)
 			}
@@ -351,7 +360,8 @@ func (r *DescriptorRule) Lint(fd *desc.FileDescriptor) []Problem {
 		if r.OnlyIf == nil || r.OnlyIf(enum) {
 			problems = append(problems, r.LintDescriptor(enum)...)
 		}
-		for _, value := range enum.GetValues() {
+		for i := 0; i < enum.Values().Len(); i++ {
+			value := enum.Values().Get(i)
 			if r.OnlyIf == nil || r.OnlyIf(value) {
 				problems = append(problems, r.LintDescriptor(value)...)
 			}
@@ -372,8 +382,8 @@ func extractDisabledRuleName(commentLine string) string {
 	return ""
 }
 
-func getLeadingComments(d desc.Descriptor) string {
-	if sourceInfo := d.GetSourceInfo(); sourceInfo != nil {
+func getLeadingComments(d protoreflect.Descriptor) string {
+	if sourceInfo := getSourceInfo(d); sourceInfo != nil {
 		return sourceInfo.GetLeadingComments()
 	}
 	return ""
@@ -381,18 +391,20 @@ func getLeadingComments(d desc.Descriptor) string {
 
 // GetAllMessages returns a slice with every message (not just top-level
 // messages) in the file.
-func GetAllMessages(f *desc.FileDescriptor) (messages []*desc.MessageDescriptor) {
-	messages = append(messages, f.GetMessageTypes()...)
-	for _, message := range f.GetMessageTypes() {
-		messages = append(messages, getAllNestedMessages(message)...)
+func GetAllMessages(f protoreflect.FileDescriptor) (messages []protoreflect.MessageDescriptor) {
+	for i := 0; i < f.Messages().Len(); i++ {
+		msg := f.Messages().Get(i)
+		messages = append(messages, msg)
+		messages = append(messages, getAllNestedMessages(msg)...)
 	}
 	return messages
 }
 
 // getAllNestedMessages returns a slice with the given message descriptor as well
 // as all nested message descriptors, traversing to arbitrary depth.
-func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDescriptor) {
-	for _, nested := range m.GetNestedMessageTypes() {
+func getAllNestedMessages(m protoreflect.MessageDescriptor) (messages []protoreflect.MessageDescriptor) {
+	for i := 0; i < m.Messages().Len(); i++ {
+		nested := m.Messages().Get(i)
 		if !nested.IsMapEntry() { // Don't include the synthetic message type that represents an entry in a map field.
 			messages = append(messages, nested)
 		}
@@ -403,13 +415,17 @@ func getAllNestedMessages(m *desc.MessageDescriptor) (messages []*desc.MessageDe
 
 // getAllEnums returns a slice with every enum (not just top-level enums)
 // in the file.
-func getAllEnums(f *desc.FileDescriptor) (enums []*desc.EnumDescriptor) {
+func getAllEnums(f protoreflect.FileDescriptor) (enums []protoreflect.EnumDescriptor) {
 	// Append all enums at the top level.
-	enums = append(enums, f.GetEnumTypes()...)
+	for i := 0; i < f.Enums().Len(); i++ {
+		enums = append(enums, f.Enums().Get(i))
+	}
 
 	// Append all enums nested within messages.
 	for _, m := range GetAllMessages(f) {
-		enums = append(enums, m.GetNestedEnumTypes()...)
+		for i := 0; i < m.Enums().Len(); i++ {
+			enums = append(enums, m.Enums().Get(i))
+		}
 	}
 
 	return
@@ -419,7 +435,7 @@ func getAllEnums(f *desc.FileDescriptor) (enums []*desc.EnumDescriptor) {
 // is on a best effort basis because protobuf is inconsistent.
 //
 // Taken from https://github.com/jhump/protoreflect/issues/215
-func fileHeader(fd *desc.FileDescriptor) string {
+func fileHeader(fd protoreflect.FileDescriptor) string {
 	var firstLoc *dpb.SourceCodeInfo_Location
 	var firstSpan int64
 
@@ -429,15 +445,21 @@ func fileHeader(fd *desc.FileDescriptor) string {
 
 	// Iterate over locations in the file descriptor looking for
 	// what we think is a file-level comment.
-	for _, curr := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
+	fdp := protodesc.ToFileDescriptorProto(fd)
+	if fdp.SourceCodeInfo == nil {
+		return ""
+	}
+	for _, curr := range fdp.GetSourceCodeInfo().GetLocation() {
 		// Skip locations that have no comments.
 		if curr.LeadingComments == nil && len(curr.LeadingDetachedComments) == 0 {
 			continue
 		}
 		// Skip locations that are not allowed because they should never be
 		// mistaken for file-level comments.
-		if _, ok := allowedPaths[curr.GetPath()[0]]; !ok {
-			continue
+		if len(curr.GetPath()) > 0 {
+			if _, ok := allowedPaths[curr.GetPath()[0]]; !ok {
+				continue
+			}
 		}
 		currSpan := asPos(curr.Span)
 		if firstLoc == nil || currSpan < firstSpan {

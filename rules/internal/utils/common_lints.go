@@ -17,18 +17,17 @@ package utils
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // LintFieldPresent returns a problem if the given message does not have the given field.
-func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescriptor, []lint.Problem) {
-	f := m.FindFieldByName(field)
+func LintFieldPresent(m protoreflect.MessageDescriptor, field string) (protoreflect.FieldDescriptor, []lint.Problem) {
+	f := m.Fields().ByName(protoreflect.Name(field))
 	if f == nil {
 		return nil, []lint.Problem{{
-			Message:    fmt.Sprintf("Message `%s` has no `%s` field.", m.GetName(), field),
+			Message:    fmt.Sprintf("Message `%s` has no `%s` field.", m.Name(), field),
 			Descriptor: m,
 		}}
 	}
@@ -36,15 +35,15 @@ func LintFieldPresent(m *desc.MessageDescriptor, field string) (*desc.FieldDescr
 }
 
 // LintSingularStringField returns a problem if the field is not a singular string.
-func LintSingularStringField(f *desc.FieldDescriptor) []lint.Problem {
-	return LintSingularField(f, builder.FieldTypeString(), "string")
+func LintSingularStringField(f protoreflect.FieldDescriptor) []lint.Problem {
+	return LintSingularField(f, protoreflect.StringKind, "string")
 }
 
 // LintSingularField returns a problem if the field is not singular i.e. it is repeated.
-func LintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want string) []lint.Problem {
-	if f.GetType() != t.GetType() || f.IsRepeated() {
+func LintSingularField(f protoreflect.FieldDescriptor, t protoreflect.Kind, want string) []lint.Problem {
+	if f.Kind() != t || f.IsList() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field must be a singular %s.", f.GetName(), want),
+			Message:    fmt.Sprintf("The `%s` field must be a singular %s.", f.Name(), want),
 			Suggestion: want,
 			Descriptor: f,
 			Location:   locations.FieldType(f),
@@ -54,16 +53,16 @@ func LintSingularField(f *desc.FieldDescriptor, t *builder.FieldType, want strin
 }
 
 // LintSingularBoolField returns a problem if the field is not a singular bool.
-func LintSingularBoolField(f *desc.FieldDescriptor) []lint.Problem {
-	return LintSingularField(f, builder.FieldTypeBool(), "bool")
+func LintSingularBoolField(f protoreflect.FieldDescriptor) []lint.Problem {
+	return LintSingularField(f, protoreflect.BoolKind, "bool")
 }
 
 // LintFieldMask returns a problem if the field is not a singular google.protobuf.FieldMask.
-func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
+func LintFieldMask(f protoreflect.FieldDescriptor) []lint.Problem {
 	const want = "google.protobuf.FieldMask"
-	if t := f.GetMessageType(); t == nil || t.GetFullyQualifiedName() != want || f.IsRepeated() {
+	if t := f.Message(); t == nil || t.FullName() != want || f.IsList() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field should be a singular %s.", f.GetName(), want),
+			Message:    fmt.Sprintf("The `%s` field should be a singular %s.", f.Name(), want),
 			Suggestion: want,
 			Descriptor: f,
 			Location:   locations.FieldType(f),
@@ -73,10 +72,10 @@ func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
 }
 
 // LintNotOneof returns a problem if the field is a oneof.
-func LintNotOneof(f *desc.FieldDescriptor) []lint.Problem {
-	if f.GetOneOf() != nil && !f.IsProto3Optional() {
+func LintNotOneof(f protoreflect.FieldDescriptor) []lint.Problem {
+	if f.ContainingOneof() != nil && !f.HasOptionalKeyword() {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
+			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.Name()),
 			Descriptor: f,
 		}}
 	}
@@ -84,8 +83,8 @@ func LintNotOneof(f *desc.FieldDescriptor) []lint.Problem {
 }
 
 // LintFieldPresentAndSingularString returns a problem if a message does not have the given singular-string field.
-func LintFieldPresentAndSingularString(field string) func(*desc.MessageDescriptor) []lint.Problem {
-	return func(m *desc.MessageDescriptor) []lint.Problem {
+func LintFieldPresentAndSingularString(field string) func(protoreflect.MessageDescriptor) []lint.Problem {
+	return func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f, problems := LintFieldPresent(m, field)
 		if f == nil {
 			return problems
@@ -94,10 +93,10 @@ func LintFieldPresentAndSingularString(field string) func(*desc.MessageDescripto
 	}
 }
 
-func lintFieldBehavior(f *desc.FieldDescriptor, want string) []lint.Problem {
+func lintFieldBehavior(f protoreflect.FieldDescriptor, want string) []lint.Problem {
 	if !GetFieldBehavior(f).Contains(want) {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field should include `(google.api.field_behavior) = %s`.", f.GetName(), want),
+			Message:    fmt.Sprintf("The `%s` field should include `(google.api.field_behavior) = %s`.", f.Name(), want),
 			Descriptor: f,
 		}}
 	}
@@ -105,31 +104,31 @@ func lintFieldBehavior(f *desc.FieldDescriptor, want string) []lint.Problem {
 }
 
 // LintRequiredField returns a problem if the field's behavior is not REQUIRED.
-func LintRequiredField(f *desc.FieldDescriptor) []lint.Problem {
+func LintRequiredField(f protoreflect.FieldDescriptor) []lint.Problem {
 	return lintFieldBehavior(f, "REQUIRED")
 }
 
 // LintOutputOnlyField returns a problem if the field's behavior is not OUTPUT_ONLY.
-func LintOutputOnlyField(f *desc.FieldDescriptor) []lint.Problem {
+func LintOutputOnlyField(f protoreflect.FieldDescriptor) []lint.Problem {
 	return lintFieldBehavior(f, "OUTPUT_ONLY")
 }
 
 // LintFieldResourceReference returns a problem if the field does not have a resource reference annotation.
-func LintFieldResourceReference(f *desc.FieldDescriptor) []lint.Problem {
+func LintFieldResourceReference(f protoreflect.FieldDescriptor) []lint.Problem {
 	if ref := GetResourceReference(f); ref == nil {
 		return []lint.Problem{{
-			Message:    fmt.Sprintf("The `%s` field should include a `google.api.resource_reference` annotation.", f.GetName()),
+			Message:    fmt.Sprintf("The `%s` field should include a `google.api.resource_reference` annotation.", f.Name()),
 			Descriptor: f,
 		}}
 	}
 	return nil
 }
 
-func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
+func lintHTTPBody(m protoreflect.MethodDescriptor, want, msg string) []lint.Problem {
 	for _, httpRule := range GetHTTPRules(m) {
 		if httpRule.Body != want {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("The `%s` method should %s HTTP body.", m.GetName(), msg),
+				Message:    fmt.Sprintf("The `%s` method should %s HTTP body.", m.Name(), msg),
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
@@ -139,22 +138,22 @@ func lintHTTPBody(m *desc.MethodDescriptor, want, msg string) []lint.Problem {
 }
 
 // LintNoHTTPBody returns a problem for each HTTP rule whose body is not "".
-func LintNoHTTPBody(m *desc.MethodDescriptor) []lint.Problem {
+func LintNoHTTPBody(m protoreflect.MethodDescriptor) []lint.Problem {
 	return lintHTTPBody(m, "", "not have an")
 }
 
 // LintWildcardHTTPBody returns a problem for each HTTP rule whose body is not "*".
-func LintWildcardHTTPBody(m *desc.MethodDescriptor) []lint.Problem {
+func LintWildcardHTTPBody(m protoreflect.MethodDescriptor) []lint.Problem {
 	return lintHTTPBody(m, "*", `use "*" as the`)
 }
 
 // LintHTTPMethod returns a problem for each HTTP rule whose HTTP method is not the given one.
-func LintHTTPMethod(verb string) func(*desc.MethodDescriptor) []lint.Problem {
-	return func(m *desc.MethodDescriptor) []lint.Problem {
+func LintHTTPMethod(verb string) func(protoreflect.MethodDescriptor) []lint.Problem {
+	return func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range GetHTTPRules(m) {
 			if httpRule.Method != verb {
 				return []lint.Problem{{
-					Message:    fmt.Sprintf("The `%s` method should use the HTTP %s verb.", m.GetName(), verb),
+					Message:    fmt.Sprintf("The `%s` method should use the HTTP %s verb.", m.Name(), verb),
 					Descriptor: m,
 					Location:   locations.MethodHTTPRule(m),
 				}}
@@ -166,11 +165,11 @@ func LintHTTPMethod(verb string) func(*desc.MethodDescriptor) []lint.Problem {
 
 // LintMethodHasMatchingRequestName returns a problem if the given method's request type does not
 // have a name matching the method's, with a "Request" suffix.
-func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
-	if got, want := m.GetInputType().GetName(), m.GetName()+"Request"; got != want {
+func LintMethodHasMatchingRequestName(m protoreflect.MethodDescriptor) []lint.Problem {
+	if got, want := m.Input().Name(), m.Name()+"Request"; got != want {
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("Request message should be named after the RPC, i.e. %q.", want),
-			Suggestion: want,
+			Suggestion: string(want),
 			Descriptor: m,
 			Location:   locations.MethodRequestType(m),
 		}}
@@ -180,18 +179,18 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 
 // LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
 // have a name matching the method's, with a "Response" suffix.
-func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
+func LintMethodHasMatchingResponseName(m protoreflect.MethodDescriptor) []lint.Problem {
 	// GetResponseType handles the LRO case.
 	rt := GetResponseType(m)
 	if rt == nil {
 		return nil
 	}
-	if got, want := rt.GetName(), m.GetName()+"Response"; got != want {
+	if got, want := rt.Name(), m.Name()+"Response"; got != want {
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 
 		// If the RPC is an LRO, we need to tweak the finding.
-		if isLongRunningOperation(m.GetOutputType()) {
+		if isLongRunningOperation(m.Output()) {
 			loc = locations.MethodOperationInfo(m)
 			// Clear the suggestion b.c we cannot easily pin point the
 			// response_type field.
@@ -200,7 +199,7 @@ func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem 
 
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("Response message should be named after the RPC, i.e. %q.", want),
-			Suggestion: suggestion,
+			Suggestion: string(suggestion),
 			Descriptor: m,
 			Location:   loc,
 		}}
@@ -210,13 +209,13 @@ func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem 
 
 // LintHTTPURIHasParentVariable returns a problem if any of the given method's HTTP rules do not
 // have a parent variable in the URI.
-func LintHTTPURIHasParentVariable(m *desc.MethodDescriptor) []lint.Problem {
+func LintHTTPURIHasParentVariable(m protoreflect.MethodDescriptor) []lint.Problem {
 	return LintHTTPURIHasVariable(m, "parent")
 }
 
 // LintHTTPURIHasVariable returns a problem if any of the given method's HTTP rules do not
 // have the given variable in the URI.
-func LintHTTPURIHasVariable(m *desc.MethodDescriptor, v string) []lint.Problem {
+func LintHTTPURIHasVariable(m protoreflect.MethodDescriptor, v string) []lint.Problem {
 	for _, httpRule := range GetHTTPRules(m) {
 		if _, ok := httpRule.GetVariables()[v]; !ok {
 			return []lint.Problem{{
@@ -231,7 +230,7 @@ func LintHTTPURIHasVariable(m *desc.MethodDescriptor, v string) []lint.Problem {
 
 // LintHTTPURIVariableCount returns a problem if the given method's HTTP rules
 // do not contain the given number of variables in the URI.
-func LintHTTPURIVariableCount(m *desc.MethodDescriptor, n int) []lint.Problem {
+func LintHTTPURIVariableCount(m protoreflect.MethodDescriptor, n int) []lint.Problem {
 	varsText := "variables"
 	if n == 1 {
 		varsText = "variable"
@@ -253,7 +252,7 @@ func LintHTTPURIVariableCount(m *desc.MethodDescriptor, n int) []lint.Problem {
 
 // LintHTTPURIHasNameVariable returns a problem if any of the given method's HTTP rules do not
 // have a name variable in the URI.
-func LintHTTPURIHasNameVariable(m *desc.MethodDescriptor) []lint.Problem {
+func LintHTTPURIHasNameVariable(m protoreflect.MethodDescriptor) []lint.Problem {
 	return LintHTTPURIHasVariable(m, "name")
 }
 

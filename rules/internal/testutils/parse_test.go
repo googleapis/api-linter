@@ -18,7 +18,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestParseProtoStrings(t *testing.T) {
@@ -37,23 +37,23 @@ func TestParseProtoStrings(t *testing.T) {
 			google.protobuf.Timestamp create_time = 3;
 		}
 	`})["test.proto"]
-	if !fd.IsProto3() {
+	if fd.Syntax() != protoreflect.Proto3 {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
 	tests := []struct {
 		name       string
-		descriptor desc.Descriptor
+		descriptor protoreflect.Descriptor
 	}{
-		{"Foo", fd.GetMessageTypes()[0]},
-		{"bar", fd.GetMessageTypes()[0].GetFields()[0]},
-		{"baz", fd.GetMessageTypes()[0].GetFields()[1]},
-		{"Spam", fd.GetMessageTypes()[1]},
-		{"eggs", fd.GetMessageTypes()[1].GetFields()[0]},
-		{"create_time", fd.GetMessageTypes()[1].GetFields()[1]},
+		{"Foo", fd.Messages().Get(0)},
+		{"bar", fd.Messages().Get(0).Fields().Get(0)},
+		{"baz", fd.Messages().Get(0).Fields().Get(1)},
+		{"Spam", fd.Messages().Get(1)},
+		{"eggs", fd.Messages().Get(1).Fields().Get(0)},
+		{"create_time", fd.Messages().Get(1).Fields().Get(1)},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got, want := test.descriptor.GetName(), test.name; got != want {
+			if got, want := test.descriptor.Name(), protoreflect.Name(test.name); got != want {
 				t.Errorf("Got %q, expected %q.", got, want)
 			}
 		})
@@ -94,7 +94,7 @@ func TestParseProto3String(t *testing.T) {
 			string eggs = 2;
 		}
 	`)
-	if !fd.IsProto3() {
+	if fd.Syntax() != protoreflect.Proto3 {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
 }
@@ -116,15 +116,15 @@ func TestParseProto3Tmpl(t *testing.T) {
 					string {{.Field2Name}} = 2;
 				}
 			`, test)
-			if !fd.IsProto3() {
+			if fd.Syntax() != protoreflect.Proto3 {
 				t.Errorf("Expected a proto3 file descriptor.")
 			}
-			msg := fd.GetMessageTypes()[0]
-			if got, want := msg.GetName(), test.MessageName; got != want {
+			msg := fd.Messages().Get(0)
+			if got, want := msg.Name(), protoreflect.Name(test.MessageName); got != want {
 				t.Errorf("Got %q for message name, expected %q.", got, want)
 			}
 			for i, fn := range []string{test.Field1Name, test.Field2Name} {
-				if got, want := msg.GetFields()[i].GetName(), fn; got != want {
+				if got, want := msg.Fields().Get(i).Name(), protoreflect.Name(fn); got != want {
 					t.Errorf("Got %q for field name %d; expected %q.", got, i+1, want)
 				}
 			}

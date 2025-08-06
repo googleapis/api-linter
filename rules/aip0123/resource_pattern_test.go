@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourcePattern(t *testing.T) {
@@ -48,7 +48,7 @@ func TestResourcePattern(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(resourcePattern.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -15,16 +15,16 @@
 package aip0134
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestMaskRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-mask-required"),
 	OnlyIf: utils.IsUpdateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		updateMask := m.FindFieldByName("update_mask")
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		updateMask := m.Fields().ByName("update_mask")
 		if updateMask == nil {
 			return []lint.Problem{{
 				Message:    "Update methods should have an `update_mask` field.",

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoMarkdownHeadings(t *testing.T) {
@@ -42,7 +42,7 @@ func TestNoMarkdownHeadings(t *testing.T) {
 			  {{.Comment}}
 			  message Foo {}
 			`, struct{ Comment string }{cmt})
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(noMarkdownHeadings.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

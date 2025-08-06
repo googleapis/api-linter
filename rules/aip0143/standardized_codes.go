@@ -17,14 +17,14 @@ package aip0143
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldNames = &lint.FieldRule{
 	Name: lint.NewRuleName(143, "standardized-codes"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		variants := map[string]string{
 			"content_type": "mime_type",
 			"country":      "region_code",
@@ -37,9 +37,9 @@ var fieldNames = &lint.FieldRule{
 			"tz":           "time_zone",
 			"timezone":     "time_zone",
 		}
-		if want, ok := variants[f.GetName()]; ok {
+		if want, ok := variants[string(f.Name())]; ok {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Use %q in place of %q.", want, f.GetName()),
+				Message:    fmt.Sprintf("Use %q in place of %q.", want, f.Name()),
 				Descriptor: f,
 				Location:   locations.DescriptorName(f),
 				Suggestion: want,

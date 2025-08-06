@@ -17,7 +17,7 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRollbackResponseMessageName(t *testing.T) {
@@ -39,7 +39,7 @@ func TestRollbackResponseMessageName(t *testing.T) {
 				message RollbackBookRequest {}
 				message {{.ResponseType}} {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(rollbackResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -73,7 +73,7 @@ func TestRollbackOperationResponse(t *testing.T) {
 				message OperationMetadata {}
 				message {{.ResponseType}} {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(rollbackResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

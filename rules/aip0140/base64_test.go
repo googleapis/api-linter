@@ -17,7 +17,7 @@ package aip0140
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestBase64(t *testing.T) {
@@ -45,7 +45,7 @@ func TestBase64(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, tmpl, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			problems := base64.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

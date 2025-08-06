@@ -19,17 +19,20 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Get methods should not have unrecognized fields.
 var requestUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(231, "request-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isBatchGetRequestMessage(f.GetOwner())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchGetRequestMessage(m)
+		}
+		return false
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
 		allowedFields := stringset.New(
 			"names",     // AIP-231
 			"parent",    // AIP-231
@@ -37,11 +40,11 @@ var requestUnknownFields = &lint.FieldRule{
 			"requests",  // AIP-231
 			"view",      // AIP-157
 		)
-		if !allowedFields.Contains(field.GetName()) {
+		if !allowedFields.Contains(string(field.Name())) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Unexpected field: Batch Get RPCs must only contain fields explicitly described in https://aip.dev/231, not %q.",
-					string(field.GetName()),
+					string(field.Name()),
 				),
 				Descriptor: field,
 			}}

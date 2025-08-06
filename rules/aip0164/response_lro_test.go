@@ -17,7 +17,7 @@ package aip0164
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResponseLRO(t *testing.T) {
@@ -48,7 +48,7 @@ func TestResponseLRO(t *testing.T) {
 				}
 				message UndeleteBookRequest {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(responseLRO.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

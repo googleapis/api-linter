@@ -16,9 +16,9 @@
 package aip0128
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -32,7 +32,7 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func isDeclarativeFriendlyResource(m *desc.MessageDescriptor) bool {
+func isDeclarativeFriendlyResource(m protoreflect.MessageDescriptor) bool {
 	// IsDeclarativeFriendly returns true for both
 	// resources and request messages, but we only care about resources.
 	resource := utils.DeclarativeFriendlyResource(m)

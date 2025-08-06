@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestHTTPURIResource(t *testing.T) {
@@ -57,10 +57,10 @@ func TestHTTPURIResource(t *testing.T) {
 				}
 			`, test)
 
-			method := f.GetServices()[0].GetMethods()[0]
-			var d desc.Descriptor = method
+			method := f.Services().Get(0).Methods().Get(0)
+			var d protoreflect.Descriptor = method
 			if strings.HasPrefix(test.testName, "Resource") {
-				d = method.GetOutputType()
+				d = method.Output()
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(httpURIResource.Lint(f)); diff != "" {
 				t.Error(diff)

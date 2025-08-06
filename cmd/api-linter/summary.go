@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/olekukonko/tablewriter"
 )
 

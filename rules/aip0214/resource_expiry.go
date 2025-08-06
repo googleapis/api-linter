@@ -15,19 +15,19 @@
 package aip0214
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceExpiry = &lint.FieldRule{
 	Name: lint.NewRuleName(214, "resource-expiry"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		isResource := utils.IsResource(f.GetParent().(*desc.MessageDescriptor))
-		isExpireTime := f.GetName() == "expire_time"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		isResource := utils.IsResource(f.Parent().(protoreflect.MessageDescriptor))
+		isExpireTime := f.Name() == "expire_time"
 		return isResource && isExpireTime
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// If this field is output only, then there is no user input permitted
 		// and therefore having a `ttl` field does not matter.
 		if utils.GetFieldBehavior(f).Contains("OUTPUT_ONLY") {
@@ -35,7 +35,7 @@ var resourceExpiry = &lint.FieldRule{
 		}
 
 		// If this message does not have a `ttl` field, suggest one.
-		if f.GetOwner().FindFieldByName("ttl") == nil {
+		if f.Parent().(protoreflect.MessageDescriptor).Fields().ByName("ttl") == nil {
 			return []lint.Problem{{
 				Message:    "Resources that let users set expire_time should include an input only `ttl` field.",
 				Descriptor: f,

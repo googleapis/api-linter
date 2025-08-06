@@ -3,8 +3,8 @@ package utils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestLintSingularStringField(t *testing.T) {
@@ -18,12 +18,12 @@ func TestLintSingularStringField(t *testing.T) {
 		{"InvalidRepeated", `repeated string`, testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				message Message {
 					{{.FieldType}} foo = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintSingularStringField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -42,13 +42,13 @@ func TestLintRequiredField(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: "REQUIRED"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/field_behavior.proto";
 				message Message {
 					string foo = 1 {{.Annotation}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintRequiredField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -67,13 +67,13 @@ func TestLintFieldResourceReference(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: "resource_reference"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/resource.proto";
 				message Message {
 					string foo = 1 {{.Annotation}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintFieldResourceReference(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -92,7 +92,7 @@ func TestLintNoHTTPBody(t *testing.T) {
 		{"Invalid", `*`, testutils.Problems{{Message: "not have an HTTP body"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
@@ -105,7 +105,7 @@ func TestLintNoHTTPBody(t *testing.T) {
 				message Book {}
 				message GetBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintNoHTTPBody(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -124,7 +124,7 @@ func TestLintWildcardHTTPBody(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: `use "*" as the HTTP body`}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc ArchiveBook(ArchiveBookRequest) returns (Book) {
@@ -137,7 +137,7 @@ func TestLintWildcardHTTPBody(t *testing.T) {
 				message Book {}
 				message ArchiveBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintWildcardHTTPBody(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -156,7 +156,7 @@ func TestLintHTTPMethod(t *testing.T) {
 		{"Invalid", `delete`, testutils.Problems{{Message: `HTTP GET`}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
@@ -168,7 +168,7 @@ func TestLintHTTPMethod(t *testing.T) {
 				message Book {}
 				message GetBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintHTTPMethod("GET")(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -187,14 +187,14 @@ func TestLintMethodHasMatchingRequestName(t *testing.T) {
 		{"Invalid", "AcquireBookRequest", testutils.Problems{{Suggestion: "GetBookRequest"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				service Library {
 					rpc GetBook({{.MessageName}}) returns (Book);
 				}
 				message Book {}
 				message {{.MessageName}} {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingRequestName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -213,14 +213,14 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 		{"Invalid", "AcquireBookResponse", testutils.Problems{{Suggestion: "GetBookResponse"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				service Library {
 					rpc GetBook(GetBookRequest) returns ({{.ResponseName}});
 				}
 				message GetBookRequest {}
 				message {{.ResponseName}} {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -239,7 +239,7 @@ func TestLintMethodHasMatchingResponseNameLRO(t *testing.T) {
 		{"Invalid", "AcquireBookResponse", testutils.Problems{{Message: "GetBookResponse"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				import "google/longrunning/operations.proto";
 
 				service Library {
@@ -254,7 +254,7 @@ func TestLintMethodHasMatchingResponseNameLRO(t *testing.T) {
 				message {{.MessageName}} {}
 				message OperationMetadata {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -273,13 +273,13 @@ func TestLintSingularField(t *testing.T) {
 		{"Invalid", "repeated", testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				message Message {
 					{{.Label}} string foo = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := LintSingularField(field, builder.FieldTypeString(), "string")
+			field := f.Messages().Get(0).Fields().Get(0)
+			problems := LintSingularField(field, protoreflect.StringKind, "string")
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
@@ -298,12 +298,12 @@ func TestLintNotOneof(t *testing.T) {
 		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.ParseProto3Tmpl(t, `
+			f := testutils.Compile(t, `
 				message Message {
 					{{.Field}}
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintNotOneof(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

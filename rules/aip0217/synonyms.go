@@ -16,9 +16,9 @@ package aip0217
 
 import (
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var synSet = stringset.New(
@@ -27,11 +27,14 @@ var synSet = stringset.New(
 
 var synonyms = &lint.FieldRule{
 	Name: lint.NewRuleName(217, "synonyms"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetOwner().FindFieldByName("next_page_token") != nil
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return m.Fields().ByName("next_page_token") != nil
+		}
+		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if synSet.Contains(f.GetName()) {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if synSet.Contains(string(f.Name())) {
 			return []lint.Problem{{
 				Message:    "Use `unreachable` to express unreachable resources when listing.",
 				Suggestion: "unreachable",

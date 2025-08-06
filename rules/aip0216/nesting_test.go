@@ -17,7 +17,7 @@ package aip0216
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNesting(t *testing.T) {
@@ -54,7 +54,7 @@ func TestNesting(t *testing.T) {
 						UNSPECIFIED = 0;
 					}
 				`, test)
-				e := f.GetEnumTypes()[0]
+				e := f.Enums().Get(0)
 				if diff := test.problems.SetDescriptor(e).Diff(nesting.Lint(f)); diff != "" {
 					t.Error(diff)
 				}

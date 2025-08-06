@@ -3,7 +3,7 @@ package aip0133
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestParentFieldRequired(t *testing.T) {
@@ -29,7 +29,7 @@ func TestRequestParentFieldRequired(t *testing.T) {
 			`, test)
 
 			problems := requestParentRequired.Lint(f)
-			message := f.GetMessageTypes()[0]
+			message := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

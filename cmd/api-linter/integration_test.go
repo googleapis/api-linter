@@ -159,7 +159,6 @@ func TestRules_DisabledByConfig(t *testing.T) {
 func TestBuildErrors(t *testing.T) {
 	expected := []string{
 		"internal/testdata/build_errors.proto:8:1:",
-		"internal/testdata/build_errors.proto:13:1:",
 	}
 	err := runCLI([]string{"internal/testdata/build_errors.proto"})
 	if err == nil {
@@ -180,7 +179,7 @@ func TestBuildErrors(t *testing.T) {
 
 func TestMultipleFilesFromParentDir(t *testing.T) {
 	// This test addresses a previously found bug:
-	// https://github.com/googleapis/api-linter/issues/1465
+	// https://github.com/googleapis/api-linter/v2/issues/1465
 
 	projDir, err := os.MkdirTemp("", "proj")
 	if err != nil {

@@ -15,17 +15,17 @@
 package aip0233
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Create methods should have a proper HTTP pattern.
 var httpURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(233, "http-uri-suffix"),
 	OnlyIf: isBatchCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !batchCreateURINameRegexp.MatchString(httpRule.URI) {
 				return []lint.Problem{{

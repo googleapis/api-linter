@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoHTML(t *testing.T) {
@@ -45,7 +45,7 @@ func TestNoHTML(t *testing.T) {
 				// A foo. {{.Comment}}
 				message Foo {}
 			`, "{{.Comment}}", test.comment))
-			message := f.GetMessageTypes()[0]
+			message := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(message).Diff(noHTML.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

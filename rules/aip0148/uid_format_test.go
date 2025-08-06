@@ -17,7 +17,7 @@ package aip0148
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUidFormat(t *testing.T) {
@@ -65,7 +65,7 @@ func TestUidFormat(t *testing.T) {
 
 				message Foo {}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(uidFormat.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -17,7 +17,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceReferenceType(t *testing.T) {
@@ -63,7 +63,7 @@ option (google.api.resource) = {
 					string name = 1;
 				}
 			`, test)
-			field := file.GetServices()[0].GetMethods()[0].GetInputType().FindFieldByName("parent")
+			field := file.Services().Get(0).Methods().Get(0).Input().Fields().ByName("parent")
 			problems := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

@@ -17,7 +17,7 @@ package aip0235
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestMethodPluralResourceName(t *testing.T) {
@@ -84,7 +84,7 @@ func TestMethodPluralResourceName(t *testing.T) {
 				message {{.MethodName}}Response{}
 				`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services().Get(0).Methods().Get(0)
 
 			problems := pluralMethodName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {

@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceReferenceType(t *testing.T) {
@@ -43,7 +43,7 @@ func TestResourceReferenceType(t *testing.T) {
 				}
 				message Author {}  // For the failure case, to make compilation work.
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			got := resourceReferenceType.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(got); diff != "" {
 				t.Error(diff)

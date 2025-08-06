@@ -16,15 +16,18 @@ package aip0148
 
 import (
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "field-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsResource(f.GetOwner()) && outputOnlyFields.Contains(f.GetName())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsResource(m) && outputOnlyFields.Contains(string(f.Name()))
+		}
+		return false
 	},
 	LintField: utils.LintOutputOnlyField,
 }

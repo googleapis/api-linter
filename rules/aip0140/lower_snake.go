@@ -17,16 +17,16 @@ package aip0140
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Field names must be snake case.
 var lowerSnake = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "lower-snake"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if got, want := f.GetName(), toLowerSnakeCase(f.GetName()); got != want {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if got, want := f.Name(), toLowerSnakeCase(string(f.Name())); string(got) != want {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Field `%s` must use lower_snake_case.", got),
 				Suggestion: want,

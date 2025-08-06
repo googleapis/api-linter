@@ -18,26 +18,22 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestFileRule(t *testing.T) {
 	// Create a file descriptor with nothing in it.
-	fd, err := builder.NewFile("test.proto").Build()
-	if err != nil {
-		t.Fatalf("Could not build file descriptor: %q", err)
-	}
+	fd := buildFile(t, `syntax = "proto3";`)
 
 	// Iterate over the tests and run them.
 	for _, test := range makeLintRuleTests(fd) {
 		t.Run(test.testName, func(t *testing.T) {
 			rule := &FileRule{
 				Name: RuleName("test"),
-				OnlyIf: func(fd *desc.FileDescriptor) bool {
-					return fd.GetName() == "test.proto"
+				OnlyIf: func(fd protoreflect.FileDescriptor) bool {
+					return fd.Path() == "test.proto"
 				},
-				LintFile: func(fd *desc.FileDescriptor) []Problem {
+				LintFile: func(fd protoreflect.FileDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -50,25 +46,18 @@ func TestFileRule(t *testing.T) {
 
 func TestMessageRule(t *testing.T) {
 	// Create a file descriptor with two messages in it.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book"),
-	).AddMessage(
-		builder.NewMessage("Author"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
-	}
+	fd := buildFile(t, `syntax = "proto3"; message Book {} message Author {}`)
 
 	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[1]) {
+	for _, test := range makeLintRuleTests(fd.Messages().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
 			rule := &MessageRule{
 				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MessageDescriptor) bool {
-					return m.GetName() == "Author"
+				OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+					return m.Name() == "Author"
 				},
-				LintMessage: func(m *desc.MessageDescriptor) []Problem {
+				LintMessage: func(m protoreflect.MessageDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -82,23 +71,18 @@ func TestMessageRule(t *testing.T) {
 // Establish that nested messages are tested.
 func TestMessageRuleNested(t *testing.T) {
 	// Create a file descriptor with a message and nested message in it.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddNestedMessage(builder.NewMessage("Author")),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
-	}
+	fd := buildFile(t, `syntax = "proto3"; message Book { message Author {} }`)
 
 	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedMessageTypes()[0]) {
+	for _, test := range makeLintRuleTests(fd.Messages().Get(0).Messages().Get(0)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the message rule.
 			rule := &MessageRule{
 				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MessageDescriptor) bool {
-					return m.GetName() == "Author"
+				OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+					return m.Name() == "Author"
 				},
-				LintMessage: func(m *desc.MessageDescriptor) []Problem {
+				LintMessage: func(m protoreflect.MessageDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -111,27 +95,18 @@ func TestMessageRuleNested(t *testing.T) {
 
 func TestFieldRule(t *testing.T) {
 	// Create a file descriptor with one message and two fields in that message.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddField(
-			builder.NewField("title", builder.FieldTypeString()),
-		).AddField(
-			builder.NewField("edition_count", builder.FieldTypeInt32()),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build file descriptor.")
-	}
+	fd := buildFile(t, `syntax = "proto3"; message Book { string title = 1; int32 edition_count = 2; }`)
 
 	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetFields()[1]) {
+	for _, test := range makeLintRuleTests(fd.Messages().Get(0).Fields().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the field rule.
 			rule := &FieldRule{
 				Name: RuleName("test"),
-				OnlyIf: func(f *desc.FieldDescriptor) bool {
-					return f.GetName() == "edition_count"
+				OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+					return f.Name() == "edition_count"
 				},
-				LintField: func(f *desc.FieldDescriptor) []Problem {
+				LintField: func(f protoreflect.FieldDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -144,20 +119,15 @@ func TestFieldRule(t *testing.T) {
 
 func TestServiceRule(t *testing.T) {
 	// Create a file descriptor with a service.
-	fd, err := builder.NewFile("test.proto").AddService(
-		builder.NewService("Library"),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor: %q", err)
-	}
+	fd := buildFile(t, `syntax = "proto3"; service Library {}`)
 
 	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetServices()[0]) {
+	for _, test := range makeLintRuleTests(fd.Services().Get(0)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the service rule.
 			rule := &ServiceRule{
 				Name: RuleName("test"),
-				LintService: func(s *desc.ServiceDescriptor) []Problem {
+				LintService: func(s protoreflect.ServiceDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -170,36 +140,27 @@ func TestServiceRule(t *testing.T) {
 
 func TestMethodRule(t *testing.T) {
 	// Create a file descriptor with a service.
-	book := builder.RpcTypeMessage(builder.NewMessage("Book"), false)
-	fd, err := builder.NewFile("test.proto").AddService(
-		builder.NewService("Library").AddMethod(
-			builder.NewMethod(
-				"GetBook",
-				builder.RpcTypeMessage(builder.NewMessage("GetBookRequest"), false),
-				book,
-			),
-		).AddMethod(
-			builder.NewMethod(
-				"CreateBook",
-				builder.RpcTypeMessage(builder.NewMessage("CreateBookRequest"), false),
-				book,
-			),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor: %q", err)
-	}
+	fd := buildFile(t, `
+		syntax = "proto3";
+		message Book {}
+		message GetBookRequest {}
+		message CreateBookRequest {}
+		service Library {
+			rpc GetBook(GetBookRequest) returns (Book);
+			rpc CreateBook(CreateBookRequest) returns (Book);
+		}
+	`)
 
 	// Iterate over the tests and run them.
-	for _, test := range makeLintRuleTests(fd.GetServices()[0].GetMethods()[1]) {
+	for _, test := range makeLintRuleTests(fd.Services().Get(0).Methods().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the method rule.
 			rule := &MethodRule{
 				Name: RuleName("test"),
-				OnlyIf: func(m *desc.MethodDescriptor) bool {
-					return m.GetName() == "CreateBook"
+				OnlyIf: func(m protoreflect.MethodDescriptor) bool {
+					return m.Name() == "CreateBook"
 				},
-				LintMethod: func(m *desc.MethodDescriptor) []Problem {
+				LintMethod: func(m protoreflect.MethodDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -212,24 +173,21 @@ func TestMethodRule(t *testing.T) {
 
 func TestEnumRule(t *testing.T) {
 	// Create a file descriptor with top-level enums.
-	fd, err := builder.NewFile("test.proto").AddEnum(
-		builder.NewEnum("Format").AddValue(builder.NewEnumValue("PDF")),
-	).AddEnum(
-		builder.NewEnum("Edition").AddValue(builder.NewEnumValue("PUBLISHER_ONLY")),
-	).Build()
-	if err != nil {
-		t.Fatalf("Error building test proto:%s ", err)
-	}
+	fd := buildFile(t, `
+		syntax = "proto3";
+		enum Format { PDF = 0; }
+		enum Edition { PUBLISHER_ONLY = 0; }
+	`)
 
-	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[1]) {
+	for _, test := range makeLintRuleTests(fd.Enums().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
 				Name: RuleName("test"),
-				OnlyIf: func(e *desc.EnumDescriptor) bool {
-					return e.GetName() == "Edition"
+				OnlyIf: func(e protoreflect.EnumDescriptor) bool {
+					return e.Name() == "Edition"
 				},
-				LintEnum: func(e *desc.EnumDescriptor) []Problem {
+				LintEnum: func(e protoreflect.EnumDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -242,22 +200,20 @@ func TestEnumRule(t *testing.T) {
 
 func TestEnumValueRule(t *testing.T) {
 	// Create a file descriptor with a top-level enum with values.
-	fd, err := builder.NewFile("test.proto").AddEnum(
-		builder.NewEnum("Format").AddValue(builder.NewEnumValue("YAML")).AddValue(builder.NewEnumValue("JSON")),
-	).Build()
-	if err != nil {
-		t.Fatalf("Error building test proto:%s ", err)
-	}
+	fd := buildFile(t, `
+		syntax = "proto3";
+		enum Format { YAML = 0; JSON = 1; }
+	`)
 
-	for _, test := range makeLintRuleTests(fd.GetEnumTypes()[0].GetValues()[1]) {
+	for _, test := range makeLintRuleTests(fd.Enums().Get(0).Values().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the enum value rule.
 			rule := &EnumValueRule{
 				Name: RuleName("test"),
-				OnlyIf: func(e *desc.EnumValueDescriptor) bool {
-					return e.GetName() == "JSON"
+				OnlyIf: func(e protoreflect.EnumValueDescriptor) bool {
+					return e.Name() == "JSON"
 				},
-				LintEnumValue: func(e *desc.EnumValueDescriptor) []Problem {
+				LintEnumValue: func(e protoreflect.EnumValueDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -270,26 +226,23 @@ func TestEnumValueRule(t *testing.T) {
 
 func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
-	fd, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Book").AddNestedEnum(
-			builder.NewEnum("Format").AddValue(builder.NewEnumValue("PDF")),
-		).AddNestedEnum(
-			builder.NewEnum("Edition").AddValue(builder.NewEnumValue("PUBLISHER_ONLY")),
-		),
-	).Build()
-	if err != nil {
-		t.Fatalf("Error building test proto:%s ", err)
-	}
+	fd := buildFile(t, `
+		syntax = "proto3";
+		message Book {
+			enum Format { PDF = 0; }
+			enum Edition { PUBLISHER_ONLY = 0; }
+		}
+	`)
 
-	for _, test := range makeLintRuleTests(fd.GetMessageTypes()[0].GetNestedEnumTypes()[1]) {
+	for _, test := range makeLintRuleTests(fd.Messages().Get(0).Enums().Get(1)) {
 		t.Run(test.testName, func(t *testing.T) {
 			// Create the enum rule.
 			rule := &EnumRule{
 				Name: RuleName("test"),
-				OnlyIf: func(e *desc.EnumDescriptor) bool {
-					return e.GetName() == "Edition"
+				OnlyIf: func(e protoreflect.EnumDescriptor) bool {
+					return e.Name() == "Edition"
 				},
-				LintEnum: func(e *desc.EnumDescriptor) []Problem {
+				LintEnum: func(e protoreflect.EnumDescriptor) []Problem {
 					return test.problems
 				},
 			}
@@ -302,35 +255,33 @@ func TestEnumRuleNested(t *testing.T) {
 
 func TestDescriptorRule(t *testing.T) {
 	// Create a file with one of everything in it.
-	book := builder.NewMessage("Book").AddNestedEnum(
-		builder.NewEnum("Format").AddValue(
-			builder.NewEnumValue("FORMAT_UNSPECIFIED"),
-		).AddValue(builder.NewEnumValue("PAPERBACK")),
-	).AddField(builder.NewField("name", builder.FieldTypeString())).AddNestedMessage(
-		builder.NewMessage("Author"),
-	)
-	fd, err := builder.NewFile("library.proto").AddMessage(book).AddService(
-		builder.NewService("Library").AddMethod(
-			builder.NewMethod(
-				"ConjureBook",
-				builder.RpcTypeMessage(book, false),
-				builder.RpcTypeMessage(book, false),
-			),
-		),
-	).AddEnum(builder.NewEnum("State").AddValue(builder.NewEnumValue("AVAILABLE"))).Build()
-	if err != nil {
-		t.Fatalf("%v", err)
-	}
+	fd := buildFile(t, `
+		syntax = "proto3";
+		message Book {
+			enum Format {
+				FORMAT_UNSPECIFIED = 0;
+				PAPERBACK = 1;
+			}
+			message Author {}
+			string name = 1;
+		}
+		service Library {
+			rpc ConjureBook(Book) returns (Book);
+		}
+		enum State {
+			AVAILABLE = 0;
+		}
+	`)
 
 	// Create a rule that lets us verify that each descriptor was visited.
-	visited := make(map[string]desc.Descriptor)
+	visited := make(map[string]protoreflect.Descriptor)
 	rule := &DescriptorRule{
 		Name: RuleName("test"),
-		OnlyIf: func(d desc.Descriptor) bool {
-			return d.GetName() != "FORMAT_UNSPECIFIED"
+		OnlyIf: func(d protoreflect.Descriptor) bool {
+			return d.Name() != "FORMAT_UNSPECIFIED"
 		},
-		LintDescriptor: func(d desc.Descriptor) []Problem {
-			visited[d.GetName()] = d
+		LintDescriptor: func(d protoreflect.Descriptor) []Problem {
+			visited[string(d.Name())] = d
 			return nil
 		},
 	}
@@ -363,7 +314,7 @@ type lintRuleTest struct {
 }
 
 // runRule runs a rule within a test environment.
-func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *testing.T) {
+func (test *lintRuleTest) runRule(rule ProtoRule, fd protoreflect.FileDescriptor, t *testing.T) {
 	// Establish that the metadata methods work.
 	if got, want := string(rule.GetName()), string(RuleName("test")); got != want {
 		t.Errorf("Got %q for GetName(), expected %q", got, want)
@@ -378,7 +329,7 @@ func (test *lintRuleTest) runRule(rule ProtoRule, fd *desc.FileDescriptor, t *te
 
 // makeLintRuleTests generates boilerplate tests that are consistent for
 // each type of rule.
-func makeLintRuleTests(d desc.Descriptor) []lintRuleTest {
+func makeLintRuleTests(d protoreflect.Descriptor) []lintRuleTest {
 	return []lintRuleTest{
 		{"NoProblems", []Problem{}},
 		{"OneProblem", []Problem{{

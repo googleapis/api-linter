@@ -18,32 +18,32 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // GetTypeName returns the name of the type of the field, as a string,
 // regardless of primitive, message, etc.
-func GetTypeName(f *desc.FieldDescriptor) string {
-	if k, v := f.GetMapKeyType(), f.GetMapValueType(); k != nil && v != nil {
-		return fmt.Sprintf("map<%s, %s>", GetTypeName(k), GetTypeName(v))
+func GetTypeName(f protoreflect.FieldDescriptor) string {
+	if f.IsMap() {
+		return fmt.Sprintf("map<%s, %s>", GetTypeName(f.MapKey()), GetTypeName(f.MapValue()))
 	}
-	if m := f.GetMessageType(); m != nil {
-		return m.GetFullyQualifiedName()
+	if m := f.Message(); m != nil {
+		return string(m.FullName())
 	}
-	if e := f.GetEnumType(); e != nil {
-		return e.GetFullyQualifiedName()
+	if e := f.Enum(); e != nil {
+		return string(e.FullName())
 	}
-	return strings.ToLower(f.GetType().String()[len("TYPE_"):])
+	return f.Kind().String()
 }
 
 // IsOperation returns if the message is a longrunning Operation or not.
-func IsOperation(m *desc.MessageDescriptor) bool {
-	return m.GetFullyQualifiedName() == "google.longrunning.Operation"
+func IsOperation(m protoreflect.MessageDescriptor) bool {
+	return m.FullName() == "google.longrunning.Operation"
 }
 
 // GetResourceMessageName returns the resource message type name from method
-func GetResourceMessageName(m *desc.MethodDescriptor, expectedVerb string) string {
-	if !strings.HasPrefix(m.GetName(), expectedVerb) {
+func GetResourceMessageName(m protoreflect.MethodDescriptor, expectedVerb string) string {
+	if !strings.HasPrefix(string(m.Name()), expectedVerb) {
 		return ""
 	}
 
@@ -51,8 +51,8 @@ func GetResourceMessageName(m *desc.MethodDescriptor, expectedVerb string) strin
 	// be part of method name (make a double check here to avoid the issue when
 	// method or output naming doesn't follow the right principles)
 	// Ignore this rule if the return type is an LRO
-	if strings.Contains(m.GetName()[len(expectedVerb):], m.GetOutputType().GetName()) && !IsOperation(m.GetOutputType()) {
-		return m.GetOutputType().GetName()
+	if strings.Contains(string(m.Name()[len(expectedVerb):]), string(m.Output().Name())) && !IsOperation(m.Output()) {
+		return string(m.Output().Name())
 	}
-	return m.GetName()[len(expectedVerb):]
+	return string(m.Name()[len(expectedVerb):])
 }

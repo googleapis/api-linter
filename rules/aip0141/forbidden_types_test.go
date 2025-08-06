@@ -17,7 +17,7 @@ package aip0141
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestForbiddenTypes(t *testing.T) {
@@ -39,7 +39,7 @@ func TestForbiddenTypes(t *testing.T) {
 					{{.TypeName}} pages = 1;
 				}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			problems := forbiddenTypes.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

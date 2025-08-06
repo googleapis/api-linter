@@ -18,21 +18,21 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var uri = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "uri"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		nameSegments := stringset.New(strings.Split(f.GetName(), "_")...)
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		nameSegments := stringset.New(strings.Split(string(f.Name()), "_")...)
 		if nameSegments.Contains("url") {
 			return []lint.Problem{{
 				Message:    "Use `uri` instead of `url` in field names.",
 				Descriptor: f,
 				Location:   locations.DescriptorName(f),
-				Suggestion: strings.ReplaceAll(f.GetName(), "url", "uri"),
+				Suggestion: strings.ReplaceAll(string(f.Name()), "url", "uri"),
 			}}
 		}
 		return nil

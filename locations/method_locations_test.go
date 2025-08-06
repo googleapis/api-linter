@@ -28,7 +28,7 @@ func TestMethodRequestType(t *testing.T) {
 		message GetBookRequest {}
 		message Book {}
 	`)
-	loc := MethodRequestType(f.GetServices()[0].GetMethods()[0])
+	loc := MethodRequestType(f.Services().Get(0).Methods().Get(0))
 	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 14, 28}); diff != "" {
 		t.Error(diff)
@@ -43,7 +43,7 @@ func TestMethodResponseType(t *testing.T) {
 		message GetBookRequest {}
 		message Book {}
 	`)
-	loc := MethodResponseType(f.GetServices()[0].GetMethods()[0])
+	loc := MethodResponseType(f.Services().Get(0).Methods().Get(0))
 	// Three character span: line, start column, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{3, 39, 43}); diff != "" {
 		t.Error(diff)
@@ -63,7 +63,7 @@ func TestMethodHTTPRule(t *testing.T) {
 		message GetBookRequest{}
 		message Book {}
 	`)
-	loc := MethodHTTPRule(f.GetServices()[0].GetMethods()[0])
+	loc := MethodHTTPRule(f.Services().Get(0).Methods().Get(0))
 	// Four character span: start line, start column, end line, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 7, 6}); diff != "" {
 		t.Error(diff)
@@ -83,7 +83,7 @@ func TestMethodOperationInfo(t *testing.T) {
 		}
 		message WriteBookRequest {}
 	`)
-	loc := MethodOperationInfo(f.GetServices()[0].GetMethods()[0])
+	loc := MethodOperationInfo(f.Services().Get(0).Methods().Get(0))
 	// Four character span: start line, start column, end line, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 8, 6}); diff != "" {
 		t.Error(diff)
@@ -110,7 +110,7 @@ func TestMethodSignature(t *testing.T) {
 		{"First", 0, []int32{5, 4, 50}},
 		{"Second", 1, []int32{6, 4, 60}},
 	} {
-		loc := MethodSignature(f.GetServices()[0].GetMethods()[0], test.index)
+		loc := MethodSignature(f.Services().Get(0).Methods().Get(0), test.index)
 		// Four character span: start line, start column, end line, end column.
 		if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
 			t.Error(diff)
@@ -141,7 +141,7 @@ func TestMethodOption(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// field number of the deprecated option == 33
-			loc := MethodOption(f.GetServices()[0].GetMethods()[test.methodIdx], 33)
+			loc := MethodOption(f.Services().Get(0).Methods().Get(test.methodIdx), 33)
 			if diff := cmp.Diff(loc.GetSpan(), test.want); diff != "" {
 				t.Errorf("Diff: %s", diff)
 			}

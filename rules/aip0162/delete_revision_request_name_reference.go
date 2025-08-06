@@ -15,15 +15,16 @@
 package aip0162
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var deleteRevisionRequestNameReference = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "delete-revision-request-name-reference"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isDeleteRevisionRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isDeleteRevisionRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintFieldResourceReference,
 }

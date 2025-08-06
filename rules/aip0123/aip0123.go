@@ -20,11 +20,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -52,19 +52,19 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func isResourceMessage(m *desc.MessageDescriptor) bool {
+func isResourceMessage(m protoreflect.MessageDescriptor) bool {
 	// If the parent of this message is a message, it is nested and shoudn't
 	// be considered a resource, even if it has a name field.
-	_, nested := m.GetParent().(*desc.MessageDescriptor)
-	return m.FindFieldByName("name") != nil && !strings.HasSuffix(m.GetName(), "Request") &&
-		!strings.HasSuffix(m.GetName(), "Response") && !nested
+	_, nested := m.Parent().(protoreflect.MessageDescriptor)
+	return m.Fields().ByName("name") != nil && !strings.HasSuffix(string(m.Name()), "Request") &&
+		!strings.HasSuffix(string(m.Name()), "Response") && !nested
 }
 
-func hasResourceAnnotation(m *desc.MessageDescriptor) bool {
+func hasResourceAnnotation(m protoreflect.MessageDescriptor) bool {
 	return utils.GetResource(m) != nil
 }
 
-func hasResourceDefinitionAnnotation(f *desc.FileDescriptor) bool {
+func hasResourceDefinitionAnnotation(f protoreflect.FileDescriptor) bool {
 	return len(utils.GetResourceDefinitions(f)) > 0
 }
 
@@ -82,7 +82,7 @@ func getVariables(pattern string) []string {
 
 // isRootLevelResource determines if the given resource is a root-level
 // resource using the isRootLevelResourcePattern helper.
-func isRootLevelResource(resource *apb.ResourceDescriptor) bool {
+func isRootLevelResource(resource *annotations.ResourceDescriptor) bool {
 	if len(resource.GetPattern()) == 0 {
 		return false
 	}
@@ -122,7 +122,7 @@ func getParentIDVariable(pattern string) string {
 // resource. Use isNestedName to check eligibility before using nestedSingular.
 // This will return empty if the resource is not eligible for nested name
 // reduction.
-func nestedSingular(resource *apb.ResourceDescriptor) string {
+func nestedSingular(resource *annotations.ResourceDescriptor) string {
 	if !isNestedName(resource) {
 		return ""
 	}
@@ -138,7 +138,7 @@ func nestedSingular(resource *apb.ResourceDescriptor) string {
 // resource. Use isNestedName to check eligibility before using nestedPlural.
 // This will return empty if the resource is not eligible for nested name
 // reduction.
-func nestedPlural(resource *apb.ResourceDescriptor) string {
+func nestedPlural(resource *annotations.ResourceDescriptor) string {
 	if !isNestedName(resource) {
 		return ""
 	}
@@ -163,7 +163,7 @@ func nestedPlural(resource *apb.ResourceDescriptor) string {
 // and `pattern: "users/{user}/userEvents/{user_event}"`, isNestedName would
 // return `true`, because the `pattern` could be reduced to
 // `"users/{user}/events/{event}"`.
-func isNestedName(resource *apb.ResourceDescriptor) bool {
+func isNestedName(resource *annotations.ResourceDescriptor) bool {
 	if len(resource.GetPattern()) == 0 {
 		return false
 	}

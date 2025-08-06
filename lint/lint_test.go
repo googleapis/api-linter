@@ -20,15 +20,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestLinter_run(t *testing.T) {
-	fd, err := builder.NewFile("protofile.proto").Build()
-	if err != nil {
-		t.Fatalf("Failed to build a file descriptor.")
-	}
+	fd := buildFile(t, `syntax = "proto3";`)
 	defaultConfigs := Configs{}
 
 	testRuleName := NewRuleName(111, "test-rule")
@@ -82,7 +78,7 @@ func TestLinter_run(t *testing.T) {
 			rules := NewRuleRegistry()
 			err := rules.Register(111, &FileRule{
 				Name: NewRuleName(111, "test-rule"),
-				LintFile: func(f *desc.FileDescriptor) []Problem {
+				LintFile: func(f protoreflect.FileDescriptor) []Problem {
 					return test.problems
 				},
 			})
@@ -103,11 +99,7 @@ func TestLinter_run(t *testing.T) {
 }
 
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
-	fd, err := builder.NewFile("test.proto").Build()
-	if err != nil {
-		t.Fatalf("Failed to build the file descriptor.")
-	}
-
+	fd := buildFile(t, `syntax = "proto3";`)
 	testAIP := 111
 
 	tests := []struct {
@@ -118,7 +110,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			testName: "Panic",
 			rule: &FileRule{
 				Name: NewRuleName(testAIP, "panic"),
-				LintFile: func(_ *desc.FileDescriptor) []Problem {
+				LintFile: func(_ protoreflect.FileDescriptor) []Problem {
 					panic("panic")
 				},
 			},
@@ -127,7 +119,7 @@ func TestLinter_LintProtos_RulePanics(t *testing.T) {
 			testName: "PanicError",
 			rule: &FileRule{
 				Name: NewRuleName(testAIP, "panic-error"),
-				LintFile: func(_ *desc.FileDescriptor) []Problem {
+				LintFile: func(_ protoreflect.FileDescriptor) []Problem {
 					panic(fmt.Errorf("panic"))
 				},
 			},

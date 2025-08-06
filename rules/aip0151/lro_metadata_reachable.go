@@ -15,15 +15,15 @@
 package aip0151
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var lroMetadataReachable = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "lro-metadata-reachable"),
 	OnlyIf: isAnnotatedLRO,
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
 		// See lro_response_reachable.go for `checkReachable` method.
 		return checkReachable(m, utils.GetOperationInfo(m).GetMetadataType())
 	},

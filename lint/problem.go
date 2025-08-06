@@ -16,8 +16,10 @@ package lint
 
 import (
 	"encoding/json"
+	"reflect"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -44,7 +46,7 @@ type Problem struct {
 	//
 	// If `Location` is not specified, then the starting location of
 	// the descriptor is used as the location of the problem.
-	Descriptor desc.Descriptor
+	Descriptor protoreflect.Descriptor
 
 	// Location provides the location of the problem.
 	//
@@ -80,7 +82,7 @@ func (p Problem) marshal() interface{} {
 	// If they are both set, prefer the location.
 	loc := p.Location
 	if loc == nil && p.Descriptor != nil {
-		loc = p.Descriptor.GetSourceInfo()
+		loc = getSourceInfo(p.Descriptor)
 	}
 
 	// Return a marshal-able structure.
@@ -125,16 +127,16 @@ type fileLocation struct {
 
 // fileLocationFromPBLocation returns a new fileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
-func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descriptor) fileLocation {
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
-	if l != nil {
+	if l != nil && len(l.Span) > 0 {
 		span = l.Span
 	}
 
 	var fl fileLocation
 	if d != nil {
-		fl = fileLocation{Path: d.GetFile().GetName()}
+		fl = fileLocation{Path: d.ParentFile().Path()}
 	}
 
 	// If `span` has four ints; they correspond to
@@ -168,4 +170,59 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descripto
 		Column: int(span[2]),
 	}
 	return fl
+}
+
+func getSourceInfo(d protoreflect.Descriptor) *dpb.SourceCodeInfo_Location {
+	path := getDescriptorPath(d, nil)
+	fdp := protodesc.ToFileDescriptorProto(d.ParentFile())
+	for _, loc := range fdp.GetSourceCodeInfo().GetLocation() {
+		if reflect.DeepEqual(path, loc.Path) {
+			return loc
+		}
+	}
+	return nil
+}
+
+func getDescriptorPath(d protoreflect.Descriptor, path []int32) []int32 {
+	parent := d.Parent()
+	if parent == nil {
+		return path
+	}
+
+	idx := int32(d.Index())
+	var fieldTag int32
+	switch dt := d.(type) {
+	case protoreflect.MessageDescriptor:
+		if _, ok := parent.(protoreflect.FileDescriptor); ok {
+			fieldTag = 4 // message_type in FileDescriptorProto
+		} else {
+			fieldTag = 3 // nested_type in DescriptorProto
+		}
+	case protoreflect.FieldDescriptor:
+		if dt.IsExtension() {
+			if _, ok := parent.(protoreflect.FileDescriptor); ok {
+				fieldTag = 7 // extension in FileDescriptorProto
+			} else {
+				fieldTag = 6 // extension in DescriptorProto
+			}
+		} else {
+			fieldTag = 2 // field in DescriptorProto
+		}
+	case protoreflect.OneofDescriptor:
+		fieldTag = 8 // oneof_decl in DescriptorProto
+	case protoreflect.EnumDescriptor:
+		if _, ok := parent.(protoreflect.FileDescriptor); ok {
+			fieldTag = 5 // enum_type in FileDescriptorProto
+		} else {
+			fieldTag = 4 // enum_type in DescriptorProto
+		}
+	case protoreflect.EnumValueDescriptor:
+		fieldTag = 2 // value in EnumDescriptorProto
+	case protoreflect.ServiceDescriptor:
+		fieldTag = 6 // service in FileDescriptorProto
+	case protoreflect.MethodDescriptor:
+		fieldTag = 2 // method in ServiceDescriptorProto
+	}
+
+	return getDescriptorPath(parent, append([]int32{fieldTag, idx}, path...))
 }

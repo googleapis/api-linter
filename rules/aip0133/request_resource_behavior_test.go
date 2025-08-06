@@ -17,7 +17,7 @@ package aip0133
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestResourceBehavior(t *testing.T) {
@@ -41,7 +41,7 @@ func TestRequestResourceBehavior(t *testing.T) {
 				}
 				message {{.FieldType}} {}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestResourceBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

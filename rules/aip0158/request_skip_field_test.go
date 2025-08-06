@@ -17,8 +17,8 @@ package aip0158
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequestSkipField(t *testing.T) {
@@ -43,9 +43,9 @@ func TestRequestSkipField(t *testing.T) {
 					{{.Fields}}
 				}
 			`, test)
-			var d desc.Descriptor = nil
+			var d protoreflect.Descriptor = nil
 			if len(test.problems) > 0 {
-				d = f.GetMessageTypes()[0].GetFields()[1]
+				d = f.Messages().Get(0).Fields().Get(1)
 			}
 			problems := requestSkipField.Lint(f)
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {

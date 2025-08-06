@@ -15,15 +15,18 @@
 package aip0132
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestParentBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-parent-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner()) && f.GetName() == "parent"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m) && f.Name() == "parent"
+		}
+		return false
 	},
 	LintField: utils.LintRequiredField,
 }

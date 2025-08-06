@@ -15,14 +15,14 @@
 package locations
 
 import (
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // DescriptorName returns the precise location for a descriptor's name.
 //
 // This works for any descriptor, regardless of type (message, field, etc.).
-func DescriptorName(d desc.Descriptor) *dpb.SourceCodeInfo_Location {
+func DescriptorName(d protoreflect.Descriptor) *dpb.SourceCodeInfo_Location {
 	// All descriptors seem to have `string name = 1`, so this conveniently works.
 	return pathLocation(d, 1)
 }

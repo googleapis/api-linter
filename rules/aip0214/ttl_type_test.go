@@ -17,7 +17,7 @@ package aip0214
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestTtlType(t *testing.T) {
@@ -36,7 +36,7 @@ func TestTtlType(t *testing.T) {
 				{{.Type}} ttl = 2;
 			}
 		`, test)
-		field := f.GetMessageTypes()[0].GetFields()[1]
+		field := f.Messages().Get(0).Fields().Get(1)
 		if diff := test.problems.SetDescriptor(field).Diff(ttlType.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

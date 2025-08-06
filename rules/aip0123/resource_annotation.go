@@ -15,15 +15,15 @@
 package aip0123
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceAnnotation = &lint.MessageRule{
 	Name:   lint.NewRuleName(123, "resource-annotation"),
 	OnlyIf: isResourceMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		if utils.GetResource(m) == nil {
 			return []lint.Problem{{
 				Message:    "Resource messages should include a `google.api.resource` annotation.",

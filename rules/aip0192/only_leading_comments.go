@@ -17,32 +17,31 @@ package aip0192
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // onlyLeadingComments ensures that a descriptor has only leading external
 // comments. (Internal trailing or detached comments are permitted.)
 var onlyLeadingComments = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "only-leading-comments"),
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
 		problems := []lint.Problem{}
-		c := d.GetSourceInfo()
-		if len(utils.SeparateInternalComments(c.GetTrailingComments()).External) > 0 {
+		if len(utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).TrailingComments).External) > 0 {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
 					"%q should have only leading (not trailing) public comments.",
-					d.GetName(),
+					d.Name(),
 				),
 				Descriptor: d,
 			})
 		}
-		if len(utils.SeparateInternalComments(c.GetLeadingDetachedComments()...).External) > 0 {
+		if len(utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingDetachedComments...).External) > 0 {
 			problems = append(problems, lint.Problem{
 				Message: fmt.Sprintf(
 					"%q has comments with empty lines between the comment and %q.",
-					d.GetName(), d.GetName(),
+					d.Name(), d.Name(),
 				),
 				Descriptor: d,
 			})
