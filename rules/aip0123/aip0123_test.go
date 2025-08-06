@@ -44,6 +44,26 @@ func TestIsNestedName(t *testing.T) {
 			want: false,
 		},
 		{
+			name: "top level with extra leading slash",
+			resource: &apb.ResourceDescriptor{
+				Type:     "example.googleapis.com/Project",
+				Pattern:  []string{"/projects/{project}"},
+				Singular: "project",
+				Plural:   "projects",
+			},
+			want: false,
+		},
+		{
+			name: "top level with extra trailing slash",
+			resource: &apb.ResourceDescriptor{
+				Type:     "example.googleapis.com/Project",
+				Pattern:  []string{"projects/{project}/"},
+				Singular: "project",
+				Plural:   "projects",
+			},
+			want: false,
+		},
+		{
 			name: "non-nested child collection",
 			resource: &apb.ResourceDescriptor{
 				Type:     "example.googleapis.com/Location",
