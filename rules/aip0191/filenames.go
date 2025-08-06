@@ -18,8 +18,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

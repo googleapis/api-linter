@@ -17,7 +17,7 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestDeleteRevisionHTTPURISuffix(t *testing.T) {

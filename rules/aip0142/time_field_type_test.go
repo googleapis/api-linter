@@ -17,7 +17,7 @@ package aip0142
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestFieldType(t *testing.T) {

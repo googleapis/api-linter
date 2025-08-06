@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

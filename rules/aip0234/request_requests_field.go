@@ -19,8 +19,8 @@ import (
 	"strings"
 
 	"github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

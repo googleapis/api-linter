@@ -17,7 +17,7 @@ package aip0136
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoPrepositions(t *testing.T) {

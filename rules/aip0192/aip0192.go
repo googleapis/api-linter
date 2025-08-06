@@ -16,7 +16,7 @@
 package aip0192
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )

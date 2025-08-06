@@ -16,7 +16,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

@@ -15,8 +15,8 @@
 package aip0122
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"

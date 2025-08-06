@@ -19,7 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"

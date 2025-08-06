@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceNameComponentsAlternate(t *testing.T) {

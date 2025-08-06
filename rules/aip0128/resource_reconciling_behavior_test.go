@@ -17,7 +17,7 @@ package aip0128
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceReconcilingBehavior(t *testing.T) {

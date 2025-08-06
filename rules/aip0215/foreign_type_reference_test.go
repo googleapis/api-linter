@@ -17,7 +17,7 @@ package aip0215
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 // Tests our regexp normalizes strings to the expected path.

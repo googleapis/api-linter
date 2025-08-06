@@ -17,7 +17,7 @@ package aip0154
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 

@@ -17,7 +17,7 @@ package aip0231
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestOutputName(t *testing.T) {

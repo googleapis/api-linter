@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/bufbuild/protocompile"
-	"github.com/googleapis/api-linter/internal"
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/internal"
+	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/spf13/pflag"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"

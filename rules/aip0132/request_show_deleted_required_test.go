@@ -3,7 +3,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestShowDeletedRequired(t *testing.T) {
@@ -43,7 +43,7 @@ func TestRequestShowDeletedRequired(t *testing.T) {
 	}
 }
 
-// Regression test for https://github.com/googleapis/api-linter/issues/854.
+// Regression test for https://github.com/googleapis/api-linter/v2/issues/854.
 func TestRequestShowDeletedRequired_NonMessageType(t *testing.T) {
 	f := testutils.ParseProto3Tmpl(t, `
 		message ListBooksRequest {}
