@@ -58,6 +58,7 @@ type Config struct {
 	// - an entire AIP category: `core`
 	// - all rules: `all`
 	DisabledRules []string `json:"disabled_rules" yaml:"disabled_rules"`
+	ImportPaths   []string `json:"import_paths" yaml:"import_paths"`
 }
 
 // ReadConfigsFromFile reads Configs from a file.
