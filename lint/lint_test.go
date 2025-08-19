@@ -20,11 +20,21 @@ import (
 	"strings"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestLinter_run(t *testing.T) {
-	fd := buildFile(t, `syntax = "proto3";`)
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:    proto.String("protofile.proto"),
+		Syntax:  proto.String("proto3"),
+		Options: &descriptorpb.FileOptions{},
+	}, nil)
+	if err != nil {
+		t.Fatalf("Failed to build a file descriptor.")
+	}
 	defaultConfigs := Configs{}
 
 	testRuleName := NewRuleName(111, "test-rule")
@@ -99,7 +109,14 @@ func TestLinter_run(t *testing.T) {
 }
 
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
-	fd := buildFile(t, `syntax = "proto3";`)
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:    proto.String("test.proto"),
+		Syntax:  proto.String("proto3"),
+		Options: &descriptorpb.FileOptions{},
+	}, nil)
+	if err != nil {
+		t.Fatalf("Failed to build the file descriptor.")
+	}
 	testAIP := 111
 
 	tests := []struct {

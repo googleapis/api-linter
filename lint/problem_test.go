@@ -19,17 +19,17 @@ import (
 	"strings"
 	"testing"
 
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
 
 func TestProblemJSON(t *testing.T) {
-	fd := buildFile(t, `syntax = "proto3";`)
 	problem := &Problem{
-		Message:    "foo bar",
-		Location:   &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
-		RuleID:     "core::0131",
-		Descriptor: fd,
+		Message:  "foo bar",
+		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
+		RuleID:   "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
 	if err != nil {
@@ -55,12 +55,10 @@ func TestProblemJSON(t *testing.T) {
 }
 
 func TestProblemYAML(t *testing.T) {
-	fd := buildFile(t, `syntax = "proto3";`)
 	problem := &Problem{
-		Message:    "foo bar",
-		Location:   &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
-		RuleID:     "core::0131",
-		Descriptor: fd,
+		Message:  "foo bar",
+		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
+		RuleID:   "core::0131",
 	}
 	serialized, err := yaml.Marshal(problem)
 	if err != nil {
@@ -87,7 +85,26 @@ func TestProblemYAML(t *testing.T) {
 }
 
 func TestProblemDescriptor(t *testing.T) {
-	fd := buildFile(t, `syntax = "proto3"; message Foo {}`)
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:   proto.String("foo.proto"),
+		Syntax: proto.String("proto3"),
+		MessageType: []*descriptorpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+		},
+		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
+			Location: []*descriptorpb.SourceCodeInfo_Location{
+				{
+					Path: []int32{4, 0}, // message_type 0
+					Span: []int32{42, 0, 79},
+				},
+			},
+		},
+	}, nil)
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
 	m := fd.Messages().Get(0)
 	problem := &Problem{
 		Message:    "foo bar",
@@ -103,8 +120,11 @@ func TestProblemDescriptor(t *testing.T) {
 		token    string
 	}{
 		{"Message", `message: foo bar`},
+		{"LineNumber", `line_number: 43`},
+		{"ColumnNumberStart", `column_number: 1`},
+		{"ColumnNumberEnd", `column_number: 79`},
 		{"RuleID", `rule_id: core::0131`},
-		{"Path", `path: test.proto`},
+		{"Path", `path: foo.proto`},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

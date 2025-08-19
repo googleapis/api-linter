@@ -7,6 +7,13 @@
 // 		https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
+// distributed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
@@ -15,10 +22,12 @@
 package lint
 
 import (
-	"fmt"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestRuleIsEnabled(t *testing.T) {
@@ -30,7 +39,7 @@ func TestRuleIsEnabled(t *testing.T) {
 		},
 	}
 
-	aliases := map[string]string{
+	alises := map[string]string{
 		"a::b::c": "d::e::f",
 	}
 
@@ -60,17 +69,38 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Run the specific tests individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f := buildFile(t, fmt.Sprintf(`
-				syntax = "proto3";
-				%s
-				package test;
-				%s
-				message MyMessage {}`, test.fileComment, test.messageComment))
-			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, false), test.enabled; got != want {
+			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+				Name:    proto.String("test.proto"),
+				Syntax:  proto.String("proto3"),
+				Package: proto.String("test"),
+				MessageType: []*descriptorpb.DescriptorProto{
+					{
+						Name: proto.String("MyMessage"),
+					},
+				},
+				SourceCodeInfo: &descriptorpb.SourceCodeInfo{
+					Location: []*descriptorpb.SourceCodeInfo_Location{
+						{
+							Path:            []int32{2}, // package
+							Span:            []int32{1, 1, 1, 1},
+							LeadingComments: proto.String(test.fileComment),
+						},
+						{
+							Path:            []int32{4, 0}, // message_type 0
+							Span:            []int32{1, 1, 1, 1},
+							LeadingComments: proto.String(test.messageComment),
+						},
+					},
+				},
+			}, nil)
+			if err != nil {
+				t.Fatalf("Error building test message: %v", err)
+			}
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, alises, false), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 			if !test.enabled {
-				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, true), true; got != want {
+				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, alises, true), true; got != want {
 					t.Errorf("Expected the test rule with ignoreCommentDisables true to return %v from ruleIsEnabled, got %v", want, got)
 				}
 			}
@@ -88,12 +118,30 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	}
 
 	// Build a proto and check that ruleIsEnabled does the right thing.
-	f := buildFile(t, `
-		syntax = "proto3";
-		// api-linter: test=disabled
-		message FirstMessage {}
-		message SecondMessage {}
-	`)
+	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:   proto.String("test.proto"),
+		Syntax: proto.String("proto3"),
+		MessageType: []*descriptorpb.DescriptorProto{
+			{
+				Name: proto.String("FirstMessage"),
+			},
+			{
+				Name: proto.String("SecondMessage"),
+			},
+		},
+		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
+			Location: []*descriptorpb.SourceCodeInfo_Location{
+				{
+					Path:            []int32{4, 0}, // message_type 0
+					Span:            []int32{1, 1, 1, 1},
+					LeadingComments: proto.String(" api-linter: test=disabled"),
+				},
+			},
+		},
+	}, nil)
+	if err != nil {
+		t.Fatalf("Error building test file: %q", err)
+	}
 	if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
 	}
@@ -112,16 +160,44 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	}
 
 	// Build a proto with two messages, one of which disables the rule.
-	f := buildFile(t, `
-		syntax = "proto3";
-		// api-linter: test=disabled
-		message Foo {
-			bool foo = 1;
-		}
-		message Bar {
-			bool bar = 1;
-		}
-	`)
+	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:   proto.String("test.proto"),
+		Syntax: proto.String("proto3"),
+		MessageType: []*descriptorpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+				Field: []*descriptorpb.FieldDescriptorProto{
+					{
+						Name:   proto.String("foo"),
+						Number: proto.Int32(1),
+						Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+					},
+				},
+			},
+			{
+				Name: proto.String("Bar"),
+				Field: []*descriptorpb.FieldDescriptorProto{
+					{
+						Name:   proto.String("bar"),
+						Number: proto.Int32(1),
+						Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+					},
+				},
+			},
+		},
+		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
+			Location: []*descriptorpb.SourceCodeInfo_Location{
+				{
+					Path:            []int32{4, 0}, // message_type 0
+					Span:            []int32{1, 1, 1, 1},
+					LeadingComments: proto.String(" api-linter: test=disabled"),
+				},
+			},
+		},
+	}, nil)
+	if err != nil {
+		t.Fatalf("Error building test file: %q", err)
+	}
 	if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
@@ -140,23 +216,43 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 	}
 
 	for _, test := range []struct {
-		name    string
-		options string
-		enabled bool
+		name            string
+		msgDeprecated   bool
+		fieldDeprecated bool
+		enabled         bool
 	}{
-		{"Both", "option deprecated = true; bool bar = 1 [deprecated = true];", false},
-		{"Message", "option deprecated = true; bool bar = 1;", false},
-		{"Field", "bool bar = 1 [deprecated = true];", false},
-		{"Neither", "bool bar = 1;", true},
+		{"Both", true, true, false},
+		{"Message", true, false, false},
+		{"Field", false, true, false},
+		{"Neither", false, false, true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
-			f := buildFile(t, fmt.Sprintf(`
-				syntax = "proto3";
-				message Foo {
-					%s
-				}
-			`, test.options))
+			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+				Name:   proto.String("test.proto"),
+				Syntax: proto.String("proto3"),
+				MessageType: []*descriptorpb.DescriptorProto{
+					{
+						Name: proto.String("Foo"),
+						Options: &descriptorpb.MessageOptions{
+							Deprecated: proto.Bool(test.msgDeprecated),
+						},
+						Field: []*descriptorpb.FieldDescriptorProto{
+							{
+								Name:   proto.String("bar"),
+								Number: proto.Int32(1),
+								Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+								Options: &descriptorpb.FieldOptions{
+									Deprecated: proto.Bool(test.fieldDeprecated),
+								},
+							},
+						},
+					},
+				},
+			}, nil)
+			if err != nil {
+				t.Fatalf("Error building test file: %q", err)
+			}
 			if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
 				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 			}
