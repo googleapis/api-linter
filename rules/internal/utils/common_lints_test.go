@@ -18,7 +18,7 @@ func TestLintSingularStringField(t *testing.T) {
 		{"InvalidRepeated", `repeated string`, testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				message Message {
 					{{.FieldType}} foo = 1;
 				}
@@ -42,7 +42,7 @@ func TestLintRequiredField(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: "REQUIRED"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/field_behavior.proto";
 				message Message {
 					string foo = 1 {{.Annotation}};
@@ -67,7 +67,7 @@ func TestLintFieldResourceReference(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: "resource_reference"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				message Message {
 					string foo = 1 {{.Annotation}};
@@ -92,7 +92,7 @@ func TestLintNoHTTPBody(t *testing.T) {
 		{"Invalid", `*`, testutils.Problems{{Message: "not have an HTTP body"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
@@ -124,7 +124,7 @@ func TestLintWildcardHTTPBody(t *testing.T) {
 		{"Invalid", ``, testutils.Problems{{Message: `use "*" as the HTTP body`}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc ArchiveBook(ArchiveBookRequest) returns (Book) {
@@ -156,7 +156,7 @@ func TestLintHTTPMethod(t *testing.T) {
 		{"Invalid", `delete`, testutils.Problems{{Message: `HTTP GET`}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
@@ -187,7 +187,7 @@ func TestLintMethodHasMatchingRequestName(t *testing.T) {
 		{"Invalid", "AcquireBookRequest", testutils.Problems{{Suggestion: "GetBookRequest"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				service Library {
 					rpc GetBook({{.MessageName}}) returns (Book);
 				}
@@ -213,7 +213,7 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 		{"Invalid", "AcquireBookResponse", testutils.Problems{{Suggestion: "GetBookResponse"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				service Library {
 					rpc GetBook(GetBookRequest) returns ({{.ResponseName}});
 				}
@@ -239,7 +239,7 @@ func TestLintMethodHasMatchingResponseNameLRO(t *testing.T) {
 		{"Invalid", "AcquireBookResponse", testutils.Problems{{Message: "GetBookResponse"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 
 				service Library {
@@ -273,7 +273,7 @@ func TestLintSingularField(t *testing.T) {
 		{"Invalid", "repeated", testutils.Problems{{Suggestion: "string"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				message Message {
 					{{.Label}} string foo = 1;
 				}
@@ -298,7 +298,7 @@ func TestLintNotOneof(t *testing.T) {
 		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				message Message {
 					{{.Field}}
 				}

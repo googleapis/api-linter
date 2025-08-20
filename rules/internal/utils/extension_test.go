@@ -26,7 +26,7 @@ import (
 )
 
 func TestGetFieldBehavior(t *testing.T) {
-	f := testutils.Compile(t, `
+	f := testutils.ParseProto3Tmpl(t, `
 		import "google/api/field_behavior.proto";
 
 		message Book {
@@ -74,7 +74,7 @@ func TestGetMethodSignatures(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/client.proto";
 				service Library {
 					rpc GetBook(GetBookRequest) returns (Book) {
@@ -93,7 +93,7 @@ func TestGetMethodSignatures(t *testing.T) {
 }
 
 func TestGetOperationInfo(t *testing.T) {
-	f := testutils.Compile(t, `
+	f := testutils.ParseProto3Tmpl(t, `
 		import "google/longrunning/operations.proto";
 		service Library {
 			rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -115,7 +115,7 @@ func TestGetOperationInfo(t *testing.T) {
 }
 
 func TestGetOperationInfoNone(t *testing.T) {
-	f := testutils.Compile(t, `
+	f := testutils.ParseProto3Tmpl(t, `
 		service Library {
 			rpc GetBook(GetBookRequest) returns (Book);
 		}
@@ -140,7 +140,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {
 					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -183,7 +183,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f := testutils.Compile(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {
 					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -216,7 +216,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 
 func TestGetResource(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			message Book {
 				option (google.api.resource) = {
@@ -234,7 +234,7 @@ func TestGetResource(t *testing.T) {
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
-		f := testutils.Compile(t, "message Book {}", nil)
+		f := testutils.ParseProto3Tmpl(t, "message Book {}", nil)
 		if got := GetResource(f.Messages().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil.`, got)
 		}
@@ -248,7 +248,7 @@ func TestGetResource(t *testing.T) {
 
 func TestGetResourceDefinition(t *testing.T) {
 	t.Run("Zero", func(t *testing.T) {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 		`, nil)
 		if got := GetResourceDefinitions(f); got != nil {
@@ -256,7 +256,7 @@ func TestGetResourceDefinition(t *testing.T) {
 		}
 	})
 	t.Run("One", func(t *testing.T) {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			option (google.api.resource_definition) = {
 				type: "library.googleapis.com/Book"
@@ -271,7 +271,7 @@ func TestGetResourceDefinition(t *testing.T) {
 		}
 	})
 	t.Run("Two", func(t *testing.T) {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			option (google.api.resource_definition) = {
 				type: "library.googleapis.com/Book"
@@ -295,7 +295,7 @@ func TestGetResourceDefinition(t *testing.T) {
 
 func TestGetResourceReference(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			message GetBookRequest {
 				string name = 1 [(google.api.resource_reference) = {
@@ -309,7 +309,7 @@ func TestGetResourceReference(t *testing.T) {
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
-		f := testutils.Compile(t, "message GetBookRequest { string name = 1; }", nil)
+		f := testutils.ParseProto3Tmpl(t, "message GetBookRequest { string name = 1; }", nil)
 		if got := GetResourceReference(f.Messages().Get(0).Fields().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil`, got)
 		}
@@ -321,38 +321,38 @@ func TestGetResourceReference(t *testing.T) {
 // 		"book.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "google/api/resource.proto";
-//
+
 // 			message Book {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Book"
 // 					pattern: "publishers/{publisher}/books/{book}"
 // 				};
-//
+
 // 				string name = 1;
 // 			}
 // 		`,
 // 		"shelf.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "book.proto";
 // 			import "google/api/resource.proto";
-//
+
 // 			message Shelf {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Shelf"
 // 					pattern: "shelves/{shelf}"
 // 				};
-//
+
 // 				string name = 1;
-//
+
 // 				repeated Book books = 2;
 // 			}
 // 		`,
 // 	})
-//
+
 // 	for _, tst := range []struct {
 // 		name, reference string
 // 		notFound        bool
@@ -363,11 +363,11 @@ func TestGetResourceReference(t *testing.T) {
 // 	} {
 // 		t.Run(tst.name, func(t *testing.T) {
 // 			got := FindResource(tst.reference, files[1])
-//
+
 // 			if tst.notFound && got != nil {
 // 				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
 // 			}
-//
+
 // 			if !tst.notFound && got == nil {
 // 				t.Errorf("Got nil, expected %q", tst.reference)
 // 			} else if !tst.notFound && got.GetType() != tst.reference {
@@ -382,38 +382,38 @@ func TestGetResourceReference(t *testing.T) {
 // 		"book.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "google/api/resource.proto";
-//
+
 // 			message Book {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Book"
 // 					pattern: "publishers/{publisher}/books/{book}"
 // 				};
-//
+
 // 				string name = 1;
 // 			}
 // 		`,
 // 		"shelf.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "book.proto";
 // 			import "google/api/resource.proto";
-//
+
 // 			message Shelf {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Shelf"
 // 					pattern: "shelves/{shelf}"
 // 				};
-//
+
 // 				string name = 1;
-//
+
 // 				repeated Book books = 2;
 // 			}
 // 		`,
 // 	})
-//
+
 // 	for _, tst := range []struct {
 // 		name, reference, wantMsg string
 // 		notFound                 bool
@@ -424,11 +424,11 @@ func TestGetResourceReference(t *testing.T) {
 // 	} {
 // 		t.Run(tst.name, func(t *testing.T) {
 // 			got := FindResourceMessage(tst.reference, files[1])
-//
+
 // 			if tst.notFound && got != nil {
 // 				t.Fatalf("Expected to not find the message, but found %q", got.Name())
 // 			}
-//
+
 // 			if !tst.notFound && got == nil {
 // 				t.Errorf("Got nil, expected %q", tst.wantMsg)
 // 			} else if !tst.notFound && string(got.Name()) != tst.wantMsg {
@@ -483,10 +483,11 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 		};`, "Book"},
 		{"LROMissingResponse", `
 			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
-		};`, ""},
+		};
+		`, ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				import "google/longrunning/operations.proto";
 				import "google/protobuf/field_mask.proto";
@@ -563,47 +564,47 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 // 		"book.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "google/api/resource.proto";
-//
+
 // 			message Book {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Book"
 // 					pattern: "publishers/{publisher}/books/{book}"
 // 				};
-//
+
 // 				string name = 1;
 // 			}
-//
+
 // 			message Edition {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Edition"
 // 					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
 // 				};
-//
+
 // 				string name = 1;
 // 			}
 // 		`,
 // 		"shelf.proto": `
 // 			syntax = "proto3";
 // 			package test;
-//
+
 // 			import "book.proto";
 // 			import "google/api/resource.proto";
-//
+
 // 			message Shelf {
 // 				option (google.api.resource) = {
 // 					type: "library.googleapis.com/Shelf"
 // 					pattern: "shelves/{shelf}"
 // 				};
-//
+
 // 				string name = 1;
-//
+
 // 				repeated Book books = 2;
 // 			}
 // 		`,
 // 	})
-//
+
 // 	for _, tst := range []struct {
 // 		name   string
 // 		parent *annotations.ResourceDescriptor
@@ -639,7 +640,7 @@ func TestHasFieldInfo(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
 
 			message CreateBookRequest {
@@ -670,7 +671,7 @@ func TestGetFieldInfo(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
 
 			message CreateBookRequest {
@@ -703,7 +704,7 @@ func TestHasFormat(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
 
 			message CreateBookRequest {
@@ -737,7 +738,7 @@ func TestGetFormat(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
 
 			message CreateBookRequest {

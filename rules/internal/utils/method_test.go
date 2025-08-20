@@ -34,7 +34,7 @@ func TestIsCreateMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -84,7 +84,7 @@ func TestIsUpdateMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -133,7 +133,7 @@ func TestIsListMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -214,7 +214,7 @@ func TestIsLegacyListRevisionsMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
@@ -278,7 +278,7 @@ func TestGetListResourceMessage(t *testing.T) {
 		`, ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/resource.proto";
 				import "google/protobuf/field_mask.proto";
 				service Foo {
@@ -364,7 +364,7 @@ func TestIsStandardMethod(t *testing.T) {
 		`, false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				service Foo {
 					{{.RPCs}}
 				}
@@ -426,7 +426,7 @@ func TestIsRevisionMethod(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				service Foo {
 					rpc {{.MethodName}}(Book) returns (Book);
 				}
@@ -479,7 +479,7 @@ func TestExtractRevisionResource(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				service Foo {
 					rpc {{.MethodName}}(Book) returns (Book);
 				}

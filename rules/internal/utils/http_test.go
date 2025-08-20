@@ -26,7 +26,7 @@ import (
 func TestGetHTTPRules(t *testing.T) {
 	for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
 		t.Run(method, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 				service Library {
 					rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
@@ -62,7 +62,7 @@ func TestGetHTTPRules(t *testing.T) {
 }
 
 func TestGetHTTPRulesEmpty(t *testing.T) {
-	file := testutils.Compile(t, `
+	file := testutils.ParseProto3Tmpl(t, `
 		import "google/api/annotations.proto";
 		service Library {
 			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse);
@@ -83,7 +83,7 @@ func TestParseRuleEmpty(t *testing.T) {
 }
 
 func TestGetHTTPRulesCustom(t *testing.T) {
-	file := testutils.Compile(t, `
+	file := testutils.ParseProto3Tmpl(t, `
 		import "google/api/annotations.proto";
 		service Library {
 			rpc FrobBook(FrobBookRequest) returns (FrobBookResponse) {
@@ -158,7 +158,7 @@ func TestHasHTTPRules(t *testing.T) {
 		{"no_rule", ""},
 	} {
 		t.Run(tst.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
 
 				service Foo {

@@ -22,7 +22,7 @@ import (
 
 func TestDiffEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	m := Compile(t, "message Foo {}", nil)
+	m := ParseProto3Tmpl(t, "message Foo {}", nil)
 
 	// Declare a series of tests that should all be equal.
 	tests := []struct {
@@ -49,8 +49,8 @@ func TestDiffEquivalent(t *testing.T) {
 
 func TestDiffNotEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	m1 := Compile(t, "message Foo {}", nil).Messages().Get(0)
-	m2 := Compile(t, "message Bar {}", nil).Messages().Get(0)
+	m1 := ParseProto3Tmpl(t, "message Foo {}", nil).Messages().Get(0)
+	m2 := ParseProto3Tmpl(t, "message Bar {}", nil).Messages().Get(0)
 
 	// Declare a series of tests that should all be equal.
 	tests := []struct {
@@ -77,7 +77,7 @@ func TestDiffNotEquivalent(t *testing.T) {
 }
 
 func TestSetDescriptor(t *testing.T) {
-	m := Compile(t, "message Foo {}", nil)
+	m := ParseProto3Tmpl(t, "message Foo {}", nil)
 	problems := Problems{{}, {}, {}}.SetDescriptor(m)
 	for _, p := range problems {
 		if p.Descriptor != m {

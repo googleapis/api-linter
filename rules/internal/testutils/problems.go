@@ -15,11 +15,8 @@
 package testutils
 
 import (
-	"bytes"
 	"sort"
 	"strings"
-	"testing"
-	"text/template"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/v2/lint"
@@ -91,17 +88,4 @@ func (problems Problems) SetDescriptor(d protoreflect.Descriptor) Problems {
 	return problems
 }
 
-// ParseTemplate is a helper function for tests that parses a string as a Go
-// template.
-func ParseTemplate(t *testing.T, content string, data any) string {
-	t.Helper()
-	tmpl, err := template.New("test").Parse(content)
-	if err != nil {
-		t.Fatalf("Failed to parse template: %v", err)
-	}
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		t.Fatalf("Failed to execute template: %v", err)
-	}
-	return buf.String()
-}
+

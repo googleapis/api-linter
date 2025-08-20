@@ -15,10 +15,8 @@
 package utils
 
 import (
-	"context"
 	"testing"
 
-	"github.com/bufbuild/protocompile"
 	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
@@ -35,25 +33,10 @@ func TestIsCommonProto(t *testing.T) {
 		{"google.cloud.speech.v1", false},
 	} {
 		t.Run(test.Package, func(t *testing.T) {
-			content := testutils.ParseTemplate(t, `
-				syntax = "proto3";
+			file := testutils.ParseProto3Tmpl(t, `
 				package {{.Package}};
 			`, test)
-			compiler := protocompile.Compiler{
-				Resolver: &protocompile.SourceResolver{
-					Accessor: protocompile.SourceAccessorFromMap(map[string]string{
-						"test.proto": content,
-					}),
-				},
-			}
-			files, err := compiler.Compile(
-				context.Background(),
-				"test.proto",
-			)
-			if err != nil {
-				t.Fatalf("Failed to compile: %v", err)
-			}
-			if got := IsCommonProto(files[0]); got != test.want {
+			if got := IsCommonProto(file); got != test.want {
 				t.Errorf("Got %v, expected %v", got, test.want)
 			}
 		})

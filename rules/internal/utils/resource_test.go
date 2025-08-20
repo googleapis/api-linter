@@ -127,7 +127,7 @@ func TestIsResourceRevision(t *testing.T) {
 			want:     false,
 		},
 	} {
-		f := testutils.Compile(t, `
+		f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/resource.proto";
 			message {{.Message}} {
 				{{.Resource}}

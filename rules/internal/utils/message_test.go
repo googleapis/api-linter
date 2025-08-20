@@ -32,7 +32,7 @@ func TestListResponseResourceName(t *testing.T) {
 		{"InvalidNotList", "WriteBook", ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Response {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -73,7 +73,7 @@ func TestIsListResponseMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Response {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -112,7 +112,7 @@ func TestIsListRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Request {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -151,7 +151,7 @@ func TestIsListRevisionsResponseMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}RevisionsResponse {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -190,7 +190,7 @@ func TestIsListRevisionsRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}RevisionsRequest {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -229,7 +229,7 @@ func TestIsGetRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Request {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -268,7 +268,7 @@ func TestIsCreateRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Request {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -307,7 +307,7 @@ func TestIsUpdateRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Request {}
 			`, test)
 			m := file.Messages().Get(0)
@@ -346,7 +346,7 @@ func TestIsDeleteRequestMessage(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				message {{.RPC}}Request {}
 			`, test)
 			m := file.Messages().Get(0)

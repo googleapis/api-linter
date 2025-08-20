@@ -23,7 +23,7 @@ import (
 func TestGetTypeName(t *testing.T) {
 	for _, ty := range []string{"int32", "int64", "string", "bytes", "google.protobuf.Timestamp", "Format"} {
 		t.Run(ty, func(t *testing.T) {
-			file := testutils.Compile(t, `
+			file := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/timestamp.proto";
 				message Book {
 					{{.Type}} field = 1;

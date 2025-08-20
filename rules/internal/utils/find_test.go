@@ -55,7 +55,7 @@ import (
 // }
 
 func TestFindFieldDotNotation(t *testing.T) {
-	file := testutils.Compile(t, `
+	file := testutils.ParseProto3String(t, `
 		package test;
 
 		message CreateBookRequest {
@@ -74,7 +74,7 @@ func TestFindFieldDotNotation(t *testing.T) {
 
 			PublishingInfo publishing_info = 2;
 		}
-	`, nil)
+	`)
 	msg := file.Messages().Get(0)
 
 	for _, tst := range []struct {
