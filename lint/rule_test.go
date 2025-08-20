@@ -27,8 +27,7 @@ import (
 func TestFileRule(t *testing.T) {
 	// Create a file descriptor with nothing in it.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 	}, nil)
 	if err != nil {
 		t.Fatalf("Could not build file descriptor: %q", err)
@@ -56,8 +55,7 @@ func TestFileRule(t *testing.T) {
 func TestMessageRule(t *testing.T) {
 	// Create a file descriptor with two messages in it.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
@@ -95,8 +93,7 @@ func TestMessageRule(t *testing.T) {
 func TestMessageRuleNested(t *testing.T) {
 	// Create a file descriptor with a message and nested message in it.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
@@ -135,8 +132,7 @@ func TestMessageRuleNested(t *testing.T) {
 func TestFieldRule(t *testing.T) {
 	// Create a file descriptor with one message and two fields in that message.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
@@ -182,8 +178,7 @@ func TestFieldRule(t *testing.T) {
 func TestServiceRule(t *testing.T) {
 	// Create a file descriptor with a service.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
 				Name: proto.String("Library"),
@@ -214,8 +209,7 @@ func TestServiceRule(t *testing.T) {
 func TestMethodRule(t *testing.T) {
 	// Create a file descriptor with a service.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
@@ -272,8 +266,7 @@ func TestMethodRule(t *testing.T) {
 func TestEnumRule(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		EnumType: []*descriptorpb.EnumDescriptorProto{
 			{
 				Name: proto.String("Format"),
@@ -321,8 +314,7 @@ func TestEnumRule(t *testing.T) {
 func TestEnumValueRule(t *testing.T) {
 	// Create a file descriptor with a top-level enum with values.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		EnumType: []*descriptorpb.EnumDescriptorProto{
 			{
 				Name: proto.String("Format"),
@@ -365,8 +357,7 @@ func TestEnumValueRule(t *testing.T) {
 func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("test.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
@@ -419,8 +410,7 @@ func TestEnumRuleNested(t *testing.T) {
 func TestDescriptorRule(t *testing.T) {
 	// Create a file with one of everything in it.
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("library.proto"),
-		Syntax: proto.String("proto3"),
+		Name: proto.String("library.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),

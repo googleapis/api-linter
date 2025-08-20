@@ -28,9 +28,7 @@ import (
 
 func TestLinter_run(t *testing.T) {
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:    proto.String("protofile.proto"),
-		Syntax:  proto.String("proto3"),
-		Options: &descriptorpb.FileOptions{},
+		Name: proto.String("protofile.proto"),
 	}, nil)
 	if err != nil {
 		t.Fatalf("Failed to build a file descriptor.")
@@ -110,9 +108,7 @@ func TestLinter_run(t *testing.T) {
 
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:    proto.String("test.proto"),
-		Syntax:  proto.String("proto3"),
-		Options: &descriptorpb.FileOptions{},
+		Name: proto.String("test.proto"),
 	}, nil)
 	if err != nil {
 		t.Fatalf("Failed to build the file descriptor.")

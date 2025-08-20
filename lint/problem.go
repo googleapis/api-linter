@@ -16,9 +16,7 @@ package lint
 
 import (
 	"encoding/json"
-	"reflect"
 
-	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
@@ -130,7 +128,7 @@ type fileLocation struct {
 func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
-	if l != nil && len(l.Span) > 0 {
+	if l != nil {
 		span = l.Span
 	}
 
@@ -173,56 +171,10 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.D
 }
 
 func getSourceInfo(d protoreflect.Descriptor) *dpb.SourceCodeInfo_Location {
-	path := getDescriptorPath(d, nil)
-	fdp := protodesc.ToFileDescriptorProto(d.ParentFile())
-	for _, loc := range fdp.GetSourceCodeInfo().GetLocation() {
-		if reflect.DeepEqual(path, loc.Path) {
-			return loc
-		}
+	loc := d.ParentFile().SourceLocations().ByDescriptor(d)
+	return &dpb.SourceCodeInfo_Location{
+		Span:             []int32{int32(loc.StartLine), int32(loc.StartColumn), int32(loc.EndLine), int32(loc.EndColumn)},
+		LeadingComments:  &loc.LeadingComments,
+		TrailingComments: &loc.TrailingComments,
 	}
-	return nil
-}
-
-func getDescriptorPath(d protoreflect.Descriptor, path []int32) []int32 {
-	parent := d.Parent()
-	if parent == nil {
-		return path
-	}
-
-	idx := int32(d.Index())
-	var fieldTag int32
-	switch dt := d.(type) {
-	case protoreflect.MessageDescriptor:
-		if _, ok := parent.(protoreflect.FileDescriptor); ok {
-			fieldTag = 4 // message_type in FileDescriptorProto
-		} else {
-			fieldTag = 3 // nested_type in DescriptorProto
-		}
-	case protoreflect.FieldDescriptor:
-		if dt.IsExtension() {
-			if _, ok := parent.(protoreflect.FileDescriptor); ok {
-				fieldTag = 7 // extension in FileDescriptorProto
-			} else {
-				fieldTag = 6 // extension in DescriptorProto
-			}
-		} else {
-			fieldTag = 2 // field in DescriptorProto
-		}
-	case protoreflect.OneofDescriptor:
-		fieldTag = 8 // oneof_decl in DescriptorProto
-	case protoreflect.EnumDescriptor:
-		if _, ok := parent.(protoreflect.FileDescriptor); ok {
-			fieldTag = 5 // enum_type in FileDescriptorProto
-		} else {
-			fieldTag = 4 // enum_type in DescriptorProto
-		}
-	case protoreflect.EnumValueDescriptor:
-		fieldTag = 2 // value in EnumDescriptorProto
-	case protoreflect.ServiceDescriptor:
-		fieldTag = 6 // service in FileDescriptorProto
-	case protoreflect.MethodDescriptor:
-		fieldTag = 2 // method in ServiceDescriptorProto
-	}
-
-	return getDescriptorPath(parent, append([]int32{fieldTag, idx}, path...))
 }
