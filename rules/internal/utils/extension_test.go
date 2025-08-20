@@ -316,127 +316,127 @@ func TestGetResourceReference(t *testing.T) {
 	})
 }
 
-// func TestFindResource(t *testing.T) {
-// 	files := testutils.CompileStrings(t, map[string]string{
-// 		"book.proto": `
-// 			syntax = "proto3";
-// 			package test;
+func TestFindResource(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
 
-// 			import "google/api/resource.proto";
+			import "google/api/resource.proto";
 
-// 			message Book {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Book"
-// 					pattern: "publishers/{publisher}/books/{book}"
-// 				};
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
 
-// 				string name = 1;
-// 			}
-// 		`,
-// 		"shelf.proto": `
-// 			syntax = "proto3";
-// 			package test;
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
 
-// 			import "book.proto";
-// 			import "google/api/resource.proto";
+			import "book.proto";
+			import "google/api/resource.proto";
 
-// 			message Shelf {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Shelf"
-// 					pattern: "shelves/{shelf}"
-// 				};
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
 
-// 				string name = 1;
+				string name = 1;
 
-// 				repeated Book books = 2;
-// 			}
-// 		`,
-// 	})
+				repeated Book books = 2;
+			}
+		`,
+	})
 
-// 	for _, tst := range []struct {
-// 		name, reference string
-// 		notFound        bool
-// 	}{
-// 		{"local_reference", "library.googleapis.com/Shelf", false},
-// 		{"imported_reference", "library.googleapis.com/Book", false},
-// 		{"unresolvable", "foo.googleapis.com/Bar", true},
-// 	} {
-// 		t.Run(tst.name, func(t *testing.T) {
-// 			got := FindResource(tst.reference, files[1])
+	for _, tst := range []struct {
+		name, reference string
+		notFound        bool
+	}{
+		{"local_reference", "library.googleapis.com/Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", true},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResource(tst.reference, files["shelf.proto"])
 
-// 			if tst.notFound && got != nil {
-// 				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
-// 			}
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the resource, but found %q", got.GetType())
+			}
 
-// 			if !tst.notFound && got == nil {
-// 				t.Errorf("Got nil, expected %q", tst.reference)
-// 			} else if !tst.notFound && got.GetType() != tst.reference {
-// 				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
-// 			}
-// 		})
-// 	}
-// }
+			if !tst.notFound && got == nil {
+				t.Errorf("Got nil, expected %q", tst.reference)
+			} else if !tst.notFound && got.GetType() != tst.reference {
+				t.Errorf("Got %q, expected %q", got.GetType(), tst.reference)
+			}
+		})
+	}
+}
 
-// func TestFindResourceMessage(t *testing.T) {
-// 	files := testutils.CompileStrings(t, map[string]string{
-// 		"book.proto": `
-// 			syntax = "proto3";
-// 			package test;
+func TestFindResourceMessage(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
 
-// 			import "google/api/resource.proto";
+			import "google/api/resource.proto";
 
-// 			message Book {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Book"
-// 					pattern: "publishers/{publisher}/books/{book}"
-// 				};
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
 
-// 				string name = 1;
-// 			}
-// 		`,
-// 		"shelf.proto": `
-// 			syntax = "proto3";
-// 			package test;
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
 
-// 			import "book.proto";
-// 			import "google/api/resource.proto";
+			import "book.proto";
+			import "google/api/resource.proto";
 
-// 			message Shelf {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Shelf"
-// 					pattern: "shelves/{shelf}"
-// 				};
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
 
-// 				string name = 1;
+				string name = 1;
 
-// 				repeated Book books = 2;
-// 			}
-// 		`,
-// 	})
+				repeated Book books = 2;
+			}
+		`,
+	})
 
-// 	for _, tst := range []struct {
-// 		name, reference, wantMsg string
-// 		notFound                 bool
-// 	}{
-// 		{"local_reference", "library.googleapis.com/Shelf", "Shelf", false},
-// 		{"imported_reference", "library.googleapis.com/Book", "Book", false},
-// 		{"unresolvable", "foo.googleapis.com/Bar", "", true},
-// 	} {
-// 		t.Run(tst.name, func(t *testing.T) {
-// 			got := FindResourceMessage(tst.reference, files[1])
+	for _, tst := range []struct {
+		name, reference, wantMsg string
+		notFound                 bool
+	}{
+		{"local_reference", "library.googleapis.com/Shelf", "Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", "Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", "", true},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResourceMessage(tst.reference, files["shelf.proto"])
 
-// 			if tst.notFound && got != nil {
-// 				t.Fatalf("Expected to not find the message, but found %q", got.Name())
-// 			}
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the message, but found %q", got.Name())
+			}
 
-// 			if !tst.notFound && got == nil {
-// 				t.Errorf("Got nil, expected %q", tst.wantMsg)
-// 			} else if !tst.notFound && string(got.Name()) != tst.wantMsg {
-// 				t.Errorf("Got %q, expected %q", got.Name(), tst.wantMsg)
-// 			}
-// 		})
-// 	}
-// }
+			if !tst.notFound && got == nil {
+				t.Errorf("Got nil, expected %q", tst.wantMsg)
+			} else if !tst.notFound && string(got.Name()) != tst.wantMsg {
+				t.Errorf("Got %q, expected %q", got.Name(), tst.wantMsg)
+			}
+		})
+	}
+}
 
 func TestSplitResourceTypeName(t *testing.T) {
 	for _, tst := range []struct {
@@ -535,93 +535,84 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 	}
 }
 
-// func TestFindResourceChildren(t *testing.T) {
-// 	publisher := &annotations.ResourceDescriptor{
-// 		Type: "library.googleapis.com/Publisher",
-// 		Pattern: []string{
-// 			"publishers/{publisher}",
-// 		},
-// 	}
-// 	shelf := &annotations.ResourceDescriptor{
-// 		Type: "library.googleapis.com/Shelf",
-// 		Pattern: []string{
-// 			"shelves/{shelf}",
-// 		},
-// 	}
-// 	book := &annotations.ResourceDescriptor{
-// 		Type: "library.googleapis.com/Book",
-// 		Pattern: []string{
-// 			"publishers/{publisher}/books/{book}",
-// 		},
-// 	}
-// 	edition := &annotations.ResourceDescriptor{
-// 		Type: "library.googleapis.com/Edition",
-// 		Pattern: []string{
-// 			"publishers/{publisher}/books/{book}/editions/{edition}",
-// 		},
-// 	}
-// 	files := testutils.CompileStrings(t, map[string]string{
-// 		"book.proto": `
-// 			syntax = "proto3";
-// 			package test;
+func TestFindResourceChildren(t *testing.T) {
+	publisher := &annotations.ResourceDescriptor{
+		Type: "library.googleapis.com/Publisher",
+		Pattern: []string{
+			"publishers/{publisher}",
+		},
+	}
+	shelf := &annotations.ResourceDescriptor{
+		Type: "library.googleapis.com/Shelf",
+		Pattern: []string{
+			"shelves/{shelf}",
+		},
+	}
+	book := &annotations.ResourceDescriptor{
+		Type: "library.googleapis.com/Book",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}",
+		},
+	}
+	edition := &annotations.ResourceDescriptor{
+		Type: "library.googleapis.com/Edition",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}/editions/{edition}",
+		},
+	}
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+			import "google/api/resource.proto";
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+				string name = 1;
+			}
+			message Edition {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Edition"
+					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
+				};
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+			import "book.proto";
+			import "google/api/resource.proto";
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+				string name = 1;
+				repeated Book books = 2;
+			}
+		`,
+	})
 
-// 			import "google/api/resource.proto";
-
-// 			message Book {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Book"
-// 					pattern: "publishers/{publisher}/books/{book}"
-// 				};
-
-// 				string name = 1;
-// 			}
-
-// 			message Edition {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Edition"
-// 					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
-// 				};
-
-// 				string name = 1;
-// 			}
-// 		`,
-// 		"shelf.proto": `
-// 			syntax = "proto3";
-// 			package test;
-
-// 			import "book.proto";
-// 			import "google/api/resource.proto";
-
-// 			message Shelf {
-// 				option (google.api.resource) = {
-// 					type: "library.googleapis.com/Shelf"
-// 					pattern: "shelves/{shelf}"
-// 				};
-
-// 				string name = 1;
-
-// 				repeated Book books = 2;
-// 			}
-// 		`,
-// 	})
-
-// 	for _, tst := range []struct {
-// 		name   string
-// 		parent *annotations.ResourceDescriptor
-// 		want   []*annotations.ResourceDescriptor
-// 	}{
-// 		{"has_child_same_file", book, []*annotations.ResourceDescriptor{edition}},
-// 		{"has_child_other_file", publisher, []*annotations.ResourceDescriptor{book, edition}},
-// 		{"no_children", shelf, nil},
-// 	} {
-// 		t.Run(tst.name, func(t *testing.T) {
-// 			got := FindResourceChildren(tst.parent, files[1])
-// 			if diff := cmp.Diff(tst.want, got, cmp.Comparer(proto.Equal)); diff != "" {
-// 				t.Errorf("got(-),want(+):\n%s", diff)
-// 			}
-// 		})
-// 	}
-// }
+	for _, tst := range []struct {
+		name   string
+		parent *annotations.ResourceDescriptor
+		want   []*annotations.ResourceDescriptor
+	}{
+		{"has_child_same_file", book, []*annotations.ResourceDescriptor{edition}},
+		{"has_child_other_file", publisher, []*annotations.ResourceDescriptor{book, edition}},
+		{"no_children", shelf, nil},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResourceChildren(tst.parent, files["shelf.proto"])
+			if diff := cmp.Diff(tst.want, got, cmp.Comparer(proto.Equal)); diff != "" {
+				t.Errorf("got(-),want(+):\n%s", diff)
+			}
+		})
+	}
+}
 
 func TestHasFieldInfo(t *testing.T) {
 	testCases := []struct {
