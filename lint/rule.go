@@ -383,10 +383,8 @@ func extractDisabledRuleName(commentLine string) string {
 }
 
 func getLeadingComments(d protoreflect.Descriptor) string {
-	if sourceInfo := getSourceInfo(d); sourceInfo != nil {
-		return sourceInfo.GetLeadingComments()
-	}
-	return ""
+	loc := d.ParentFile().SourceLocations().ByDescriptor(d)
+	return loc.LeadingComments
 }
 
 // GetAllMessages returns a slice with every message (not just top-level

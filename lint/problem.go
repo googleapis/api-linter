@@ -48,7 +48,7 @@ type Problem struct {
 
 	// Location provides the location of the problem.
 	//
-	// If unset, this defaults to the value of `Descriptor.GetSourceInfo()`.
+	// If unset, the location of the descriptor is used.
 	// This should almost always be set if `Suggestion` is set. The best way to
 	// do this is by using the helper methods in `location.go`.
 	Location *dpb.SourceCodeInfo_Location
@@ -76,11 +76,28 @@ func (p Problem) MarshalYAML() (interface{}, error) {
 
 // Marshal defines how to represent a serialized Problem.
 func (p Problem) marshal() interface{} {
-	// The descriptor is always set, and location may be set.
-	// If they are both set, prefer the location.
-	loc := p.Location
-	if loc == nil && p.Descriptor != nil {
-		loc = getSourceInfo(p.Descriptor)
+	var fl fileLocation
+	if p.Location != nil {
+		// If Location is set, use it.
+		fl = fileLocationFromPBLocation(p.Location, p.Descriptor)
+	} else if p.Descriptor != nil {
+		// Otherwise, use the descriptor's location.
+		// This is the protobuf-go idiomatic way to get the source location.
+		loc := p.Descriptor.ParentFile().SourceLocations().ByDescriptor(p.Descriptor)
+		fl = fileLocation{
+			Path: p.Descriptor.ParentFile().Path(),
+			Start: position{
+				Line:   loc.StartLine + 1,
+				Column: loc.StartColumn + 1,
+			},
+			End: position{
+				Line:   loc.EndLine + 1,
+				Column: loc.EndColumn,
+			},
+		}
+	} else {
+		// Default location if no descriptor.
+		fl = fileLocationFromPBLocation(nil, nil)
 	}
 
 	// Return a marshal-able structure.
@@ -94,7 +111,7 @@ func (p Problem) marshal() interface{} {
 	}{
 		p.Message,
 		p.Suggestion,
-		fileLocationFromPBLocation(loc, p.Descriptor),
+		fl,
 		p.RuleID,
 		p.GetRuleURI(),
 		p.category,
@@ -170,11 +187,4 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.D
 	return fl
 }
 
-func getSourceInfo(d protoreflect.Descriptor) *dpb.SourceCodeInfo_Location {
-	loc := d.ParentFile().SourceLocations().ByDescriptor(d)
-	return &dpb.SourceCodeInfo_Location{
-		Span:             []int32{int32(loc.StartLine), int32(loc.StartColumn), int32(loc.EndLine), int32(loc.EndColumn)},
-		LeadingComments:  &loc.LeadingComments,
-		TrailingComments: &loc.TrailingComments,
-	}
-}
+
