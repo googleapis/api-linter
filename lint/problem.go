@@ -186,5 +186,3 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.D
 	}
 	return fl
 }
-
-
