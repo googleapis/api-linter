@@ -7,13 +7,6 @@
 // 		https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 		https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
@@ -39,7 +32,7 @@ func TestRuleIsEnabled(t *testing.T) {
 		},
 	}
 
-	alises := map[string]string{
+	aliases := map[string]string{
 		"a::b::c": "d::e::f",
 	}
 
@@ -51,19 +44,19 @@ func TestRuleIsEnabled(t *testing.T) {
 		enabled        bool
 	}{
 		{"Enabled", "", "", true},
-		{"FileDisabled", "// api-linter: a::b::c=disabled", "", false},
-		{"MessageDisabled", "", "// api-linter: a::b::c=disabled", false},
-		{"NameNotMatch", "", "// api-linter: other=disabled", true},
+		{"FileDisabled", " api-linter: a::b::c=disabled", "", false},
+		{"MessageDisabled", "", " api-linter: a::b::c=disabled", false},
+		{"NameNotMatch", "", " api-linter: other=disabled", true},
 		{"RegexpNotMatch", "", "// api-lint: a::b::c=disabled", true},
-		{"AliasDisabled", "", "// api-linter: d::e::f=disabled", false},
-		{"FileComments_PrefixMatched_Disabled", "// api-linter: a=disabled", "", false},
-		{"FileComments_MiddleMatched_Disabled", "// api-linter: b=disabled", "", false},
-		{"FileComments_SuffixMatched_Disabled", "// api-linter: c=disabled", "", false},
-		{"FileComments_MultipleLinesMatched_Disabled", "// api-linter: x=disabled\n// api-linter: a=disabled", "", false},
-		{"MessageComments_PrefixMatched_Disabled", "", "// api-linter: a=disabled", false},
-		{"MessageComments_MiddleMatched_Disabled", "", "// api-linter: b=disabled", false},
-		{"MessageComments_SuffixMatched_Disabled", "", "// api-linter: c=disabled", false},
-		{"MessageComments_MultipleLinesMatched_Disabled", "", "// api-linter: x=disabled\n// api-linter: a=disabled", false},
+		{"AliasDisabled", "", " api-linter: d::e::f=disabled", false},
+		{"FileComments_PrefixMatched_Disabled", " api-linter: a=disabled", "", false},
+		{"FileComments_MiddleMatched_Disabled", " api-linter: b=disabled", "", false},
+		{"FileComments_SuffixMatched_Disabled", " api-linter: c=disabled", "", false},
+		{"FileComments_MultipleLinesMatched_Disabled", " api-linter: x=disabled\n// api-linter: a=disabled", "", false},
+		{"MessageComments_PrefixMatched_Disabled", "", " api-linter: a=disabled", false},
+		{"MessageComments_MiddleMatched_Disabled", "", " api-linter: b=disabled", false},
+		{"MessageComments_SuffixMatched_Disabled", "", " api-linter: c=disabled", false},
+		{"MessageComments_MultipleLinesMatched_Disabled", "", " api-linter: x=disabled\n// api-linter: a=disabled", false},
 	}
 
 	// Run the specific tests individually.
@@ -71,7 +64,6 @@ func TestRuleIsEnabled(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 				Name:    proto.String("test.proto"),
-				Syntax:  proto.String("proto3"),
 				Package: proto.String("test"),
 				MessageType: []*descriptorpb.DescriptorProto{
 					{
@@ -96,11 +88,11 @@ func TestRuleIsEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test message: %v", err)
 			}
-			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, alises, false), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, false), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 			if !test.enabled {
-				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, alises, true), true; got != want {
+				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, true), true; got != want {
 					t.Errorf("Expected the test rule with ignoreCommentDisables true to return %v from ruleIsEnabled, got %v", want, got)
 				}
 			}
@@ -120,7 +112,6 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	// Build a proto and check that ruleIsEnabled does the right thing.
 	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("FirstMessage"),
@@ -162,7 +153,6 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	// Build a proto with two messages, one of which disables the rule.
 	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name:   proto.String("test.proto"),
-		Syntax: proto.String("proto3"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
@@ -230,7 +220,6 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
 			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 				Name:   proto.String("test.proto"),
-				Syntax: proto.String("proto3"),
 				MessageType: []*descriptorpb.DescriptorProto{
 					{
 						Name: proto.String("Foo"),
