@@ -201,7 +201,9 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		return err
 	}
 
-	// Convert linker.Files to []protoreflect.FileDescriptor
+	// The compiler returns a slice of `*linker.File`, which is the compiler's
+	// internal representation. We convert this to a slice of the standard
+	// `protoreflect.FileDescriptor` interface, which the linter engine expects.
 	var fileDescriptors []protoreflect.FileDescriptor
 	for _, f := range files {
 		fileDescriptors = append(fileDescriptors, f)
@@ -257,10 +259,16 @@ func anyProblems(results []lint.Response) bool {
 	return false
 }
 
+// resolver is a minimal implementation of the protocompile.Resolver interface.
+// It is used to wrap a protoregistry.Files object, which is created from
+// pre-compiled FileDescriptorSet files (`.protoset`), allowing the compiler
+// to find and use these files for import resolution.
 type resolver struct {
 	files *protoregistry.Files
 }
 
+// FindFileByPath satisfies the protocompile.Resolver interface by searching
+// for a file descriptor in the wrapped protoregistry.Files.
 func (r *resolver) FindFileByPath(path string) (protocompile.SearchResult, error) {
 	fd, err := r.files.FindFileByPath(path)
 	if err != nil {
@@ -269,6 +277,10 @@ func (r *resolver) FindFileByPath(path string) (protocompile.SearchResult, error
 	return protocompile.SearchResult{Desc: fd}, nil
 }
 
+// loadFileDescriptorsAsResolver reads one or more FileDescriptorSet files
+// (typically `.protoset` files) and loads them into a protoregistry.Files
+// object. It then wraps this object in our custom resolver so that it can be
+// used by the protocompile.Compiler to resolve imports.
 func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, error) {
 	if len(filePaths) == 0 {
 		return nil, nil
