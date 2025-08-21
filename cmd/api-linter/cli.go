@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/bufbuild/protocompile"
+	"github.com/bufbuild/protocompile/reporter"
 	"github.com/googleapis/api-linter/v2/internal"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/spf13/pflag"
@@ -160,13 +161,42 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 	resolvers = append(resolvers, sourceResolver)
 
+	// The previous parser (`jhump/protoreflect`) reported all parse errors it
+	// found. The default behavior of the new parser (`protocompile`) is to
+	// stop on the first error.
+	//
+	// To preserve the original behavior, we provide a custom reporter that
+	// collects all errors and allows the compiler to continue. The previous
+	// parser also had no distinct concept of warnings, so we pass a nil
+	// warning handler to maintain the same behavior of ignoring them.
+	var collectedErrors []error
+	rep := reporter.NewReporter(func(err reporter.ErrorWithPos) error {
+		collectedErrors = append(collectedErrors, err)
+		return nil // Returning nil signals the compiler to continue.
+	}, nil)
+
 	compiler := protocompile.Compiler{
 		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver(resolvers)),
 		SourceInfoMode: protocompile.SourceInfoStandard,
+		Reporter:       rep,
 	}
 
 	// Compile files.
 	files, err := compiler.Compile(context.Background(), c.ProtoFiles...)
+
+	// After compilation, check if the handler collected any errors.
+	// This is the primary source of truth for parse errors when using a
+	// custom reporter that continues on error.
+	if len(collectedErrors) > 0 {
+		errorStrings := make([]string, len(collectedErrors))
+		for i, e := range collectedErrors {
+			errorStrings[i] = e.Error()
+		}
+		return errors.New(strings.Join(errorStrings, "\n"))
+	}
+
+	// If the reporter has no errors, but the compiler still returned one,
+	// it's a fatal, non-recoverable error.
 	if err != nil {
 		return err
 	}

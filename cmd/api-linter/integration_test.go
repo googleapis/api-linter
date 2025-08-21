@@ -159,6 +159,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 func TestBuildErrors(t *testing.T) {
 	expected := []string{
 		"internal/testdata/build_errors.proto:8:1:",
+		"internal/testdata/build_errors.proto:13:1:",
 	}
 	err := runCLI([]string{"internal/testdata/build_errors.proto"})
 	if err == nil {
