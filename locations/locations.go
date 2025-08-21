@@ -41,6 +41,16 @@ func pathLocation(d protoreflect.Descriptor, path ...int) *dpb.SourceCodeInfo_Lo
 }
 
 // getDescriptorPath returns the path for a given descriptor.
+//
+// This function is necessary because the modern `protoreflect` API does not
+// provide a way to get this path directly from a descriptor, unlike the older
+// `jhump/protoreflect` library. While `SourceLocations.ByDescriptor()` can find
+// the location for an entire descriptor, it does not provide the `[]int32` path
+// itself. This path is the essential "key" needed to look up the locations of
+// a descriptor's sub-elements (e.g., a field's name vs. its type).
+//
+// This function reconstructs the path by traversing upwards from the descriptor
+// to the file root, collecting the field numbers and indexes at each step.
 func getDescriptorPath(d protoreflect.Descriptor) []int32 {
 	var path []int32
 	current := d
