@@ -60,12 +60,12 @@ func parse(t *testing.T, s string) protoreflect.FileDescriptor {
 		SourceInfoMode: protocompile.SourceInfoStandard,
 	}
 
-	files, err := compiler.Compile(context.Background(), "test.proto")
+	fds, err := compiler.Compile(context.Background(), "test.proto")
 	if err != nil {
-		t.Fatalf("Failed to parse proto: %v", err)
+		t.Fatalf("%v", err)
 	}
 
-	return files[0]
+	return fds[0]
 }
 
 func TestSourceInfo_Concurrency(t *testing.T) {
