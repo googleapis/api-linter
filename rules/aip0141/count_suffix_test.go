@@ -26,7 +26,7 @@ func TestCount(t *testing.T) {
 		testName  string
 		FieldName string
 		want      string
-		err       bool
+		wantErr   bool
 	}{
 		{"Valid", "item_count", "item_count", false},
 		{"NumItems", "num_items", "item_count", true},
@@ -43,7 +43,7 @@ func TestCount(t *testing.T) {
 		`, test)
 		field := file.GetMessageTypes()[0].GetFields()[0]
 		wantProblems := testutils.Problems{}
-		if test.err {
+		if test.wantErr {
 			wantProblems = append(wantProblems, lint.Problem{
 				Message:    "_count suffix",
 				Suggestion: test.want,
