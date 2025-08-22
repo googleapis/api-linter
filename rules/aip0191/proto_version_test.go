@@ -40,7 +40,9 @@ func TestSyntax(t *testing.T) {
 			if test.isProto3 {
 				f = testutils.ParseProto3String(t, "")
 			} else {
-				f = testutils.ParseProto2String(t, "")
+				f = testutils.ParseProtoStrings(t, map[string]string{
+					"test.proto": "syntax = \"proto2\";",
+				})["test.proto"]
 			}
 
 			// Lint the file, and ensure we got the expected problems.

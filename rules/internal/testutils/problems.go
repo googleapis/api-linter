@@ -15,7 +15,6 @@
 package testutils
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
@@ -37,26 +36,12 @@ func (problems Problems) Diff(other []lint.Problem) string {
 		return cmp.Diff(problems, other)
 	}
 
-	// Sort both slices for consistent comparison.
-	sort.Slice(problems, func(i, j int) bool {
-		if problems[i].Message != problems[j].Message {
-			return problems[i].Message < problems[j].Message
-		}
-		return problems[i].Descriptor.FullName() < problems[j].Descriptor.FullName()
-	})
-	sort.Slice(other, func(i, j int) bool {
-		if other[i].Message != other[j].Message {
-			return other[i].Message < other[j].Message
-		}
-		return other[i].Descriptor.FullName() < other[j].Descriptor.FullName()
-	})
-
 	// Iterate over the individual problems and determine whether they are
 	// sufficiently equivalent.
 	for i := range problems {
 		x, y := problems[i], other[i]
 
-		// The descriptors must have the same full name, otherwise the problems are unequal.
+		// The descriptors must exactly match, otherwise the problems are unequal.
 		if x.Descriptor != y.Descriptor {
 			return cmp.Diff(problems, other)
 		}
@@ -87,5 +72,3 @@ func (problems Problems) SetDescriptor(d protoreflect.Descriptor) Problems {
 	}
 	return problems
 }
-
-

@@ -64,8 +64,7 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 
 	// Test the case where the google.api.resource annotation is not present.
 	t.Run("NotResource", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, "message Book {}", nil)
-		m := f.Messages().Get(0)
+		m := testutils.ParseProto3Tmpl(t, "message Book {}", nil).Messages().Get(0)
 		if IsDeclarativeFriendlyMessage(m) {
 			t.Errorf("Got true, expected false.")
 		}
@@ -178,7 +177,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 
 	// Test an edge case where the LRO response is not found.
 	t.Run("lro/not-found", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/longrunning/operations.proto";
 			service Library {
 				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
@@ -188,7 +187,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 				}
 			}
 			message CreateBookRequest {}
-		`, nil)
+		`)
 		m := f.Services().Get(0).Methods().Get(0)
 		want := false
 		if got := IsDeclarativeFriendlyMethod(m); got != want {
@@ -196,4 +195,3 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 		}
 	})
 }
-

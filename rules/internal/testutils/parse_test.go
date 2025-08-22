@@ -53,7 +53,7 @@ func TestParseProtoStrings(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got, want := test.descriptor.Name(), protoreflect.Name(test.name); got != want {
+			if got, want := string(test.descriptor.Name()), test.name; got != want {
 				t.Errorf("Got %q, expected %q.", got, want)
 			}
 		})
@@ -120,11 +120,11 @@ func TestParseProto3Tmpl(t *testing.T) {
 				t.Errorf("Expected a proto3 file descriptor.")
 			}
 			msg := fd.Messages().Get(0)
-			if got, want := msg.Name(), protoreflect.Name(test.MessageName); got != want {
+			if got, want := string(msg.Name()), test.MessageName; got != want {
 				t.Errorf("Got %q for message name, expected %q.", got, want)
 			}
 			for i, fn := range []string{test.Field1Name, test.Field2Name} {
-				if got, want := msg.Fields().Get(i).Name(), protoreflect.Name(fn); got != want {
+				if got, want := string(msg.Fields().Get(i).Name()), fn; got != want {
 					t.Errorf("Got %q for field name %d; expected %q.", got, i+1, want)
 				}
 			}

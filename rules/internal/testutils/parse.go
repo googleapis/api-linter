@@ -67,13 +67,13 @@ func ParseProtoStrings(t *testing.T, src map[string]string) map[string]protorefl
 		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver{memResolver, importResolver}),
 		SourceInfoMode: protocompile.SourceInfoStandard,
 	}
-	files, err := compiler.Compile(context.Background(), filenames...)
+	fds, err := compiler.Compile(context.Background(), filenames...)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
 
 	answer := map[string]protoreflect.FileDescriptor{}
-	for _, fd := range files {
+	for _, fd := range fds {
 		answer[fd.Path()] = fd
 	}
 	return answer
@@ -93,19 +93,7 @@ func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
 	})["test.proto"]
 }
 
-// ParseProto2String parses a string representing a proto file, and returns
-// a FileDescriptor.
-//
-// It adds the `syntax = "proto2";` line to the beginning of the file and
-// chooses a filename, and then calls ParseProtoStrings.
-func ParseProto2String(t *testing.T, src string) protoreflect.FileDescriptor {
-	return ParseProtoStrings(t, map[string]string{
-		"test.proto": fmt.Sprintf(
-			"syntax = \"proto2\";\n\n%s",
-			strings.TrimSpace(dedent.Dedent(src)),
-		),
-	})["test.proto"]
-}
+
 
 // ParseProto3Tmpl parses a template string representing a proto file, and
 // returns a FileDescriptor.
@@ -147,3 +135,4 @@ func ParseProto3Tmpls(t *testing.T, srcs map[string]string, data interface{}) ma
 	// Parse the proto as a string.
 	return ParseProtoStrings(t, strs)
 }
+

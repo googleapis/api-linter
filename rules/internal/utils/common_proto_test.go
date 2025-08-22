@@ -33,10 +33,10 @@ func TestIsCommonProto(t *testing.T) {
 		{"google.cloud.speech.v1", false},
 	} {
 		t.Run(test.Package, func(t *testing.T) {
-			file := testutils.ParseProto3Tmpl(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				package {{.Package}};
 			`, test)
-			if got := IsCommonProto(file); got != test.want {
+			if got := IsCommonProto(f); got != test.want {
 				t.Errorf("Got %v, expected %v", got, test.want)
 			}
 		})
