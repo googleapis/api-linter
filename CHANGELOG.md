@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.71.0](https://github.com/googleapis/api-linter/compare/v1.70.2...v1.71.0) (2025-08-22)
+
+
+### Features
+
+* **AIP-160:** Validate filter field name. ([#1523](https://github.com/googleapis/api-linter/issues/1523)) ([73e4f83](https://github.com/googleapis/api-linter/commit/73e4f83da2399d9067df2c15310864969a33509f))
+* **AIP-160:** Validate filter field type ([#1524](https://github.com/googleapis/api-linter/issues/1524)) ([f182a25](https://github.com/googleapis/api-linter/commit/f182a25e6ba6ff5c85a7d3300f6d94f19b36d95b))
+
 ## [1.70.2](https://github.com/googleapis/api-linter/compare/v1.70.1...v1.70.2) (2025-08-06)
 
 
