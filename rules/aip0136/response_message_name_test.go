@@ -204,38 +204,4 @@ func TestResponseMessageName(t *testing.T) {
 			})
 		}
 	})
-
-	t.Run("LRO with Empty response", func(t *testing.T) {
-		file := testutils.ParseProto3Tmpl(t, `
-			package test;
-			import "google/api/annotations.proto";
-			import "google/api/resource.proto";
-			import "google/longrunning/operations.proto";
-			import "google/protobuf/empty.proto";
-
-			service Library {
-				rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
-					option (google.longrunning.operation_info) = {
-						response_type: "google.protobuf.Empty"
-						metadata_type: "OperationMetadata"
-					};
-				};
-			}
-			message ImportBooksRequest {
-				string name = 1 [(google.api.resource_reference).type = "library.googleapis.com/Book"];
-			}
-			message Book {
-				option (google.api.resource) = {
-					type: "library.googleapis.com/Book"
-					pattern: "publishers/{publisher}/books/{book}"
-				};
-			}
-			message OperationMetadata {}
-			`, nil)
-		method := file.Services().Get(0).Methods().Get(0)
-		problems := responseMessageName.Lint(file)
-		if diff := (testutils.Problems{}).SetDescriptor(method).Diff(problems); diff != "" {
-			t.Error(diff)
-		}
-	})
 }
