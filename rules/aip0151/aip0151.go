@@ -16,9 +16,9 @@
 package aip0151
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-151 rules to the provided registry.
@@ -34,10 +34,10 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func isLRO(m *desc.MethodDescriptor) bool {
-	return m.GetOutputType().GetFullyQualifiedName() == "google.longrunning.Operation"
+func isLRO(m protoreflect.MethodDescriptor) bool {
+	return m.Output().FullName() == "google.longrunning.Operation"
 }
 
-func isAnnotatedLRO(m *desc.MethodDescriptor) bool {
+func isAnnotatedLRO(m protoreflect.MethodDescriptor) bool {
 	return isLRO(m) && utils.GetOperationInfo(m) != nil
 }

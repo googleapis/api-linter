@@ -17,26 +17,28 @@ package aip0233
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Create method should have a properly named Response message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(233, "response-message-name"),
 	OnlyIf: isBatchCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Proper response name should be the concatenation of the method name and
 		// "Response"
-		want := m.GetName() + "Response"
+		want := string(m.Name()) + "Response"
 
 		// If this is an LRO, then use the annotated response type instead of
 		// the actual RPC return type.
-		got := m.GetOutputType().GetName()
-		if utils.IsOperation(m.GetOutputType()) {
+		var got string
+		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
+		} else {
+			got = string(m.Output().Name())
 		}
 
 		// Rule check: Establish that for methods such as `BatchCreateFoos`, the

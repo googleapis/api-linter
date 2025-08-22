@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Undelete messages should use google.longrunning.Operation
@@ -29,15 +29,15 @@ import (
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(164, "response-message-name"),
 	OnlyIf: isUndeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UndeleteFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := strings.Replace(m.GetName(), "Undelete", "", 1)
-		got := m.GetOutputType().GetName()
+		want := strings.Replace(string(m.Name()), "Undelete", "", 1)
+		got := m.Output().Name()
 
 		// If the return type is an LRO, use the annotated response type instead.
-		if utils.IsOperation(m.GetOutputType()) {
-			got = utils.GetOperationInfo(m).GetResponseType()
+		if utils.IsOperation(m.Output()) {
+			got = protoreflect.Name(utils.GetOperationInfo(m).GetResponseType())
 		}
 
 		// Return a problem if we did not get the expected return name.
@@ -45,7 +45,7 @@ var responseMessageName = &lint.MethodRule{
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if got != want && got != "" {
+		if string(got) != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Undelete RPCs should have response message type %q, not %q.",

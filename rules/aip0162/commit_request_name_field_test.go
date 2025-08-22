@@ -17,8 +17,8 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestCommitRequestNameField(t *testing.T) {
@@ -29,7 +29,7 @@ func TestCommitRequestNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "CommitBook", "string name = 1;", nil},
-		{"Missing", "CommitBook", "", testutils.Problems{{Message: "no `name`"}}},
+		{"Missing", "CommitBook", "", testutils.Problems{{Message: "Message `CommitBookRequest` has no `name` field."}}},
 		{"InvalidType", "CommitBook", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
@@ -39,9 +39,9 @@ func TestCommitRequestNameField(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" {
-				d = f.GetMessageTypes()[0].GetFields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(commitRequestNameField.Lint(f)); diff != "" {
 				t.Error(diff)

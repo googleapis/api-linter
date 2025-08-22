@@ -17,7 +17,7 @@ package aip0159
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHardcodedHyphen(t *testing.T) {
@@ -41,7 +41,7 @@ func TestHardcodedHyphen(t *testing.T) {
 			message ListBooksRequest {}
 			message ListBooksResponse {}
 		`, test)
-		method := f.GetServices()[0].GetMethods()[0]
+		method := f.Services().Get(0).Methods().Get(0)
 		if diff := test.problems.SetDescriptor(method).Diff(hardcodedHyphen.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

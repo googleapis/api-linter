@@ -17,7 +17,7 @@ package aip4232
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 func TestAddRules(t *testing.T) {

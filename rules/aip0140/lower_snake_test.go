@@ -17,15 +17,14 @@ package aip0140
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestLowerSnake(t *testing.T) {
 	// Define permutations.
 	tests := []struct {
 		testName  string
-		fieldName string
+		FieldName string
 		problems  testutils.Problems
 	}{
 		{"ValidOneWord", "rated", testutils.Problems{}},
@@ -38,18 +37,17 @@ func TestLowerSnake(t *testing.T) {
 	// Test each permutation.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create the given field.
-			message, err := builder.NewMessage("Book").AddField(
-				builder.NewField(test.fieldName, builder.FieldTypeBool()),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build `%s` field.", test.fieldName)
-			}
+			f := testutils.ParseProto3Tmpl(t, `
+				message Book {
+					bool {{.FieldName}} = 1;
+				}
+			`, test)
+			field := f.Messages().Get(0).Fields().Get(0)
 
 			// Run the lint rule and verify that we got the expected set
 			// of problems.
-			problems := lowerSnake.Lint(message.GetFile())
-			if diff := test.problems.SetDescriptor(message.GetFields()[0]).Diff(problems); diff != "" {
+			problems := lowerSnake.Lint(f)
+			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

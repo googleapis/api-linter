@@ -17,7 +17,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -42,7 +42,7 @@ func TestResponseUnknownFields(t *testing.T) {
 				}
 				message Book {}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[2]
+			field := f.Messages().Get(0).Fields().Get(2)
 			if diff := test.problems.SetDescriptor(field).Diff(responseUnknownFields.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

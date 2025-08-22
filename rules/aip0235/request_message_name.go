@@ -15,8 +15,8 @@
 package aip0235
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 )
 
 // Batch Delete messages should have a properly named Request message.

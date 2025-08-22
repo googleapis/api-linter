@@ -17,8 +17,8 @@ package aip0231
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestParentField(t *testing.T) {
@@ -31,13 +31,13 @@ func TestParentField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "", "BatchGetBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"Missing", "", "BatchGetBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"Missing", "", "BatchGetBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchGetBooksRequest` has no `parent` field."}}},
 		{"InvalidType", "", "BatchGetBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"IrrelevantNoParent", "", "BatchGetBooks", "", "books/{b}", nil},
 
 		{"PackageValid", "package foo;", "BatchGetBooks", "string parent = 1;", "publishers/{p}/books/{b}", nil},
-		{"PackageMissing", "package foo;", "BatchGetBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "no `parent`"}}},
+		{"PackageMissing", "package foo;", "BatchGetBooks", "", "publishers/{p}/books/{b}", testutils.Problems{{Message: "Message `BatchGetBooksRequest` has no `parent` field."}}},
 		{"PackageInvalidType", "package foo;", "BatchGetBooks", "int32 parent = 1;", "publishers/{p}/books/{b}", testutils.Problems{{Suggestion: "string"}}},
 		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books/{b}", nil},
 		{"PackageIrrelevantNoParent", "package foo;", "BatchGetBooks", "", "books/{b}", nil},
@@ -67,9 +67,9 @@ func TestParentField(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" || test.name == "PackageInvalidType" {
-				d = f.GetMessageTypes()[0].GetFields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(requestParentField.Lint(f)); diff != "" {
 				t.Error(diff)

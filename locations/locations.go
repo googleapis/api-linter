@@ -25,18 +25,78 @@ package locations
 import (
 	"sync"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // pathLocation returns the precise location for a given descriptor and path.
 // It combines the path of the descriptor itself with any path provided appended.
-func pathLocation(d desc.Descriptor, path ...int) *dpb.SourceCodeInfo_Location {
-	fullPath := d.GetSourceInfo().GetPath()
+func pathLocation(d protoreflect.Descriptor, path ...int) *dpb.SourceCodeInfo_Location {
+	fullPath := getDescriptorPath(d)
 	for _, i := range path {
 		fullPath = append(fullPath, int32(i))
 	}
-	return sourceInfoRegistry.sourceInfo(d.GetFile()).findLocation(fullPath)
+	return sourceInfoRegistry.sourceInfo(d.ParentFile()).findLocation(fullPath)
+}
+
+// getDescriptorPath returns the path for a given descriptor.
+//
+// This function is necessary because the modern `protoreflect` API does not
+// provide a way to get this path directly from a descriptor, unlike the older
+// `jhump/protoreflect` library. While `SourceLocations.ByDescriptor()` can find
+// the location for an entire descriptor, it does not provide the `[]int32` path
+// itself. This path is the essential "key" needed to look up the locations of
+// a descriptor's sub-elements (e.g., a field's name vs. its type).
+//
+// This function reconstructs the path by traversing upwards from the descriptor
+// to the file root, collecting the field numbers and indexes at each step.
+func getDescriptorPath(d protoreflect.Descriptor) []int32 {
+	var path []int32
+	current := d
+	for current != nil {
+		var fieldNumber int32
+		parent := current.Parent()
+		switch desc := current.(type) {
+		case protoreflect.FileDescriptor:
+			// Done.
+			current = nil
+			continue
+		case protoreflect.MessageDescriptor:
+			if _, ok := parent.(protoreflect.FileDescriptor); ok {
+				fieldNumber = 4 // FileDescriptorProto.message_type
+			} else { // parent is MessageDescriptor (nested)
+				fieldNumber = 3 // DescriptorProto.nested_type
+			}
+		case protoreflect.FieldDescriptor:
+			if desc.IsExtension() {
+				if _, ok := parent.(protoreflect.FileDescriptor); ok {
+					fieldNumber = 7 // FileDescriptorProto.extension
+				} else { // parent is MessageDescriptor (nested extension)
+					fieldNumber = 6 // DescriptorProto.extension
+				}
+			} else {
+				fieldNumber = 2 // DescriptorProto.field
+			}
+		case protoreflect.OneofDescriptor:
+			fieldNumber = 8 // DescriptorProto.oneof_decl
+		case protoreflect.EnumDescriptor:
+			if _, ok := parent.(protoreflect.FileDescriptor); ok {
+				fieldNumber = 5 // FileDescriptorProto.enum_type
+			} else { // parent is MessageDescriptor (nested)
+				fieldNumber = 4 // DescriptorProto.enum_type
+			}
+		case protoreflect.EnumValueDescriptor:
+			fieldNumber = 2 // EnumDescriptorProto.value
+		case protoreflect.ServiceDescriptor:
+			fieldNumber = 6 // FileDescriptorProto.service
+		case protoreflect.MethodDescriptor:
+			fieldNumber = 2 // ServiceDescriptorProto.method
+		}
+		path = append([]int32{fieldNumber, int32(current.Index())}, path...)
+		current = parent
+	}
+	return path
 }
 
 type sourceInfo struct {
@@ -71,12 +131,12 @@ func (si *sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
 type sourceInfoRegistryType struct {
 	// registryMu protects the registry map
 	registryMu sync.Mutex
-	registry   map[*desc.FileDescriptor]*sourceInfo
+	registry   map[protoreflect.FileDescriptor]*sourceInfo
 }
 
 func newSourceInfoRegistryType() *sourceInfoRegistryType {
 	return &sourceInfoRegistryType{
-		registry: map[*desc.FileDescriptor]*sourceInfo{},
+		registry: map[protoreflect.FileDescriptor]*sourceInfo{},
 	}
 }
 
@@ -95,7 +155,7 @@ func strPath(segments []int32) (p string) {
 // sourceInfo compiles the source info object for a given file descriptor.
 // It also caches this into a registry, so subsequent calls using the same
 // descriptor will return the same object.
-func (sir *sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) *sourceInfo {
+func (sir *sourceInfoRegistryType) sourceInfo(fd protoreflect.FileDescriptor) *sourceInfo {
 	sir.registryMu.Lock()
 	defer sir.registryMu.Unlock()
 	answer, ok := sir.registry[fd]
@@ -104,7 +164,7 @@ func (sir *sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) *sourceIn
 
 		// This file descriptor does not yet have a source info map.
 		// Compile one.
-		for _, loc := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
+		for _, loc := range protodesc.ToFileDescriptorProto(fd).GetSourceCodeInfo().GetLocation() {
 			answer.info[strPath(loc.Path)] = loc
 		}
 

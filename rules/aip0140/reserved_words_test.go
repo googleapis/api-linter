@@ -17,7 +17,7 @@ package aip0140
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestReservedWords(t *testing.T) {
@@ -29,8 +29,8 @@ func TestReservedWords(t *testing.T) {
 					string {{.N}} = 2;
 				}
 			`, struct{ N string }{N: s})
-			field := f.GetMessageTypes()[0].GetFields()[1]
-			want := testutils.Problems{{Message: field.GetName(), Descriptor: field}}
+			field := f.Messages().Get(0).Fields().Get(1)
+			want := testutils.Problems{{Message: string(field.Name()), Descriptor: field}}
 			if diff := want.Diff(reservedWords.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

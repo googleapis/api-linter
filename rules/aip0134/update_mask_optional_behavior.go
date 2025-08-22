@@ -15,18 +15,21 @@
 package aip0134
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var updateMaskOptionalBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "update-mask-optional-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "update_mask" && utils.IsUpdateRequestMessage(f.GetOwner())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return f.Name() == "update_mask" && utils.IsUpdateRequestMessage(m)
+		}
+		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)
 		if !behaviors.Contains("OPTIONAL") {
 			return []lint.Problem{

@@ -22,7 +22,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Linter checks API files and returns a list of detected problems.
@@ -65,7 +65,7 @@ func New(rules RuleRegistry, configs Configs, opts ...LinterOption) *Linter {
 }
 
 // LintProtos checks protobuf files and returns a list of problems or an error.
-func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
+func (l *Linter) LintProtos(files ...protoreflect.FileDescriptor) ([]Response, error) {
 	var responses []Response
 	for _, proto := range files {
 		resp, err := l.lintFileDescriptor(proto)
@@ -82,9 +82,9 @@ func (l *Linter) LintProtos(files ...*desc.FileDescriptor) ([]Response, error) {
 // It uses the proto file path to determine which rules will
 // be applied to the request, according to the list of Linter
 // configs.
-func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
+func (l *Linter) lintFileDescriptor(fd protoreflect.FileDescriptor) (Response, error) {
 	resp := Response{
-		FilePath: fd.GetName(),
+		FilePath: fd.Path(),
 		Problems: []Problem{},
 	}
 	var errMessages []string
@@ -92,7 +92,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	for name, rule := range l.rules {
 		// Run the linter rule against this file, and throw away any problems
 		// which should have been disabled.
-		if l.configs.IsRuleEnabled(string(name), fd.GetName()) {
+		if l.configs.IsRuleEnabled(string(name), fd.Path()) {
 			if problems, err := l.runAndRecoverFromPanics(rule, fd); err == nil {
 				for _, p := range problems {
 					if p.Descriptor == nil {
@@ -118,7 +118,7 @@ func (l *Linter) lintFileDescriptor(fd *desc.FileDescriptor) (Response, error) {
 	return resp, err
 }
 
-func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd *desc.FileDescriptor) (probs []Problem, err error) {
+func (l *Linter) runAndRecoverFromPanics(rule ProtoRule, fd protoreflect.FileDescriptor) (probs []Problem, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if l.debug {

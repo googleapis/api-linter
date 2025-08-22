@@ -17,8 +17,8 @@ package utils
 import (
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // GetResourceSingular returns the resource singular. The
@@ -68,8 +68,8 @@ func GetResourceNameField(r *apb.ResourceDescriptor) string {
 
 // IsResourceRevision determines if the given message represents a resource
 // revision as described in AIP-162.
-func IsResourceRevision(m *desc.MessageDescriptor) bool {
-	return IsResource(m) && strings.HasSuffix(m.GetName(), "Revision")
+func IsResourceRevision(m protoreflect.MessageDescriptor) bool {
+	return IsResource(m) && strings.HasSuffix(string(m.Name()), "Revision")
 }
 
 // IsRevisionRelationship determines if the "revision" resource is actually

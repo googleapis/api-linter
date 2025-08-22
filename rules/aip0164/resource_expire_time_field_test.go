@@ -3,7 +3,7 @@ package aip0164
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceExpireTimeField(t *testing.T) {
@@ -29,7 +29,7 @@ func TestResourceExpireTimeField(t *testing.T) {
 				}
 				message {{.MethodName}}Request {}
 			`, test)
-			message := file.GetMessageTypes()[0]
+			message := file.Messages().Get(0)
 			problems := resourceExpireTimeField.Lint(file)
 			if diff := test.problems.SetDescriptor(message).Diff(problems); diff != "" {
 				t.Error(diff)

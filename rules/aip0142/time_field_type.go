@@ -18,16 +18,16 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-field-type"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		tokens := strings.Split(f.GetName(), "_")
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		tokens := strings.Split(string(f.Name()), "_")
 		suffix := tokens[len(tokens)-1]
 		typeName := utils.GetTypeName(f)
 		suffixes := stringset.New(

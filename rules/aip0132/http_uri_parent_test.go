@@ -17,7 +17,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHTTPURIParent(t *testing.T) {
@@ -29,8 +29,8 @@ func TestHTTPURIParent(t *testing.T) {
 		problems     testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*/books/*}", "ListBooks", "string parent = 1;", nil},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "`parent` variable"}}},
-		{"InvalidNoVarParent", "/v1/publishers/*/books/*", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "`parent` variable"}}},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "HTTP URI should include a `parent` variable."}}},
+		{"InvalidNoVarParent", "/v1/publishers/*/books/*", "ListBooks", "string parent = 1;", testutils.Problems{{Message: "HTTP URI should include a `parent` variable."}}},
 		{"ValidNoParent", "/v1/books/*", "ListBooks", "", nil},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "string parent = 1;", nil},
 	}
@@ -51,7 +51,7 @@ func TestHTTPURIParent(t *testing.T) {
 				}
 				message {{.MethodName}}Response {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpURIParent.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

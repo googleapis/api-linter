@@ -17,7 +17,7 @@ package aip0140
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoPrepositions(t *testing.T) {
@@ -40,7 +40,7 @@ func TestNoPrepositions(t *testing.T) {
 					string {{.Name}} = 1;
 				}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(noPrepositions.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

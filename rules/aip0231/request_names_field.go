@@ -18,10 +18,9 @@ import (
 	"fmt"
 
 	"github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The Batch Get standard method should have repeated name field or repeated
@@ -29,15 +28,15 @@ import (
 var namesField = &lint.MessageRule{
 	Name:   lint.NewRuleName(231, "request-names-field"),
 	OnlyIf: isBatchGetRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that a name field is present.
-		names := m.FindFieldByName("names")
-		getReqMsg := m.FindFieldByName("requests")
+		names := m.Fields().ByName("names")
+		getReqMsg := m.Fields().ByName("requests")
 
 		// Rule check: Ensure that the names field is present.
 		if names == nil && getReqMsg == nil {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.GetName()),
+				Message:    fmt.Sprintf(`Message %q has no "names" field`, m.Name()),
 				Descriptor: m,
 			})
 		}
@@ -45,13 +44,13 @@ var namesField = &lint.MessageRule{
 		// Rule check: Ensure that only the suggested names field is present.
 		if names != nil && getReqMsg != nil {
 			problems = append(problems, lint.Problem{
-				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.GetName()),
+				Message:    fmt.Sprintf(`Message %q should delete "requests" field, only keep the "names" field`, m.Name()),
 				Descriptor: getReqMsg,
 			})
 		}
 
 		// Rule check: Ensure that the names field is repeated.
-		if names != nil && !names.IsRepeated() {
+		if names != nil && !names.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "names" field should be repeated`,
 				Suggestion: "repeated string",
@@ -61,7 +60,7 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the names field is the correct type.
-		if names != nil && names.GetType() != builder.FieldTypeString().GetType() {
+		if names != nil && names.Kind() != protoreflect.StringKind {
 			problems = append(problems, lint.Problem{
 				Message:    `"names" field on Batch Get Request should be a "string" type`,
 				Suggestion: "string",
@@ -71,7 +70,7 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard get request message field is repeated.
-		if getReqMsg != nil && !getReqMsg.IsRepeated() {
+		if getReqMsg != nil && !getReqMsg.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    `The "requests" field should be repeated`,
 				Descriptor: getReqMsg,
@@ -79,11 +78,11 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard get request message field is the
-		// correct type. Note: Use m.GetName()[8:len(m.GetName())-7]) to retrieve
+		// correct type. Note: Use m.Name()[8:len(m.Name())-7]) to retrieve
 		// the resource name from the batch get request, for example:
 		// "BatchGetBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(m.GetName()[8:len(m.GetName())-7]))
-		if getReqMsg != nil && (getReqMsg.GetMessageType() == nil || getReqMsg.GetMessageType().GetName() != rightTypeName) {
+		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(string(m.Name())[8:len(m.Name())-7]))
+		if getReqMsg != nil && (getReqMsg.Message() == nil || getReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),
 				Descriptor: getReqMsg,

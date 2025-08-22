@@ -17,7 +17,7 @@ package aip0203
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUnorderedList(t *testing.T) {
@@ -55,7 +55,7 @@ func TestUnorderedList(t *testing.T) {
 				message Book {
 					{{.Field}}
 				}`, test)
-			f := file.GetMessageTypes()[0].GetFields()[0]
+			f := file.Messages().Get(0).Fields().Get(0)
 			problems := unorderedListRepeated.Lint(file)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Error(diff)

@@ -17,7 +17,8 @@ package aip0203
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestResourceIdentifierOnly(t *testing.T) {
@@ -70,7 +71,7 @@ func TestResourceIdentifierOnly(t *testing.T) {
 				string foo = 1 {{.NonResourceExtensions}};
 			}
 			`, test)
-			f := file.FindMessage(test.message).GetFields()[0]
+			f := file.Messages().ByName(protoreflect.Name(test.message)).Fields().Get(0)
 			problems := resourceIdentifierOnly.Lint(file)
 			if diff := test.problems.SetDescriptor(f).Diff(problems); diff != "" {
 				t.Error(diff)

@@ -17,7 +17,7 @@ package aip0163
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestSynonyms(t *testing.T) {
@@ -34,7 +34,7 @@ func TestSynonyms(t *testing.T) {
 					bool {{.Name}} = 1;
 				}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(synonyms.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

@@ -17,7 +17,7 @@ package aip4232
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequiredFields(t *testing.T) {
@@ -55,7 +55,7 @@ func TestRequiredFields(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(requiredFields.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

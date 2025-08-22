@@ -17,8 +17,8 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestTagRevisionRequestNameField(t *testing.T) {
@@ -29,7 +29,7 @@ func TestTagRevisionRequestNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "TagBookRevision", "string name = 1;", nil},
-		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: "no `name`"}}},
+		{"Missing", "TagBookRevision", "", testutils.Problems{{Message: "Message `TagBookRevisionRequest` has no `name` field."}}},
 		{"InvalidType", "TagBookRevision", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
@@ -39,9 +39,9 @@ func TestTagRevisionRequestNameField(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidType" {
-				d = f.GetMessageTypes()[0].GetFields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(tagRevisionRequestNameField.Lint(f)); diff != "" {
 				t.Error(diff)

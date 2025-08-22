@@ -17,7 +17,7 @@ package aip0148
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestFieldBehavior(t *testing.T) {
@@ -53,7 +53,7 @@ func TestFieldBehavior(t *testing.T) {
 					{{.Field}} = 1 {{.FieldOpts}};
 				}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(fieldBehavior.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

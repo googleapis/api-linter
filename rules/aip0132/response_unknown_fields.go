@@ -18,9 +18,9 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The resource itself is not included here, but also permitted.
@@ -34,12 +34,15 @@ var respAllowedFields = stringset.New(
 
 var responseUnknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "response-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsListResponseMessage(f.GetOwner())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListResponseMessage(m)
+		}
+		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// A repeated variant of the resource should be permitted.
-		resource := utils.ListResponseResourceName(f.GetOwner())
+		resource := utils.ListResponseResourceName(f.Parent().(protoreflect.MessageDescriptor))
 		if strings.HasSuffix(resource, "_revisions") {
 			// This is an AIP-162 ListFooRevisions response, which is subtly
 			// different from an AIP-132 List response. We need to modify the RPC
@@ -47,12 +50,12 @@ var responseUnknownFields = &lint.FieldRule{
 			// the resource field properly.
 			resource = utils.ToPlural(strings.TrimSuffix(resource, "_revisions"))
 		}
-		if f.GetName() == resource {
+		if string(f.Name()) == resource {
 			return nil
 		}
 
 		// It is not the resource field; check it against the whitelist.
-		if !respAllowedFields.Contains(f.GetName()) {
+		if !respAllowedFields.Contains(string(f.Name())) {
 			return []lint.Problem{{
 				Message:    "List responses should only contain fields explicitly described in AIPs.",
 				Descriptor: f,

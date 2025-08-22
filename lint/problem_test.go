@@ -19,15 +19,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc/builder"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
 
 func TestProblemJSON(t *testing.T) {
 	problem := &Problem{
 		Message:  "foo bar",
-		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
+		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
 		RuleID:   "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
@@ -56,7 +57,7 @@ func TestProblemJSON(t *testing.T) {
 func TestProblemYAML(t *testing.T) {
 	problem := &Problem{
 		Message:  "foo bar",
-		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
+		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
 		RuleID:   "core::0131",
 	}
 	serialized, err := yaml.Marshal(problem)
@@ -84,14 +85,26 @@ func TestProblemYAML(t *testing.T) {
 }
 
 func TestProblemDescriptor(t *testing.T) {
-	mb := builder.NewMessage("Foo")
-	builder.NewFile("foo.proto").AddMessage(mb)
-
-	m, err := mb.Build()
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:   proto.String("foo.proto"),
+		MessageType: []*descriptorpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+		},
+		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
+			Location: []*descriptorpb.SourceCodeInfo_Location{
+				{
+					Path: []int32{4, 0}, // message_type 0
+					Span: []int32{42, 0, 79},
+				},
+			},
+		},
+	}, nil)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	m.GetSourceInfo().Span = []int32{42, 0, 79}
+	m := fd.Messages().Get(0)
 	problem := &Problem{
 		Message:    "foo bar",
 		Descriptor: m,

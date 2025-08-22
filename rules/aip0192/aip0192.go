@@ -16,8 +16,9 @@
 package aip0192
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // AddRules adds all of the AIP-192 rules to the provided registry.
@@ -36,20 +37,20 @@ func AddRules(r lint.RuleRegistry) error {
 }
 
 // Returns true if this is a deprecated descriptor, false otherwise.
-func isDeprecated(d desc.Descriptor) bool {
+func isDeprecated(d protoreflect.Descriptor) bool {
 	switch d := d.(type) {
-	case *desc.MethodDescriptor:
-		return d.GetMethodOptions().GetDeprecated()
-	case *desc.ServiceDescriptor:
-		return d.GetServiceOptions().GetDeprecated()
-	case *desc.FieldDescriptor:
-		return d.GetFieldOptions().GetDeprecated()
-	case *desc.EnumDescriptor:
-		return d.GetEnumOptions().GetDeprecated()
-	case *desc.EnumValueDescriptor:
-		return d.GetEnumValueOptions().GetDeprecated()
-	case *desc.MessageDescriptor:
-		return d.GetMessageOptions().GetDeprecated()
+	case protoreflect.MethodDescriptor:
+		return d.Options().(*descriptorpb.MethodOptions).GetDeprecated()
+	case protoreflect.ServiceDescriptor:
+		return d.Options().(*descriptorpb.ServiceOptions).GetDeprecated()
+	case protoreflect.FieldDescriptor:
+		return d.Options().(*descriptorpb.FieldOptions).GetDeprecated()
+	case protoreflect.EnumDescriptor:
+		return d.Options().(*descriptorpb.EnumOptions).GetDeprecated()
+	case protoreflect.EnumValueDescriptor:
+		return d.Options().(*descriptorpb.EnumValueOptions).GetDeprecated()
+	case protoreflect.MessageDescriptor:
+		return d.Options().(*descriptorpb.MessageOptions).GetDeprecated()
 	default:
 		return false
 	}

@@ -18,20 +18,20 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Update methods should use the resource as the response message
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "response-message-name"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `UpdateFoo`, the response
 		// message is `Foo` or `google.longrunning.Operation`.
-		want := strings.Replace(m.GetName(), "Update", "", 1)
+		want := strings.Replace(string(m.Name()), "Update", "", 1)
 
 		// Load the response type, resolving the
 		// `google.longrunning.OperationInfo.response_type` if necessary.
@@ -40,14 +40,14 @@ var responseMessageName = &lint.MethodRule{
 			// If we can't resolve it, let the AIP-151 rule warn about this.
 			return nil
 		}
-		got := resp.GetName()
+		got := resp.Name()
 
 		// Return a problem if we did not get the expected return name.
 		//
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if got != want && got != "" {
+		if string(got) != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Update RPCs should have response message type %q, not %q.",

@@ -17,19 +17,23 @@ package aip0163
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var declarativeFriendlyRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(163, "declarative-friendly-required"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// We only want to look at request methods, not the resources themselves.
-		if name := m.GetName(); strings.HasSuffix(name, "Request") && utils.IsDeclarativeFriendlyMessage(m) {
+		if name := string(m.Name()); strings.HasSuffix(name, "Request") && utils.IsDeclarativeFriendlyMessage(m) {
 			// If the corresponding method is a GET method, it does not need
 			// validate_only.
-			method := utils.FindMethod(m.GetFile(), strings.TrimSuffix(name, "Request"))
+			file, ok := m.Parent().(protoreflect.FileDescriptor)
+			if !ok {
+				return false
+			}
+			method := utils.FindMethod(file, strings.TrimSuffix(name, "Request"))
 			for _, http := range utils.GetHTTPRules(method) {
 				if http.Method == "GET" {
 					return false
@@ -39,8 +43,8 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 		}
 		return false
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		if vo := m.FindFieldByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" || vo.IsRepeated() {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		if vo := m.Fields().ByName("validate_only"); vo == nil || utils.GetTypeName(vo) != "bool" || vo.IsList() {
 			return []lint.Problem{{
 				Message:    "Declarative-friendly mutate requests should include a singular `bool validate_only` field.",
 				Descriptor: m,

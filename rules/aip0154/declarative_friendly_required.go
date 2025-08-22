@@ -18,14 +18,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var declarativeFriendlyRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(154, "declarative-friendly-required"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		// Sanity check: If the resource is not declarative-friendly, none of
 		// this logic applies.
 		if resource := utils.DeclarativeFriendlyResource(m); resource != nil {
@@ -39,11 +39,11 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 
 			// If this is a request message, then make several more checks based on
 			// what the method looks like.
-			if name := m.GetName(); strings.HasSuffix(name, "Request") {
-				name = strings.TrimSuffix(name, "Request")
+			if name := string(m.Name()); strings.HasSuffix(name, "Request") {
+				methodName := strings.TrimSuffix(name, "Request")
 
 				// If this is a GET request, then this message is exempt.
-				if method := utils.FindMethod(m.GetFile(), name); method != nil {
+				if method := utils.FindMethod(m.Parent().(protoreflect.FileDescriptor), methodName); method != nil {
 					for _, rule := range utils.GetHTTPRules(method) {
 						if rule.Method == "GET" {
 							return false
@@ -52,8 +52,9 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 				}
 
 				// If the message contains the resource, then this message is exempt.
-				for _, field := range m.GetFields() {
-					if field.GetMessageType() == resource {
+				for i := 0; i < m.Fields().Len(); i++ {
+					field := m.Fields().Get(i)
+					if field.Message() == resource {
 						return false
 					}
 				}
@@ -65,15 +66,16 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 
 		return false
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		for _, field := range m.GetFields() {
-			if field.GetName() == "etag" {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if field.Name() == "etag" {
 				return nil
 			}
 		}
 
 		whoami := "resources"
-		if strings.HasSuffix(m.GetName(), "Request") {
+		if strings.HasSuffix(string(m.Name()), "Request") {
 			whoami = "mutation requests without the resource"
 		}
 		return []lint.Problem{{

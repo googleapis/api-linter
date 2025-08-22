@@ -18,17 +18,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Protobuf package must match the directory structure.
 var protoPkg = &lint.FileRule{
 	Name: lint.NewRuleName(191, "proto-package"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		dir := filepath.Dir(f.GetName())
-		pkg := strings.ReplaceAll(f.GetPackage(), ".", string(filepath.Separator))
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
+		dir := filepath.Dir(string(f.Path()))
+		pkg := strings.ReplaceAll(string(f.Package()), ".", string(filepath.Separator))
 
 		if dir != "." && dir != pkg {
 			return []lint.Problem{{

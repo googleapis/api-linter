@@ -18,19 +18,19 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var standardMethodsOnly = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "declarative-standard-methods-only"),
 	OnlyIf: utils.IsDeclarativeFriendlyMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Standard methods are fine.
 		standard := stringset.New("Get", "List", "Create", "Update", "Delete", "Undelete", "Batch")
 		for s := range standard {
-			if strings.HasPrefix(m.GetName(), s) {
+			if strings.HasPrefix(string(m.Name()), s) {
 				return nil
 			}
 		}
@@ -40,7 +40,7 @@ var standardMethodsOnly = &lint.MethodRule{
 		//
 		// Therefore, we allow "Imperative only." in an internal comment to make
 		// this not complain.
-		if cmt := m.GetSourceInfo().GetLeadingComments(); strings.Contains(strings.ToLower(cmt), "imperative only") {
+		if cmt := m.ParentFile().SourceLocations().ByDescriptor(m).LeadingComments; strings.Contains(strings.ToLower(string(cmt)), "imperative only") {
 			return nil
 		}
 

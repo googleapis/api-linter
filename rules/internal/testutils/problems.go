@@ -18,8 +18,8 @@ import (
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Problems is a slice of individual Problem objects.
@@ -66,7 +66,7 @@ func (problems Problems) Diff(other []lint.Problem) string {
 // returns the slice back.
 //
 // This is intended primarily for use in unit tests.
-func (problems Problems) SetDescriptor(d desc.Descriptor) Problems {
+func (problems Problems) SetDescriptor(d protoreflect.Descriptor) Problems {
 	for i := range problems {
 		problems[i].Descriptor = d
 	}

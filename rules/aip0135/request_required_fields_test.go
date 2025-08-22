@@ -17,8 +17,8 @@ package aip0135
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequiredFieldTests(t *testing.T) {
@@ -89,9 +89,9 @@ func TestRequiredFieldTests(t *testing.T) {
 					{{.Fields}}
 				}
 			`, test)
-			var dbr desc.Descriptor = f.FindMessage("DeleteBookRequest")
+			var dbr protoreflect.Descriptor = f.Messages().Get(0)
 			if test.problematicFieldName != "" {
-				dbr = f.FindMessage("DeleteBookRequest").FindFieldByName(test.problematicFieldName)
+				dbr = f.Messages().Get(0).Fields().ByName(protoreflect.Name(test.problematicFieldName))
 			}
 			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFields.Lint(f)); diff != "" {
 				t.Error(diff)

@@ -15,13 +15,13 @@
 package locations
 
 import (
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // MessageResource returns the precise location of the `google.api.resource`
 // annotation.
-func MessageResource(m *desc.MessageDescriptor) *dpb.SourceCodeInfo_Location {
+func MessageResource(m protoreflect.MessageDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(m, 7, int(apb.E_Resource.TypeDescriptor().Number())) // MessageDescriptor.options == 7
 }

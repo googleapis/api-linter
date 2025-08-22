@@ -18,8 +18,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -47,8 +49,8 @@ func TestLocations(t *testing.T) {
 	t.Run("File", func(t *testing.T) {
 		tests := []struct {
 			testName string
-			fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
-			idxFx    func(f *desc.FileDescriptor, i int) *dpb.SourceCodeInfo_Location
+			fx       func(f protoreflect.FileDescriptor) *dpb.SourceCodeInfo_Location
+			idxFx    func(f protoreflect.FileDescriptor, i int) *dpb.SourceCodeInfo_Location
 			idx      int
 			wantSpan []int32
 		}{
@@ -128,22 +130,25 @@ func TestLocations(t *testing.T) {
 }
 
 func TestMissingLocations(t *testing.T) {
-	m, err := builder.NewMessage("Foo").Build()
+	fdp := &dpb.FileDescriptorProto{
+		Name:        proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{{Name: proto.String("Foo")}},
+	}
+	f, err := protodesc.NewFile(fdp, new(protoregistry.Files))
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	f := m.GetFile()
 	tests := []struct {
 		testName string
-		fx       func(f *desc.FileDescriptor) *dpb.SourceCodeInfo_Location
+		fx       func(f protoreflect.FileDescriptor) *dpb.SourceCodeInfo_Location
 	}{
 		{"Syntax", FileSyntax},
 		{"Package", FilePackage},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			if diff := cmp.Diff(test.fx(f).Span, []int32{0, 0, 0}); diff != "" {
-				t.Error(diff)
+			if loc := test.fx(f); loc != nil {
+				t.Errorf("Expected nil location, got %v", loc)
 			}
 		})
 	}

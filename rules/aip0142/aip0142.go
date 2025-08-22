@@ -16,9 +16,9 @@
 package aip0142
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-142 rules to the provided registry.
@@ -34,6 +34,6 @@ func AddRules(r lint.RuleRegistry) error {
 
 // isTimestamp simply returns if the field is of type google.protobuf.Timestamp
 // or not.
-func isTimestamp(f *desc.FieldDescriptor) bool {
+func isTimestamp(f protoreflect.FieldDescriptor) bool {
 	return utils.GetTypeName(f) == "google.protobuf.Timestamp"
 }

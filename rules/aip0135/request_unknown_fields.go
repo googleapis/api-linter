@@ -17,16 +17,16 @@ package aip0135
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Delete methods should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-unknown-fields"),
 	OnlyIf: utils.IsDeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := map[string]struct{}{
 			"name":          {}, // AIP-135
@@ -36,12 +36,13 @@ var unknownFields = &lint.MessageRule{
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
 		}
-		for _, field := range m.GetFields() {
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if _, ok := allowedFields[string(field.Name())]; !ok {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Delete RPCs must only contain fields explicitly described in AIPs, not %q.",
-						string(field.GetName()),
+						string(field.Name()),
 					),
 					Descriptor: field,
 				})

@@ -17,7 +17,7 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestCommitHTTPBody(t *testing.T) {
@@ -47,7 +47,7 @@ func TestCommitHTTPBody(t *testing.T) {
 				message Book {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			problems := commitHTTPBody.Lint(file)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)

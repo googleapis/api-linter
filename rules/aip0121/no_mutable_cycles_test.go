@@ -17,7 +17,7 @@ package aip0121
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoMutableCycles(t *testing.T) {
@@ -140,13 +140,13 @@ func TestNoMutableCycles(t *testing.T) {
 			}
 			`, test)
 
-			msg := f.FindMessage("Publisher")
+			msg := f.Messages().ByName("Publisher")
 			want := test.problems
 			if len(want) >= 1 {
-				want[0].Descriptor = msg.FindFieldByName("resource")
+				want[0].Descriptor = msg.Fields().ByName("resource")
 			}
 			if len(want) == 2 {
-				want[1].Descriptor = msg.FindFieldByName("other_resource")
+				want[1].Descriptor = msg.Fields().ByName("other_resource")
 			}
 			// If this rule was run on the entire test file, there would be two
 			// findings, one for each resource in the cycle. To simplify that,

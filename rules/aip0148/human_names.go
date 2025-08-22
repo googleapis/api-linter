@@ -17,16 +17,16 @@ package aip0148
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var humanNames = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "human-names"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		for got, want := range corrections {
-			if f.GetName() == got {
+			if string(f.Name()) == got {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Use %s instead of %s.", want, got),
 					Descriptor: f,

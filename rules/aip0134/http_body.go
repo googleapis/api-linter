@@ -17,10 +17,10 @@ package aip0134
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -28,8 +28,8 @@ import (
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "http-body"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		fieldName := strcase.SnakeCase(m.GetName()[6:])
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		fieldName := strcase.SnakeCase(string(m.Name()[6:]))
 		// Establish that the RPC has HTTP body equal to fieldName.
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if httpRule.Body != fieldName {

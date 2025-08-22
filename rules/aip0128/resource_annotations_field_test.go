@@ -17,8 +17,8 @@ package aip0128
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestResourceAnnotationsField(t *testing.T) {
@@ -48,9 +48,9 @@ func TestResourceAnnotationsField(t *testing.T) {
 				}
 				message DeleteBookRequest {}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.name == "InvalidBadTypeDF" {
-				d = f.GetMessageTypes()[0].GetFields()[1]
+				d = f.Messages().Get(0).Fields().Get(1)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(resourceAnnotationsField.Lint(f)); diff != "" {
 				t.Error(diff)

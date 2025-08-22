@@ -15,62 +15,120 @@
 package aip0191
 
 import (
-	"reflect"
 	"sort"
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
-	"github.com/stoewer/go-strcase"
-	"google.golang.org/protobuf/proto"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestFileOptionConsistency(t *testing.T) {
-	// Make a "control file".
-	// This is a situation where using a builder is much easier
-	// than parsing a proto template.
-	controlFile := builder.NewFile("control.proto").SetPackageName(
-		"google.example.v1",
-	).SetOptions(getOptions(nil))
+	controlSrc := `
+		package google.example.v1;
+		option csharp_namespace = "Google.Example.V1";
+		option go_package = "github.com/googleapis/genproto/googleapis/example/v1;example";
+		option java_package = "com.google.example.v1";
+		option java_multiple_files = true;
+		option php_namespace = "Google\\Example\\V1";
+		option objc_class_prefix = "GEX";
+		option ruby_package = "Google::Example::V1";
+		option swift_prefix = "Google_Example_V1";
+	`
+	baseOptions := map[string]string{
+		"csharp_namespace":       "Google.Example.V1",
+		"go_package":             "github.com/googleapis/genproto/googleapis/example/v1;example",
+		"java_package":           "com.google.example.v1",
+		"java_multiple_files":    "true",
+		"php_namespace":          "Google\\\\Example\\\\V1",
+		"objc_class_prefix":      "GEX",
+		"ruby_package":           "Google::Example::V1",
+		"swift_prefix":           "Google_Example_V1",
+		"php_metadata_namespace": "",
+		"php_class_prefix":       "",
+	}
+
+	// Helper function to create a new map with modified options.
+	// This avoids modifying the base map.
+	withOptions := func(mods map[string]string) map[string]string {
+		res := map[string]string{}
+		for k, v := range baseOptions {
+			res[k] = v
+		}
+		for k, v := range mods {
+			if v == "" {
+				delete(res, k)
+			} else {
+				res[k] = v
+			}
+		}
+		return res
+	}
 
 	// Run our tests. Each test will make a "test file" that imports the
 	// control file.
-	for _, test := range []consistencyTest{
-		{"ValidSame", map[string]string{}},
-		{"InvalidCsharpNamespaceMissing", map[string]string{"csharp_namespace": ""}},
-		{"InvalidCsharpNamespaceMismatch", map[string]string{"csharp_namespace": "Example.V1"}},
-		{"InvalidJavaPackageMissing", map[string]string{"java_package": ""}},
-		{"InvalidJavaPackageMismatch", map[string]string{"java_package": "com.example.v1"}},
-		{"InvalidPhpNamespaceMissing", map[string]string{"php_namespace": ""}},
-		{"InvalidPhpNamespaceMismatch", map[string]string{"php_namespace": "Example\\V1"}},
-		{"InvalidPhpMetadataNamespace", map[string]string{"php_metadata_namespace": "Example\\V1"}},
-		{"InvalidPhpClassPrefix", map[string]string{"php_class_prefix": "ExampleProto"}},
-		{"InvalidObjcClassPrefixMissing", map[string]string{"objc_class_prefix": ""}},
-		{"InvalidObjcClassPrefixMismatch", map[string]string{"objc_class_prefix": "GEXV1"}},
-		{"InvalidRubyPackageMissing", map[string]string{"ruby_package": ""}},
-		{"InvalidRubyPackageMismatch", map[string]string{"ruby_package": "Example::V1"}},
-		{"InvalidSwiftPrefixMissing", map[string]string{"swift_prefix": ""}},
-		{"InvalidSwiftPrefixMismatch", map[string]string{"swift_prefix": "ExampleProto"}},
-		{"InvalidLotsOfReasons", map[string]string{
+	for _, test := range []struct {
+		name     string
+		options  map[string]string
+		problems testutils.Problems
+	}{
+		{"ValidSame", baseOptions, testutils.Problems{}},
+		{"InvalidCsharpNamespaceMissing", withOptions(map[string]string{"csharp_namespace": ""}), testutils.Problems{{Message: `Option "csharp_namespace" should be consistent throughout the package.`}}},
+		{"InvalidCsharpNamespaceMismatch", withOptions(map[string]string{"csharp_namespace": "Example.V1"}), testutils.Problems{{Message: `Option "csharp_namespace" should be consistent throughout the package.`}}},
+		{"InvalidJavaPackageMissing", withOptions(map[string]string{"java_package": ""}), testutils.Problems{{Message: `Option "java_package" should be consistent throughout the package.`}}},
+		{"InvalidJavaPackageMismatch", withOptions(map[string]string{"java_package": "com.example.v1"}), testutils.Problems{{Message: `Option "java_package" should be consistent throughout the package.`}}},
+		{"InvalidPhpNamespaceMissing", withOptions(map[string]string{"php_namespace": ""}), testutils.Problems{{Message: `Option "php_namespace" should be consistent throughout the package.`}}},
+		{"InvalidPhpNamespaceMismatch", withOptions(map[string]string{"php_namespace": "Example\\\\V1"}), testutils.Problems{{Message: `Option "php_namespace" should be consistent throughout the package.`}}},
+		{"InvalidPhpMetadataNamespace", withOptions(map[string]string{"php_metadata_namespace": "Example\\\\V1"}), testutils.Problems{{Message: `Option "php_metadata_namespace" should be consistent throughout the package.`}}},
+		{"InvalidPhpClassPrefix", withOptions(map[string]string{"php_class_prefix": "ExampleProto"}), testutils.Problems{{Message: `Option "php_class_prefix" should be consistent throughout the package.`}}},
+		{"InvalidObjcClassPrefixMissing", withOptions(map[string]string{"objc_class_prefix": ""}), testutils.Problems{{Message: `Option "objc_class_prefix" should be consistent throughout the package.`}}},
+		{"InvalidObjcClassPrefixMismatch", withOptions(map[string]string{"objc_class_prefix": "GEXV1"}), testutils.Problems{{Message: `Option "objc_class_prefix" should be consistent throughout the package.`}}},
+		{"InvalidRubyPackageMissing", withOptions(map[string]string{"ruby_package": ""}), testutils.Problems{{Message: `Option "ruby_package" should be consistent throughout the package.`}}},
+		{"InvalidRubyPackageMismatch", withOptions(map[string]string{"ruby_package": "Example::V1"}), testutils.Problems{{Message: `Option "ruby_package" should be consistent throughout the package.`}}},
+		{"InvalidSwiftPrefixMissing", withOptions(map[string]string{"swift_prefix": ""}), testutils.Problems{{Message: `Option "swift_prefix" should be consistent throughout the package.`}}},
+		{"InvalidSwiftPrefixMismatch", withOptions(map[string]string{"swift_prefix": "ExampleProto"}), testutils.Problems{{Message: `Option "swift_prefix" should be consistent throughout the package.`}}},
+		{"InvalidLotsOfReasons", withOptions(map[string]string{
 			"csharp_namespace": "Example.V1",
 			"go_package":       "google.golang.org/googleapis/genproto/googleapis/example/v1;example",
 			"java_package":     "com.example.v1",
 			"ruby_package":     "Example::V1",
 			"swift_prefix":     "",
+		}), testutils.Problems{
+			{Message: `Option "csharp_namespace" should be consistent throughout the package.`},
+			{Message: `Option "go_package" should be consistent throughout the package.`},
+			{Message: `Option "java_package" should be consistent throughout the package.`},
+			{Message: `Option "ruby_package" should be consistent throughout the package.`},
+			{Message: `Option "swift_prefix" should be consistent throughout the package.`},
 		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build our test file, which imports the control file.
-			testFile, err := builder.NewFile("test.proto").AddDependency(
-				controlFile,
-			).SetPackageName("google.example.v1").SetOptions(getOptions(test.options)).Build()
-			if err != nil {
-				t.Fatalf("Could not build test file.")
+			testSrc := `
+				import "control.proto";
+				package google.example.v1;
+				{{range $key, $value := .Options}}
+				option {{$key}} = "{{$value}}";
+				{{end}}
+			`
+			// The template is basic, and does not handle bools.
+			// We address this by replacing the quoted "true" with the raw bool.
+			// This is a bit of a hack, but it works for this test.
+			if val, ok := test.options["java_multiple_files"]; ok && val == "true" {
+				delete(test.options, "java_multiple_files")
+				testSrc += "\noption java_multiple_files = true;"
 			}
-			if diff := test.getProblems(testFile).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
+
+			files := testutils.ParseProto3Tmpls(t, map[string]string{
+				"control.proto": controlSrc,
+				"test.proto":    testSrc,
+			}, map[string]interface{}{
+				"Options": test.options,
+			})
+			testFile := files["test.proto"]
+			problems := fileOptionConsistency.Lint(testFile)
+			// We need to sort the problems to have a consistent diff.
+			sort.Slice(problems, func(i, j int) bool {
+				return problems[i].Message < problems[j].Message
+			})
+			if diff := test.problems.SetDescriptor(testFile).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -78,47 +136,28 @@ func TestFileOptionConsistency(t *testing.T) {
 
 	// Also ensure separate packages are ignored.
 	t.Run("ValidDifferentPackages", func(t *testing.T) {
-		testFile, err := builder.NewFile("test.proto").AddDependency(controlFile).SetOptions(
-			getOptions(map[string]string{"java_package": "com.wrong"}),
-		).SetPackageName("google.different.v1").Build()
-		if err != nil {
-			t.Fatalf("Could not build test file.")
-		}
+		controlSrc := `
+			package google.example.v1;
+			option csharp_namespace = "Google.Example.V1";
+			option go_package = "github.com/googleapis/genproto/googleapis/example/v1;example";
+			option java_package = "com.google.example.v1";
+			option php_namespace = "Google\\Example\\V1";
+			option objc_class_prefix = "GEX";
+			option ruby_package = "Google::Example::V1";
+			option swift_prefix = "Google_Example_V1";
+		`
+		testSrc := `
+			import "control.proto";
+			package google.different.v1;
+			option java_package = "com.wrong";
+		`
+		files := testutils.ParseProto3Tmpls(t, map[string]string{
+			"control.proto": controlSrc,
+			"test.proto":    testSrc,
+		}, nil)
+		testFile := files["test.proto"]
 		if diff := (testutils.Problems{}).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
 			t.Error(diff)
 		}
 	})
-}
-
-func getOptions(fileopts map[string]string) *dpb.FileOptions {
-	opts := &dpb.FileOptions{
-		CsharpNamespace: proto.String("Google.Example.V1"),
-		GoPackage:       proto.String("github.com/googleapis/genproto/googleapis/example/v1;example"),
-		JavaPackage:     proto.String("com.google.example.v1"),
-		PhpNamespace:    proto.String("Google\\Example\\V1"),
-		ObjcClassPrefix: proto.String("GEX"),
-		RubyPackage:     proto.String("Google::Example::V1"),
-		SwiftPrefix:     proto.String("Google_Example_V1"),
-	}
-	for k, v := range fileopts {
-		field := strcase.UpperCamelCase(k)
-		reflect.ValueOf(opts).Elem().FieldByName(field).Set(reflect.ValueOf(proto.String(v)))
-	}
-	return opts
-}
-
-type consistencyTest struct {
-	name    string
-	options map[string]string
-}
-
-func (ct *consistencyTest) getProblems(f *desc.FileDescriptor) testutils.Problems {
-	p := testutils.Problems{}
-	for k := range ct.options {
-		p = append(p, lint.Problem{Message: k, Descriptor: f})
-	}
-	sort.Slice(p, func(i, j int) bool {
-		return p[i].Message < p[j].Message
-	})
-	return p
 }

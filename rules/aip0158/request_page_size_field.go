@@ -15,23 +15,22 @@
 package aip0158
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestPaginationPageSize = &lint.MessageRule{
 	Name:   lint.NewRuleName(158, "request-page-size-field"),
 	OnlyIf: isPaginatedRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f, problems := utils.LintFieldPresent(m, "page_size")
 		if len(problems) > 0 {
 			return problems
 		}
 		// Checks that page_size is of type int32 and is not a oneof. These are
 		// noops if page_size is not a oneof and is a int32.
-		problems = append(problems, utils.LintSingularField(f, builder.FieldTypeInt32(), "int32")...)
+		problems = append(problems, utils.LintSingularField(f, protoreflect.Int32Kind, "int32")...)
 		problems = append(problems, utils.LintNotOneof(f)...)
 
 		return problems

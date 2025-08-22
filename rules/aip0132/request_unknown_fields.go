@@ -16,9 +16,9 @@ package aip0132
 
 import (
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var allowedFields = stringset.New(
@@ -38,11 +38,14 @@ var allowedFields = stringset.New(
 // List methods should not have unrecognized fields.
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-unknown-fields"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m)
+		}
+		return false
 	},
-	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
-		if !allowedFields.Contains(field.GetName()) {
+	LintField: func(field protoreflect.FieldDescriptor) []lint.Problem {
+		if !allowedFields.Contains(string(field.Name())) {
 			return []lint.Problem{{
 				Message:    "List RPCs should only contain fields explicitly described in AIPs.",
 				Descriptor: field,

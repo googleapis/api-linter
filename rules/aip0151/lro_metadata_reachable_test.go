@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestLROMetadataReachable(t *testing.T) {
@@ -54,7 +54,7 @@ func TestLROMetadataReachable(t *testing.T) {
 					message WriteBookMetadata {}
 				`, test)
 				problems := lroMetadataReachable.Lint(f)
-				m := f.GetServices()[0].GetMethods()[0]
+				m := f.Services().Get(0).Methods().Get(0)
 				if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 					t.Error(diff)
 				}
@@ -93,7 +93,7 @@ func TestLROMetadataReachable(t *testing.T) {
 					`,
 				})
 				problems := lroMetadataReachable.Lint(files["test.proto"])
-				method := files["test.proto"].GetServices()[0].GetMethods()[0]
+				method := files["test.proto"].Services().Get(0).Methods().Get(0)
 				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 					t.Error(diff)
 				}

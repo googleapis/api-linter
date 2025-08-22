@@ -17,10 +17,10 @@ package aip0136
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const responseMessageNameErrorMessage = "" +
@@ -32,7 +32,7 @@ const responseMessageNameErrorMessage = "" +
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "response-message-name"),
 	OnlyIf: utils.IsCustomMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// A response is considered valid if
 		// - The response name matches the RPC name with a `Response` suffix
 		// - The response is the resource being operated on
@@ -53,14 +53,15 @@ var responseMessageName = &lint.MethodRule{
 			// just exit.
 			return nil
 		}
+
 		res := utils.GetResource(response)
 		responseResourceType := res.GetType()
-		requestResourceType := utils.GetResourceReference(m.GetInputType().FindFieldByName("name")).GetType()
+		requestResourceType := utils.GetResourceReference(m.Input().Fields().ByName("name")).GetType()
 
 		// Check to see if the custom method uses the resource type name as the target
 		// field name and use that instead if `name` is not present as well.
 		// AIP-144 methods recommend this naming style.
-		resourceFieldType := utils.GetResourceReference(m.GetInputType().FindFieldByName(utils.GetResourceSingular(res))).GetType()
+		resourceFieldType := utils.GetResourceReference(m.Input().Fields().ByName(protoreflect.Name(utils.GetResourceSingular(res)))).GetType()
 		if requestResourceType == "" && resourceFieldType != "" {
 			requestResourceType = resourceFieldType
 		}
@@ -71,12 +72,12 @@ var responseMessageName = &lint.MethodRule{
 		}
 
 		loc := locations.MethodResponseType(m)
-		if utils.IsOperation(m.GetOutputType()) {
+		if utils.IsOperation(m.Output()) {
 			loc = locations.MethodOperationInfo(m)
 		}
 
 		return []lint.Problem{{
-			Message:    fmt.Sprintf(responseMessageNameErrorMessage, response.GetName()),
+			Message:    fmt.Sprintf(responseMessageNameErrorMessage, response.Name()),
 			Descriptor: m,
 			Location:   loc,
 		}}
