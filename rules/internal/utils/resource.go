@@ -17,7 +17,7 @@ package utils
 import (
 	"strings"
 
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -27,7 +27,7 @@ import (
 // it from multiple different locations including:
 // 1. the singular annotation
 // 2. the type definition
-func GetResourceSingular(r *annotations.ResourceDescriptor) string {
+func GetResourceSingular(r *apb.ResourceDescriptor) string {
 	if r == nil {
 		return ""
 	}
@@ -45,7 +45,7 @@ func GetResourceSingular(r *annotations.ResourceDescriptor) string {
 
 // GetResourcePlural is a convenience method for getting the `plural` field of a
 // resource.
-func GetResourcePlural(r *annotations.ResourceDescriptor) string {
+func GetResourcePlural(r *apb.ResourceDescriptor) string {
 	if r == nil {
 		return ""
 	}
@@ -56,7 +56,7 @@ func GetResourcePlural(r *annotations.ResourceDescriptor) string {
 // GetResourceNameField is a convenience method for getting the name of the
 // field that represents the resource's name. This is either set by the
 // `name_field` attribute, or defaults to "name".
-func GetResourceNameField(r *annotations.ResourceDescriptor) string {
+func GetResourceNameField(r *apb.ResourceDescriptor) string {
 	if r == nil {
 		return ""
 	}
@@ -74,7 +74,7 @@ func IsResourceRevision(m protoreflect.MessageDescriptor) bool {
 
 // IsRevisionRelationship determines if the "revision" resource is actually
 // a revision of the "parent" resource.
-func IsRevisionRelationship(parent, revision *annotations.ResourceDescriptor) bool {
+func IsRevisionRelationship(parent, revision *apb.ResourceDescriptor) bool {
 	_, pType, ok := SplitResourceTypeName(parent.GetType())
 	if !ok {
 		return false
@@ -94,7 +94,7 @@ func IsRevisionRelationship(parent, revision *annotations.ResourceDescriptor) bo
 // HasParent determines if the given resource has a parent resource or not
 // based on the pattern(s) it defines having multiple resource ID segments
 // or not. Incomplete or nil input returns false.
-func HasParent(resource *annotations.ResourceDescriptor) bool {
+func HasParent(resource *apb.ResourceDescriptor) bool {
 	if resource == nil || len(resource.GetPattern()) == 0 {
 		return false
 	}
