@@ -41,7 +41,11 @@ func FindMessage(f protoreflect.FileDescriptor, name string) protoreflect.Messag
 	}
 
 	files := &protoregistry.Files{}
-	RegisterFileRecursive(f, files)
+	for _, fd := range GetAllDependencies(f) {
+		// It is safe to ignore this error. If a file is already registered,
+		// it will return an error, but that is fine.
+		_ = files.RegisterFile(fd)
+	}
 
 	// Attempt to find the message in the file provided.
 	if d, err := files.FindDescriptorByName(protoreflect.FullName(name)); err == nil {
@@ -164,17 +168,4 @@ func FindFieldDotNotation(msg protoreflect.MessageDescriptor, ref string) protor
 	return nil
 }
 
-// RegisterFileRecursive recursively registers a file and its dependencies
-// into a protoregistry.Files.
-func RegisterFileRecursive(f protoreflect.FileDescriptor, files *protoregistry.Files) {
-	if _, err := files.FindFileByPath(f.Path()); err == nil {
-		return // Already registered.
-	}
-	err := files.RegisterFile(f)
-	if err != nil {
-		// Ignore errors. This is a best-effort registration.
-	}
-	for i := 0; i < f.Imports().Len(); i++ {
-		RegisterFileRecursive(f.Imports().Get(i).FileDescriptor, files)
-	}
-}
+

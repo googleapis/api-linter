@@ -24,17 +24,14 @@ import (
 func TestFindMessage(t *testing.T) {
 	files := testutils.ParseProtoStrings(t, map[string]string{
 		"a.proto": `
-			syntax = "proto3";
 			package test;
 			message Book {}
 		`,
 		"b.proto": `
-			syntax = "proto3";
 			package other;
 			message Scroll {}
 		`,
 		"c.proto": `
-			syntax = "proto3";
 			package test;
 			import "a.proto";
 			import "b.proto";
