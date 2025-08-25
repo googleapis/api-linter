@@ -115,6 +115,27 @@ func TestMethodSignature(t *testing.T) {
 			t.Error(diff)
 		}
 	})
+
+	// Ensure that this isn't producing a wonky finding if the "standard create"
+	// doesn't actually interact with a resource. Other rules would capture that
+	// errant aspect.
+	t.Run("SkipNonResource", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (Book) {}
+			}
+			message CreateBookRequest {
+				Book book = 1;
+				string book_id = 2;
+			}
+			message Book {}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
+			t.Error(diff)
+		}
+	})
+
 	// Add a separate test for the LRO case rather than introducing yet
 	// another knob on the above test.
 	t.Run("Longrunning", func(t *testing.T) {
