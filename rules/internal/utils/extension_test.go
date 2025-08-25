@@ -20,13 +20,13 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
-	f := testutils.ParseProto3Tmpl(t, `
+	f := testutils.ParseProto3String(t, `
 		import "google/api/field_behavior.proto";
 
 		message Book {
@@ -38,7 +38,7 @@ func TestGetFieldBehavior(t *testing.T) {
 
 			string summary = 3;
 		}
-	`, nil)
+	`)
 	msg := f.Messages().Get(0)
 	tests := []struct {
 		fieldName      string
@@ -93,7 +93,7 @@ func TestGetMethodSignatures(t *testing.T) {
 }
 
 func TestGetOperationInfo(t *testing.T) {
-	f := testutils.ParseProto3Tmpl(t, `
+	f := testutils.ParseProto3String(t, `
 		import "google/longrunning/operations.proto";
 		service Library {
 			rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -104,7 +104,7 @@ func TestGetOperationInfo(t *testing.T) {
 			}
 		}
 		message WriteBookRequest {}
-	`, nil)
+	`)
 	lro := GetOperationInfo(f.Services().Get(0).Methods().Get(0))
 	if got, want := lro.ResponseType, "WriteBookResponse"; got != want {
 		t.Errorf("Response type - got %q, want %q.", got, want)
@@ -115,13 +115,13 @@ func TestGetOperationInfo(t *testing.T) {
 }
 
 func TestGetOperationInfoNone(t *testing.T) {
-	f := testutils.ParseProto3Tmpl(t, `
+	f := testutils.ParseProto3String(t, `
 		service Library {
 			rpc GetBook(GetBookRequest) returns (Book);
 		}
 		message GetBookRequest {}
 		message Book {}
-	`, nil)
+	`)
 	lro := GetOperationInfo(f.Services().Get(0).Methods().Get(0))
 	if lro != nil {
 		t.Errorf("Got %v, expected nil LRO annotation.", lro)
@@ -216,7 +216,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 
 func TestGetResource(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
 			message Book {
 				option (google.api.resource) = {
@@ -224,7 +224,7 @@ func TestGetResource(t *testing.T) {
 					pattern: "publishers/{publisher}/books/{book}"
 				};
 			}
-		`, nil)
+		`)
 		resource := GetResource(f.Messages().Get(0))
 		if got, want := resource.GetType(), "library.googleapis.com/Book"; got != want {
 			t.Errorf("Got %q, expected %q.", got, want)
@@ -234,7 +234,7 @@ func TestGetResource(t *testing.T) {
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, "message Book {}", nil)
+		f := testutils.ParseProto3String(t, "message Book {}")
 		if got := GetResource(f.Messages().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil.`, got)
 		}
@@ -248,20 +248,20 @@ func TestGetResource(t *testing.T) {
 
 func TestGetResourceDefinition(t *testing.T) {
 	t.Run("Zero", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
-		`, nil)
+		`)
 		if got := GetResourceDefinitions(f); got != nil {
 			t.Errorf("Got %v, expected nil.", got)
 		}
 	})
 	t.Run("One", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
 			option (google.api.resource_definition) = {
 				type: "library.googleapis.com/Book"
 			};
-		`, nil)
+		`)
 		defs := GetResourceDefinitions(f)
 		if got, want := len(defs), 1; got != want {
 			t.Errorf("Got %d definitions, expected %d.", got, want)
@@ -271,7 +271,7 @@ func TestGetResourceDefinition(t *testing.T) {
 		}
 	})
 	t.Run("Two", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
 			option (google.api.resource_definition) = {
 				type: "library.googleapis.com/Book"
@@ -279,7 +279,7 @@ func TestGetResourceDefinition(t *testing.T) {
 			option (google.api.resource_definition) = {
 				type: "library.googleapis.com/Author"
 			};
-		`, nil)
+		`)
 		defs := GetResourceDefinitions(f)
 		if got, want := len(defs), 2; got != want {
 			t.Errorf("Got %d definitions, expected %d.", got, want)
@@ -295,21 +295,21 @@ func TestGetResourceDefinition(t *testing.T) {
 
 func TestGetResourceReference(t *testing.T) {
 	t.Run("Present", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, `
+		f := testutils.ParseProto3String(t, `
 			import "google/api/resource.proto";
 			message GetBookRequest {
 				string name = 1 [(google.api.resource_reference) = {
 					type: "library.googleapis.com/Book"
 				}];
 			}
-		`, nil)
+		`)
 		ref := GetResourceReference(f.Messages().Get(0).Fields().Get(0))
 		if got, want := ref.GetType(), "library.googleapis.com/Book"; got != want {
 			t.Errorf("Got %q, expected %q.", got, want)
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
-		f := testutils.ParseProto3Tmpl(t, "message GetBookRequest { string name = 1; }", nil)
+		f := testutils.ParseProto3String(t, "message GetBookRequest { string name = 1; }")
 		if got := GetResourceReference(f.Messages().Get(0).Fields().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil`, got)
 		}
@@ -536,25 +536,25 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 }
 
 func TestFindResourceChildren(t *testing.T) {
-	publisher := &annotations.ResourceDescriptor{
+	publisher := &apb.ResourceDescriptor{
 		Type: "library.googleapis.com/Publisher",
 		Pattern: []string{
 			"publishers/{publisher}",
 		},
 	}
-	shelf := &annotations.ResourceDescriptor{
+	shelf := &apb.ResourceDescriptor{
 		Type: "library.googleapis.com/Shelf",
 		Pattern: []string{
 			"shelves/{shelf}",
 		},
 	}
-	book := &annotations.ResourceDescriptor{
+	book := &apb.ResourceDescriptor{
 		Type: "library.googleapis.com/Book",
 		Pattern: []string{
 			"publishers/{publisher}/books/{book}",
 		},
 	}
-	edition := &annotations.ResourceDescriptor{
+	edition := &apb.ResourceDescriptor{
 		Type: "library.googleapis.com/Edition",
 		Pattern: []string{
 			"publishers/{publisher}/books/{book}/editions/{edition}",
@@ -564,7 +564,9 @@ func TestFindResourceChildren(t *testing.T) {
 		"book.proto": `
 			syntax = "proto3";
 			package test;
+
 			import "google/api/resource.proto";
+
 			message Book {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Book"
@@ -572,25 +574,31 @@ func TestFindResourceChildren(t *testing.T) {
 				};
 				string name = 1;
 			}
+
 			message Edition {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Edition"
 					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
 				};
+
 				string name = 1;
 			}
 		`,
 		"shelf.proto": `
 			syntax = "proto3";
 			package test;
+
 			import "book.proto";
 			import "google/api/resource.proto";
+
 			message Shelf {
 				option (google.api.resource) = {
 					type: "library.googleapis.com/Shelf"
 					pattern: "shelves/{shelf}"
 				};
+
 				string name = 1;
+
 				repeated Book books = 2;
 			}
 		`,
@@ -598,11 +606,11 @@ func TestFindResourceChildren(t *testing.T) {
 
 	for _, tst := range []struct {
 		name   string
-		parent *annotations.ResourceDescriptor
-		want   []*annotations.ResourceDescriptor
+		parent *apb.ResourceDescriptor
+		want   []*apb.ResourceDescriptor
 	}{
-		{"has_child_same_file", book, []*annotations.ResourceDescriptor{edition}},
-		{"has_child_other_file", publisher, []*annotations.ResourceDescriptor{book, edition}},
+		{"has_child_same_file", book, []*apb.ResourceDescriptor{edition}},
+		{"has_child_other_file", publisher, []*apb.ResourceDescriptor{book, edition}},
 		{"no_children", shelf, nil},
 	} {
 		t.Run(tst.name, func(t *testing.T) {
@@ -638,7 +646,7 @@ func TestHasFieldInfo(t *testing.T) {
 				string foo = 1 {{.FieldInfo}};
 			}
 			`, tc)
-			fd := file.Messages().Get(0).Fields().Get(0)
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := HasFieldInfo(fd); got != tc.want {
 				t.Errorf("HasFieldInfo(%+v): expected %v, got %v", fd, tc.want, got)
 			}
@@ -649,12 +657,12 @@ func TestHasFieldInfo(t *testing.T) {
 func TestGetFieldInfo(t *testing.T) {
 	testCases := []struct {
 		name, FieldInfo string
-		want            *annotations.FieldInfo
+		want            *apb.FieldInfo
 	}{
 		{
 			name:      "HasFieldInfo",
 			FieldInfo: "[(google.api.field_info).format = UUID4]",
-			want:      &annotations.FieldInfo{Format: annotations.FieldInfo_UUID4},
+			want:      &apb.FieldInfo{Format: apb.FieldInfo_UUID4},
 		},
 		{
 			name: "NoFieldInfo",
@@ -669,7 +677,7 @@ func TestGetFieldInfo(t *testing.T) {
 				string foo = 1 {{.FieldInfo}};
 			}
 			`, tc)
-			fd := file.Messages().Get(0).Fields().Get(0)
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			got := GetFieldInfo(fd)
 			if diff := cmp.Diff(got, tc.want, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Errorf("GetFieldInfo(%+v): got(-),want(+):\n%s", fd, diff)
@@ -704,7 +712,7 @@ func TestHasFormat(t *testing.T) {
 				}];
 			}
 			`, tc)
-			fd := file.Messages().Get(0).Fields().Get(0)
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := HasFormat(fd); got != tc.want {
 				t.Errorf("HasFormat(%+v): expected %v, got %v", fd, tc.want, got)
 			}
@@ -715,16 +723,16 @@ func TestHasFormat(t *testing.T) {
 func TestGetFormat(t *testing.T) {
 	testCases := []struct {
 		name, Format string
-		want         annotations.FieldInfo_Format
+		want         apb.FieldInfo_Format
 	}{
 		{
 			name:   "HasUUID4Format",
 			Format: "format: UUID4",
-			want:   annotations.FieldInfo_UUID4,
+			want:   apb.FieldInfo_UUID4,
 		},
 		{
 			name: "NoFormat",
-			want: annotations.FieldInfo_FORMAT_UNSPECIFIED,
+			want: apb.FieldInfo_FORMAT_UNSPECIFIED,
 		},
 	}
 	for _, tc := range testCases {
@@ -738,7 +746,7 @@ func TestGetFormat(t *testing.T) {
 				}];
 			}
 			`, tc)
-			fd := file.Messages().Get(0).Fields().Get(0)
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := GetFormat(fd); got != tc.want {
 				t.Errorf("GetFormat(%+v): expected %v, got %v", fd, tc.want, got)
 			}
