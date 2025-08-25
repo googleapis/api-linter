@@ -180,7 +180,7 @@ func TestRuleIsEnabledParent(t *testing.T) {
 				{
 					Path:            []int32{4, 0}, // message_type 0
 					Span:            []int32{1, 1, 1, 1},
-					LeadingComments: proto.String(" api-linter: test=disabled"),
+					LeadingComments: proto.String("api-linter: test=disabled"),
 				},
 			},
 		},
