@@ -77,7 +77,7 @@ func TestGetHTTPRulesEmpty(t *testing.T) {
 
 func TestParseRuleEmpty(t *testing.T) {
 	http := &apb.HttpRule{}
-	if got := parseRule(http); got != nil {
+	if got := parseRule(http.ProtoReflect()); got != nil {
 		t.Errorf("Got %v, expected nil.", got)
 	}
 }

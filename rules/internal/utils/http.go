@@ -16,9 +16,9 @@ package utils
 
 import (
 	"regexp"
+	"strings"
 
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -36,33 +36,24 @@ func HasHTTPRules(m protoreflect.MethodDescriptor) bool {
 // since the common case is to want to apply the checks to all of them.
 func GetHTTPRules(m protoreflect.MethodDescriptor) []*HTTPRule {
 	rules := []*HTTPRule{}
-
-	// Get the method options.
 	opts := m.Options()
+	if !opts.ProtoReflect().Has(apb.E_Http.TypeDescriptor()) {
+		return rules
+	}
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if opts.ProtoReflect().Has(apb.E_Http.TypeDescriptor()) {
-		ext := opts.ProtoReflect().Get(apb.E_Http.TypeDescriptor()).Message().Interface()
-		var httpRule *apb.HttpRule
-		if r, ok := ext.(*apb.HttpRule); ok {
-			httpRule = r
-		} else {
-			b, err := proto.Marshal(ext)
-			if err != nil {
-				return nil
-			}
-			httpRule = &apb.HttpRule{}
-			if err := proto.Unmarshal(b, httpRule); err != nil {
-				return nil
-			}
-		}
+	ext := opts.ProtoReflect().Get(apb.E_Http.TypeDescriptor()).Message()
+	if parsedRule := parseRule(ext); parsedRule != nil {
+		rules = append(rules, parsedRule)
+	}
 
-		if parsedRule := parseRule(httpRule); parsedRule != nil {
-			rules = append(rules, parsedRule)
-
-			// Add any additional bindings and flatten them into `rules`.
-			for _, binding := range httpRule.GetAdditionalBindings() {
-				rules = append(rules, parseRule(binding))
+	// Add any additional bindings.
+	additionalBindingsDesc := ext.Descriptor().Fields().ByName("additional_bindings")
+	if additionalBindingsDesc != nil {
+		bindings := ext.Get(additionalBindingsDesc).List()
+		for i := 0; i < bindings.Len(); i++ {
+			if parsedRule := parseRule(bindings.Get(i).Message()); parsedRule != nil {
+				rules = append(rules, parsedRule)
 			}
 		}
 	}
@@ -71,25 +62,40 @@ func GetHTTPRules(m protoreflect.MethodDescriptor) []*HTTPRule {
 	return rules
 }
 
-func parseRule(rule *apb.HttpRule) *HTTPRule {
-	oneof := map[string]string{
-		"GET":    rule.GetGet(),
-		"POST":   rule.GetPost(),
-		"PUT":    rule.GetPut(),
-		"PATCH":  rule.GetPatch(),
-		"DELETE": rule.GetDelete(),
-	}
-	if custom := rule.GetCustom(); custom != nil {
-		oneof[custom.GetKind()] = custom.GetPath()
-	}
-	for method, uri := range oneof {
-		if uri != "" {
-			return &HTTPRule{
-				Method:       method,
-				URI:          uri,
-				Body:         rule.GetBody(),
-				ResponseBody: rule.GetResponseBody(),
+func parseRule(rule protoreflect.Message) *HTTPRule {
+	var method, uri, body, responseBody string
+	rule.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		switch fd.Name() {
+		case "body":
+			body = v.String()
+		case "response_body":
+			responseBody = v.String()
+		case "get", "put", "post", "delete", "patch":
+			if v.String() != "" {
+				method = strings.ToUpper(string(fd.Name()))
+				uri = v.String()
 			}
+		case "custom":
+			custom := v.Message()
+			custom.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+				switch fd.Name() {
+				case "kind":
+					method = v.String()
+				case "path":
+					uri = v.String()
+				}
+				return true
+			})
+		}
+		return true
+	})
+
+	if uri != "" {
+		return &HTTPRule{
+			Method:       method,
+			URI:          uri,
+			Body:         body,
+			ResponseBody: responseBody,
 		}
 	}
 	return nil
