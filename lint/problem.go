@@ -83,6 +83,7 @@ func (p Problem) marshal() interface{} {
 	} else if p.Descriptor != nil {
 		// Otherwise, use the descriptor's location.
 		// This is the protobuf-go idiomatic way to get the source location.
+		// Note: ParentFile() called on a FileDescriptor returns itself.
 		loc := p.Descriptor.ParentFile().SourceLocations().ByDescriptor(p.Descriptor)
 		fl = fileLocation{
 			Path: p.Descriptor.ParentFile().Path(),
