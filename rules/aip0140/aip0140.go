@@ -19,8 +19,8 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/v2/lint"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-140 rules to the provided registry.

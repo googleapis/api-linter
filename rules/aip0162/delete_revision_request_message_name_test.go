@@ -42,7 +42,7 @@ func TestDeleteRevisionRequestMessageName(t *testing.T) {
 				}
 				message {{.ReqMessageName}} {}
 			`, test)
-						m := f.Services().Get(0).Methods().Get(0)
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(deleteRevisionRequestMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

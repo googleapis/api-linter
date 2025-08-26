@@ -24,11 +24,11 @@ import (
 func TestRequestPaginationPageToken(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName      string
-		MessageName   string
-		Fields        string
-		problems      testutils.Problems
-		problemDesc   func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
+		testName    string
+		MessageName string
+		Fields      string
+		problems    testutils.Problems
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Valid",

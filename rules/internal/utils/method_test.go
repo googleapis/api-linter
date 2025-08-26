@@ -498,4 +498,3 @@ func TestExtractRevisionResource(t *testing.T) {
 		})
 	}
 }
-

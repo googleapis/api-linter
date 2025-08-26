@@ -34,7 +34,7 @@ var tagRevisionResponseMessageName = &lint.MethodRule{
 			return nil
 		}
 		response := utils.GetResponseType(m)
-				if response == nil {
+		if response == nil {
 			return nil
 		}
 		got := string(response.Name())

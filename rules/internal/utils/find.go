@@ -167,5 +167,3 @@ func FindFieldDotNotation(msg protoreflect.MessageDescriptor, ref string) protor
 
 	return nil
 }
-
-

@@ -21,8 +21,8 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/data"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noPrepositions = &lint.MethodRule{

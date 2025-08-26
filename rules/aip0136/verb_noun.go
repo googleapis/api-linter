@@ -19,8 +19,8 @@ import (
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var verbNoun = &lint.MethodRule{

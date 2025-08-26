@@ -18,8 +18,8 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // List methods should reference the target resource via `child_type` or the

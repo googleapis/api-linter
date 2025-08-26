@@ -39,4 +39,3 @@ func TestGetTypeName(t *testing.T) {
 		})
 	}
 }
-

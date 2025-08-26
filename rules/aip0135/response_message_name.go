@@ -81,4 +81,3 @@ var responseMessageName = &lint.MethodRule{
 		return nil
 	},
 }
-

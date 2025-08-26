@@ -86,7 +86,7 @@ func TestProblemYAML(t *testing.T) {
 
 func TestProblemDescriptor(t *testing.T) {
 	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
-		Name:   proto.String("foo.proto"),
+		Name: proto.String("foo.proto"),
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
