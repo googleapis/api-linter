@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
@@ -35,7 +35,7 @@ var resourcePattern = &lint.MessageRule{
 	},
 }
 
-func lintResourcePattern(resource *apb.ResourceDescriptor, desc protoreflect.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
+func lintResourcePattern(resource *annotations.ResourceDescriptor, desc protoreflect.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
 	// Are any patterns declared at all? If not, complain.
 	if len(resource.GetPattern()) == 0 {
 		return []lint.Problem{{

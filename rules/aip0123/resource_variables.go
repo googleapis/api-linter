@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
@@ -40,7 +40,7 @@ var resourceVariables = &lint.MessageRule{
 // give ResourceDescriptor. This is used for both the file-level annotation
 // google.api.resource_definition and the message-level annotation
 // google.api.resource.
-func lintResourceVariables(resource *apb.ResourceDescriptor, desc protoreflect.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
+func lintResourceVariables(resource *annotations.ResourceDescriptor, desc protoreflect.Descriptor, loc *dpb.SourceCodeInfo_Location) []lint.Problem {
 	for _, pattern := range resource.GetPattern() {
 		for _, variable := range getVariables(pattern) {
 			if strings.ToLower(variable) != variable {
