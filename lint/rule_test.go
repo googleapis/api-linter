@@ -21,12 +21,12 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestFileRule(t *testing.T) {
 	// Create a file descriptor with nothing in it.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
 	}, nil)
 	if err != nil {
@@ -54,9 +54,9 @@ func TestFileRule(t *testing.T) {
 
 func TestMessageRule(t *testing.T) {
 	// Create a file descriptor with two messages in it.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
 			},
@@ -92,12 +92,12 @@ func TestMessageRule(t *testing.T) {
 // Establish that nested messages are tested.
 func TestMessageRuleNested(t *testing.T) {
 	// Create a file descriptor with a message and nested message in it.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
-				NestedType: []*dpb.DescriptorProto{
+				NestedType: []*descriptorpb.DescriptorProto{
 					{
 						Name: proto.String("Author"),
 					},
@@ -131,21 +131,21 @@ func TestMessageRuleNested(t *testing.T) {
 
 func TestFieldRule(t *testing.T) {
 	// Create a file descriptor with one message and two fields in that message.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
-				Field: []*dpb.FieldDescriptorProto{
+				Field: []*descriptorpb.FieldDescriptorProto{
 					{
 						Name:   proto.String("title"),
 						Number: proto.Int32(1),
-						Type:   dpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+						Type:   descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
 					},
 					{
 						Name:   proto.String("edition_count"),
 						Number: proto.Int32(2),
-						Type:   dpb.FieldDescriptorProto_TYPE_INT32.Enum(),
+						Type:   descriptorpb.FieldDescriptorProto_TYPE_INT32.Enum(),
 					},
 				},
 			},
@@ -177,9 +177,9 @@ func TestFieldRule(t *testing.T) {
 
 func TestServiceRule(t *testing.T) {
 	// Create a file descriptor with a service.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		Service: []*dpb.ServiceDescriptorProto{
+		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
 				Name: proto.String("Library"),
 			},
@@ -208,9 +208,9 @@ func TestServiceRule(t *testing.T) {
 
 func TestMethodRule(t *testing.T) {
 	// Create a file descriptor with a service.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
 			},
@@ -221,10 +221,10 @@ func TestMethodRule(t *testing.T) {
 				Name: proto.String("CreateBookRequest"),
 			},
 		},
-		Service: []*dpb.ServiceDescriptorProto{
+		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
 				Name: proto.String("Library"),
-				Method: []*dpb.MethodDescriptorProto{
+				Method: []*descriptorpb.MethodDescriptorProto{
 					{
 						Name:       proto.String("GetBook"),
 						InputType:  proto.String("GetBookRequest"),
@@ -265,12 +265,12 @@ func TestMethodRule(t *testing.T) {
 
 func TestEnumRule(t *testing.T) {
 	// Create a file descriptor with top-level enums.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		EnumType: []*dpb.EnumDescriptorProto{
+		EnumType: []*descriptorpb.EnumDescriptorProto{
 			{
 				Name: proto.String("Format"),
-				Value: []*dpb.EnumValueDescriptorProto{
+				Value: []*descriptorpb.EnumValueDescriptorProto{
 					{
 						Name:   proto.String("PDF"),
 						Number: proto.Int32(0),
@@ -279,7 +279,7 @@ func TestEnumRule(t *testing.T) {
 			},
 			{
 				Name: proto.String("Edition"),
-				Value: []*dpb.EnumValueDescriptorProto{
+				Value: []*descriptorpb.EnumValueDescriptorProto{
 					{
 						Name:   proto.String("PUBLISHER_ONLY"),
 						Number: proto.Int32(0),
@@ -313,12 +313,12 @@ func TestEnumRule(t *testing.T) {
 
 func TestEnumValueRule(t *testing.T) {
 	// Create a file descriptor with a top-level enum with values.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		EnumType: []*dpb.EnumDescriptorProto{
+		EnumType: []*descriptorpb.EnumDescriptorProto{
 			{
 				Name: proto.String("Format"),
-				Value: []*dpb.EnumValueDescriptorProto{
+				Value: []*descriptorpb.EnumValueDescriptorProto{
 					{
 						Name:   proto.String("YAML"),
 						Number: proto.Int32(0),
@@ -356,15 +356,15 @@ func TestEnumValueRule(t *testing.T) {
 
 func TestEnumRuleNested(t *testing.T) {
 	// Create a file descriptor with top-level enums.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
-				EnumType: []*dpb.EnumDescriptorProto{
+				EnumType: []*descriptorpb.EnumDescriptorProto{
 					{
 						Name: proto.String("Format"),
-						Value: []*dpb.EnumValueDescriptorProto{
+						Value: []*descriptorpb.EnumValueDescriptorProto{
 							{
 								Name:   proto.String("PDF"),
 								Number: proto.Int32(0),
@@ -373,7 +373,7 @@ func TestEnumRuleNested(t *testing.T) {
 					},
 					{
 						Name: proto.String("Edition"),
-						Value: []*dpb.EnumValueDescriptorProto{
+						Value: []*descriptorpb.EnumValueDescriptorProto{
 							{
 								Name:   proto.String("PUBLISHER_ONLY"),
 								Number: proto.Int32(0),
@@ -409,22 +409,22 @@ func TestEnumRuleNested(t *testing.T) {
 
 func TestDescriptorRule(t *testing.T) {
 	// Create a file with one of everything in it.
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("library.proto"),
-		MessageType: []*dpb.DescriptorProto{
+		MessageType: []*descriptorpb.DescriptorProto{
 			{
 				Name: proto.String("Book"),
-				Field: []*dpb.FieldDescriptorProto{
+				Field: []*descriptorpb.FieldDescriptorProto{
 					{
 						Name:   proto.String("name"),
 						Number: proto.Int32(1),
-						Type:   dpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+						Type:   descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
 					},
 				},
-				EnumType: []*dpb.EnumDescriptorProto{
+				EnumType: []*descriptorpb.EnumDescriptorProto{
 					{
 						Name: proto.String("Format"),
-						Value: []*dpb.EnumValueDescriptorProto{
+						Value: []*descriptorpb.EnumValueDescriptorProto{
 							{
 								Name:   proto.String("FORMAT_UNSPECIFIED"),
 								Number: proto.Int32(0),
@@ -436,17 +436,17 @@ func TestDescriptorRule(t *testing.T) {
 						},
 					},
 				},
-				NestedType: []*dpb.DescriptorProto{
+				NestedType: []*descriptorpb.DescriptorProto{
 					{
 						Name: proto.String("Author"),
 					},
 				},
 			},
 		},
-		EnumType: []*dpb.EnumDescriptorProto{
+		EnumType: []*descriptorpb.EnumDescriptorProto{
 			{
 				Name: proto.String("State"),
-				Value: []*dpb.EnumValueDescriptorProto{
+				Value: []*descriptorpb.EnumValueDescriptorProto{
 					{
 						Name:   proto.String("AVAILABLE"),
 						Number: proto.Int32(0),
@@ -454,10 +454,10 @@ func TestDescriptorRule(t *testing.T) {
 				},
 			},
 		},
-		Service: []*dpb.ServiceDescriptorProto{
+		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
 				Name: proto.String("Library"),
-				Method: []*dpb.MethodDescriptorProto{
+				Method: []*descriptorpb.MethodDescriptorProto{
 					{
 						Name:       proto.String("ConjureBook"),
 						InputType:  proto.String("Book"),

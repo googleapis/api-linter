@@ -23,11 +23,11 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestLinter_run(t *testing.T) {
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("protofile.proto"),
 	}, nil)
 	if err != nil {
@@ -107,7 +107,7 @@ func TestLinter_run(t *testing.T) {
 }
 
 func TestLinter_LintProtos_RulePanics(t *testing.T) {
-	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
 	}, nil)
 	if err != nil {
