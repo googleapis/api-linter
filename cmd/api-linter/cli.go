@@ -177,7 +177,7 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 
 	compiler := protocompile.Compiler{
 		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver(resolvers)),
-		SourceInfoMode: protocompile.SourceInfoStandard,
+		SourceInfoMode: protocompile.SourceInfoExtraOptionLocations,
 		Reporter:       rep,
 	}
 

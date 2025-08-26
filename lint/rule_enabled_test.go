@@ -48,7 +48,7 @@ func TestRuleIsEnabled(t *testing.T) {
 		{"MessageDisabled", "", "api-linter: a::b::c=disabled", false},
 		{"NameNotMatch", "", "api-linter: other=disabled", true},
 		{"RegexpNotMatch", "", "api-lint: a::b::c=disabled", true},
-		{"AliasDisabled", "", " api-linter: d::e::f=disabled", false},
+		{"AliasDisabled", "", "api-linter: d::e::f=disabled", false},
 		{"FileComments_PrefixMatched_Disabled", "api-linter: a=disabled", "", false},
 		{"FileComments_MiddleMatched_Disabled", "api-linter: b=disabled", "", false},
 		{"FileComments_SuffixMatched_Disabled", "api-linter: c=disabled", "", false},
