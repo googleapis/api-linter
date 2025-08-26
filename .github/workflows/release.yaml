@@ -30,6 +30,8 @@ jobs:
             arch: amd64
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
