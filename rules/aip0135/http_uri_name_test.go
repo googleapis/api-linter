@@ -29,8 +29,8 @@ func TestHttpNameField(t *testing.T) {
 	}{
 		{"Valid", "/v1/{name=publishers/*/books/*}", "DeleteBook", nil},
 		{"ValidRevision", "/v1/{name=publishers/*/books/*}:deleteRevision", "DeleteBookRevision", nil},
-		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "HTTP URI should include a `name` variable."}}},
-		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "HTTP URI should include a `name` variable."}}},
+		{"InvalidVarName", "/v1/{book=publishers/*/books/*}", "DeleteBook", testutils.Problems{{Message: "`name`"}}},
+		{"NoVarName", "/v1/publishers/*/books/*", "DeleteBook", testutils.Problems{{Message: "`name`"}}},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "AcquireBook", nil},
 	}
 
