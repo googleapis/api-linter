@@ -53,7 +53,7 @@ func TestRequestIDField(t *testing.T) {
 					Book book = 3;
 				}
 			`, test)
-			m := f.Messages().Get(1)
+			m := f.Messages().ByName("CreateBookRequest")
 			if diff := test.problems.SetDescriptor(m).Diff(requestIDField.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
