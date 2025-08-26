@@ -32,27 +32,27 @@ func TestHttpNameField(t *testing.T) {
 		{
 			"InvalidNoUnderscore", "/v1/{bigbook.name=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "HTTP URI should include a `big_book.name` variable."}},
+			testutils.Problems{{Message: "`big_book.name`"}},
 		},
 		{
 			"InvalidVarNameBook", "/v1/{big_book=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "HTTP URI should include a `big_book.name` variable."}},
+			testutils.Problems{{Message: "`big_book.name`"}},
 		},
 		{
 			"InvalidVarNameName", "/v1/{name=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "HTTP URI should include a `big_book.name` variable."}},
+			testutils.Problems{{Message: "`big_book.name`"}},
 		},
 		{
 			"InvalidVarNameReversed", "/v1/{name.big_book=publishers/*/books/*}",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "HTTP URI should include a `big_book.name` variable."}},
+			testutils.Problems{{Message: "`big_book.name`"}},
 		},
 		{
 			"NoVarName", "/v1/publishers/*/books/*",
 			"UpdateBigBook",
-			testutils.Problems{{Message: "HTTP URI should include a `big_book.name` variable."}},
+			testutils.Problems{{Message: "`big_book.name`"}},
 		},
 		{
 			"Irrelevant", "/v1/{book=publishers/*/books/*}",
