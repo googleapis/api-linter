@@ -23,7 +23,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -82,7 +82,7 @@ func getVariables(pattern string) []string {
 
 // isRootLevelResource determines if the given resource is a root-level
 // resource using the isRootLevelResourcePattern helper.
-func isRootLevelResource(resource *annotations.ResourceDescriptor) bool {
+func isRootLevelResource(resource *apb.ResourceDescriptor) bool {
 	if len(resource.GetPattern()) == 0 {
 		return false
 	}
@@ -122,7 +122,7 @@ func getParentIDVariable(pattern string) string {
 // resource. Use isNestedName to check eligibility before using nestedSingular.
 // This will return empty if the resource is not eligible for nested name
 // reduction.
-func nestedSingular(resource *annotations.ResourceDescriptor) string {
+func nestedSingular(resource *apb.ResourceDescriptor) string {
 	if !isNestedName(resource) {
 		return ""
 	}
@@ -138,7 +138,7 @@ func nestedSingular(resource *annotations.ResourceDescriptor) string {
 // resource. Use isNestedName to check eligibility before using nestedPlural.
 // This will return empty if the resource is not eligible for nested name
 // reduction.
-func nestedPlural(resource *annotations.ResourceDescriptor) string {
+func nestedPlural(resource *apb.ResourceDescriptor) string {
 	if !isNestedName(resource) {
 		return ""
 	}
@@ -163,7 +163,7 @@ func nestedPlural(resource *annotations.ResourceDescriptor) string {
 // and `pattern: "users/{user}/userEvents/{user_event}"`, isNestedName would
 // return `true`, because the `pattern` could be reduced to
 // `"users/{user}/events/{event}"`.
-func isNestedName(resource *annotations.ResourceDescriptor) bool {
+func isNestedName(resource *apb.ResourceDescriptor) bool {
 	if len(resource.GetPattern()) == 0 {
 		return false
 	}

@@ -25,16 +25,16 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var csharpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "csharp-namespace"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return f.Options().(*descriptorpb.FileOptions).GetCsharpNamespace() != ""
+		return f.Options().(*dpb.FileOptions).GetCsharpNamespace() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		ns := f.Options().(*descriptorpb.FileOptions).GetCsharpNamespace()
+		ns := f.Options().(*dpb.FileOptions).GetCsharpNamespace()
 		delim := "."
 
 		// Check for invalid characters.

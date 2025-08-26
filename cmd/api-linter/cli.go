@@ -32,7 +32,7 @@ import (
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
 
@@ -285,7 +285,7 @@ func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, 
 	if len(filePaths) == 0 {
 		return nil, nil
 	}
-	fds := &descriptorpb.FileDescriptorSet{}
+	fds := &dpb.FileDescriptorSet{}
 	for _, filePath := range filePaths {
 		fs, err := readFileDescriptorSet(filePath)
 		if err != nil {
@@ -300,12 +300,12 @@ func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, 
 	return &resolver{files: files}, nil
 }
 
-func readFileDescriptorSet(filePath string) (*descriptorpb.FileDescriptorSet, error) {
+func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
 	in, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	fs := &descriptorpb.FileDescriptorSet{}
+	fs := &dpb.FileDescriptorSet{}
 	if err := proto.Unmarshal(in, fs); err != nil {
 		return nil, err
 	}

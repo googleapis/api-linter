@@ -23,7 +23,7 @@ import (
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaOuterClassname = &lint.FileRule{
@@ -37,7 +37,7 @@ var javaOuterClassname = &lint.FileRule{
 
 		// We ignore case on the comparisons to not be too pedantic on compound
 		// word protos without underscores in the filename.
-		if !strings.EqualFold(f.Options().(*descriptorpb.FileOptions).GetJavaOuterClassname(), strings.ToUpper(want)) {
+		if !strings.EqualFold(f.Options().(*dpb.FileOptions).GetJavaOuterClassname(), strings.ToUpper(want)) {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Proto files should set `option java_outer_classname = %q`.",

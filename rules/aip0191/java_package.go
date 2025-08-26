@@ -21,7 +21,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaPackage = &lint.FileRule{
@@ -30,7 +30,7 @@ var javaPackage = &lint.FileRule{
 		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		javaPkg := f.Options().(*descriptorpb.FileOptions).GetJavaPackage()
+		javaPkg := f.Options().(*dpb.FileOptions).GetJavaPackage()
 		if javaPkg == "" {
 			return []lint.Problem{{
 				Message:    "Proto files must set `option java_package`.",

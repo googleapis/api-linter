@@ -19,14 +19,14 @@ import (
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var ipAddressFormats = []annotations.FieldInfo_Format{
-	annotations.FieldInfo_IPV4,
-	annotations.FieldInfo_IPV6,
-	annotations.FieldInfo_IPV4_OR_IPV6,
+var ipAddressFormats = []apb.FieldInfo_Format{
+	apb.FieldInfo_IPV4,
+	apb.FieldInfo_IPV6,
+	apb.FieldInfo_IPV4_OR_IPV6,
 }
 
 var ipAddressFormat = &lint.FieldRule{
@@ -45,7 +45,7 @@ var ipAddressFormat = &lint.FieldRule{
 	},
 }
 
-func oneofFormats(f annotations.FieldInfo_Format, desired []annotations.FieldInfo_Format) bool {
+func oneofFormats(f apb.FieldInfo_Format, desired []apb.FieldInfo_Format) bool {
 	for _, d := range desired {
 		if f == d {
 			return true

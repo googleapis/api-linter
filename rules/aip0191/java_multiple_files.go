@@ -20,7 +20,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaMultipleFiles = &lint.FileRule{
@@ -29,7 +29,7 @@ var javaMultipleFiles = &lint.FileRule{
 		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		if !f.Options().(*descriptorpb.FileOptions).GetJavaMultipleFiles() {
+		if !f.Options().(*dpb.FileOptions).GetJavaMultipleFiles() {
 			return []lint.Problem{{
 				Descriptor: f,
 				Location:   locations.FilePackage(f),

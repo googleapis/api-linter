@@ -18,7 +18,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -29,7 +29,7 @@ var resourceReferenceType = &lint.MethodRule{
 	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		p := m.Input().Fields().ByName("parent")
 
-		var resource *annotations.ResourceDescriptor
+		var resource *apb.ResourceDescriptor
 		resourceField := utils.GetListResourceMessage(m)
 		if resourceField != nil {
 			resource = utils.GetResource(resourceField)

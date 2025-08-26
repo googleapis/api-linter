@@ -23,16 +23,16 @@ import (
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var phpNamespace = &lint.FileRule{
 	Name: lint.NewRuleName(191, "php-namespace"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return f.Options().(*descriptorpb.FileOptions).GetPhpNamespace() != ""
+		return f.Options().(*dpb.FileOptions).GetPhpNamespace() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		ns := f.Options().(*descriptorpb.FileOptions).GetPhpNamespace()
+		ns := f.Options().(*dpb.FileOptions).GetPhpNamespace()
 		delim := `\`
 
 		// Check for invalid characters.

@@ -19,7 +19,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/v2/lint"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestFormatGitHubActionOutput(t *testing.T) {
@@ -42,28 +42,28 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 						{
 							RuleID:  "line::col::endLine::endColumn",
 							Message: "line, column, endline, and endColumn",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{5, 6, 7, 8},
 							},
 						},
 						{
 							RuleID:  "line::col::endLine",
 							Message: "Line, column, and endline",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{5, 6, 7},
 							},
 						},
 						{
 							RuleID:  "line::col",
 							Message: "Line and column",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{5, 6},
 							},
 						},
 						{
 							RuleID:  "line",
 							Message: "Line only",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{5},
 							},
 						},
@@ -84,14 +84,14 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 					Problems: []lint.Problem{
 						{
 							RuleID: "core::naming_formats::field_names",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{1, 2, 3, 4},
 							},
 						},
 						{
 							RuleID:  "core::naming_formats::field_names",
 							Message: "multi\nline\ncomment",
-							Location: &descriptorpb.SourceCodeInfo_Location{
+							Location: &dpb.SourceCodeInfo_Location{
 								Span: []int32{5, 6, 7, 8},
 							},
 						},

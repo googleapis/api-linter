@@ -21,14 +21,14 @@ import (
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
 
 func TestProblemJSON(t *testing.T) {
 	problem := &Problem{
 		Message:  "foo bar",
-		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
+		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 42}},
 		RuleID:   "core::0131",
 	}
 	serialized, err := json.Marshal(problem)
@@ -57,7 +57,7 @@ func TestProblemJSON(t *testing.T) {
 func TestProblemYAML(t *testing.T) {
 	problem := &Problem{
 		Message:  "foo bar",
-		Location: &descriptorpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
+		Location: &dpb.SourceCodeInfo_Location{Span: []int32{2, 0, 5, 70}},
 		RuleID:   "core::0131",
 	}
 	serialized, err := yaml.Marshal(problem)
@@ -85,15 +85,15 @@ func TestProblemYAML(t *testing.T) {
 }
 
 func TestProblemDescriptor(t *testing.T) {
-	fd, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
 		Name: proto.String("foo.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
 			},
 		},
-		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
-			Location: []*descriptorpb.SourceCodeInfo_Location{
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
 				{
 					Path: []int32{4, 0}, // message_type 0
 					Span: []int32{42, 0, 79},

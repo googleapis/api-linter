@@ -20,7 +20,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestRuleIsEnabled(t *testing.T) {
@@ -62,16 +62,16 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Run the specific tests individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+			f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
 				Name:    proto.String("test.proto"),
 				Package: proto.String("test"),
-				MessageType: []*descriptorpb.DescriptorProto{
+				MessageType: []*dpb.DescriptorProto{
 					{
 						Name: proto.String("MyMessage"),
 					},
 				},
-				SourceCodeInfo: &descriptorpb.SourceCodeInfo{
-					Location: []*descriptorpb.SourceCodeInfo_Location{
+				SourceCodeInfo: &dpb.SourceCodeInfo{
+					Location: []*dpb.SourceCodeInfo_Location{
 						{
 							Path:            []int32{2}, // package
 							Span:            []int32{1, 1, 1, 1},
@@ -110,9 +110,9 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	}
 
 	// Build a proto and check that ruleIsEnabled does the right thing.
-	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+	f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("FirstMessage"),
 			},
@@ -120,8 +120,8 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 				Name: proto.String("SecondMessage"),
 			},
 		},
-		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
-			Location: []*descriptorpb.SourceCodeInfo_Location{
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
 				{
 					Path:            []int32{4, 0}, // message_type 0
 					Span:            []int32{1, 1, 1, 1},
@@ -151,32 +151,32 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	}
 
 	// Build a proto with two messages, one of which disables the rule.
-	f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+	f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
-				Field: []*descriptorpb.FieldDescriptorProto{
+				Field: []*dpb.FieldDescriptorProto{
 					{
 						Name:   proto.String("foo"),
 						Number: proto.Int32(1),
-						Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+						Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
 					},
 				},
 			},
 			{
 				Name: proto.String("Bar"),
-				Field: []*descriptorpb.FieldDescriptorProto{
+				Field: []*dpb.FieldDescriptorProto{
 					{
 						Name:   proto.String("bar"),
 						Number: proto.Int32(1),
-						Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+						Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
 					},
 				},
 			},
 		},
-		SourceCodeInfo: &descriptorpb.SourceCodeInfo{
-			Location: []*descriptorpb.SourceCodeInfo_Location{
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
 				{
 					Path:            []int32{4, 0}, // message_type 0
 					Span:            []int32{1, 1, 1, 1},
@@ -218,20 +218,20 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
-			f, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+			f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
 				Name: proto.String("test.proto"),
-				MessageType: []*descriptorpb.DescriptorProto{
+				MessageType: []*dpb.DescriptorProto{
 					{
 						Name: proto.String("Foo"),
-						Options: &descriptorpb.MessageOptions{
+						Options: &dpb.MessageOptions{
 							Deprecated: proto.Bool(test.msgDeprecated),
 						},
-						Field: []*descriptorpb.FieldDescriptorProto{
+						Field: []*dpb.FieldDescriptorProto{
 							{
 								Name:   proto.String("bar"),
 								Number: proto.Int32(1),
-								Type:   descriptorpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
-								Options: &descriptorpb.FieldOptions{
+								Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+								Options: &dpb.FieldOptions{
 									Deprecated: proto.Bool(test.fieldDeprecated),
 								},
 							},

@@ -19,7 +19,7 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/stoewer/go-strcase"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -52,7 +52,7 @@ func DeclarativeFriendlyResource(d protoreflect.Descriptor) protoreflect.Message
 		// declarative-friendly.
 		if resource := GetResource(m); resource != nil {
 			for _, style := range resource.GetStyle() {
-				if style == annotations.ResourceDescriptor_DECLARATIVE_FRIENDLY {
+				if style == apb.ResourceDescriptor_DECLARATIVE_FRIENDLY {
 					return m
 				}
 			}

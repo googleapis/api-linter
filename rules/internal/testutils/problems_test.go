@@ -20,14 +20,14 @@ import (
 	. "github.com/googleapis/api-linter/v2/lint"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestDiffEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	fileProto := &descriptorpb.FileDescriptorProto{
+	fileProto := &dpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
 			},
@@ -64,9 +64,9 @@ func TestDiffEquivalent(t *testing.T) {
 
 func TestDiffNotEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	fileProto := &descriptorpb.FileDescriptorProto{
+	fileProto := &dpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
 			},
@@ -107,9 +107,9 @@ func TestDiffNotEquivalent(t *testing.T) {
 }
 
 func TestSetDescriptor(t *testing.T) {
-	fileProto := &descriptorpb.FileDescriptorProto{
+	fileProto := &dpb.FileDescriptorProto{
 		Name: proto.String("test.proto"),
-		MessageType: []*descriptorpb.DescriptorProto{
+		MessageType: []*dpb.DescriptorProto{
 			{
 				Name: proto.String("Foo"),
 			},

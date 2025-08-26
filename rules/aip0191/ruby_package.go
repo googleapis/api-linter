@@ -23,16 +23,16 @@ import (
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/descriptorpb"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var rubyPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "ruby-package"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return f.Options().(*descriptorpb.FileOptions).GetRubyPackage() != ""
+		return f.Options().(*dpb.FileOptions).GetRubyPackage() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
-		ns := f.Options().(*descriptorpb.FileOptions).GetRubyPackage()
+		ns := f.Options().(*dpb.FileOptions).GetRubyPackage()
 		delim := "::"
 
 		// Check for invalid characters.
