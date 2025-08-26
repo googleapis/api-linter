@@ -22,6 +22,7 @@ import (
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 var lroResponseReachable = &lint.MethodRule{
@@ -44,12 +45,17 @@ func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem
 		name = string(pkg) + "." + name
 	}
 
-	// If the message is defined in the file, we are good to go.
-	if findMessage(m.ParentFile(), protoreflect.FullName(name)) != nil {
-		return nil
+	// Build a local registry.
+	files := &protoregistry.Files{}
+	for _, fd := range utils.GetAllDependencies(m.ParentFile()) {
+		// It is safe to ignore this error. If a file is already registered,
+		// it will return an error, but that is fine.
+		_ = files.RegisterFile(fd)
 	}
-	for _, file := range utils.GetAllDependencies(m.ParentFile()) {
-		if findMessage(file, protoreflect.FullName(name)) != nil {
+
+	// If the message is defined in the registry, we are good to go.
+	if d, err := files.FindDescriptorByName(protoreflect.FullName(name)); err == nil {
+		if _, ok := d.(protoreflect.MessageDescriptor); ok {
 			return nil
 		}
 	}
@@ -63,25 +69,4 @@ func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem
 		Descriptor: m,
 		Location:   locations.MethodOperationInfo(m),
 	}}
-}
-
-func findMessage(d protoreflect.Descriptor, name protoreflect.FullName) protoreflect.MessageDescriptor {
-	switch d := d.(type) {
-	case protoreflect.FileDescriptor:
-		for i := 0; i < d.Messages().Len(); i++ {
-			if md := findMessage(d.Messages().Get(i), name); md != nil {
-				return md
-			}
-		}
-	case protoreflect.MessageDescriptor:
-		if d.FullName() == name {
-			return d
-		}
-		for i := 0; i < d.Messages().Len(); i++ {
-			if md := findMessage(d.Messages().Get(i), name); md != nil {
-				return md
-			}
-		}
-	}
-	return nil
 }
