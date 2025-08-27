@@ -17,7 +17,7 @@ package aip0136
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestDeclarativeFriendly(t *testing.T) {
@@ -58,7 +58,7 @@ func TestDeclarativeFriendly(t *testing.T) {
 					};
 				}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(standardMethodsOnly.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

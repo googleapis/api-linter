@@ -17,15 +17,15 @@ package aip0127
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var leadingSlash = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "uri-leading-slash"),
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, http := range utils.GetHTTPRules(m) {
 			if !strings.HasPrefix(http.GetPlainURI(), "/") {
 				return []lint.Problem{{

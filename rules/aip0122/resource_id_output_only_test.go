@@ -17,7 +17,7 @@ package aip0122
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceIdOutputOnly(t *testing.T) {
@@ -46,7 +46,7 @@ func TestResourceIdOutputOnly(t *testing.T) {
 				string {{.FieldName}} = 2 {{.FieldBehavior}};
 			}
 		`, test)
-		field := f.GetMessageTypes()[0].GetFields()[1]
+		field := f.Messages().Get(0).Fields().Get(1)
 		if diff := test.problems.SetDescriptor(field).Diff(resourceIdOutputOnly.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

@@ -17,47 +17,42 @@ package aip0135
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUnknownFields(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
 		testName    string
-		messageName string
-		fieldName   string
-		fieldType   *builder.FieldType
+		MessageName string
+		FieldName   string
+		FieldType   string
 		problems    testutils.Problems
 	}{
-		{"Force", "DeleteBookRequest", "force", builder.FieldTypeBool(), testutils.Problems{}},
-		{"Etag", "DeleteBookRequest", "etag", builder.FieldTypeString(), testutils.Problems{}},
-		{"AllowMissing", "DeleteBookRequest", "allow_missing", builder.FieldTypeBool(), testutils.Problems{}},
-		{"RequestId", "DeleteBookRequest", "request_id", builder.FieldTypeString(), testutils.Problems{}},
-		{"ValidateOnly", "DeleteBookRequest", "validate_only", builder.FieldTypeBool(), testutils.Problems{}},
-		{"Invalid", "DeleteBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
+		{"Force", "DeleteBookRequest", "force", "bool", testutils.Problems{}},
+		{"Etag", "DeleteBookRequest", "etag", "string", testutils.Problems{}},
+		{"AllowMissing", "DeleteBookRequest", "allow_missing", "bool", testutils.Problems{}},
+		{"RequestId", "DeleteBookRequest", "request_id", "string", testutils.Problems{}},
+		{"ValidateOnly", "DeleteBookRequest", "validate_only", "bool", testutils.Problems{}},
+		{"Invalid", "DeleteBookRequest", "application_id", "string", testutils.Problems{{
 			Message: "Unexpected field",
 		}}},
-		{"Irrelevant", "RemoveBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
+		{"Irrelevant", "RemoveBookRequest", "application_id", "string", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			message, err := builder.NewMessage(test.messageName).AddField(
-				builder.NewField("name", builder.FieldTypeString()),
-			).AddField(
-				builder.NewField(test.fieldName, test.fieldType),
-			).Build()
-			if err != nil {
-				t.Fatalf("Could not build DeleteBookRequest message.")
-			}
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					string name = 1;
+					{{.FieldType}} {{.FieldName}} = 2;
+				}
+			`, test)
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
-			gotProblems := unknownFields.Lint(message.GetFile())
-			if diff := wantProblems.Diff(gotProblems); diff != "" {
+			problems := unknownFields.Lint(f)
+			if diff := test.problems.SetDescriptor(f.Messages().Get(0).Fields().Get(1)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

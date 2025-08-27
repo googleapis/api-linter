@@ -15,37 +15,37 @@
 package aip0158
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var responsePluralFirstField = &lint.MessageRule{
 	Name: lint.NewRuleName(158, "response-plural-first-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return isPaginatedResponseMessage(m) && len(m.GetFields()) > 0
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		return isPaginatedResponseMessage(m) && m.Fields().Len() > 0
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 
 		var message string
 		// Throw a linter warning if, the first field in the message is not named
 		// according to plural(message_name.to_snake().split('_')[1:-1]).
-		firstField := m.GetFields()[0]
+		firstField := m.Fields().Get(0)
 
 		// If the field is a resource, use the `plural` annotation to decide the
 		// appropriate plural field name.
-		want := utils.GetResourcePlural(utils.GetResource(firstField.GetMessageType()))
+		want := utils.GetResourcePlural(utils.GetResource(firstField.Message()))
 		if want != "" {
 			want = strcase.SnakeCase(want)
 			message = "Paginated resource response field name should be the snake_case form of the resource type plural defined in the `(google.api.resource)` annotation."
 		} else {
-			want = utils.ToPlural(firstField.GetName())
+			want = utils.ToPlural(string(firstField.Name()))
 			message = "First field of Paginated RPCs' response should be plural."
 		}
 
-		if want != firstField.GetName() {
+		if want != string(firstField.Name()) {
 			return []lint.Problem{{
 				Message:    message,
 				Suggestion: want,

@@ -3,8 +3,8 @@ package utils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestLintSingularStringField(t *testing.T) {
@@ -23,7 +23,7 @@ func TestLintSingularStringField(t *testing.T) {
 					{{.FieldType}} foo = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintSingularStringField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -48,7 +48,7 @@ func TestLintRequiredField(t *testing.T) {
 					string foo = 1 {{.Annotation}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintRequiredField(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -73,7 +73,7 @@ func TestLintFieldResourceReference(t *testing.T) {
 					string foo = 1 {{.Annotation}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintFieldResourceReference(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -105,7 +105,7 @@ func TestLintNoHTTPBody(t *testing.T) {
 				message Book {}
 				message GetBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintNoHTTPBody(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -137,7 +137,7 @@ func TestLintWildcardHTTPBody(t *testing.T) {
 				message Book {}
 				message ArchiveBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintWildcardHTTPBody(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -168,7 +168,7 @@ func TestLintHTTPMethod(t *testing.T) {
 				message Book {}
 				message GetBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintHTTPMethod("GET")(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -194,7 +194,7 @@ func TestLintMethodHasMatchingRequestName(t *testing.T) {
 				message Book {}
 				message {{.MessageName}} {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingRequestName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -220,7 +220,7 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 				message GetBookRequest {}
 				message {{.ResponseName}} {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -254,7 +254,7 @@ func TestLintMethodHasMatchingResponseNameLRO(t *testing.T) {
 				message {{.MessageName}} {}
 				message OperationMetadata {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			problems := LintMethodHasMatchingResponseName(method)
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 				t.Error(diff)
@@ -278,8 +278,8 @@ func TestLintSingularField(t *testing.T) {
 					{{.Label}} string foo = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
-			problems := LintSingularField(field, builder.FieldTypeString(), "string")
+			field := f.Messages().Get(0).Fields().Get(0)
+			problems := LintSingularField(field, protoreflect.StringKind, "string")
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
@@ -303,7 +303,7 @@ func TestLintNotOneof(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			problems := LintNotOneof(field)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

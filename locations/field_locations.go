@@ -15,7 +15,6 @@
 package locations
 
 import (
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
@@ -25,31 +24,31 @@ import (
 // the given field. This is useful for writing rules against custom extensions.
 //
 // Example: locations.FieldOption(field, fieldbehaviorpb.E_FieldBehavior)
-func FieldOption(f *desc.FieldDescriptor, e protoreflect.ExtensionType) *dpb.SourceCodeInfo_Location {
+func FieldOption(f protoreflect.FieldDescriptor, e protoreflect.ExtensionType) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, int(e.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
 // FieldResourceReference returns the precise location for a field's
 // resource reference annotation.
-func FieldResourceReference(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+func FieldResourceReference(f protoreflect.FieldDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, int(apb.E_ResourceReference.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
 // FieldBehavior returns the precise location for a field's
 // field_behavior annotation.
-func FieldBehavior(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+func FieldBehavior(f protoreflect.FieldDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 8, int(apb.E_FieldBehavior.TypeDescriptor().Number())) // FieldDescriptor.options == 8
 }
 
 // FieldType returns the precise location for a field's type.
-func FieldType(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
-	if f.GetMessageType() != nil || f.GetEnumType() != nil {
+func FieldType(f protoreflect.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+	if f.Message() != nil || f.Enum() != nil {
 		return pathLocation(f, 6) // FieldDescriptor.type_name == 6
 	}
 	return pathLocation(f, 5) // FieldDescriptor.type == 5
 }
 
 // FieldLabel returns the precise location for a field's label.
-func FieldLabel(f *desc.FieldDescriptor) *dpb.SourceCodeInfo_Location {
+func FieldLabel(f protoreflect.FieldDescriptor) *dpb.SourceCodeInfo_Location {
 	return pathLocation(f, 4) // FieldDescriptor.label == 4
 }

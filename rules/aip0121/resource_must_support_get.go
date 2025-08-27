@@ -18,21 +18,22 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceMustSupportGet = &lint.ServiceRule{
 	Name: lint.NewRuleName(121, "resource-must-support-get"),
-	LintService: func(s *desc.ServiceDescriptor) []lint.Problem {
+	LintService: func(s protoreflect.ServiceDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		var resourcesWithGet stringset.Set
 		var resourcesWithOtherMethods stringset.Set
 
 		// Iterate all RPCs and try to find resources. Mark the
 		// resources which have a Get method, and which ones do not.
-		for _, m := range s.GetMethods() {
+		for i := 0; i < s.Methods().Len(); i++ {
+			m := s.Methods().Get(i)
 			// Streaming methods do not count as standard methods even if they
 			// look like them.
 			if utils.IsStreaming(m) {
@@ -40,7 +41,7 @@ var resourceMustSupportGet = &lint.ServiceRule{
 			}
 
 			if utils.IsGetMethod(m) && utils.IsResource(utils.GetResponseType(m)) {
-				t := utils.GetResource(m.GetOutputType()).GetType()
+				t := utils.GetResource(m.Output()).GetType()
 				resourcesWithGet.Add(t)
 			} else if utils.IsCreateMethod(m) || utils.IsUpdateMethod(m) {
 				if msg := utils.GetResponseType(m); msg != nil && utils.IsResource(msg) {

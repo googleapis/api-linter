@@ -17,10 +17,10 @@ package aip0148
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const (
@@ -30,11 +30,14 @@ const (
 
 var useUid = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "use-uid"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsResource(f.GetOwner())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsResource(m)
+		}
+		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if f.GetName() == idStr {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if f.Name() == idStr {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("Use %s instead of %s.", uidStr, idStr),
 				Descriptor: f,

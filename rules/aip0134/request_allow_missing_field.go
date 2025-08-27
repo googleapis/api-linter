@@ -15,23 +15,24 @@
 package aip0134
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var allowMissing = &lint.MessageRule{
 	Name: lint.NewRuleName(134, "request-allow-missing-field"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		if !utils.IsUpdateRequestMessage(m) {
 			return false
 		}
 		r := utils.DeclarativeFriendlyResource(m)
 		return r != nil && !utils.IsSingletonResource(r)
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		for _, field := range m.GetFields() {
-			if field.GetName() == "allow_missing" && utils.GetTypeName(field) == "bool" && !field.IsRepeated() {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
+			if field.Name() == "allow_missing" && utils.GetTypeName(field) == "bool" && !field.IsList() {
 				return nil
 			}
 		}

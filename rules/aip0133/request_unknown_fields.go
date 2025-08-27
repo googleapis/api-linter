@@ -18,39 +18,40 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"bitbucket.org/creachadair/stringset"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The create request message should not have unrecognized fields.
 var unknownFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-unknown-fields"),
 	OnlyIf: utils.IsCreateRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		resourceMsgName := getResourceMsgNameFromReq(m)
 
 		// Rule check: Establish that there are no unexpected fields.
-		allowedFields := map[string]*builder.FieldType{
-			"parent":        nil, // AIP-133
-			"request_id":    nil, // AIP-155
-			"validate_only": nil, // AIP-163
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
-		}
+		allowedFields := stringset.New(
+			"parent",        // AIP-133
+			"request_id",    // AIP-155
+			"validate_only", // AIP-163
+			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
+		)
 
-		for _, field := range m.GetFields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			field := m.Fields().Get(i)
 			// Skip the check with the field that is the body.
-			if t := field.GetMessageType(); t != nil && t.GetName() == resourceMsgName {
+			if t := field.Message(); t != nil && string(t.Name()) == resourceMsgName {
 				continue
 			}
 			// Check the remaining fields.
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+			if !allowedFields.Contains(string(field.Name())) {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",
-						field.GetName(),
+						field.Name(),
 					),
 					Descriptor: field,
 				})

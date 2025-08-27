@@ -18,17 +18,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var valueSynonyms = &lint.EnumValueRule{
 	Name: lint.NewRuleName(216, "value-synonyms"),
-	OnlyIf: func(v *desc.EnumValueDescriptor) bool {
-		return strings.HasSuffix(v.GetEnum().GetName(), "State")
+	OnlyIf: func(v protoreflect.EnumValueDescriptor) bool {
+		return strings.HasSuffix(string(v.Parent().(protoreflect.EnumDescriptor).Name()), "State")
 	},
-	LintEnumValue: func(v *desc.EnumValueDescriptor) []lint.Problem {
+	LintEnumValue: func(v protoreflect.EnumValueDescriptor) []lint.Problem {
 		for bad, good := range map[string]string{
 			"CANCELED":   "CANCELLED",
 			"CANCELING":  "CANCELLING",
@@ -38,7 +38,7 @@ var valueSynonyms = &lint.EnumValueRule{
 			"SUCCESS":    "SUCCEEDED",
 			"SUCCESSFUL": "SUCCEEDED",
 		} {
-			if v.GetName() == bad {
+			if string(v.Name()) == bad {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Prefer %q over %q for state names.", good, bad),
 					Suggestion: good,

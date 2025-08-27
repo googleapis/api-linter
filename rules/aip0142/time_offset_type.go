@@ -17,16 +17,16 @@ package aip0142
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var timeOffsetType = &lint.FieldRule{
 	Name: lint.NewRuleName(142, "time-offset-type"),
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if utils.GetTypeName(f) != "google.protobuf.Duration" && strings.HasSuffix(f.GetName(), "_time_offset") {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if utils.GetTypeName(f) != "google.protobuf.Duration" && strings.HasSuffix(string(f.Name()), "_time_offset") {
 			return []lint.Problem{{
 				Message:    "Fields with names ending in `_time_offset` must be of type `google.protobuf.Duration`.",
 				Descriptor: f,

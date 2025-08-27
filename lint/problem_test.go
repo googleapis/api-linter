@@ -19,7 +19,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 )
@@ -84,14 +85,26 @@ func TestProblemYAML(t *testing.T) {
 }
 
 func TestProblemDescriptor(t *testing.T) {
-	mb := builder.NewMessage("Foo")
-	builder.NewFile("foo.proto").AddMessage(mb)
-
-	m, err := mb.Build()
+	fd, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+		Name: proto.String("foo.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+		},
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
+				{
+					Path: []int32{4, 0}, // message_type 0
+					Span: []int32{42, 0, 79},
+				},
+			},
+		},
+	}, nil)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	m.GetSourceInfo().Span = []int32{42, 0, 79}
+	m := fd.Messages().Get(0)
 	problem := &Problem{
 		Message:    "foo bar",
 		Descriptor: m,

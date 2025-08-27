@@ -17,7 +17,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
@@ -134,7 +134,7 @@ func TestIsResourceRevision(t *testing.T) {
 				string name = 1;
 			}
 		`, test)
-		m := f.FindMessage(test.Message)
+		m := f.Messages().Get(0)
 		if got := IsResourceRevision(m); got != test.want {
 			t.Errorf("IsResourceRevision(%+v): got %v, want %v", m, got, test.want)
 		}

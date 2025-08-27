@@ -18,25 +18,25 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Batch Delete method should have a properly named response message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(235, "response-message-name"),
 	OnlyIf: isBatchDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		got := m.GetOutputType().GetFullyQualifiedName()
-		if utils.IsOperation(m.GetOutputType()) {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		got := string(m.Output().FullName())
+		if utils.IsOperation(m.Output()) {
 			got = utils.GetOperationInfo(m).GetResponseType()
 		} else if got != "google.protobuf.Empty" {
-			got = m.GetOutputType().GetName()
+			got = string(m.Output().Name())
 		}
 
-		wantSoftDelete := m.GetName() + "Response"
+		wantSoftDelete := string(m.Name()) + "Response"
 		want := stringset.New(
 			"google.protobuf.Empty",
 			wantSoftDelete,

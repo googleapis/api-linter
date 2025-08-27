@@ -17,7 +17,7 @@ package aip0216
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestStateFieldOutputOnly(t *testing.T) {
@@ -74,7 +74,7 @@ func TestStateFieldOutputOnly(t *testing.T) {
 			}
 		`, test)
 
-			field := f.GetMessageTypes()[0].GetFields()[1]
+			field := f.Messages().Get(0).Fields().Get(1)
 			if diff := test.problems.SetDescriptor(field).Diff(stateFieldOutputOnly.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

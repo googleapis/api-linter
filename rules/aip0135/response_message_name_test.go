@@ -17,7 +17,7 @@ package aip0135
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResponseMessageName(t *testing.T) {
@@ -104,7 +104,7 @@ func TestResponseMessageName(t *testing.T) {
 					file := testutils.ParseProto3Tmpl(t, tmpl[tmplName], test)
 
 					// Run the lint rule, and establish that it returns the expected problems.
-					method := file.GetServices()[0].GetMethods()[0]
+					method := file.Services().Get(0).Methods().Get(0)
 					problems := responseMessageName.Lint(file)
 					if diff := test.problems[tmplName].SetDescriptor(method).Diff(problems); diff != "" {
 						t.Error(diff)

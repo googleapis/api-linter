@@ -17,7 +17,7 @@ package aip0134
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceField(t *testing.T) {
@@ -46,7 +46,7 @@ func TestResourceField(t *testing.T) {
 				}
 				message {{.ResourceName}} {}
 			`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := requestResourceField.Lint(file)

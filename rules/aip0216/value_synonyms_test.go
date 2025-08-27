@@ -17,7 +17,7 @@ package aip0216
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestValueSynonyms(t *testing.T) {
@@ -44,7 +44,7 @@ func TestValueSynonyms(t *testing.T) {
 					{{.ValueName}} = 1;
 				}
 			`, test)
-			ev := file.GetEnumTypes()[0].GetValues()[1]
+			ev := file.Enums().Get(0).Values().Get(1)
 			if diff := test.problems.SetDescriptor(ev).Diff(valueSynonyms.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

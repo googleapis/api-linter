@@ -17,7 +17,7 @@ package aip0192
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestTrademarkedNames(t *testing.T) {
@@ -40,7 +40,7 @@ func TestTrademarkedNames(t *testing.T) {
 			// This is a comment that says {{.Token}}.
 			message Foo {}
 		`, test)
-		m := f.GetMessageTypes()[0]
+		m := f.Messages().Get(0)
 		if diff := test.problems.SetDescriptor(m).Diff(trademarkedNames.Lint(f)); diff != "" {
 			t.Error(diff)
 		}

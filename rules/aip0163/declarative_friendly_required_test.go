@@ -17,7 +17,7 @@ package aip0163
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestDeclarativeFriendlyRequired(t *testing.T) {
@@ -71,7 +71,7 @@ func TestDeclarativeFriendlyRequired(t *testing.T) {
 					{{.ValidateOnly}}
 				}
 			`, test)
-			dbr := f.FindMessage("DeleteBookRequest")
+			dbr := f.Messages().ByName("DeleteBookRequest")
 			if diff := test.problems.SetDescriptor(dbr).Diff(declarativeFriendlyRequired.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

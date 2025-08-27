@@ -16,9 +16,9 @@
 package aip4232
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -31,7 +31,7 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-func hasMethodSignatures(m *desc.MethodDescriptor) bool {
+func hasMethodSignatures(m protoreflect.MethodDescriptor) bool {
 	sigs := utils.GetMethodSignatures(m)
 	return len(sigs) > 0
 }

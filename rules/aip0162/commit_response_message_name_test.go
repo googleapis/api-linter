@@ -17,7 +17,7 @@ package aip0162
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestCommitResponseMessageName(t *testing.T) {
@@ -39,7 +39,7 @@ func TestCommitResponseMessageName(t *testing.T) {
 				message CommitBookRequest {}
 				message {{.ResponseType}} {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -73,7 +73,7 @@ func TestCommitResponseMessageNameLRO(t *testing.T) {
 				message {{.ResponseType}} {}
 				message OperationMetadata{}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(commitResponseMessageName.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

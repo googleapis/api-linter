@@ -17,28 +17,27 @@ package aip0165
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The Purge response message should have purge_count field.
 var responsePurgeCountField = &lint.MessageRule{
 	Name:   lint.NewRuleName(165, "response-purge-count-field"),
 	OnlyIf: isPurgeResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `purge_count` field is present.
-		field := m.FindFieldByName("purge_count")
+		field := m.Fields().ByName("purge_count")
 		if field == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `purge_count` field.", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `purge_count` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}
 
 		// Rule check: Establish that the purge_count field is a singular int32.
-		if field.GetType() != builder.FieldTypeInt32().GetType() || field.IsRepeated() {
+		if field.Kind() != protoreflect.Int32Kind || field.Cardinality() == protoreflect.Repeated {
 			return []lint.Problem{{
 				Message:    "`purge_count` field on Purge response message must be a singular int32.",
 				Descriptor: field,

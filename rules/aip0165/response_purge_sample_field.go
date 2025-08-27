@@ -17,28 +17,27 @@ package aip0165
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The Purge response message should have purge_sample field.
 var responsePurgeSampleField = &lint.MessageRule{
 	Name:   lint.NewRuleName(165, "response-purge-sample-field"),
 	OnlyIf: isPurgeResponseMessage,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// Rule check: Establish that a `purge_sample` field is present.
-		field := m.FindFieldByName("purge_sample")
+		field := m.Fields().ByName("purge_sample")
 		if field == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Message %q has no `purge_sample` field.", m.GetName()),
+				Message:    fmt.Sprintf("Message %q has no `purge_sample` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}
 
 		// Rule check: Establish that the purge_sample field is a repeated string.
-		if field.GetType() != builder.FieldTypeString().GetType() || !field.IsRepeated() {
+		if field.Kind() != protoreflect.StringKind || field.Cardinality() != protoreflect.Repeated {
 			return []lint.Problem{{
 				Message:    "`purge_sample` field on Purge response message must be a repeated string.",
 				Descriptor: field,

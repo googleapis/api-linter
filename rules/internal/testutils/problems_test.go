@@ -17,16 +17,27 @@ package testutils
 import (
 	"testing"
 
-	. "github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc/builder"
+	. "github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestDiffEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	m, err := builder.NewMessage("Foo").Build()
-	if err != nil {
-		t.Fatalf("Could not build descriptor.")
+	fileProto := &dpb.FileDescriptorProto{
+		Name: proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+		},
 	}
+	file, err := protodesc.NewFile(fileProto, nil)
+	if err != nil {
+		t.Fatalf("Failed to create file descriptor: %v", err)
+	}
+	m := file.Messages().Get(0)
 
 	// Declare a series of tests that should all be equal.
 	tests := []struct {
@@ -53,11 +64,23 @@ func TestDiffEquivalent(t *testing.T) {
 
 func TestDiffNotEquivalent(t *testing.T) {
 	// Build a message for the descriptor test.
-	m1, err1 := builder.NewMessage("Foo").Build()
-	m2, err2 := builder.NewMessage("Bar").Build()
-	if err1 != nil || err2 != nil {
-		t.Fatalf("Could not build descriptor.")
+	fileProto := &dpb.FileDescriptorProto{
+		Name: proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+			{
+				Name: proto.String("Bar"),
+			},
+		},
 	}
+	file, err := protodesc.NewFile(fileProto, nil)
+	if err != nil {
+		t.Fatalf("Failed to create file descriptor: %v", err)
+	}
+	m1 := file.Messages().Get(0)
+	m2 := file.Messages().Get(1)
 
 	// Declare a series of tests that should all be equal.
 	tests := []struct {
@@ -84,10 +107,19 @@ func TestDiffNotEquivalent(t *testing.T) {
 }
 
 func TestSetDescriptor(t *testing.T) {
-	m, err := builder.NewMessage("Foo").Build()
-	if err != nil {
-		t.Fatalf("Could not build descriptor.")
+	fileProto := &dpb.FileDescriptorProto{
+		Name: proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+			},
+		},
 	}
+	file, err := protodesc.NewFile(fileProto, nil)
+	if err != nil {
+		t.Fatalf("Failed to create file descriptor: %v", err)
+	}
+	m := file.Messages().Get(0)
 	problems := Problems{{}, {}, {}}.SetDescriptor(m)
 	for _, p := range problems {
 		if p.Descriptor != m {

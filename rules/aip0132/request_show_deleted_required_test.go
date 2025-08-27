@@ -3,7 +3,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestShowDeletedRequired(t *testing.T) {
@@ -36,7 +36,7 @@ func TestRequestShowDeletedRequired(t *testing.T) {
 				message {{.Method}}Request {}
 			`, test)
 			problems := requestShowDeletedRequired.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[1]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(f.Messages().Get(1)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -52,7 +52,7 @@ func TestRequestShowDeletedRequired_NonMessageType(t *testing.T) {
 		}
 	`, nil)
 	problems := requestShowDeletedRequired.Lint(f)
-	if diff := (testutils.Problems{}).SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
+	if diff := (testutils.Problems{}).SetDescriptor(f.Messages().Get(0)).Diff(problems); diff != "" {
 		t.Error(diff)
 	}
 }

@@ -17,7 +17,7 @@ package aip0140
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUnderscores(t *testing.T) {
@@ -41,7 +41,7 @@ func TestUnderscores(t *testing.T) {
 					string {{.Field}} = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(underscores.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

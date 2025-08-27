@@ -17,8 +17,9 @@ package lint
 import (
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -26,7 +27,7 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: RuleName("a::b::c"),
-		LintFile: func(fd *desc.FileDescriptor) []Problem {
+		LintFile: func(fd protoreflect.FileDescriptor) []Problem {
 			return []Problem{}
 		},
 	}
@@ -61,21 +62,37 @@ func TestRuleIsEnabled(t *testing.T) {
 	// Run the specific tests individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := builder.NewFile("test.proto").SetSyntaxComments(builder.Comments{
-				LeadingComment: test.fileComment,
-			}).AddMessage(
-				builder.NewMessage("MyMessage").SetComments(builder.Comments{
-					LeadingComment: test.messageComment,
-				}),
-			).Build()
+			f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+				Name:    proto.String("test.proto"),
+				Package: proto.String("test"),
+				MessageType: []*dpb.DescriptorProto{
+					{
+						Name: proto.String("MyMessage"),
+					},
+				},
+				SourceCodeInfo: &dpb.SourceCodeInfo{
+					Location: []*dpb.SourceCodeInfo_Location{
+						{
+							Path:            []int32{2}, // package
+							Span:            []int32{1, 1, 1, 1},
+							LeadingComments: proto.String(test.fileComment),
+						},
+						{
+							Path:            []int32{4, 0}, // message_type 0
+							Span:            []int32{1, 1, 1, 1},
+							LeadingComments: proto.String(test.messageComment),
+						},
+					},
+				},
+			}, nil)
 			if err != nil {
-				t.Fatalf("Error building test message")
+				t.Fatalf("Error building test message: %v", err)
 			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, false), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, false), test.enabled; got != want {
 				t.Errorf("Expected the test rule to return %v from ruleIsEnabled, got %v", want, got)
 			}
 			if !test.enabled {
-				if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, aliases, true), true; got != want {
+				if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, aliases, true), true; got != want {
 					t.Errorf("Expected the test rule with ignoreCommentDisables true to return %v from ruleIsEnabled, got %v", want, got)
 				}
 			}
@@ -87,26 +104,39 @@ func TestRuleIsEnabledFirstMessage(t *testing.T) {
 	// Create a no-op rule, which we can check enabled status on.
 	rule := &FileRule{
 		Name: RuleName("test"),
-		LintFile: func(fd *desc.FileDescriptor) []Problem {
+		LintFile: func(fd protoreflect.FileDescriptor) []Problem {
 			return []Problem{}
 		},
 	}
 
 	// Build a proto and check that ruleIsEnabled does the right thing.
-	f, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("FirstMessage").SetComments(builder.Comments{
-			LeadingComment: "api-linter: test=disabled",
-		}),
-	).AddMessage(
-		builder.NewMessage("SecondMessage"),
-	).Build()
+	f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+		Name: proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("FirstMessage"),
+			},
+			{
+				Name: proto.String("SecondMessage"),
+			},
+		},
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
+				{
+					Path:            []int32{4, 0}, // message_type 0
+					Span:            []int32{1, 1, 1, 1},
+					LeadingComments: proto.String("api-linter: test=disabled"),
+				},
+			},
+		},
+	}, nil)
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0], nil, nil, false), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the first message to return %v from ruleIsEnabled, got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1], nil, nil, false), true; got != want {
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(1), nil, nil, false), true; got != want {
 		t.Errorf("Expected the second message to return %v from ruleIsEnabled, got %v", want, got)
 	}
 }
@@ -115,27 +145,54 @@ func TestRuleIsEnabledParent(t *testing.T) {
 	// Create a rule that we can check enabled status on.
 	rule := &FieldRule{
 		Name: RuleName("test"),
-		LintField: func(f *desc.FieldDescriptor) []Problem {
+		LintField: func(f protoreflect.FieldDescriptor) []Problem {
 			return nil
 		},
 	}
 
 	// Build a proto with two messages, one of which disables the rule.
-	f, err := builder.NewFile("test.proto").AddMessage(
-		builder.NewMessage("Foo").SetComments(builder.Comments{
-			LeadingComment: "api-linter: test=disabled",
-		}).AddField(builder.NewField("foo", builder.FieldTypeBool())),
-	).AddMessage(
-		builder.NewMessage("Bar").AddField(builder.NewField("bar", builder.FieldTypeBool())),
-	).Build()
+	f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+		Name: proto.String("test.proto"),
+		MessageType: []*dpb.DescriptorProto{
+			{
+				Name: proto.String("Foo"),
+				Field: []*dpb.FieldDescriptorProto{
+					{
+						Name:   proto.String("foo"),
+						Number: proto.Int32(1),
+						Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+					},
+				},
+			},
+			{
+				Name: proto.String("Bar"),
+				Field: []*dpb.FieldDescriptorProto{
+					{
+						Name:   proto.String("bar"),
+						Number: proto.Int32(1),
+						Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+					},
+				},
+			},
+		},
+		SourceCodeInfo: &dpb.SourceCodeInfo{
+			Location: []*dpb.SourceCodeInfo_Location{
+				{
+					Path:            []int32{4, 0}, // message_type 0
+					Span:            []int32{1, 1, 1, 1},
+					LeadingComments: proto.String("api-linter: test=disabled"),
+				},
+			},
+		},
+	}, nil)
 	if err != nil {
 		t.Fatalf("Error building test file: %q", err)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), false; got != want {
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), false; got != want {
 		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 	}
-	if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[1].GetFields()[0], nil, nil, false), true; got != want {
-		t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+	if got, want := ruleIsEnabled(rule, f.Messages().Get(1).Fields().Get(0), nil, nil, false), true; got != want {
+		t.Errorf("Expected the bar field to return %v from ruleIsEnabled; got %v", want, got)
 	}
 }
 
@@ -143,7 +200,7 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 	// Create a rule that we can check enabled status on.
 	rule := &FieldRule{
 		Name: RuleName("test"),
-		LintField: func(f *desc.FieldDescriptor) []Problem {
+		LintField: func(f protoreflect.FieldDescriptor) []Problem {
 			return nil
 		},
 	}
@@ -161,17 +218,31 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
-			f, err := builder.NewFile("test.proto").AddMessage(
-				builder.NewMessage("Foo").SetOptions(&dpb.MessageOptions{
-					Deprecated: &test.msgDeprecated,
-				}).AddField(builder.NewField("bar", builder.FieldTypeBool()).SetOptions(
-					&dpb.FieldOptions{Deprecated: &test.fieldDeprecated},
-				)),
-			).Build()
+			f, err := protodesc.NewFile(&dpb.FileDescriptorProto{
+				Name: proto.String("test.proto"),
+				MessageType: []*dpb.DescriptorProto{
+					{
+						Name: proto.String("Foo"),
+						Options: &dpb.MessageOptions{
+							Deprecated: proto.Bool(test.msgDeprecated),
+						},
+						Field: []*dpb.FieldDescriptorProto{
+							{
+								Name:   proto.String("bar"),
+								Number: proto.Int32(1),
+								Type:   dpb.FieldDescriptorProto_TYPE_BOOL.Enum(),
+								Options: &dpb.FieldOptions{
+									Deprecated: proto.Bool(test.fieldDeprecated),
+								},
+							},
+						},
+					},
+				},
+			}, nil)
 			if err != nil {
 				t.Fatalf("Error building test file: %q", err)
 			}
-			if got, want := ruleIsEnabled(rule, f.GetMessageTypes()[0].GetFields()[0], nil, nil, false), test.enabled; got != want {
+			if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
 				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
 			}
 		})

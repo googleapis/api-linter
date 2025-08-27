@@ -15,7 +15,7 @@
 // Package aip0216 contains rules defined in https://aip.dev/216.
 package aip0216
 
-import "github.com/googleapis/api-linter/lint"
+import "github.com/googleapis/api-linter/v2/lint"
 
 // AddRules accepts a register function and registers each of
 // this AIP's rules to it.

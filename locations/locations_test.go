@@ -15,13 +15,15 @@
 package locations
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/protoparse"
+	"github.com/bufbuild/protocompile"
 	"github.com/lithammer/dedent"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 
 	// These imports cause the common protos to be registered with
 	// the protocol buffer registry, and therefore make the call to
@@ -30,22 +32,39 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 )
 
-func parse(t *testing.T, s string) *desc.FileDescriptor {
+func parse(t *testing.T, s string) protoreflect.FileDescriptor {
+	t.Helper()
 	s = strings.TrimSpace(dedent.Dedent(s))
 	if !strings.Contains(s, "syntax = ") {
 		s = "syntax = \"proto3\";\n\n" + s
 	}
-	parser := protoparse.Parser{
-		Accessor: protoparse.FileContentsFromMap(map[string]string{
-			"test.proto": strings.TrimSpace(dedent.Dedent(s)),
+
+	// Resolver for our in-memory test file
+	testFileResolver := &protocompile.SourceResolver{
+		Accessor: protocompile.SourceAccessorFromMap(map[string]string{
+			"test.proto": s,
 		}),
-		IncludeSourceCodeInfo: true,
-		LookupImport:          desc.LoadFileDescriptor,
 	}
-	fds, err := parser.ParseFiles("test.proto")
+
+	// Resolver for standard imports (like google/api/annotations.proto)
+	importResolver := protocompile.ResolverFunc(func(path string) (protocompile.SearchResult, error) {
+		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
+		if err != nil {
+			return protocompile.SearchResult{}, err
+		}
+		return protocompile.SearchResult{Desc: fd}, nil
+	})
+
+	compiler := protocompile.Compiler{
+		Resolver:       protocompile.CompositeResolver{testFileResolver, importResolver},
+		SourceInfoMode: protocompile.SourceInfoStandard,
+	}
+
+	fds, err := compiler.Compile(context.Background(), "test.proto")
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
+
 	return fds[0]
 }
 

@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestResourceNameField(t *testing.T) {
@@ -30,7 +30,7 @@ func TestResourceNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"ValidBothPresent", `option (google.api.resource) = { type: "foo" };`, `string name = 1;`, nil},
-		{"InvalidNoField", `option (google.api.resource) = { type: "foo" };`, ``, testutils.Problems{{Message: "`name`"}}},
+		{"InvalidNoField", `option (google.api.resource) = { type: "foo" };`, ``, testutils.Problems{{Message: "has no `name` field"}}},
 		{"InvalidTypeNotString", `option (google.api.resource) = { type: "foo" };`, `int32 name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"InvalidTypeRepeated", `option (google.api.resource) = { type: "foo" };`, `repeated string name = 1;`, testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantNoAnnotation", ``, ``, nil},
@@ -44,9 +44,9 @@ func TestResourceNameField(t *testing.T) {
 					{{.Field}}
 				}
 			`, test)
-			var d desc.Descriptor = f.GetMessageTypes()[0]
+			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if strings.HasPrefix(test.name, "InvalidType") {
-				d = f.GetMessageTypes()[0].GetFields()[0]
+				d = f.Messages().Get(0).Fields().Get(0)
 			}
 			if diff := test.problems.SetDescriptor(d).Diff(resourceNameField.Lint(f)); diff != "" {
 				t.Error(diff)

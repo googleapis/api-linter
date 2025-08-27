@@ -18,8 +18,8 @@ package aip0231
 import (
 	"regexp"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules accepts a register function and registers each of
@@ -51,16 +51,16 @@ var (
 )
 
 // Returns true if this is a AIP-231 Get method, false otherwise.
-func isBatchGetMethod(m *desc.MethodDescriptor) bool {
-	return batchGetMethodRegexp.MatchString(m.GetName())
+func isBatchGetMethod(m protoreflect.MethodDescriptor) bool {
+	return batchGetMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-231 Get request message, false otherwise.
-func isBatchGetRequestMessage(m *desc.MessageDescriptor) bool {
-	return batchGetReqMessageRegexp.MatchString(m.GetName())
+func isBatchGetRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return batchGetReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-231 Get request message, false otherwise.
-func isBatchGetResponseMessage(m *desc.MessageDescriptor) bool {
-	return batchGetResMessageRegexp.MatchString(m.GetName())
+func isBatchGetResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return batchGetResMessageRegexp.MatchString(string(m.Name()))
 }

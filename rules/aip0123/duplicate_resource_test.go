@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestDuplicateResource(t *testing.T) {
@@ -55,15 +55,15 @@ func TestDuplicateResource(t *testing.T) {
 		},
 		{
 			Message:    "resource \"library.googleapis.com/Author\": `google.api.resource_definition` 1 in file `test.proto`, message `abc.Author`.",
-			Descriptor: f.GetMessageTypes()[1],
+			Descriptor: f.Messages().Get(1),
 		},
 		{
 			Message:    "resource \"library.googleapis.com/Book\": message `abc.Book`, message `abc.Foo.Tome`.",
-			Descriptor: f.GetMessageTypes()[0],
+			Descriptor: f.Messages().Get(0),
 		},
 		{
 			Message:    "resource \"library.googleapis.com/Book\": message `abc.Book`, message `abc.Foo.Tome`.",
-			Descriptor: f.GetMessageTypes()[2].GetNestedMessageTypes()[0],
+			Descriptor: f.Messages().Get(2).Messages().Get(0),
 		},
 		{
 			Message:    "resource \"library.googleapis.com/Publisher\": message `xyz.Publisher`.",

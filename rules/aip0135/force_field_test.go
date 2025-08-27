@@ -17,7 +17,7 @@ package aip0135
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestForceField(t *testing.T) {
@@ -43,7 +43,7 @@ func TestForceField(t *testing.T) {
 						type: "library.googleapis.com/Book"
 						pattern: "publishers/{publisher}/books/{book}"
 					};
-	
+
 					string name = 1;
 				}
 
@@ -52,7 +52,7 @@ func TestForceField(t *testing.T) {
 						type: "library.googleapis.com/Publisher"
 						pattern: "publishers/{publisher}"
 					};
-	
+
 					string name = 1;
 				}
 
@@ -62,7 +62,7 @@ func TestForceField(t *testing.T) {
 					bool {{.BoolField}} = 2;
 				}
 			`, test)
-			msg := f.FindMessage("DeleteResourceRequest")
+			msg := f.Messages().ByName("DeleteResourceRequest")
 			problems := forceField.Lint(f)
 			if diff := test.problems.SetDescriptor(msg).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)

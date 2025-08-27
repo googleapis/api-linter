@@ -18,14 +18,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var forbiddenMethods = &lint.MethodRule{
 	Name: lint.NewRuleName(156, "forbidden-methods"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		// If the `name` variable in the URI ends in something other than
 		// "*", that indicates that this is a singleton.
 		//
@@ -41,10 +41,10 @@ var forbiddenMethods = &lint.MethodRule{
 		}
 		return false
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Singletons should not use Create, or Delete.
 		for _, badPrefix := range []string{"Create", "Delete"} {
-			if strings.HasPrefix(m.GetName(), badPrefix) {
+			if strings.HasPrefix(string(m.Name()), badPrefix) {
 				return []lint.Problem{{
 					Message:    fmt.Sprintf("Singletons must not define %q methods.", badPrefix),
 					Descriptor: m,

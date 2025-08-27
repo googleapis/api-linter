@@ -18,19 +18,19 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var nameSuffix = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "name-suffix"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		n := f.GetName()
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		n := string(f.Name())
 		// Ignore `{prefix}_display_name` fields as this seems like a reasonable suffix.
 		return strings.HasSuffix(n, "_name") && !strings.HasSuffix(n, "_display_name")
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		allowedNameFields := stringset.New(
 			"display_name",
 			"family_name",
@@ -39,7 +39,7 @@ var nameSuffix = &lint.FieldRule{
 			"crypto_key_name",
 			"cmek_key_name",
 		)
-		if n := f.GetName(); !allowedNameFields.Contains(n) {
+		if n := string(f.Name()); !allowedNameFields.Contains(n) {
 			return []lint.Problem{{
 				Message:    "Fields should not use the `_name` suffix.",
 				Suggestion: strings.TrimSuffix(n, "_name"),

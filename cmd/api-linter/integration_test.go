@@ -180,7 +180,7 @@ func TestBuildErrors(t *testing.T) {
 
 func TestMultipleFilesFromParentDir(t *testing.T) {
 	// This test addresses a previously found bug:
-	// https://github.com/googleapis/api-linter/issues/1465
+	// https://github.com/googleapis/api-linter/v2/issues/1465
 
 	projDir, err := os.MkdirTemp("", "proj")
 	if err != nil {

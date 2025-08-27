@@ -17,7 +17,7 @@ package aip0136
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHTTPVariables(t *testing.T) {
@@ -49,7 +49,7 @@ func TestHTTPVariables(t *testing.T) {
 				message {{.MethodName}}Request {}
 				message {{.MethodName}}Response {}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(httpNameVariable.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

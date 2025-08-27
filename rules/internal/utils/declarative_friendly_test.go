@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestDeclarativeFriendlyMessage(t *testing.T) {
@@ -51,8 +51,9 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 					rpc CreateBook(CreateBookRequest) returns (Book);
 				}
 			`, test)
-			for _, m := range f.GetMessageTypes() {
-				t.Run(m.GetName(), func(t *testing.T) {
+			for i := 0; i < f.Messages().Len(); i++ {
+				m := f.Messages().Get(i)
+				t.Run(string(m.Name()), func(t *testing.T) {
 					if got := IsDeclarativeFriendlyMessage(m); got != test.want {
 						t.Errorf("Got %v, expected %v.", got, test.want)
 					}
@@ -63,7 +64,7 @@ func TestDeclarativeFriendlyMessage(t *testing.T) {
 
 	// Test the case where the google.api.resource annotation is not present.
 	t.Run("NotResource", func(t *testing.T) {
-		m := testutils.ParseProto3String(t, "message Book {}").GetMessageTypes()[0]
+		m := testutils.ParseProto3Tmpl(t, "message Book {}", nil).Messages().Get(0)
 		if IsDeclarativeFriendlyMessage(m) {
 			t.Errorf("Got true, expected false.")
 		}
@@ -165,7 +166,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 							};
 						}
 					`, tmpl), s)
-					m := f.GetServices()[0].GetMethods()[0]
+					m := f.Services().Get(0).Methods().Get(0)
 					if got := IsDeclarativeFriendlyMethod(m); got != test.want {
 						t.Errorf("Got %v, expected %v.", got, test.want)
 					}
@@ -187,7 +188,7 @@ func TestDeclarativeFriendlyMethod(t *testing.T) {
 			}
 			message CreateBookRequest {}
 		`)
-		m := f.GetServices()[0].GetMethods()[0]
+		m := f.Services().Get(0).Methods().Get(0)
 		want := false
 		if got := IsDeclarativeFriendlyMethod(m); got != want {
 			t.Errorf("Got %v, expected %v.", got, want)

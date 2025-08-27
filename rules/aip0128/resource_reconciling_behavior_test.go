@@ -17,7 +17,7 @@ package aip0128
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourceReconcilingBehavior(t *testing.T) {
@@ -44,7 +44,7 @@ func TestResourceReconcilingBehavior(t *testing.T) {
 					bool {{.FieldName}} = 1 {{.FieldBehavior}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(resourceReconcilingBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

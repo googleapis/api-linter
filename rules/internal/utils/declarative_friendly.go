@@ -18,9 +18,9 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // DeclarativeFriendlyResource returns the declarative-friendly resource
@@ -45,9 +45,9 @@ import (
 // returned.
 //
 // If there is no declarative-friendly resource, it returns nil.
-func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
+func DeclarativeFriendlyResource(d protoreflect.Descriptor) protoreflect.MessageDescriptor {
 	switch m := d.(type) {
-	case *desc.MessageDescriptor:
+	case protoreflect.MessageDescriptor:
 		// Get the google.api.resource annotation and see if it is styled
 		// declarative-friendly.
 		if resource := GetResource(m); resource != nil {
@@ -61,13 +61,13 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 		// If this is a standard method request message, find the corresponding
 		// resource message. The easiest way to do this is to farm it out to the
 		// corresponding method.
-		if n := m.GetName(); strings.HasSuffix(n, "Request") {
-			if method := FindMethod(m.GetFile(), strings.TrimSuffix(n, "Request")); method != nil {
+		if n := m.Name(); strings.HasSuffix(string(n), "Request") {
+			if method := FindMethod(m.ParentFile(), strings.TrimSuffix(string(n), "Request")); method != nil {
 				return DeclarativeFriendlyResource(method)
 			}
 		}
-	case *desc.MethodDescriptor:
-		response := m.GetOutputType()
+	case protoreflect.MethodDescriptor:
+		response := m.Output()
 
 		// If this is a Delete method (AIP-135) with a return value of Empty,
 		// try to find the resource.
@@ -75,8 +75,8 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 		// Note: This needs to precede the LRO logic because Delete requests
 		// may resolve to Empty, in which case FindMessage will return nil and
 		// short-circuit this logic.
-		if strings.HasPrefix(m.GetName(), "Delete") && stringset.New("Empty", "Operation").Contains(m.GetOutputType().GetName()) {
-			if resource := FindMessage(m.GetFile(), strings.TrimPrefix(m.GetName(), "Delete")); resource != nil {
+		if strings.HasPrefix(string(m.Name()), "Delete") && stringset.New("Empty", "Operation").Contains(string(m.Output().Name())) {
+			if resource := FindMessage(m.ParentFile(), strings.TrimPrefix(string(m.Name()), "Delete")); resource != nil {
 				return DeclarativeFriendlyResource(resource)
 			}
 		}
@@ -85,7 +85,7 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 		// operation_info annotation.
 		if IsOperation(response) {
 			if opInfo := GetOperationInfo(m); opInfo != nil {
-				response = FindMessage(m.GetFile(), opInfo.GetResponseType())
+				response = FindMessage(m.ParentFile(), opInfo.GetResponseType())
 
 				// Sanity check: We may not have found the message.
 				// If that is the case, give up and assume the method is not
@@ -104,10 +104,11 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 
 		// If the return value is a List response (AIP-132), we should be able
 		// to find the resource as a field in the response.
-		if n := response.GetName(); strings.HasPrefix(n, "List") && strings.HasSuffix(n, "Response") {
-			for _, field := range response.GetFields() {
-				if field.IsRepeated() && field.GetMessageType() != nil {
-					return DeclarativeFriendlyResource(field.GetMessageType())
+		if n := response.Name(); strings.HasPrefix(string(n), "List") && strings.HasSuffix(string(n), "Response") {
+			for i := 0; i < response.Fields().Len(); i++ {
+				field := response.Fields().Get(i)
+				if field.IsList() && field.Message() != nil {
+					return DeclarativeFriendlyResource(field.Message())
 				}
 			}
 		}
@@ -115,10 +116,10 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 		// At this point, we probably have a custom method.
 		// Try to identify a resource by whittling away at the method name and
 		// seeing if there is a match.
-		snakeName := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+		snakeName := strings.Split(strcase.SnakeCase(string(m.Name())), "_")
 		for i := 1; i < len(snakeName); i++ {
 			name := strcase.UpperCamelCase(strings.Join(snakeName[i:], "_"))
-			if resource := FindMessage(m.GetFile(), name); resource != nil {
+			if resource := FindMessage(m.ParentFile(), name); resource != nil {
 				return DeclarativeFriendlyResource(resource)
 			}
 		}
@@ -128,12 +129,12 @@ func DeclarativeFriendlyResource(d desc.Descriptor) *desc.MessageDescriptor {
 
 // IsDeclarativeFriendlyMessage returns true if the descriptor is
 // declarative-friendly (if DeclarativeFriendlyResource(m) is not nil).
-func IsDeclarativeFriendlyMessage(m *desc.MessageDescriptor) bool {
+func IsDeclarativeFriendlyMessage(m protoreflect.MessageDescriptor) bool {
 	return DeclarativeFriendlyResource(m) != nil
 }
 
 // IsDeclarativeFriendlyMethod returns true if the method is for a
 // declarative-friendly resource (if DeclarativeFriendlyResource(m) is not nil).
-func IsDeclarativeFriendlyMethod(m *desc.MethodDescriptor) bool {
+func IsDeclarativeFriendlyMethod(m protoreflect.MethodDescriptor) bool {
 	return DeclarativeFriendlyResource(m) != nil
 }

@@ -15,15 +15,16 @@
 package aip0162
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var commitRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "commit-request-name-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isCommitRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isCommitRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintRequiredField,
 }

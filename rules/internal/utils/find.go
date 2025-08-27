@@ -18,38 +18,41 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 // FindMessage looks for a message in a file and all imports within the
 // same package.
-func FindMessage(f *desc.FileDescriptor, name string) *desc.MessageDescriptor {
+func FindMessage(f protoreflect.FileDescriptor, name string) protoreflect.MessageDescriptor {
 	// Default to using the current file's package.
-	pkg := f.GetPackage()
+	pkg := f.Package()
 
 	// FileDescriptor.FindMessage requires fully-qualified message names;
 	// attempt to infer that.
 	if !strings.Contains(name, ".") {
 		if pkg != "" {
-			name = pkg + "." + name
+			name = string(pkg) + "." + name
 		}
-	} else if !strings.HasPrefix(name, pkg+".") {
+	} else if !strings.HasPrefix(name, string(pkg)+".") {
 		// If value is fully qualified, but from a different package,
 		// accommodate that.
-		pkg = name[:strings.LastIndex(name, ".")]
+		pkg = protoreflect.FullName(name[:strings.LastIndex(name, ".")])
+	}
+
+	files := &protoregistry.Files{}
+	for _, fd := range GetAllDependencies(f) {
+		// It is safe to ignore this error. If a file is already registered,
+		// it will return an error, but that is fine.
+		_ = files.RegisterFile(fd)
 	}
 
 	// Attempt to find the message in the file provided.
-	if m := f.FindMessage(name); m != nil {
-		return m
-	}
-
-	// Attempt to find the message in any dependency files if they are in the
-	// same package.
-	for _, dep := range f.GetDependencies() {
-		if pkg == dep.GetPackage() {
-			if m := FindMessage(dep, name); m != nil {
+	if d, err := files.FindDescriptorByName(protoreflect.FullName(name)); err == nil {
+		if m, ok := d.(protoreflect.MessageDescriptor); ok {
+			// If the message's package is not what we expect, then it is
+			// the wrong message.
+			if m.ParentFile().Package() == pkg {
 				return m
 			}
 		}
@@ -61,12 +64,10 @@ func FindMessage(f *desc.FileDescriptor, name string) *desc.MessageDescriptor {
 
 // FindMethod searches a file and all imports within the same package, and
 // returns the method with a given name, or nil if none is found.
-func FindMethod(f *desc.FileDescriptor, name string) *desc.MethodDescriptor {
+func FindMethod(f protoreflect.FileDescriptor, name string) protoreflect.MethodDescriptor {
 	for _, s := range getServices(f) {
-		for _, m := range s.GetMethods() {
-			if m.GetName() == name {
-				return m
-			}
+		if m := s.Methods().ByName(protoreflect.Name(name)); m != nil {
+			return m
 		}
 	}
 	return nil
@@ -74,22 +75,27 @@ func FindMethod(f *desc.FileDescriptor, name string) *desc.MethodDescriptor {
 
 // getServices finds all services in a file and all imports within the
 // same package.
-func getServices(f *desc.FileDescriptor) []*desc.ServiceDescriptor {
-	answer := f.GetServices()
-	for _, dep := range f.GetDependencies() {
-		if f.GetPackage() == dep.GetPackage() {
-			answer = append(answer, getServices(dep)...)
+func getServices(f protoreflect.FileDescriptor) []protoreflect.ServiceDescriptor {
+	var answer []protoreflect.ServiceDescriptor
+	for i := 0; i < f.Services().Len(); i++ {
+		answer = append(answer, f.Services().Get(i))
+	}
+	for i := 0; i < f.Imports().Len(); i++ {
+		dep := f.Imports().Get(i)
+		if f.Package() == dep.Package() {
+			answer = append(answer, getServices(dep.FileDescriptor)...)
 		}
 	}
 	return answer
 }
 
 // GetAllDependencies returns all dependencies.
-func GetAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescriptor {
-	answer := map[string]*desc.FileDescriptor{file.GetName(): file}
-	for _, f := range file.GetDependencies() {
-		if _, found := answer[f.GetName()]; !found {
-			answer[f.GetName()] = f
+func GetAllDependencies(file protoreflect.FileDescriptor) map[string]protoreflect.FileDescriptor {
+	answer := map[string]protoreflect.FileDescriptor{file.Path(): file}
+	for i := 0; i < file.Imports().Len(); i++ {
+		f := file.Imports().Get(i).FileDescriptor
+		if _, found := answer[f.Path()]; !found {
+			answer[f.Path()] = f
 			for name, f2 := range GetAllDependencies(f) {
 				answer[name] = f2
 			}
@@ -98,7 +104,7 @@ func GetAllDependencies(file *desc.FileDescriptor) map[string]*desc.FileDescript
 	return answer
 }
 
-type fieldSorter []*desc.FieldDescriptor
+type fieldSorter []protoreflect.FieldDescriptor
 
 // Len is part of sort.Interface.
 func (f fieldSorter) Len() int {
@@ -112,12 +118,12 @@ func (f fieldSorter) Swap(i, j int) {
 
 // Less is part of sort.Interface. Compare field number.
 func (f fieldSorter) Less(i, j int) bool {
-	return f[i].GetNumber() < f[j].GetNumber()
+	return f[i].Number() < f[j].Number()
 }
 
 // GetRepeatedMessageFields returns all fields labeled `repeated` of type
 // Message in the given message, sorted in field number order.
-func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor {
+func GetRepeatedMessageFields(m protoreflect.MessageDescriptor) []protoreflect.FieldDescriptor {
 	var fields fieldSorter
 
 	// If an unresolable message is fed into this helper, return empty slice.
@@ -125,8 +131,9 @@ func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor
 		return fields
 	}
 
-	for _, f := range m.GetFields() {
-		if f.IsRepeated() && f.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE {
+	for i := 0; i < m.Fields().Len(); i++ {
+		f := m.Fields().Get(i)
+		if f.IsList() && f.Kind() == protoreflect.MessageKind {
 			fields = append(fields, f)
 		}
 	}
@@ -141,16 +148,16 @@ func GetRepeatedMessageFields(m *desc.MessageDescriptor) []*desc.FieldDescriptor
 // unresolable the method returns nil. This is especially useful for resolving
 // path variables in google.api.http and nested fields in
 // google.api.method_signature annotations.
-func FindFieldDotNotation(msg *desc.MessageDescriptor, ref string) *desc.FieldDescriptor {
+func FindFieldDotNotation(msg protoreflect.MessageDescriptor, ref string) protoreflect.FieldDescriptor {
 	path := strings.Split(ref, ".")
 	end := len(path) - 1
 	for i, seg := range path {
-		field := msg.FindFieldByName(seg)
+		field := msg.Fields().ByName(protoreflect.Name(seg))
 		if field == nil {
 			return nil
 		}
 
-		if m := field.GetMessageType(); m != nil && i != end {
+		if m := field.Message(); m != nil && i != end {
 			msg = m
 			continue
 		}

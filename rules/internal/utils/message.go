@@ -17,8 +17,8 @@ package utils
 import (
 	"regexp"
 
-	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var (
@@ -33,54 +33,54 @@ var (
 )
 
 // Returns true if this is an AIP-131 Get request message, false otherwise.
-func IsGetRequestMessage(m *desc.MessageDescriptor) bool {
-	return getReqMessageRegexp.MatchString(m.GetName())
+func IsGetRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return getReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Return true if this is an AIP-132 List request message, false otherwise.
-func IsListRequestMessage(m *desc.MessageDescriptor) bool {
-	return listReqMessageRegexp.MatchString(m.GetName()) && !IsListRevisionsRequestMessage(m)
+func IsListRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return listReqMessageRegexp.MatchString(string(m.Name())) && !IsListRevisionsRequestMessage(m)
 }
 
 // Return true if this is an AIP-132 List response message, false otherwise.
-func IsListResponseMessage(m *desc.MessageDescriptor) bool {
-	return listRespMessageRegexp.MatchString(m.GetName()) && !IsListRevisionsResponseMessage(m)
+func IsListResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return listRespMessageRegexp.MatchString(string(m.Name())) && !IsListRevisionsResponseMessage(m)
 }
 
 // Returns the name of the resource type from the response message name based on
 // Standard List response message naming convention. If the message is not a
 // Standard List response message, empty string is returned.
-func ListResponseResourceName(m *desc.MessageDescriptor) string {
+func ListResponseResourceName(m protoreflect.MessageDescriptor) string {
 	if !IsListResponseMessage(m) {
 		return ""
 	}
 
-	return strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(m.GetName())[1])
+	return strcase.SnakeCase(listRespMessageRegexp.FindStringSubmatch(string(m.Name()))[1])
 }
 
 // IsListRevisionsRequestMessage returns true if this is an AIP-162 List
 // Revisions request message, false otherwise.
-func IsListRevisionsRequestMessage(m *desc.MessageDescriptor) bool {
-	return listRevisionsReqMessageRegexp.MatchString(m.GetName())
+func IsListRevisionsRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return listRevisionsReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // IsListRevisionsResponseMessage returns true if this is an AIP-162 List
 // Revisions response message, false otherwise.
-func IsListRevisionsResponseMessage(m *desc.MessageDescriptor) bool {
-	return listRevisionsRespMessageRegexp.MatchString(m.GetName())
+func IsListRevisionsResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return listRevisionsRespMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-133 Get request message, false otherwise.
-func IsCreateRequestMessage(m *desc.MessageDescriptor) bool {
-	return createReqMessageRegexp.MatchString(m.GetName())
+func IsCreateRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return createReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-134 Update request message, false otherwise.
-func IsUpdateRequestMessage(m *desc.MessageDescriptor) bool {
-	return updateReqMessageRegexp.MatchString(m.GetName())
+func IsUpdateRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return updateReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-135 Delete request message, false otherwise.
-func IsDeleteRequestMessage(m *desc.MessageDescriptor) bool {
-	return deleteReqMessageRegexp.MatchString(m.GetName())
+func IsDeleteRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return deleteReqMessageRegexp.MatchString(string(m.Name()))
 }

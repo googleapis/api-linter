@@ -17,8 +17,8 @@ package aip0191
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestSyntax(t *testing.T) {
@@ -36,9 +36,13 @@ func TestSyntax(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Build an appropriate file descriptor.
-			f, err := builder.NewFile("library.proto").SetProto3(test.isProto3).Build()
-			if err != nil {
-				t.Fatalf("Could not build file descriptor.")
+			var f protoreflect.FileDescriptor
+			if test.isProto3 {
+				f = testutils.ParseProto3String(t, "")
+			} else {
+				f = testutils.ParseProtoStrings(t, map[string]string{
+					"test.proto": "syntax = \"proto2\";",
+				})["test.proto"]
 			}
 
 			// Lint the file, and ensure we got the expected problems.

@@ -18,25 +18,26 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Create methods should have an HTTP body, and the body value should be resource.
 var httpBody = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "http-body"),
 	OnlyIf: utils.IsCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		resourceMsgName := utils.GetResourceMessageName(m, "Create")
 		resourceFieldName := strings.ToLower(resourceMsgName)
-		for _, fieldDesc := range m.GetInputType().GetFields() {
+		for i := 0; i < m.Input().Fields().Len(); i++ {
+			fieldDesc := m.Input().Fields().Get(i)
 			// when msgDesc is nil, the resource field in the request message is
 			// missing. A lint warning for the rule `resourceField` will be generated.
 			// For here, we will use the lower case resource message name as default
-			if msgDesc := fieldDesc.GetMessageType(); msgDesc != nil && msgDesc.GetName() == resourceMsgName {
-				resourceFieldName = fieldDesc.GetName()
+			if msgDesc := fieldDesc.Message(); msgDesc != nil && string(msgDesc.Name()) == resourceMsgName {
+				resourceFieldName = string(fieldDesc.Name())
 			}
 		}
 

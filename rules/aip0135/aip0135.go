@@ -16,7 +16,7 @@
 package aip0135
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 // AddRules accepts a register function and registers each of

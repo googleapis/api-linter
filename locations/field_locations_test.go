@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestFieldLocations(t *testing.T) {
@@ -32,11 +32,11 @@ func TestFieldLocations(t *testing.T) {
 	`)
 	tests := []struct {
 		name  string
-		field *desc.FieldDescriptor
+		field protoreflect.FieldDescriptor
 		span  []int32
 	}{
-		{"Primitive", f.GetMessageTypes()[0].GetFields()[0], []int32{3, 2, 8}},
-		{"Composite", f.GetMessageTypes()[0].GetFields()[1], []int32{4, 2, 8}},
+		{"Primitive", f.Messages().Get(0).Fields().Get(0), []int32{3, 2, 8}},
+		{"Composite", f.Messages().Get(0).Fields().Get(1), []int32{4, 2, 8}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -57,11 +57,11 @@ func TestFieldLabel(t *testing.T) {
 	`)
 	for _, test := range []struct {
 		name  string
-		field *desc.FieldDescriptor
+		field protoreflect.FieldDescriptor
 		span  []int32
 	}{
-		{"Present", f.GetMessageTypes()[0].GetFields()[1], []int32{4, 8, 16}},
-		{"Absent", f.GetMessageTypes()[0].GetFields()[0], nil},
+		{"Present", f.Messages().Get(0).Fields().Get(1), []int32{4, 8, 16}},
+		{"Absent", f.Messages().Get(0).Fields().Get(0), nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			l := FieldLabel(test.field)
@@ -81,7 +81,7 @@ func TestFieldResourceReference(t *testing.T) {
 		  }];
 		}
 	`)
-	loc := FieldResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+	loc := FieldResourceReference(f.Messages().Get(0).Fields().Get(0))
 	// resource_reference annotation location is roughly line 4, column 19.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
 		t.Error(diff)
@@ -97,7 +97,7 @@ func TestFieldOption(t *testing.T) {
 		  }];
 		}
 	`)
-	loc := FieldOption(f.GetMessageTypes()[0].GetFields()[0], apb.E_ResourceReference)
+	loc := FieldOption(f.Messages().Get(0).Fields().Get(0), apb.E_ResourceReference)
 	if diff := cmp.Diff(loc.GetSpan(), []int32{4, 19, 6, 3}); diff != "" {
 		t.Error(diff)
 	}

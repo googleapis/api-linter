@@ -17,7 +17,7 @@ package aip0146
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestAny(t *testing.T) {
@@ -41,7 +41,7 @@ func TestAny(t *testing.T) {
 					{{.Type}} foo = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(any.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

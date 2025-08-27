@@ -15,19 +15,19 @@
 package aip0217
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var unreachableFieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(217, "unreachable-field-type"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "unreachable"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return f.Name() == "unreachable"
 	},
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
-		if !f.IsRepeated() {
+	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
+		if !f.IsList() {
 			problems = append(problems, lint.Problem{
 				Message:    "unreachable field should be repeated.",
 				Descriptor: f,

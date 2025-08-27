@@ -18,9 +18,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestAbbreviations(t *testing.T) {
@@ -28,30 +28,30 @@ func TestAbbreviations(t *testing.T) {
 		name     string
 		tmpl     string
 		caseFunc func(string) string
-		descFunc func(*desc.FileDescriptor) desc.Descriptor
+		descFunc func(protoreflect.FileDescriptor) protoreflect.Descriptor
 	}{
 		{
 			name:     "Field",
 			tmpl:     `message Book { string {{.Name}} = 1; }`,
 			caseFunc: strcase.SnakeCase,
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetMessageTypes()[0].GetFields()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Messages().Get(0).Fields().Get(0)
 			},
 		},
 		{
 			name:     "Message",
 			tmpl:     `message {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetMessageTypes()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Messages().Get(0)
 			},
 		},
 		{
 			name:     "Service",
 			tmpl:     `service {{.Name}} {}`,
 			caseFunc: strcase.UpperCamelCase,
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetServices()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Services().Get(0)
 			},
 		},
 		{
@@ -65,16 +65,16 @@ func TestAbbreviations(t *testing.T) {
 				message Response {}
 			`,
 			caseFunc: strcase.UpperCamelCase,
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetServices()[0].GetMethods()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Services().Get(0).Methods().Get(0)
 			},
 		},
 		{
 			name:     "Enum",
 			tmpl:     `enum {{.Name}} { UNSPECIFIED = 0; }`,
 			caseFunc: strcase.UpperCamelCase,
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetEnumTypes()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Enums().Get(0)
 			},
 		},
 		{
@@ -83,8 +83,8 @@ func TestAbbreviations(t *testing.T) {
 			caseFunc: func(s string) string {
 				return strings.ToUpper(strcase.SnakeCase(s))
 			},
-			descFunc: func(f *desc.FileDescriptor) desc.Descriptor {
-				return f.GetEnumTypes()[0].GetValues()[0]
+			descFunc: func(f protoreflect.FileDescriptor) protoreflect.Descriptor {
+				return f.Enums().Get(0).Values().Get(0)
 			},
 		},
 	}

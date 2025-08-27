@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestUnknownFields(t *testing.T) {
@@ -40,7 +40,7 @@ func TestRequestUnknownFields(t *testing.T) {
 					repeated string {{.FieldName}} = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestUnknownFields.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

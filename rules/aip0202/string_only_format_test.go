@@ -17,7 +17,7 @@ package aip0202
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestStringOnlyFormat(t *testing.T) {
@@ -53,7 +53,7 @@ func TestStringOnlyFormat(t *testing.T) {
 				}];
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			problems := stringOnlyFormat.Lint(file)
 			if diff := tc.problems.SetDescriptor(fd).Diff(problems); diff != "" {
 				t.Error(diff)

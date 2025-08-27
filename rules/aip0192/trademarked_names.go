@@ -19,9 +19,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var trademarkAliases = map[string][]string{
@@ -63,9 +63,9 @@ var tmRegexes = defaultTrademarkTypos()
 
 var trademarkedNames = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "trademarked-names"),
-	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
+	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
 		c := strings.Join(
-			utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External,
+			utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External,
 			"\n",
 		)
 		for want, badThings := range tmRegexes {

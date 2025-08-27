@@ -19,23 +19,22 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var foreignTypeReference = &lint.FieldRule{
 	Name: lint.NewRuleName(215, "foreign-type-reference"),
-	OnlyIf: func(fd *desc.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_MESSAGE
+	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
+		return fd.Kind() == protoreflect.MessageKind
 	},
-	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		curPkg := getNormalizedPackage(fd)
 		if curPkg == "" {
 			return nil // Empty or unavailable package.
 		}
-		msg := fd.GetMessageType()
+		msg := fd.Message()
 		if msg == nil {
 			return nil // Couldn't resolve type.
 		}
@@ -44,7 +43,7 @@ var foreignTypeReference = &lint.FieldRule{
 			return nil // Empty or unavailable package.
 		}
 
-		if utils.IsCommonProto(msg.GetFile()) {
+		if utils.IsCommonProto(msg.ParentFile()) {
 			return nil // reference to a well known proto package.
 		}
 
@@ -69,12 +68,12 @@ var versionedPrefix = regexp.MustCompile(`^.*\.v[\d]+(p[\d]+)?(alpha|beta|eap|te
 // getNormalizedPackage returns a normalized package path.
 // If package cannot be resolved it returns the empty string.
 // If the package path has a "versioned" segment, the path is truncated to that segment.
-func getNormalizedPackage(d desc.Descriptor) string {
-	f := d.GetFile()
+func getNormalizedPackage(d protoreflect.Descriptor) string {
+	f := d.ParentFile()
 	if f == nil {
 		return ""
 	}
-	pkg := f.GetPackage()
+	pkg := string(f.Package())
 	if normPkg := versionedPrefix.FindString(pkg); normPkg != "" {
 		pkg = normPkg
 	}

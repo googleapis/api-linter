@@ -15,15 +15,16 @@
 package aip0162
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var rollbackRequestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(162, "rollback-request-name-behavior"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isRollbackRequestMessage(f.GetOwner()) && f.GetName() == "name"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		msg, ok := f.Parent().(protoreflect.MessageDescriptor)
+		return ok && isRollbackRequestMessage(msg) && string(f.Name()) == "name"
 	},
 	LintField: utils.LintRequiredField,
 }
