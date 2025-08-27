@@ -17,7 +17,7 @@ package aip0155
 import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -28,7 +28,7 @@ var requestIdFormat = &lint.FieldRule{
 			fd.Name() == "request_id"
 	},
 	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
-		if !utils.HasFormat(fd) || utils.GetFormat(fd) != apb.FieldInfo_UUID4 {
+		if !utils.HasFormat(fd) || utils.GetFormat(fd) != annotations.FieldInfo_UUID4 {
 			return []lint.Problem{{
 				Message:    "The `request_id` field should have a `(google.api.field_info).format = UUID4` annotation.",
 				Descriptor: fd,
