@@ -17,7 +17,7 @@ package aip0216
 import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
-	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"strings"
 )
@@ -40,7 +40,7 @@ var stateFieldOutputOnly = &lint.FieldRule{
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)
-		if !behaviors.Contains(apb.FieldBehavior_OUTPUT_ONLY.String()) {
+		if !behaviors.Contains(annotations.FieldBehavior_OUTPUT_ONLY.String()) {
 			return []lint.Problem{
 				{
 					Message:    "state fields must have field_behavior OUTPUT_ONLY",
