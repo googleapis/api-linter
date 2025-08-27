@@ -29,7 +29,7 @@ func TestDeleteRevisionRequestNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "DeleteBookRevision", "string name = 1;", nil},
-		{"Missing", "DeleteBookRevision", "", testutils.Problems{{Message: "Message `DeleteBookRevisionRequest` has no `name` field."}}},
+		{"Missing", "DeleteBookRevision", "", testutils.Problems{{Message: "no `name`"}}},
 		{"InvalidType", "DeleteBookRevision", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {

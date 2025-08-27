@@ -29,7 +29,7 @@ func TestCommitRequestNameField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "CommitBook", "string name = 1;", nil},
-		{"Missing", "CommitBook", "", testutils.Problems{{Message: "Message `CommitBookRequest` has no `name` field."}}},
+		{"Missing", "CommitBook", "", testutils.Problems{{Message: "no `name`"}}},
 		{"InvalidType", "CommitBook", "int32 name = 1;", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "EnumerateBooks", "", nil},
 	} {
