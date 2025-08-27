@@ -31,13 +31,13 @@ func TestParentField(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", "", "PurgeBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"Missing", "", "PurgeBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "Message `PurgeBooksRequest` has no `parent` field."}}},
+		{"Missing", "", "PurgeBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
 		{"InvalidType", "", "PurgeBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
 		{"IrrelevantRPCName", "", "EnumerateBooks", "", "publishers/{p}/books", nil},
 		{"IrrelevantNoParent", "", "PurgeBooks", "", "books", nil},
 
 		{"PackageValid", "package foo;", "PurgeBooks", "string parent = 1;", "publishers/{p}/books", nil},
-		{"PackageMissing", "package foo;", "PurgeBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "Message `PurgeBooksRequest` has no `parent` field."}}},
+		{"PackageMissing", "package foo;", "PurgeBooks", "", "publishers/{p}/books", testutils.Problems{{Message: "no `parent`"}}},
 		{"PackageInvalidType", "package foo;", "PurgeBooks", "int32 parent = 1;", "publishers/{p}/books", testutils.Problems{{Suggestion: "string"}}},
 		{"PackageIrrelevantRPCName", "package foo;", "EnumerateBooks", "", "publishers/{p}/books", nil},
 		{"PackageIrrelevantNoParent", "package foo;", "PurgeBooks", "", "books", nil},

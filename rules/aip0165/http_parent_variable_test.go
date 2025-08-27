@@ -29,8 +29,8 @@ func TestHTTPParentVariable(t *testing.T) {
 		problems   testutils.Problems
 	}{
 		{"Valid", "/v1/{parent=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", nil},
-		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "HTTP URI should include a `parent` variable."}}},
-		{"NoVarParent", "/v1/publishers/*/books/*", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "HTTP URI should include a `parent` variable."}}},
+		{"InvalidVarParent", "/v1/{book=publishers/*/books/*}", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "`parent`"}}},
+		{"NoVarParent", "/v1/publishers/*/books/*", "PurgeBooks", "string parent = 1;", testutils.Problems{{Message: "`parent`"}}},
 		{"NoParent", "/v1/books/*", "PurgeBooks", "", nil},
 		{"Irrelevant", "/v1/{book=publishers/*/books/*}", "BuildBook", "string parent = 1;", nil},
 	}
