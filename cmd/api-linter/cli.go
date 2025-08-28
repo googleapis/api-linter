@@ -155,8 +155,9 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		ImportPaths: imports,
 	}
 
-	// Combine resolvers. We prioritize the source resolver, and fall back
-	// to the descriptor set resolver.
+	// This combines resolvers, prioritizing the source resolver and falling
+	// back to the descriptor set resolver. This approach provides more accurate
+	// descriptor information when the descriptor set lacks source details
 	resolvers := []protocompile.Resolver{sourceResolver}
 	if descResolver != nil {
 		resolvers = append(resolvers, descResolver)
