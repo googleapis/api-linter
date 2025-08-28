@@ -154,12 +154,12 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		ImportPaths: imports,
 	}
 
-	// Combine resolvers.
-	var resolvers []protocompile.Resolver
+	// Combine resolvers. We prioritize the source resolver, and fall back
+	// to the descriptor set resolver.
+	resolvers := []protocompile.Resolver{sourceResolver}
 	if descResolver != nil {
 		resolvers = append(resolvers, descResolver)
 	}
-	resolvers = append(resolvers, sourceResolver)
 
 	// The previous parser (`jhump/protoreflect`) reported all parse errors it
 	// found. The default behavior of the new parser (`protocompile`) is to

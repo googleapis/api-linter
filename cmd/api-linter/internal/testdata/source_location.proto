@@ -1,0 +1,8 @@
+// internal/testdata/source_location.proto
+syntax = "proto3";
+
+package test.locations;
+
+message SourceLocationRequest {
+  string bad_FieldName = 1; // Lint violation on this line.
+}
