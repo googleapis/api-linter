@@ -133,14 +133,15 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		}
 		configs = append(configs, config...)
 	}
-	// Add configs for the enabled rules.
-	configs = append(configs, lint.Config{
-		EnabledRules: c.EnabledRules,
-	})
-	// Add configs for the disabled rules.
-	configs = append(configs, lint.Config{
-		DisabledRules: c.DisabledRules,
-	})
+	// Add configs for the enabled and disabled rules from flags.
+	// Combine them into a single config so that enable/disable
+	// precedence is handled correctly.
+	if len(c.EnabledRules) > 0 || len(c.DisabledRules) > 0 {
+		configs = append(configs, lint.Config{
+			EnabledRules:  c.EnabledRules,
+			DisabledRules: c.DisabledRules,
+		})
+	}
 
 	// Create resolver for descriptor sets.
 	descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
