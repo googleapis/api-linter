@@ -25,6 +25,41 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestLocationFoundWithoutSourceInfo_Fixed(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "test-source-location")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	outPath := filepath.Join(tempDir, "lint-output.yaml")
+
+	args := []string{
+		"--descriptor-set-in=internal/testdata/source_location.protoset",
+		"--disable-rule", "all",
+		"--enable-rule", "core::0140::lower-snake",
+		"-o", outPath,
+		"internal/testdata/source_location.proto",
+	}
+
+	// We run the CLI. We don't check the error because we care about the output content.
+	runCLI(args)
+
+	outBytes, readErr := os.ReadFile(outPath)
+	if readErr != nil {
+		t.Fatalf("Failed to read linter output file: %v", readErr)
+	}
+	output := string(outBytes)
+
+	// Assert that the output contains the correct line number.
+	expectedOutput := "line_number: 7"
+	if !strings.Contains(output, expectedOutput) {
+		t.Fatalf("Fix failed. Expected output to contain %q, but it didn't.\nOutput:\n%s", expectedOutput, output)
+	}
+
+	t.Log("Successfully verified the fix. Linter reports location on the correct line.")
+}
+
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
 // comment at the place where you want the rule to be

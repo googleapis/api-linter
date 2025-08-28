@@ -133,14 +133,15 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		}
 		configs = append(configs, config...)
 	}
-	// Add configs for the enabled rules.
-	configs = append(configs, lint.Config{
-		EnabledRules: c.EnabledRules,
-	})
-	// Add configs for the disabled rules.
-	configs = append(configs, lint.Config{
-		DisabledRules: c.DisabledRules,
-	})
+	// Add configs for the enabled and disabled rules from flags.
+	// Combine them into a single config so that enable/disable
+	// precedence is handled correctly.
+	if len(c.EnabledRules) > 0 || len(c.DisabledRules) > 0 {
+		configs = append(configs, lint.Config{
+			EnabledRules:  c.EnabledRules,
+			DisabledRules: c.DisabledRules,
+		})
+	}
 
 	// Create resolver for descriptor sets.
 	descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
@@ -154,12 +155,13 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		ImportPaths: imports,
 	}
 
-	// Combine resolvers.
-	var resolvers []protocompile.Resolver
+	// This combines resolvers, prioritizing the source resolver and falling
+	// back to the descriptor set resolver. This approach provides more accurate
+	// descriptor information when the descriptor set lacks source details
+	resolvers := []protocompile.Resolver{sourceResolver}
 	if descResolver != nil {
 		resolvers = append(resolvers, descResolver)
 	}
-	resolvers = append(resolvers, sourceResolver)
 
 	// The previous parser (`jhump/protoreflect`) reported all parse errors it
 	// found. The default behavior of the new parser (`protocompile`) is to
