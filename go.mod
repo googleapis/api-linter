@@ -11,12 +11,12 @@ require (
 	github.com/jhump/protoreflect v1.16.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/pflag v1.0.9
 	github.com/stoewer/go-strcase v1.3.1
 	golang.org/x/text v0.28.0
-	google.golang.org/genproto v0.0.0-20250811230008-5f3141c8851a
-	google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/genproto ef028d996bc1
+	google.golang.org/genproto/googleapis/api ef028d996bc1
+	google.golang.org/protobuf v1.36.8
 	gopkg.in/yaml.v3 v3.0.1
 )
 
