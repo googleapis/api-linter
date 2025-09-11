@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/bufbuild/protocompile"
 	"github.com/bufbuild/protocompile/reporter"
 	"github.com/googleapis/api-linter/v2/internal"
@@ -150,7 +151,9 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 
 	// Create resolver for source files.
-	imports := resolveImports(c.ProtoImportPaths)
+	fmt.Println("Raw imports:", c.ProtoImportPaths)
+	imports := resolveImports(c.ProtoImportPaths, c.ProtoFiles)
+	fmt.Println("Resolved imports:", imports)
 	sourceResolver := &protocompile.SourceResolver{
 		ImportPaths: imports,
 	}
@@ -357,7 +360,7 @@ func getOutputFormatFunc(formatType string) formatFunc {
 	return yaml.Marshal
 }
 
-func resolveImports(imports []string) []string {
+func resolveImports(imports []string, inputs []string) []string {
 	// If no import paths are provided, default to the current directory.
 	if len(imports) == 0 {
 		return []string{"."}
@@ -388,6 +391,15 @@ func resolveImports(imports []string) []string {
 		evaluatedCwd = filepath.Clean(cwd)
 	}
 
+	evaluatedInputs := stringset.New()
+	for _, p := range inputs {
+		absPath, err := filepath.Abs(p)
+		if err != nil {
+			continue
+		}
+		evaluatedInputs.Add(absPath)
+	}
+
 	// Initialize resolvedImports with "." and track its canonical absolute path.
 	resolvedImports := []string{"."}
 	seenAbsolutePaths := map[string]bool{
@@ -413,9 +425,16 @@ func resolveImports(imports []string) []string {
 			evaluatedAbsPath = filepath.Clean(absPath)
 		}
 
+		var overlaps bool
+		evaluatedInputs.Each(func(s string) {
+			if strings.HasPrefix(evaluatedAbsPath+string(os.PathSeparator), s) {
+				overlaps = true
+			}
+		})
+
 		// Check if the current import path's canonical form is the CWD's canonical form
 		// or a subdirectory of it. If so, it's covered by ".", so we skip it.
-		if evaluatedAbsPath == evaluatedCwd || strings.HasPrefix(evaluatedAbsPath, evaluatedCwd+string(os.PathSeparator)) {
+		if evaluatedAbsPath == evaluatedCwd || overlaps {
 			continue
 		}
 

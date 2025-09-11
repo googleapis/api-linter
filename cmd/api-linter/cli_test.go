@@ -189,7 +189,7 @@ func TestResolveImports(t *testing.T) {
 			protoImportPaths := test.protoImportPaths(cwd, externalDir)
 			want := test.want(externalDir)
 
-			got := resolveImports(protoImportPaths)
+			got := resolveImports(protoImportPaths, []string{})
 			sort.Strings(got)
 			sort.Strings(want)
 
