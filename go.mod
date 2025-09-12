@@ -6,7 +6,7 @@ require (
 	bitbucket.org/creachadair/stringset v0.0.12
 	cloud.google.com/go/longrunning v0.6.7
 	github.com/bmatcuk/doublestar/v4 v4.9.1
-	github.com/bufbuild/protocompile v0.14.0
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.7.0
 	github.com/lithammer/dedent v1.1.0

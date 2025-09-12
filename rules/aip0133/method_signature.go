@@ -28,7 +28,7 @@ import (
 
 var methodSignature = &lint.MethodRule{
 	Name: lint.NewRuleName(133, "method-signature"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return utils.IsCreateMethod(m) && utils.IsResource(utils.GetResponseType(m))
 	},
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {

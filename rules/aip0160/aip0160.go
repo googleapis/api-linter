@@ -16,7 +16,7 @@
 package aip0160
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 // AddRules adds all of the AIP-160 rules to the provided registry.

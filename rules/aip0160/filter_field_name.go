@@ -17,10 +17,10 @@ package aip0160
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const (
@@ -30,15 +30,16 @@ const (
 
 var filterFieldName = &lint.MethodRule{
 	Name: lint.NewRuleName(160, "filter-field-name"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return utils.IsListMethod(m) || utils.IsCustomMethod(m)
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		var problems []lint.Problem
-		for _, f := range m.GetInputType().GetFields() {
-			if f.GetName() == "filters" {
+		for ndx := 0; ndx < m.Input().Fields().Len(); ndx++ {
+			f := m.Input().Fields().Get(ndx)
+			if f.Name() == "filters" {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf(nameMessageFmt, f.GetName()),
+					Message:    fmt.Sprintf(nameMessageFmt, f.Name()),
 					Descriptor: f,
 					Location:   locations.DescriptorName(f),
 					Suggestion: nameSuggestion,

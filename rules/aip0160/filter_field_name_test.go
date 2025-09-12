@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestFiltersFieldName(t *testing.T) {
@@ -55,7 +55,7 @@ func TestFiltersFieldName(t *testing.T) {
 
 				message BookFilters {}
 		`, test)
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			wantProblems := testutils.Problems{}
 			if test.wantErr {
 				wantProblems = append(wantProblems, lint.Problem{
