@@ -287,13 +287,23 @@ func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, 
 	if len(filePaths) == 0 {
 		return nil, nil
 	}
-	fds := &dpb.FileDescriptorSet{}
+
+	fdsSet := make(map[string]*dpb.FileDescriptorProto)
 	for _, filePath := range filePaths {
 		fs, err := readFileDescriptorSet(filePath)
 		if err != nil {
 			return nil, err
 		}
-		fds.File = append(fds.File, fs.GetFile()...)
+		for _, fd := range fs.GetFile() {
+			if _, exists := fdsSet[fd.GetName()]; !exists {
+				fdsSet[fd.GetName()] = fd
+			}
+		}
+	}
+
+	fds := &dpb.FileDescriptorSet{}
+	for _, fd := range fdsSet {
+		fds.File = append(fds.File, fd)
 	}
 	files, err := protodesc.NewFiles(fds)
 	if err != nil {

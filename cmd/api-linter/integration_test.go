@@ -389,3 +389,24 @@ func writeFile(path, content string) error {
 	}
 	return os.WriteFile(path, []byte(content), 0o644)
 }
+
+func TestDeduplicatesRepeatedDescriptors_DescriptorSets(t *testing.T) {
+	args := []string{
+		"--descriptor-set-in", "internal/testdata/a.protoset",
+		"--descriptor-set-in", "internal/testdata/b.protoset",
+		"a.proto",
+		"b.proto",
+	}
+
+	err := runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "already defined") {
+			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else if strings.Contains(err.Error(), "file appears multiple times") {
+			t.Errorf("Linter failed with unexpected 'file appears multiple times' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
+	}
+}

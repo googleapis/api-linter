@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package test;
+
+import "common.proto";
+
+message B {
+  Common common = 1;
+}
