@@ -53,7 +53,15 @@ func getExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflec
 		return v, ok
 	}
 
-	proto.Merge(c, ext)
+	d, err := proto.Marshal(ext)
+	if err != nil {
+		var zero T
+		return zero, false
+	}
+	if err := proto.Unmarshal(d, c); err != nil {
+		var zero T
+		return zero, false
+	}
 	return c, true
 }
 
