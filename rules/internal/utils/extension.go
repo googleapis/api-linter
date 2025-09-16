@@ -42,26 +42,24 @@ func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
 	return answer
 }
 
+func getExtensionMessage(o protoreflect.Message, ed protoreflect.FieldDescriptor, c proto.Message) bool {
+	if !o.Has(ed) {
+		return false
+	}
+
+	ext := o.Get(ed).Message().Interface()
+	proto.Merge(c, ext)
+
+	return true
+}
+
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 	if m == nil {
 		return nil
 	}
-	opts := m.Options()
-	if !opts.ProtoReflect().Has(lrpb.E_OperationInfo.TypeDescriptor()) {
-		return nil
-	}
-	ext := opts.ProtoReflect().Get(lrpb.E_OperationInfo.TypeDescriptor()).Message().Interface()
-	if opInfo, ok := ext.(*lrpb.OperationInfo); ok {
-		return opInfo
-	}
-	// It may be a dynamic message, so we need to marshal and unmarshal.
-	b, err := proto.Marshal(ext)
-	if err != nil {
-		return nil
-	}
 	opInfo := &lrpb.OperationInfo{}
-	if err := proto.Unmarshal(b, opInfo); err != nil {
+	if ok := getExtensionMessage(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo); !ok {
 		return nil
 	}
 	return opInfo
@@ -138,23 +136,11 @@ func GetResource(m protoreflect.MessageDescriptor) *apb.ResourceDescriptor {
 	if m == nil {
 		return nil
 	}
-	opts := m.Options()
-	if !opts.ProtoReflect().Has(apb.E_Resource.TypeDescriptor()) {
-		return nil
-	}
-	ext := opts.ProtoReflect().Get(apb.E_Resource.TypeDescriptor()).Message().Interface()
-	if res, ok := ext.(*apb.ResourceDescriptor); ok {
-		return res
-	}
-	// It may be a dynamic message, so we need to marshal and unmarshal.
-	b, err := proto.Marshal(ext)
-	if err != nil {
-		return nil
-	}
 	res := &apb.ResourceDescriptor{}
-	if err := proto.Unmarshal(b, res); err != nil {
+	if ok := getExtensionMessage(m.Options().ProtoReflect(), apb.E_Resource.TypeDescriptor(), res); !ok {
 		return nil
 	}
+
 	return res
 }
 
@@ -233,24 +219,13 @@ func GetResourceReference(f protoreflect.FieldDescriptor) *apb.ResourceReference
 	if f == nil {
 		return nil
 	}
-	opts := f.Options()
-	if !opts.ProtoReflect().Has(apb.E_ResourceReference.TypeDescriptor()) {
+
+	ref := &apb.ResourceReference{}
+	if ok := getExtensionMessage(f.Options().ProtoReflect(), apb.E_ResourceReference.TypeDescriptor(), ref); !ok {
 		return nil
 	}
-	ext := opts.ProtoReflect().Get(apb.E_ResourceReference.TypeDescriptor()).Message().Interface()
-	if res, ok := ext.(*apb.ResourceReference); ok {
-		return res
-	}
-	// It may be a dynamic message, so we need to marshal and unmarshal.
-	b, err := proto.Marshal(ext)
-	if err != nil {
-		return nil
-	}
-	res := &apb.ResourceReference{}
-	if err := proto.Unmarshal(b, res); err != nil {
-		return nil
-	}
-	return res
+
+	return ref
 }
 
 // FindResource returns first resource of type matching the reference param.
@@ -346,19 +321,12 @@ func GetFieldInfo(fd protoreflect.FieldDescriptor) *apb.FieldInfo {
 	if !HasFieldInfo(fd) {
 		return nil
 	}
-	ext := fd.Options().ProtoReflect().Get(apb.E_FieldInfo.TypeDescriptor()).Message().Interface()
-	if fi, ok := ext.(*apb.FieldInfo); ok {
-		return fi
-	}
-	// It may be a dynamic message, so we need to marshal and unmarshal.
-	b, err := proto.Marshal(ext)
-	if err != nil {
-		return nil
-	}
+
 	fi := &apb.FieldInfo{}
-	if err := proto.Unmarshal(b, fi); err != nil {
+	if ok := getExtensionMessage(fd.Options().ProtoReflect(), apb.E_FieldInfo.TypeDescriptor(), fi); !ok {
 		return nil
 	}
+
 	return fi
 }
 
