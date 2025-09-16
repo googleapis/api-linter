@@ -42,6 +42,21 @@ func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
 	return answer
 }
 
+func getExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflect.FieldDescriptor, c T) (T, bool) {
+	if !o.Has(ed) {
+		var zero T
+		return zero, false
+	}
+
+	ext := o.Get(ed).Message().Interface()
+	if v, ok := ext.(T); ok {
+		return v, ok
+	}
+
+	proto.Merge(c, ext)
+	return c, true
+}
+
 func getExtensionMessage(o protoreflect.Message, ed protoreflect.FieldDescriptor, c proto.Message) bool {
 	if !o.Has(ed) {
 		return false
@@ -59,7 +74,9 @@ func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 		return nil
 	}
 	opInfo := &lrpb.OperationInfo{}
-	if ok := getExtensionMessage(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo); !ok {
+	var ok bool
+	opInfo, ok = getExtensionGeneric(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo)
+	if !ok {
 		return nil
 	}
 	return opInfo
