@@ -57,17 +57,6 @@ func getExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflec
 	return c, true
 }
 
-func getExtensionMessage(o protoreflect.Message, ed protoreflect.FieldDescriptor, c proto.Message) bool {
-	if !o.Has(ed) {
-		return false
-	}
-
-	ext := o.Get(ed).Message().Interface()
-	proto.Merge(c, ext)
-
-	return true
-}
-
 // GetOperationInfo returns the google.longrunning.operation_info annotation.
 func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 	if m == nil {
