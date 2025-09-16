@@ -73,8 +73,7 @@ func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 	if m == nil {
 		return nil
 	}
-	opInfo := &lrpb.OperationInfo{}
-	var ok bool
+	opInfo, ok := &lrpb.OperationInfo{}, false
 	opInfo, ok = getExtensionGeneric(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo)
 	if !ok {
 		return nil
@@ -153,8 +152,8 @@ func GetResource(m protoreflect.MessageDescriptor) *apb.ResourceDescriptor {
 	if m == nil {
 		return nil
 	}
-	res := &apb.ResourceDescriptor{}
-	if ok := getExtensionMessage(m.Options().ProtoReflect(), apb.E_Resource.TypeDescriptor(), res); !ok {
+	res, ok := &apb.ResourceDescriptor{}, false
+	if res, ok = getExtensionGeneric(m.Options().ProtoReflect(), apb.E_Resource.TypeDescriptor(), res); !ok {
 		return nil
 	}
 
@@ -237,8 +236,8 @@ func GetResourceReference(f protoreflect.FieldDescriptor) *apb.ResourceReference
 		return nil
 	}
 
-	ref := &apb.ResourceReference{}
-	if ok := getExtensionMessage(f.Options().ProtoReflect(), apb.E_ResourceReference.TypeDescriptor(), ref); !ok {
+	ref, ok := &apb.ResourceReference{}, false
+	if ref, ok = getExtensionGeneric(f.Options().ProtoReflect(), apb.E_ResourceReference.TypeDescriptor(), ref); !ok {
 		return nil
 	}
 
@@ -339,8 +338,8 @@ func GetFieldInfo(fd protoreflect.FieldDescriptor) *apb.FieldInfo {
 		return nil
 	}
 
-	fi := &apb.FieldInfo{}
-	if ok := getExtensionMessage(fd.Options().ProtoReflect(), apb.E_FieldInfo.TypeDescriptor(), fi); !ok {
+	fi, ok := &apb.FieldInfo{}, false
+	if fi, ok = getExtensionGeneric(fd.Options().ProtoReflect(), apb.E_FieldInfo.TypeDescriptor(), fi); !ok {
 		return nil
 	}
 
