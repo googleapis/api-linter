@@ -47,9 +47,11 @@ func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
 // logic of using proto Marshaling APIs is necessary. This is still being
 // explored and refined, but at the moment this is the easiest means of loading
 // extensions of type message present on a protoreflect.Descriptor.
+// If it the extension is not set or it cannot be parsed out, a nil pointer and
+// false are returned.
 func GetExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflect.FieldDescriptor, c T) (T, bool) {
+	var zero T
 	if !o.Has(ed) {
-		var zero T
 		return zero, false
 	}
 
@@ -60,11 +62,9 @@ func GetExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflec
 
 	d, err := proto.Marshal(ext)
 	if err != nil {
-		var zero T
 		return zero, false
 	}
 	if err := proto.Unmarshal(d, c); err != nil {
-		var zero T
 		return zero, false
 	}
 	return c, true
