@@ -42,7 +42,12 @@ func GetFieldBehavior(f protoreflect.FieldDescriptor) stringset.Set {
 	return answer
 }
 
-func getExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflect.FieldDescriptor, c T) (T, bool) {
+// GetExtensionGeneric centralizes loading extensions of type message in a
+// generic way. Sometimes, direct type assertions are not possible, and fallback
+// logic of using proto Marshaling APIs is necessary. This is still being
+// explored and refined, but at the moment this is the easiest means of loading
+// extensions of type message present on a protoreflect.Descriptor.
+func GetExtensionGeneric[T proto.Message](o protoreflect.Message, ed protoreflect.FieldDescriptor, c T) (T, bool) {
 	if !o.Has(ed) {
 		var zero T
 		return zero, false
@@ -71,7 +76,7 @@ func GetOperationInfo(m protoreflect.MethodDescriptor) *lrpb.OperationInfo {
 		return nil
 	}
 	opInfo, ok := &lrpb.OperationInfo{}, false
-	opInfo, ok = getExtensionGeneric(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo)
+	opInfo, ok = GetExtensionGeneric(m.Options().ProtoReflect(), lrpb.E_OperationInfo.TypeDescriptor(), opInfo)
 	if !ok {
 		return nil
 	}
@@ -150,7 +155,7 @@ func GetResource(m protoreflect.MessageDescriptor) *apb.ResourceDescriptor {
 		return nil
 	}
 	res, ok := &apb.ResourceDescriptor{}, false
-	if res, ok = getExtensionGeneric(m.Options().ProtoReflect(), apb.E_Resource.TypeDescriptor(), res); !ok {
+	if res, ok = GetExtensionGeneric(m.Options().ProtoReflect(), apb.E_Resource.TypeDescriptor(), res); !ok {
 		return nil
 	}
 
@@ -234,7 +239,7 @@ func GetResourceReference(f protoreflect.FieldDescriptor) *apb.ResourceReference
 	}
 
 	ref, ok := &apb.ResourceReference{}, false
-	if ref, ok = getExtensionGeneric(f.Options().ProtoReflect(), apb.E_ResourceReference.TypeDescriptor(), ref); !ok {
+	if ref, ok = GetExtensionGeneric(f.Options().ProtoReflect(), apb.E_ResourceReference.TypeDescriptor(), ref); !ok {
 		return nil
 	}
 
@@ -336,7 +341,7 @@ func GetFieldInfo(fd protoreflect.FieldDescriptor) *apb.FieldInfo {
 	}
 
 	fi, ok := &apb.FieldInfo{}, false
-	if fi, ok = getExtensionGeneric(fd.Options().ProtoReflect(), apb.E_FieldInfo.TypeDescriptor(), fi); !ok {
+	if fi, ok = GetExtensionGeneric(fd.Options().ProtoReflect(), apb.E_FieldInfo.TypeDescriptor(), fi); !ok {
 		return nil
 	}
 
