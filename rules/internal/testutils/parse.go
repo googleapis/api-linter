@@ -93,6 +93,14 @@ func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
 	})["test.proto"]
 }
 
+// ParseProtoString parses a string representing a proto file, and returns
+// a FileDescriptor.
+//
+// It dedents the string before parsing.
+func ParseProtoString(t *testing.T, src string) protoreflect.FileDescriptor {
+	return ParseProtoStrings(t, map[string]string{"test.proto": src})["test.proto"]
+}
+
 // ParseProto3Tmpl parses a template string representing a proto file, and
 // returns a FileDescriptor.
 //
