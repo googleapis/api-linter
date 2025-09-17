@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.0](https://github.com/googleapis/api-linter/compare/v1.71.0...v1.72.0) (2025-09-17)
+
+
+### Features
+
+* upgrade to Go 1.24 ([#1532](https://github.com/googleapis/api-linter/issues/1532)) ([8448403](https://github.com/googleapis/api-linter/commit/844840381c253125c4d68a165b4000c7f68be411))
+
 ## [1.71.0](https://github.com/googleapis/api-linter/compare/v1.70.2...v1.71.0) (2025-08-26)
 
 
