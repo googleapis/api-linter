@@ -24,6 +24,7 @@ var aipGroups = []func(int) string{
 	aipCoreGroup,
 	aipClientLibrariesGroup,
 	aipCloudGroup,
+	aipInternalGroup,
 }
 
 func aipCoreGroup(aip int) string {
@@ -43,6 +44,15 @@ func aipClientLibrariesGroup(aip int) string {
 func aipCloudGroup(aip int) string {
 	if (aip >= 2500 && aip <= 2599) || (aip >= 25000 && aip <= 25999) {
 		return "cloud"
+	}
+	return ""
+}
+
+// aipInternalGroup identifies AIPs in the 9000+ block, which is reserved for
+// internal/custom use as per https://google.aip.dev/adopting
+func aipInternalGroup(aip int) string {
+	if aip > 9000 {
+		return "internal"
 	}
 	return ""
 }
