@@ -43,6 +43,7 @@ import (
 //
 // It dedents the string before parsing.
 func ParseProtoStrings(t *testing.T, src map[string]string) map[string]protoreflect.FileDescriptor {
+	t.Helper()
 	filenames := []string{}
 	for k, v := range src {
 		filenames = append(filenames, k)
@@ -85,6 +86,7 @@ func ParseProtoStrings(t *testing.T, src map[string]string) map[string]protorefl
 // It adds the `syntax = "proto3";` line to the beginning of the file and
 // chooses a filename, and then calls ParseProtoStrings.
 func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
+	t.Helper()
 	return ParseProtoStrings(t, map[string]string{
 		"test.proto": fmt.Sprintf(
 			"syntax = \"proto3\";\n\n%s",
@@ -98,6 +100,7 @@ func ParseProto3String(t *testing.T, src string) protoreflect.FileDescriptor {
 //
 // It dedents the string before parsing.
 func ParseProtoString(t *testing.T, src string) protoreflect.FileDescriptor {
+	t.Helper()
 	return ParseProtoStrings(t, map[string]string{"test.proto": src})["test.proto"]
 }
 
@@ -107,6 +110,7 @@ func ParseProtoString(t *testing.T, src string) protoreflect.FileDescriptor {
 // It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3String.
 func ParseProto3Tmpl(t *testing.T, src string, data interface{}) protoreflect.FileDescriptor {
+	t.Helper()
 	return ParseProto3Tmpls(t, map[string]string{
 		"test.proto": src,
 	}, data)["test.proto"]
@@ -118,6 +122,7 @@ func ParseProto3Tmpl(t *testing.T, src string, data interface{}) protoreflect.Fi
 // It parses the template using Go's text/template Parse function, and then
 // calls ParseProto3Strings.
 func ParseProto3Tmpls(t *testing.T, srcs map[string]string, data interface{}) map[string]protoreflect.FileDescriptor {
+	t.Helper()
 	strs := map[string]string{}
 	for fn, src := range srcs {
 		// Create a new template object.
