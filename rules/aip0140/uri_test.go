@@ -36,6 +36,7 @@ func TestURI(t *testing.T) {
 		{"ValidURLPrefix", "", "url_foo", nil},
 		{"ValidURLSuffix", "", "foo_url", nil},
 		{"ValidURLIntermixed", "", "foo_url_bar", nil},
+		{"ValidIntraWordURIComment", "// A URL to a curio.", "url", nil},
 		{"Invalid", "// A URI.", "url", testutils.Problems{{Message: "uri", Suggestion: "uri"}}},
 		{"InvalidPrefix", "// A uri.", "url_foo", testutils.Problems{{Message: "uri", Suggestion: "uri_foo"}}},
 		{"InvalidSuffix", "// A URI.", "foo_url", testutils.Problems{{Message: "uri", Suggestion: "foo_uri"}}},
