@@ -31,6 +31,7 @@ func TestURI(t *testing.T) {
 		{"ValidPrefix", "", "uri_foo", nil},
 		{"ValidSuffix", "", "foo_uri", nil},
 		{"ValidIntermixed", "", "foo_uri_bar", nil},
+		{"ValidWithURIComment", "// A URI.", "uri", nil},
 		{"ValidURL", "", "url", nil},
 		{"ValidURLPrefix", "", "url_foo", nil},
 		{"ValidURLSuffix", "", "foo_url", nil},
