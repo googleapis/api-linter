@@ -87,14 +87,14 @@ func (p Problem) marshal() interface{} {
 	return struct {
 		Message    string       `json:"message" yaml:"message"`
 		Suggestion string       `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
-		Location   fileLocation `json:"location" yaml:"location"`
+		Location   FileLocation `json:"location" yaml:"location"`
 		RuleID     RuleName     `json:"rule_id" yaml:"rule_id"`
 		RuleDocURI string       `json:"rule_doc_uri" yaml:"rule_doc_uri"`
 		Category   string       `json:"category,omitempty" yaml:"category,omitempty"`
 	}{
 		p.Message,
 		p.Suggestion,
-		fileLocationFromPBLocation(loc, p.Descriptor),
+		FileLocationFromPBLocation(loc, p.Descriptor),
 		p.RuleID,
 		p.GetRuleURI(),
 		p.category,
@@ -106,35 +106,35 @@ func (p Problem) GetRuleURI() string {
 	return getRuleURL(string(p.RuleID), ruleURLMappings)
 }
 
-// position describes a one-based position in a source code file.
+// Position describes a one-based Position in a source code file.
 // They are one-indexed, as a human counts lines or columns.
-type position struct {
+type Position struct {
 	Line   int `json:"line_number" yaml:"line_number"`
 	Column int `json:"column_number" yaml:"column_number"`
 }
 
-// fileLocation describes a location in a source code file.
+// FileLocation describes a location in a source code file.
 //
 // Note: Positions are one-indexed, as a human counts lines or columns
 // in a file.
-type fileLocation struct {
-	Start position `json:"start_position" yaml:"start_position"`
-	End   position `json:"end_position" yaml:"end_position"`
+type FileLocation struct {
+	Start Position `json:"start_position" yaml:"start_position"`
+	End   Position `json:"end_position" yaml:"end_position"`
 	Path  string   `json:"path" yaml:"path"`
 }
 
-// fileLocationFromPBLocation returns a new fileLocation object based on a
+// FileLocationFromPBLocation returns a new fileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
-func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descriptor) fileLocation {
+func FileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descriptor) FileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
 	if l != nil {
 		span = l.Span
 	}
 
-	var fl fileLocation
+	var fl FileLocation
 	if d != nil {
-		fl = fileLocation{Path: d.GetFile().GetName()}
+		fl = FileLocation{Path: d.GetFile().GetName()}
 	}
 
 	// If `span` has four ints; they correspond to
@@ -143,11 +143,11 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descripto
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
 	if len(span) == 4 {
-		fl.Start = position{
+		fl.Start = Position{
 			Line:   int(span[0]) + 1,
 			Column: int(span[1]) + 1,
 		}
-		fl.End = position{
+		fl.End = Position{
 			Line:   int(span[2]) + 1,
 			Column: int(span[3]),
 		}
@@ -159,11 +159,11 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descripto
 	//
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
-	fl.Start = position{
+	fl.Start = Position{
 		Line:   int(span[0]) + 1,
 		Column: int(span[1]) + 1,
 	}
-	fl.End = position{
+	fl.End = Position{
 		Line:   int(span[0]) + 1,
 		Column: int(span[2]),
 	}
