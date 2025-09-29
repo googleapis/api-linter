@@ -233,8 +233,8 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	// a.proto imports b.proto.
 	if err := writeFile(filepath.Join(protoDir, "a.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
-		import "grandparent/parent/b.proto";
+		package parent;
+		import "parent/b.proto";
 		message A {
 			B b_field = 1;
 		}
@@ -244,7 +244,7 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 
 	if err := writeFile(filepath.Join(protoDir, "b.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
+		package parent;
 		message B {}
 	`); err != nil {
 		t.Fatal(err)
