@@ -413,9 +413,9 @@ func resolveImports(imports []string) []string {
 			evaluatedAbsPath = filepath.Clean(absPath)
 		}
 
-		// Check if the current import path's canonical form is the CWD's canonical form
-		// or a subdirectory of it. If so, it's covered by ".", so we skip it.
-		if evaluatedAbsPath == evaluatedCwd || strings.HasPrefix(evaluatedAbsPath, evaluatedCwd+string(os.PathSeparator)) {
+		// Check if the current import path's canonical form is the CWD's canonical form.
+		// If so, it's covered by ".", so we skip it.
+		if evaluatedAbsPath == evaluatedCwd {
 			continue
 		}
 
