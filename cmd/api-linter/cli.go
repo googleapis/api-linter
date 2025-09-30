@@ -184,9 +184,11 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		Reporter:       rep,
 	}
 
+	// Compile each file individually to avoid possible collisions
+	// between a linted file that imports other files that are also being linted.
+	// Otherwise, both the import resolver and the file will be "duplicated".
 	var compiledFiles linker.Files
 	for _, protoFile := range c.ProtoFiles {
-		// Compile each file individually.
 		// The compiler returns a slice of files, even for a single input file.
 		f, err := compiler.Compile(context.Background(), protoFile)
 		// After compilation, check if the handler collected any errors.
