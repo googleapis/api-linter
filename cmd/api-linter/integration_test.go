@@ -311,7 +311,7 @@ func TestImportFromAnotherRoot(t *testing.T) {
 	if err := os.MkdirAll(apiCommonDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	thirdPartyDir := filepath.Join(projDir, "third_party", "google", "api")
+	thirdPartyDir := filepath.Join(projDir, "third_party", "other", "api")
 	if err := os.MkdirAll(thirdPartyDir, 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -322,12 +322,11 @@ func TestImportFromAnotherRoot(t *testing.T) {
 
 		package api.v1;
 
-		import "google/api/field_behavior.proto";
+		import "other/api/useful.proto";
 		import "api/common/common.proto";
 
 		message Test {
-		  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
-
+		  other.api.Bar bar = 1;
 		  api.common.Foo foo = 2;
 		}
 	`); err != nil {
@@ -344,34 +343,12 @@ func TestImportFromAnotherRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := writeFile(filepath.Join(thirdPartyDir, "field_behavior.proto"), `
+	if err := writeFile(filepath.Join(thirdPartyDir, "useful.proto"), `
 		syntax = "proto3";
 
-		package google.api;
+		package other.api;
 
-		import "google/protobuf/descriptor.proto";
-
-		option go_package = "google.golang.org/genproto/googleapis/api/annotations;annotations";
-		option java_multiple_files = true;
-		option java_outer_classname = "FieldBehaviorProto";
-		option java_package = "com.google.api";
-		option objc_class_prefix = "GAPI";
-
-		extend google.protobuf.FieldOptions {
-		  repeated google.api.FieldBehavior field_behavior = 1052 [packed = false];
-		}
-
-		enum FieldBehavior {
-		  FIELD_BEHAVIOR_UNSPECIFIED = 0;
-		  OPTIONAL = 1;
-		  REQUIRED = 2;
-		  OUTPUT_ONLY = 3;
-		  INPUT_ONLY = 4;
-		  IMMUTABLE = 5;
-		  UNORDERED_LIST = 6;
-		  NON_EMPTY_DEFAULT = 7;
-		  IDENTIFIER = 8;
-		}
+		message Bar{}
 	`); err != nil {
 		t.Fatal(err)
 	}
