@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/bufbuild/protocompile"
+	"github.com/bufbuild/protocompile/linker"
 	"github.com/bufbuild/protocompile/reporter"
 	"github.com/googleapis/api-linter/v2/internal"
 	"github.com/googleapis/api-linter/v2/lint"
@@ -183,25 +184,33 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		Reporter:       rep,
 	}
 
-	// Compile files.
-	files, err := compiler.Compile(context.Background(), c.ProtoFiles...)
-
-	// After compilation, check if the handler collected any errors.
-	// This is the primary source of truth for parse errors when using a
-	// custom reporter that continues on error.
-	if len(collectedErrors) > 0 {
-		errorStrings := make([]string, len(collectedErrors))
-		for i, e := range collectedErrors {
-			errorStrings[i] = e.Error()
+	// Compile each file individually to avoid possible collisions
+	// between a linted file that imports other files that are also being linted.
+	// Otherwise, both the import resolver and the file will be "duplicated".
+	var compiledFiles linker.Files
+	for _, protoFile := range c.ProtoFiles {
+		// The compiler returns a slice of files, even for a single input file.
+		f, err := compiler.Compile(context.Background(), protoFile)
+		// After compilation, check if the handler collected any errors.
+		// This is the primary source of truth for parse errors when using a
+		// custom reporter that continues on error.
+		if len(collectedErrors) > 0 {
+			errorStrings := make([]string, len(collectedErrors))
+			for i, e := range collectedErrors {
+				errorStrings[i] = e.Error()
+			}
+			return errors.New(strings.Join(errorStrings, "\n"))
 		}
-		return errors.New(strings.Join(errorStrings, "\n"))
-	}
 
-	// If the reporter has no errors, but the compiler still returned one,
-	// it's a fatal, non-recoverable error.
-	if err != nil {
-		return err
+		// If the reporter has no errors, but the compiler still returned one,
+		// it's a fatal, non-recoverable error.
+		if err != nil {
+			return err
+		}
+		// Append the compiled file(s) to the slice.
+		compiledFiles = append(compiledFiles, f...)
 	}
+	files := compiledFiles
 
 	// The compiler returns a slice of `*linker.File`, which is the compiler's
 	// internal representation. We convert this to a slice of the standard
@@ -413,9 +422,9 @@ func resolveImports(imports []string) []string {
 			evaluatedAbsPath = filepath.Clean(absPath)
 		}
 
-		// Check if the current import path's canonical form is the CWD's canonical form
-		// or a subdirectory of it. If so, it's covered by ".", so we skip it.
-		if evaluatedAbsPath == evaluatedCwd || strings.HasPrefix(evaluatedAbsPath, evaluatedCwd+string(os.PathSeparator)) {
+		// Check if the current import path's canonical form is the CWD's canonical form.
+		// If so, it's covered by ".", so we skip it.
+		if evaluatedAbsPath == evaluatedCwd {
 			continue
 		}
 

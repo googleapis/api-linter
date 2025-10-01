@@ -233,8 +233,8 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	// a.proto imports b.proto.
 	if err := writeFile(filepath.Join(protoDir, "a.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
-		import "grandparent/parent/b.proto";
+		package parent;
+		import "parent/b.proto";
 		message A {
 			B b_field = 1;
 		}
@@ -244,7 +244,7 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 
 	if err := writeFile(filepath.Join(protoDir, "b.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
+		package parent;
 		message B {}
 	`); err != nil {
 		t.Fatal(err)
@@ -271,6 +271,108 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	if err != nil && !errors.Is(err, ExitForLintFailure) {
 		if strings.Contains(err.Error(), "already defined") {
 			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
+	}
+}
+
+func TestImportFromAnotherRoot(t *testing.T) {
+	// This test case is based on a scenario described in:
+	// https://github.com/googleapis/api-linter/pull/1519
+	//
+	// It checks that the linter can correctly resolve imports when
+	// one import is in a directory provided by `-I` and another
+	// is relative to the working directory. i.e.
+	//
+	// .
+	// ├── api
+	// │   ├── common
+	// │   │   └── common.proto
+	// │   └── v1
+	// │       └── test.proto
+	// └── third_party
+	//     └── google
+	//         └── api
+	//             └── field_behavior.proto
+
+	projDir, err := os.MkdirTemp("", "proj")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(projDir)
+
+	// Create the subdirectory for protos.
+	apiV1Dir := filepath.Join(projDir, "api", "v1")
+	if err := os.MkdirAll(apiV1Dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	apiCommonDir := filepath.Join(projDir, "api", "common")
+	if err := os.MkdirAll(apiCommonDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	thirdPartyDir := filepath.Join(projDir, "third_party", "other", "api")
+	if err := os.MkdirAll(thirdPartyDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Write the proto files.
+	if err := writeFile(filepath.Join(apiV1Dir, "test.proto"), `
+		syntax = "proto3";
+
+		package api.v1;
+
+		import "other/api/useful.proto";
+		import "api/common/common.proto";
+
+		message Test {
+		  other.api.Bar bar = 1;
+		  api.common.Foo foo = 2;
+		}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeFile(filepath.Join(apiCommonDir, "common.proto"), `
+		syntax = "proto3";
+
+		package api.common;
+
+		message Foo {}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeFile(filepath.Join(thirdPartyDir, "useful.proto"), `
+		syntax = "proto3";
+
+		package other.api;
+
+		message Bar{}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Change the working directory to the project root.
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(projDir); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chdir(oldWD)
+
+	args := []string{
+		"-I", "third_party",
+		filepath.Join("api", "v1", "test.proto"),
+	}
+
+	err = runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "not found") {
+			t.Errorf("Linter failed with unexpected 'file not found' error: %v", err)
 		} else {
 			t.Fatalf("Linter failed with unexpected error: %v", err)
 		}
