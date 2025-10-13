@@ -127,10 +127,6 @@ func TestUnknownFields(t *testing.T) {
 				}
 			`, test)
 
-			// Correct the field type for the ViewField test case.
-			if test.testName == "ViewField" {
-				test.FieldType = "BookView"
-			}
 			problems := unknownFields.Lint(f)
 			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.problematicFieldName != "" {
