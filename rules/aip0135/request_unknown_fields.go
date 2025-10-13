@@ -35,6 +35,7 @@ var unknownFields = &lint.MessageRule{
 			"etag":          {}, // AIP-154
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
+			"view":          {}, // AIP-157
 		}
 		for i := 0; i < m.Fields().Len(); i++ {
 			field := m.Fields().Get(i)

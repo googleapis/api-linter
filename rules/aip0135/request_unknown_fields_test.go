@@ -34,6 +34,7 @@ func TestUnknownFields(t *testing.T) {
 		{"AllowMissing", "DeleteBookRequest", "allow_missing", "bool", testutils.Problems{}},
 		{"RequestId", "DeleteBookRequest", "request_id", "string", testutils.Problems{}},
 		{"ValidateOnly", "DeleteBookRequest", "validate_only", "bool", testutils.Problems{}},
+		{"View", "DeleteBookRequest", "view", "View", testutils.Problems{}},
 		{"Invalid", "DeleteBookRequest", "application_id", "string", testutils.Problems{{
 			Message: "Unexpected field",
 		}}},
@@ -44,6 +45,11 @@ func TestUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				enum View {
+					VIEW_UNSPECIFIED = 0;
+					BASIC = 1;
+					FULL = 2;
+				}
 				message {{.MessageName}} {
 					string name = 1;
 					{{.FieldType}} {{.FieldName}} = 2;
