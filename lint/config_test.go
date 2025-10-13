@@ -444,6 +444,26 @@ func TestReadConfigsFromFile(t *testing.T) {
 	}
 }
 
+func TestMatchPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		path     string
+		patterns []string
+		want     bool
+	}{
+		{"Windows", "a\\b.proto", []string{"a/**/*.proto"}, true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Manually normalize the path for the test case to simulate Windows behavior.
+			path := strings.ReplaceAll(test.path, "\\", "/")
+			if got := matchPath(path, test.patterns...); got != test.want {
+				t.Errorf("matchPath(%q, %q) = %v, want %v (normalized path: %q)", test.path, test.patterns, got, test.want, path)
+			}
+		})
+	}
+}
+
 func createTempFile(t *testing.T, name, content string) string {
 	dir, err := os.MkdirTemp("", "config_tests")
 	if err != nil {
