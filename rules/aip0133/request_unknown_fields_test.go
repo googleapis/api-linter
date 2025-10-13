@@ -72,6 +72,14 @@ func TestUnknownFields(t *testing.T) {
 			"",
 		},
 		{
+			"ViewField",
+			"CreateBookRequest",
+			"view",
+			"View",
+			testutils.Problems{},
+			"",
+		},
+		{
 			"Invalid",
 			"CreateBookRequest",
 			"name",
@@ -99,8 +107,13 @@ func TestUnknownFields(t *testing.T) {
 
 	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
+		t.Run(test.testName, func(t * testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				enum View {
+					VIEW_UNSPECIFIED = 0;
+					BASIC = 1;
+					FULL = 2;
+				}
 				message {{.MessageName}} {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}

@@ -37,6 +37,7 @@ var unknownFields = &lint.MessageRule{
 			"parent",        // AIP-133
 			"request_id",    // AIP-155
 			"validate_only", // AIP-163
+			"view",          // AIP-157
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
 		)
 
