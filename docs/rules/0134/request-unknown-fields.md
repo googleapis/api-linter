@@ -22,6 +22,7 @@ comes across any fields other than:
 - `bool allow_missing` ([AIP-134][])
 - `google.protobuf.FieldMask update_mask` ([AIP-134][])
 - `string request_id` ([AIP-155][])
+- `{Resource}View view` ([AIP-157][])
 
 ## Examples
 
@@ -43,6 +44,7 @@ message UpdateBookRequest {
 message UpdateBookRequest {
   Book book = 1;
   google.protobuf.FieldMask update_mask = 2;
+  BookView view = 3;
 }
 ```
 
@@ -66,4 +68,5 @@ top of the file.
 
 [aip-134]: https://aip.dev/134
 [aip-155]: https://aip.dev/155
+[aip-157]: https://aip.dev/157
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
