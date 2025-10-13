@@ -24,6 +24,7 @@ comes across any fields other than:
 - `string etag` ([AIP-154][])
 - `string request_id` ([AIP-155][])
 - `bool validate_only` ([AIP-163][])
+- `{Resource}View view` ([AIP-157][])
 
 ## Examples
 
