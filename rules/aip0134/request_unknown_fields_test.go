@@ -41,7 +41,12 @@ func TestUnknownFields(t *testing.T) {
 		},
 		{
 			"View", "UpdateBigBookRequest", "view",
-			"View",
+			"BigBookView",
+			testutils.Problems{},
+		},
+		{
+			"SuffixedView", "UpdateBigBookRequest", "custom_view",
+			"BigBookView",
 			testutils.Problems{},
 		},
 		{
@@ -66,10 +71,10 @@ func TestUnknownFields(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/protobuf/field_mask.proto";
-				enum View {
-					VIEW_UNSPECIFIED = 0;
-					BASIC = 1;
-					FULL = 2;
+				enum BigBookView {
+					BIG_BOOK_VIEW_UNSPECIFIED = 0;
+					BIG_BOOK_VIEW_BASIC = 1;
+					BIG_BOOK_VIEW_FULL = 2;
 				}
 				message {{.MessageName}} {
 					BigBook big_book = 1;

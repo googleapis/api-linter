@@ -75,7 +75,15 @@ func TestUnknownFields(t *testing.T) {
 			"ViewField",
 			"CreateBookRequest",
 			"view",
-			"View",
+			"BookView",
+			testutils.Problems{},
+			"",
+		},
+		{
+			"SuffixedViewField",
+			"CreateBookRequest",
+			"book_view",
+			"BookView",
 			testutils.Problems{},
 			"",
 		},
@@ -107,18 +115,22 @@ func TestUnknownFields(t *testing.T) {
 
 	// Run each test individually.
 	for _, test := range tests {
-		t.Run(test.testName, func(t * testing.T) {
+		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				enum View {
-					VIEW_UNSPECIFIED = 0;
-					BASIC = 1;
-					FULL = 2;
+				enum BookView {
+					BOOK_VIEW_UNSPECIFIED = 0;
+					BOOK_VIEW_BASIC = 1;
+					BOOK_VIEW_FULL = 2;
 				}
 				message {{.MessageName}} {
 					{{.FieldType}} {{.FieldName}} = 1;
 				}
 			`, test)
 
+			// Correct the field type for the ViewField test case.
+			if test.testName == "ViewField" {
+				test.FieldType = "BookView"
+			}
 			problems := unknownFields.Lint(f)
 			var d protoreflect.Descriptor = f.Messages().Get(0)
 			if test.problematicFieldName != "" {

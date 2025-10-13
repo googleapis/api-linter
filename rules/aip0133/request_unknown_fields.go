@@ -48,7 +48,7 @@ var unknownFields = &lint.MessageRule{
 				continue
 			}
 			// Check the remaining fields.
-			if !allowedFields.Contains(string(field.Name())) {
+			if !allowedFields.Contains(string(field.Name())) && !strings.HasSuffix(string(field.Name()), "_view") {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",

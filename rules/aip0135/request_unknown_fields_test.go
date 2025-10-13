@@ -34,21 +34,21 @@ func TestUnknownFields(t *testing.T) {
 		{"AllowMissing", "DeleteBookRequest", "allow_missing", "bool", testutils.Problems{}},
 		{"RequestId", "DeleteBookRequest", "request_id", "string", testutils.Problems{}},
 		{"ValidateOnly", "DeleteBookRequest", "validate_only", "bool", testutils.Problems{}},
-		{"View", "DeleteBookRequest", "view", "View", testutils.Problems{}},
-		{"Invalid", "DeleteBookRequest", "application_id", "string", testutils.Problems{{
-			Message: "Unexpected field",
-		}}},
-		{"Irrelevant", "RemoveBookRequest", "application_id", "string", testutils.Problems{}},
+		        {"ValidView", "DeleteBookRequest", "view", "BookView", testutils.Problems{}},
+				{"SuffixedView", "DeleteBookRequest", "custom_view", "BookView", testutils.Problems{}},
+				{"Invalid", "DeleteBookRequest", "application_id", "string", testutils.Problems{{
+					Message: "Unexpected field",
+				}}},		{"Irrelevant", "RemoveBookRequest", "application_id", "string", testutils.Problems{}},
 	}
 
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				enum View {
-					VIEW_UNSPECIFIED = 0;
-					BASIC = 1;
-					FULL = 2;
+				enum BookView {
+					BOOK_VIEW_UNSPECIFIED = 0;
+					BOOK_VIEW_BASIC = 1;
+					BOOK_VIEW_FULL = 2;
 				}
 				message {{.MessageName}} {
 					string name = 1;
@@ -56,6 +56,10 @@ func TestUnknownFields(t *testing.T) {
 				}
 			`, test)
 
+			// Correct the field type for the View test case.
+			if test.testName == "View" {
+				test.FieldType = "BookView"
+			}
 			// Run the lint rule, and establish that it returns the correct problems.
 			problems := unknownFields.Lint(f)
 			if diff := test.problems.SetDescriptor(f.Messages().Get(0).Fields().Get(1)).Diff(problems); diff != "" {
