@@ -22,6 +22,7 @@ comes across any fields other than:
 - `{Resource} {resource}` ([AIP-133][])
 - `string {resource}_id` ([AIP-133][])
 - `string request_id` ([AIP-155][])
+- `{Resource}View view` ([AIP-157][])
 
 ## Examples
 
@@ -33,7 +34,8 @@ message CreateBookRequest {
   string parent = 1;
   Book book = 2;
   string book_id = 3;
-  string library_id = 4;  // Non-standard field.
+  BookView view = 4;
+  string library_id = 5;  // Non-standard field.
 }
 ```
 
@@ -45,6 +47,7 @@ message CreateBookRequest {
   string parent = 1;
   Book book = 2;
   string book_id = 3;
+  BookView view = 4;
 }
 ```
 
@@ -58,10 +61,11 @@ message CreateBookRequest {
   string parent = 1;
   Book book = 2;
   string book_id = 3;
+  BookView view = 4;
 
   // (-- api-linter: core::0133::request-unknown-fields=disabled
   //     aip.dev/not-precedent: We really need this field because reasons. --)
-  string library_id = 4;  // Non-standard field.
+  string library_id = 5;  // Non-standard field.
 }
 ```
 
@@ -70,4 +74,5 @@ top of the file.
 
 [aip-133]: https://aip.dev/133
 [aip-155]: https://aip.dev/155
+[aip-157]: https://aip.dev/157
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
