@@ -15,6 +15,7 @@
 package aip0140
 
 import (
+	"regexp"
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
@@ -23,18 +24,26 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
+var uriInCommentRegexp = regexp.MustCompile(`\b(uri|URI)\b`)
+
 var uri = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "uri"),
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		nameSegments := stringset.New(strings.Split(string(f.Name()), "_")...)
-		if nameSegments.Contains("url") {
-			return []lint.Problem{{
-				Message:    "Use `uri` instead of `url` in field names.",
-				Descriptor: f,
-				Location:   locations.DescriptorName(f),
-				Suggestion: strings.ReplaceAll(string(f.Name()), "url", "uri"),
-			}}
+		if !nameSegments.Contains("url") {
+			return nil
 		}
-		return nil
+
+		comment := f.ParentFile().SourceLocations().ByDescriptor(f).LeadingComments
+		if !uriInCommentRegexp.MatchString(comment) {
+			return nil
+		}
+
+		return []lint.Problem{{
+			Message:    "Field uses `url` in field name but comment refers to URIs. Use `uri` instead of `url` in field name if field represents a URI.",
+			Descriptor: f,
+			Location:   locations.DescriptorName(f),
+			Suggestion: strings.ReplaceAll(string(f.Name()), "url", "uri"),
+		}}
 	},
 }
