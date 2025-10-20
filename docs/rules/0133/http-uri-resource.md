@@ -31,7 +31,7 @@ return type contains the string `"{collection_identifier}/"` in each `pattern`.
 // Incorrect.
 rpc CreateBook(CreateBookRequest) returns (Book) {
   option (google.api.http) = {
-    // There collection identifier should appear after the final `/` in the URI.
+    // The collection identifier should appear after the final `/` in the URI.
     post: "/v1/"
     body: "book"
   };
