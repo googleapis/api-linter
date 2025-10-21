@@ -19,13 +19,13 @@ import (
 	"sort"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/proto"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestFileOptionConsistency(t *testing.T) {
@@ -71,7 +71,7 @@ func TestFileOptionConsistency(t *testing.T) {
 				t.Fatalf("Could not build test file.")
 			}
 			if diff := test.getProblems(testFile).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -85,7 +85,7 @@ func TestFileOptionConsistency(t *testing.T) {
 			t.Fatalf("Could not build test file.")
 		}
 		if diff := (testutils.Problems{}).Diff(fileOptionConsistency.Lint(testFile)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

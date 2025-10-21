@@ -49,6 +49,16 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 			"map<string, string> page_count = 1 [(google.api.field_behavior) = OPTIONAL];",
 			nil,
 		},
+		// OneOfs are not required to have an annotation, as they
+		// are implicitly optional.
+		{
+			"ValidOneOfNoAnnotation",
+			`oneof candy_bar {
+				bool snickers = 1;
+				bool chocolate = 3;
+			}`,
+			nil,
+		},
 		{
 			"ValidOutputOnly",
 			"int32 page_count = 1 [(google.api.field_behavior) = OUTPUT_ONLY];",
@@ -60,6 +70,13 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 				(google.api.field_behavior) = OUTPUT_ONLY,
 				(google.api.field_behavior) = OPTIONAL
 			];`,
+			nil,
+		},
+		{
+			"ValidRecursiveMessage",
+			`message Foo { Foo foo = 1 [(google.api.field_behavior) = OPTIONAL]; }
+			 Foo foo = 1 [(google.api.field_behavior) = OPTIONAL];
+			`,
 			nil,
 		},
 		{
@@ -100,12 +117,14 @@ func TestFieldBehaviorRequired_SingleFile_SingleMessage(t *testing.T) {
 					};
 
 					string name = 1;
+
+					string etag = 2;
 				}
 			`, tc)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -158,7 +177,7 @@ func TestFieldBehaviorRequired_Resource_SingleFile(t *testing.T) {
 			field := f.GetMessageTypes()[1].GetFields()[1]
 
 			if diff := tc.problems.SetDescriptor(field).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -179,6 +198,14 @@ func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
 		{
 			"InvalidChildNotAnnotated",
 			"NonAnnotated non_annotated = 1 [(google.api.field_behavior) = REQUIRED];",
+			testutils.Problems{{Message: "must be set"}},
+		},
+		// Children of OneOfs should still be validated.
+		{
+			"InvalidOneOfChildNotAnnotated",
+			`oneof candy_bar {
+				NonAnnotated non_annotated = 1;
+			}`,
 			testutils.Problems{{Message: "must be set"}},
 		},
 	}
@@ -215,7 +242,7 @@ func TestFieldBehaviorRequired_NestedMessages_SingleFile(t *testing.T) {
 			nestedField := it.GetFields()[0].GetMessageType().GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(nestedField).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -226,25 +253,36 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 		name             string
 		MessageType      string
 		MessageFieldName string
+		RequestMessage   string
 		problems         testutils.Problems
 	}{
 		{
 			"ValidAnnotatedAndChildAnnotated",
 			"Annotated",
 			"annotated",
+			"UpdateBookRequest",
 			nil,
 		},
 		{
 			"ValidAnnotatedAndChildInOtherPackageUnannotated",
 			"unannotated.NonAnnotated",
 			"non_annotated",
+			"UpdateBookRequest",
 			nil,
 		},
 		{
 			"InvalidChildNotAnnotated",
 			"NonAnnotated",
 			"non_annotated",
+			"UpdateBookRequest",
 			testutils.Problems{{Message: "must be set"}},
+		},
+		{
+			"SkipRequestInOtherPackageUnannotated",
+			"Annotated",                // set this so that the template compiles
+			"annotated",                // set this so that the template compiles
+			"unannotated.NonAnnotated", // unannotated message as request
+			nil,
 		},
 	}
 	for _, tc := range testCases {
@@ -257,7 +295,7 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				import "unannotated.proto";
 
 				service Library {
-					rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
+					rpc UpdateBook({{.RequestMessage}}) returns (UpdateBookResponse) {
 					}
 				}
 
@@ -290,7 +328,11 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 				package apilinter.test.unannotated;
 
 				message NonAnnotated {
-					string nested = 1;
+					OtherNonAnnotated nested = 1;
+				}
+
+				message OtherNonAnnotated {
+					string foo = 1;
 				}
 			`
 
@@ -306,7 +348,7 @@ func TestFieldBehaviorRequired_NestedMessages_MultipleFile(t *testing.T) {
 			fd := it.GetFields()[0].GetMessageType().GetFields()[0]
 
 			if diff := tc.problems.SetDescriptor(fd).Diff(fieldBehaviorRequired.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 
 			if tc.problems != nil {

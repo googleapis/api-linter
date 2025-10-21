@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 // The create request message should have resource field.
 var requestResourceRequired = &lint.MessageRule{
 	Name:   lint.NewRuleName(134, "request-resource-required"),
-	OnlyIf: isUpdateRequestMessage,
+	OnlyIf: utils.IsUpdateRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
 		resourceMsgName := extractResource(m.GetName())
 		for _, fieldDesc := range m.GetFields() {

@@ -38,7 +38,7 @@ func TestJavaPackage(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3String(t, strings.Join(test.statements, "\n"))
 			if diff := test.problems.SetDescriptor(f).Diff(javaPackage.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -16,55 +16,16 @@
 package aip0203
 
 import (
-	"fmt"
-	"regexp"
-	"strings"
-
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
 )
-
-var standardFields = stringset.New("etag")
 
 // AddRules adds all of the AIP-203 rules to the provided registry.
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		203,
 		fieldBehaviorRequired,
-		inputOnly,
-		immutable,
-		optional,
-		optionalBehaviorConflict,
-		outputOnly,
-		required,
-		requiredAndOptional,
 		unorderedListRepeated,
+		resourceNameIdentifier,
+		resourceIdentifierOnly,
 	)
-}
-
-// check leading comments of a field and produce a problem
-// if the comments match the give pattern.
-func checkLeadingComments(pattern *regexp.Regexp, annotation string, unless ...*regexp.Regexp) func(*desc.FieldDescriptor) []lint.Problem {
-	return func(f *desc.FieldDescriptor) []lint.Problem {
-		leadingComments := f.GetSourceInfo().GetLeadingComments()
-		leadingComments = strings.Join(utils.SeparateInternalComments(leadingComments).External, "\n")
-		for _, ul := range unless {
-			if ul.MatchString(leadingComments) {
-				return nil
-			}
-		}
-		if pattern.MatchString(leadingComments) {
-			return []lint.Problem{{
-				Message:    fmt.Sprintf("Use the `google.api.field_behavior` annotation instead of %q in the leading comments. For example, `string name = 1 [(google.api.field_behavior) = %s];`.", pattern.FindString(leadingComments), annotation),
-				Descriptor: f,
-			}}
-		}
-		return nil
-	}
-}
-
-func withoutFieldBehavior(f *desc.FieldDescriptor) bool {
-	return utils.GetFieldBehavior(f).Len() == 0 && !standardFields.Contains(f.GetName())
 }

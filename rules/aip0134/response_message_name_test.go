@@ -31,6 +31,7 @@ func TestResponseMessageName(t *testing.T) {
 	}{
 		{"ValidResource", "UpdateBook", "Book", false, testutils.Problems{}},
 		{"ValidLRO", "UpdateBook", "Book", true, testutils.Problems{}},
+		{"ValidLROContainingOperation", "UpdateUnitOperation", "UnitOperation", true, testutils.Problems{}},
 		{"Invalid", "UpdateBook", "UpdateBookResponse", false, testutils.Problems{{Suggestion: "Book"}}},
 		{"InvalidLRO", "UpdateBook", "UpdateBookResponse", true, testutils.Problems{{Suggestion: "Book"}}},
 		{"Irrelevant", "MutateBook", "MutateBookResponse", false, testutils.Problems{}},
@@ -62,7 +63,65 @@ func TestResponseMessageName(t *testing.T) {
 			problems := responseMessageName.Lint(file)
 			method := file.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestResponseMessageName_FullyQualified(t *testing.T) {
+	for _, test := range []struct {
+		name              string
+		TypePkg           string
+		ServicePkg        string
+		TypeName          string
+		ResponseTypeValue string
+		problems          testutils.Problems
+	}{
+		{
+			name:       "ValidLocalImport",
+			TypePkg:    "library",
+			ServicePkg: "library",
+			TypeName:   "Book",
+			problems:   nil,
+		},
+		{
+			name:       "ValidXPkgImport",
+			TypePkg:    "other",
+			ServicePkg: "library",
+			TypeName:   "Book",
+			problems:   nil,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			files := testutils.ParseProto3Tmpls(t, map[string]string{
+				"type.proto": `
+			package {{.TypePkg}};
+	
+			message {{.TypeName}} {}
+			`,
+				"service.proto": `
+			package {{.ServicePkg}};
+	
+			import "google/longrunning/operations.proto";
+			import "type.proto";
+	
+			service Foo {
+				rpc Update{{.TypeName}} (Update{{.TypeName}}Request) returns (google.longrunning.Operation) {
+					option (google.longrunning.operation_info) = {
+					response_type: "{{.TypePkg}}.{{.TypeName}}"
+					metadata_type: "Update{{.TypeName}}Metadata"
+					};
+				}
+			}
+			message Update{{.TypeName}}Request {}
+			message Update{{.TypeName}}Metadata {}
+			`,
+			}, test)
+			file := files["service.proto"]
+			got := responseMessageName.Lint(file)
+			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(got); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

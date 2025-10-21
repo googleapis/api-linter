@@ -74,7 +74,7 @@ func LintFieldMask(f *desc.FieldDescriptor) []lint.Problem {
 
 // LintNotOneof returns a problem if the field is a oneof.
 func LintNotOneof(f *desc.FieldDescriptor) []lint.Problem {
-	if f.GetOneOf() != nil {
+	if f.GetOneOf() != nil && !f.IsProto3Optional() {
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("The `%s` field should not be a oneof field.", f.GetName()),
 			Descriptor: f,
@@ -181,12 +181,28 @@ func LintMethodHasMatchingRequestName(m *desc.MethodDescriptor) []lint.Problem {
 // LintMethodHasMatchingResponseName returns a problem if the given method's response type does not
 // have a name matching the method's, with a "Response" suffix.
 func LintMethodHasMatchingResponseName(m *desc.MethodDescriptor) []lint.Problem {
-	if got, want := m.GetOutputType().GetName(), m.GetName()+"Response"; got != want {
+	// GetResponseType handles the LRO case.
+	rt := GetResponseType(m)
+	if rt == nil {
+		return nil
+	}
+	if got, want := rt.GetName(), m.GetName()+"Response"; got != want {
+		loc := locations.MethodResponseType(m)
+		suggestion := want
+
+		// If the RPC is an LRO, we need to tweak the finding.
+		if isLongRunningOperation(m.GetOutputType()) {
+			loc = locations.MethodOperationInfo(m)
+			// Clear the suggestion b.c we cannot easily pin point the
+			// response_type field.
+			suggestion = ""
+		}
+
 		return []lint.Problem{{
 			Message:    fmt.Sprintf("Response message should be named after the RPC, i.e. %q.", want),
-			Suggestion: want,
+			Suggestion: suggestion,
 			Descriptor: m,
-			Location:   locations.MethodResponseType(m),
+			Location:   loc,
 		}}
 	}
 	return nil

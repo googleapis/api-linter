@@ -16,7 +16,6 @@ package aip0162
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
@@ -26,20 +25,25 @@ import (
 
 var rollbackResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "rollback-response-message-name"),
-	OnlyIf: isRollbackMethod,
+	OnlyIf: utils.IsRollbackRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `RollbackBook`, the response
 		// message is `Book`.
-		want := rollbackMethodRegexp.FindStringSubmatch(m.GetName())[1]
-		got := m.GetOutputType().GetName()
+		want, ok := utils.ExtractRevisionResource(m)
+		if !ok {
+			return nil
+		}
+		response := utils.GetResponseType(m)
+		if response == nil {
+			return nil
+		}
+		got := response.GetName()
 		loc := locations.MethodResponseType(m)
+		suggestion := want
 
-		// If LRO, check the response_type short name.
-		if utils.IsOperation(m.GetOutputType()) {
-			t := utils.GetOperationInfo(m).GetResponseType()
-			ndx := strings.LastIndex(t, ".")
-			got = t[ndx+1:]
+		if utils.GetOperationInfo(m) != nil {
 			loc = locations.MethodOperationInfo(m)
+			suggestion = "" // We cannot offer a precise enough location to make a suggestion.
 		}
 
 		// Return a problem if we did not get the expected return name.
@@ -50,7 +54,7 @@ var rollbackResponseMessageName = &lint.MethodRule{
 					want,
 					got,
 				),
-				Suggestion: want,
+				Suggestion: suggestion,
 				Descriptor: m,
 				Location:   loc,
 			}}

@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Configs determine if a rule is enabled or not on a file path.
@@ -33,9 +33,30 @@ type Configs []Config
 // that the file path must match any of the included paths
 // but none of the excluded ones.
 type Config struct {
+	// Explicitly specify the input file paths in scope of this config.
+	// If omitted, it applies to all input file paths.
 	IncludedPaths []string `json:"included_paths" yaml:"included_paths"`
+
+	// Explicitly specify the input files paths to exclude from using this
+	// config. If omitted, none of the input file paths are excluded.
 	ExcludedPaths []string `json:"excluded_paths" yaml:"excluded_paths"`
-	EnabledRules  []string `json:"enabled_rules" yaml:"enabled_rules"`
+
+	// The fully-qualifed rule name of a rule to enable as part of this config.
+	// Can be one of the following formats:
+	//
+	// - an individual rule: `core::0203::field-behavior-required`
+	// - an entire AIP rule group: `core::0203`
+	// - an entire AIP category: `core`
+	// - all rules: `all`
+	EnabledRules []string `json:"enabled_rules" yaml:"enabled_rules"`
+
+	// The fully-qualifed rule name of a rule to disable as part of this config.
+	// Can be one of the following formats:
+	//
+	// - an individual rule: `core::0203::field-behavior-required`
+	// - an entire AIP rule group: `core::0203`
+	// - an entire AIP category: `core`
+	// - all rules: `all`
 	DisabledRules []string `json:"disabled_rules" yaml:"disabled_rules"`
 }
 

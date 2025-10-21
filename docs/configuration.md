@@ -6,20 +6,20 @@ comments.
 
 ## CLI flag
 
-We can disable a rule using the `-disable_rule` flag.
+We can disable a rule using the `-disable-rule` flag.
 
 Example:
 
 Disable the rule `core::0140::lower-snake`:
 
 ```sh
-api-linter -disable_rule core::0140::lower-snake test.proto
+api-linter -disable-rule core::0140::lower-snake test.proto
 ```
 
 To disable multiple rules, specify the flag multiple times respectively:
 
 ```sh
-api-linter -disable_rule core::0140::lower-snake -disable_rule core::0131::request-name-field test.proto
+api-linter -disable-rule core::0140::lower-snake -disable-rule core::0131::request-name-field test.proto
 ```
 
 ## Configuration file
@@ -47,6 +47,28 @@ Disable the same rule using a YAML config file:
 - included_paths:
     - 'tests/**/*.proto'
   disabled_rules:
+    - 'core::0140::lower-snake'
+```
+
+Enable the rule `core::0140::lower-snake` for all proto files except the
+directory `tests` using a JSON config file:
+
+```json
+[
+  {
+    "excluded_paths": ["tests/**/*.proto"],
+    "enabled_rules": ["core::0140::lower-snake"]
+  }
+]
+```
+
+Enable the same rule using a YAML config file:
+
+```yaml
+---
+- excluded_paths:
+    - 'tests/**/*.proto'
+  enabled_rules:
     - 'core::0140::lower-snake'
 ```
 

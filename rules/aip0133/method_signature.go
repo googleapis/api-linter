@@ -27,21 +27,36 @@ import (
 )
 
 var methodSignature = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "method-signature"),
-	OnlyIf: utils.IsCreateMethod,
+	Name: lint.NewRuleName(133, "method-signature"),
+	OnlyIf: func(m *desc.MethodDescriptor) bool {
+		return utils.IsCreateMethod(m) && utils.IsResource(utils.GetResponseType(m))
+	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
 
-		// Determine what signature we want. The {resource}_id is desired
-		// if and only if the field exists on the request.
-		resourceField := strcase.SnakeCase(getResourceMsgName(m))
+		// Determine what signature we want.
 		want := []string{}
-		if !hasNoParent(m.GetOutputType()) {
+		if utils.HasParent(utils.GetResource(utils.GetResponseType(m))) {
 			want = append(want, "parent")
 		}
-		want = append(want, resourceField)
-		if idField := resourceField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
+		for _, f := range m.GetInputType().GetFields() {
+			if mt := f.GetMessageType(); mt != nil && utils.IsResource(mt) {
+				want = append(want, f.GetName())
+				break
+			}
+		}
+		// The {resource}_id is desired if and only if the field exists on the
+		// request and the request targets a resource.
+		expectedResourceIDField := strcase.SnakeCase(utils.GetResourceMessageName(m, "Create"))
+		if idField := expectedResourceIDField + "_id"; m.GetInputType().FindFieldByName(idField) != nil {
 			want = append(want, idField)
+		}
+
+		// The Standard Create is not standard and has nothing to suggest.
+		// There are likely other rules warning about the non-standard nature
+		// so just silently move on.
+		if len(want) == 0 {
+			return nil
 		}
 
 		// Check if the signature is missing.

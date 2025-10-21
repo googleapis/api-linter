@@ -24,7 +24,7 @@ import (
 // Tag Revision methods should have a proper HTTP pattern.
 var tagRevisionHTTPURISuffix = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "tag-revision-http-uri-suffix"),
-	OnlyIf: isTagRevisionMethod,
+	OnlyIf: utils.IsTagRevisionMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			if !tagRevisionURINameRegexp.MatchString(httpRule.URI) {

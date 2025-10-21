@@ -17,26 +17,29 @@ package aip0132
 import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var allowedFields = stringset.New(
-	"parent",       // AIP-132
-	"page_size",    // AIP-158
-	"page_token",   // AIP-158
-	"skip",         // AIP-158
-	"filter",       // AIP-132
-	"order_by",     // AIP-132
-	"show_deleted", // AIP-135
-	"read_mask",    // AIP-157
-	"view",         // AIP-157
+	"parent",                 // AIP-132
+	"page_size",              // AIP-158
+	"page_token",             // AIP-158
+	"skip",                   // AIP-158
+	"filter",                 // AIP-132
+	"order_by",               // AIP-132
+	"show_deleted",           // AIP-135
+	"request_id",             // AIP-155
+	"read_mask",              // AIP-157
+	"view",                   // AIP-157
+	"return_partial_success", // AIP-217
 )
 
 // List methods should not have unrecognized fields.
 var unknownFields = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-unknown-fields"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isListRequestMessage(f.GetOwner())
+		return utils.IsListRequestMessage(f.GetOwner())
 	},
 	LintField: func(field *desc.FieldDescriptor) []lint.Problem {
 		if !allowedFields.Contains(field.GetName()) {

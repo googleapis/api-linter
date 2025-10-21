@@ -27,7 +27,7 @@ var responseLRO = &lint.MethodRule{
 		return utils.IsUpdateMethod(m) && utils.IsDeclarativeFriendlyMethod(m)
 	},
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		if m.GetOutputType().GetFullyQualifiedName() != "google.longrunning.Operation" {
+		if !utils.IsOperation(m.GetOutputType()) {
 			return []lint.Problem{{
 				Message:    "Declarative-friendly update methods should use an LRO.",
 				Descriptor: m,

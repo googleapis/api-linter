@@ -23,7 +23,7 @@ import (
 var requestMaskField = &lint.FieldRule{
 	Name: lint.NewRuleName(134, "request-mask-field"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
+		return utils.IsUpdateRequestMessage(f.GetOwner()) && f.GetName() == "update_mask"
 	},
 	LintField: utils.LintFieldMask,
 }

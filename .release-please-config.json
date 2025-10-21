@@ -1,0 +1,11 @@
+{
+    "release-type": "go-yoshi",
+    "include-component-in-tag": false,
+    "include-v-in-tag": true,
+    "changelog-path": "CHANGELOG.md",
+    "packages": {
+        ".": {
+            "component": "api-linter"
+        }
+    }
+}

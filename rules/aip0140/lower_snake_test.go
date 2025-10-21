@@ -50,7 +50,7 @@ func TestLowerSnake(t *testing.T) {
 			// of problems.
 			problems := lowerSnake.Lint(message.GetFile())
 			if diff := test.problems.SetDescriptor(message.GetFields()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

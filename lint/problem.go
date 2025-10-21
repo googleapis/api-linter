@@ -17,8 +17,8 @@ package lint
 import (
 	"encoding/json"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // Problem contains information about a result produced by an API Linter.

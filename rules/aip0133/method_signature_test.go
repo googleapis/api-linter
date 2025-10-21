@@ -64,6 +64,7 @@ func TestMethodSignature(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				import "google/api/client.proto";
+				import "google/api/resource.proto";
 				service Library {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns (Book) {
 						{{.Signature}}
@@ -74,11 +75,16 @@ func TestMethodSignature(t *testing.T) {
 					Book book = 2;
 					{{.IDField}}
 				}
-				message Book {}
+				message Book {
+				  option (google.api.resource) = {
+				    type: "library.googleapis.com/Book"
+					  pattern: "libraries/{library}/books/{book}"
+				  };
+				}
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(methodSignature.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -100,12 +106,103 @@ func TestMethodSignature(t *testing.T) {
 			}
 			message Book {
 				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
 					pattern: "books/{book}"
 				};
 			}
 		`)
 		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
+		}
+	})
+
+	// Ensure that this isn't producing a wonky finding if the "standard create"
+	// doesn't actually interact with a resource. Other rules would capture that
+	// errant aspect.
+	t.Run("SkipNonResource", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (Book) {}
+			}
+			message CreateBookRequest {
+				Book book = 1;
+				string book_id = 2;
+			}
+			message Book {}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
+			t.Error(diff)
+		}
+	})
+
+	// Add a separate test for the LRO case rather than introducing yet
+	// another knob on the above test.
+	t.Run("Longrunning", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			import "google/api/resource.proto";
+			import "google/longrunning/operations.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+					option (google.api.method_signature) = "book,book_id";
+					option (google.longrunning.operation_info) = {
+						response_type: "Book"
+						metadata_type: "Book"
+					};
+				}
+			}
+			message CreateBookRequest {
+				Book book = 1;
+				string book_id = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "books/{book}"
+				};
+			}
+		`)
+		if diff := (testutils.Problems{}).Diff(methodSignature.Lint(file)); diff != "" {
+			t.Error(diff)
+		}
+	})
+	// Add a separate test for the non-standard resource field case rather than
+	// introducing yet another knob on the above test.
+	t.Run("NonStandardResourceFieldName", func(t *testing.T) {
+		file := testutils.ParseProto3String(t, `
+			import "google/api/client.proto";
+			import "google/api/resource.proto";
+			import "google/longrunning/operations.proto";
+			service Library {
+				rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
+					option (google.api.method_signature) = "book,book_id";
+					option (google.longrunning.operation_info) = {
+						response_type: "Book"
+						metadata_type: "Book"
+					};
+				}
+			}
+			message CreateBookRequest {
+				Book not_book = 1;
+				string book_id = 2;
+			}
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "books/{book}"
+				};
+			}
+		`)
+		want := testutils.Problems{
+			{
+				Message:    "not_book,book",
+				Suggestion: `option (google.api.method_signature) = "not_book,book_id";`,
+				Descriptor: file.GetServices()[0].GetMethods()[0],
+			},
+		}
+		if diff := want.Diff(methodSignature.Lint(file)); diff != "" {
+			t.Error(diff)
 		}
 	})
 }

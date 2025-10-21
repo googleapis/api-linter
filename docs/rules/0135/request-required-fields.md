@@ -19,6 +19,7 @@ This rule looks at any message matching `Delete*Request` and complains if it
 comes across any required fields other than:
 
 - `string name` ([AIP-135][])
+- `string etag` ([AIP-135][], [AIP-154][])
 
 ## Examples
 
@@ -62,4 +63,5 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 [aip-135]: https://aip.dev/135
+[aip-154]: https://aip.dev/154
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

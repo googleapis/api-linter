@@ -38,6 +38,7 @@ func TestUnknownFields(t *testing.T) {
 		fieldType   *builder.FieldType
 		problems    testutils.Problems
 	}{
+		{"RequestId", "GetBookRequest", "request_id", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
 		{"ReadMask", "GetBookRequest", "read_mask", builder.FieldTypeImportedMessage(fieldMask), testutils.Problems{}},
 		{"View", "GetBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("View").AddValue(builder.NewEnumValue("BASIC"))), testutils.Problems{}},
 		{"Invalid", "GetBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{{
@@ -63,7 +64,7 @@ func TestUnknownFields(t *testing.T) {
 			wantProblems := test.problems.SetDescriptor(message.FindFieldByName(test.fieldName))
 			gotProblems := unknownFields.Lint(message.GetFile())
 			if diff := wantProblems.Diff(gotProblems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

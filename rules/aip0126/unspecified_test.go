@@ -30,8 +30,9 @@ func TestUnspecified(t *testing.T) {
 		{"Valid", "BookFormat", "BOOK_FORMAT_UNSPECIFIED", testutils.Problems{}},
 		{"ValidWithNum", "Ipv6Format", "IPV6_FORMAT_UNSPECIFIED", nil},
 		{"ValidUnknown", "BookFormat", "UNKNOWN", nil},
+		{"ValidPrefixedUnknown", "BookFormat", "BOOK_FORMAT_UNKNOWN", nil},
 		{"InvalidNoPrefix", "BookFormat", "UNSPECIFIED", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
-		{"InvalidWrongSuffix", "BookFormat", "BOOK_FORMAT_UNKNOWN", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
+		{"InvalidWrongSuffix", "BookFormat", "BOOK_FORMAT_NOT_SET", testutils.Problems{{Suggestion: "BOOK_FORMAT_UNSPECIFIED"}}},
 		{"InvalidWithNum", "Ipv6Format", "IPV6FORMAT_UNSPECIFIED", testutils.Problems{{Suggestion: "IPV6_FORMAT_UNSPECIFIED"}}},
 	}
 	for _, test := range tests {
@@ -48,7 +49,7 @@ func TestUnspecified(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := unspecified.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -67,7 +68,7 @@ func TestUnspecified(t *testing.T) {
 			// Run the lint rule and establish we get the correct problems.
 			problems := unspecified.Lint(f)
 			if diff := test.problems.SetDescriptor(f.GetEnumTypes()[0].GetValues()[0]).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

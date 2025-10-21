@@ -31,7 +31,7 @@ func TestRequestNameReference(t *testing.T) {
 			}
 		`)
 		if diff := (testutils.Problems{}).Diff(requestNameReference.Lint(f)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
@@ -52,7 +52,7 @@ func TestRequestNameReference(t *testing.T) {
 				`, test)
 				field := f.GetMessageTypes()[0].GetFields()[0]
 				if diff := test.problems.SetDescriptor(field).Diff(requestNameReference.Lint(f)); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}

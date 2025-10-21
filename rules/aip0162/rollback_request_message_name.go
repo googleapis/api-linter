@@ -22,6 +22,6 @@ import (
 // Rollback messages should have a properly named request message.
 var rollbackRequestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "rollback-request-message-name"),
-	OnlyIf:     isRollbackMethod,
+	OnlyIf:     utils.IsRollbackRevisionMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

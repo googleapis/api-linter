@@ -22,6 +22,6 @@ import (
 // Delete Revision messages should have a properly named request message.
 var deleteRevisionRequestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "delete-revision-request-message-name"),
-	OnlyIf:     isDeleteRevisionMethod,
+	OnlyIf:     utils.IsDeleteRevisionMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

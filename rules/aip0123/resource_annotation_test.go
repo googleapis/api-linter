@@ -34,7 +34,21 @@ func TestResourceAnnotation(t *testing.T) {
 			}
 		`)
 		if diff := (testutils.Problems{}).Diff(resourceAnnotation.Lint(f)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
+		}
+	})
+
+	t.Run("SkipNested", func(t *testing.T) {
+		f := testutils.ParseProto3String(t, `
+			message Foo {
+				message Bar {
+					string name = 1;
+				}
+				Bar bar = 1;
+			}
+		`)
+		if diff := (testutils.Problems{}).Diff(resourceAnnotation.Lint(f)); diff != "" {
+			t.Error(diff)
 		}
 	})
 
@@ -59,7 +73,7 @@ func TestResourceAnnotation(t *testing.T) {
 			`, test)
 			m := f.GetMessageTypes()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(resourceAnnotation.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

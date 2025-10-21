@@ -16,6 +16,10 @@ func TestUpperSnake(t *testing.T) {
 	}{
 		{"ValidOneWord", []string{"ONE"}, testutils.Problems{}},
 		{"ValidTwoWords", []string{"ONE_TWO"}, testutils.Problems{}},
+		{"ValidTwoWordsTrailingNumber", []string{"ONE_TWO2"}, testutils.Problems{}},
+		{"ValidThreeWordsTrailingNumber", []string{"ONE_TWO2_THREE"}, testutils.Problems{}},
+		{"ValidThreeWordsTrailingLeadingNumber", []string{"ONE_TWO2_3THREE"}, testutils.Problems{}},
+		{"ValidThreeWordsIsolatedNumber", []string{"ONE_TWO_3"}, testutils.Problems{}},
 		{"InvalidOneWord", []string{"one"}, testutils.Problems{{Suggestion: "ONE"}}},
 		{"InvalidTwoWordsCamel", []string{"oneTwo"}, testutils.Problems{{Suggestion: "ONE_TWO"}}},
 		{"InvalidTwoWordsLowerSnake", []string{"one_two"}, testutils.Problems{{Suggestion: "ONE_TWO"}}},
@@ -49,7 +53,7 @@ func TestUpperSnake(t *testing.T) {
 			// Run the lint rule, and establish that we got the correct problems.
 			problems := enumValueUpperSnakeCase.Lint(enum.GetFile())
 			if diff := test.problems.Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

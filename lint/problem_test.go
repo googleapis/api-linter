@@ -19,9 +19,9 @@ import (
 	"strings"
 	"testing"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc/builder"
-	"gopkg.in/yaml.v2"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
+	"gopkg.in/yaml.v3"
 )
 
 func TestProblemJSON(t *testing.T) {

@@ -20,6 +20,8 @@ import (
 	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/api-linter/rules/internal/testutils"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
@@ -49,7 +51,7 @@ func TestGetFieldBehavior(t *testing.T) {
 		t.Run(test.fieldName, func(t *testing.T) {
 			f := msg.FindFieldByName(test.fieldName)
 			if diff := cmp.Diff(GetFieldBehavior(f), test.fieldBehaviors); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -83,7 +85,7 @@ func TestGetMethodSignatures(t *testing.T) {
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := cmp.Diff(GetMethodSignatures(method), test.want); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -374,6 +376,67 @@ func TestFindResource(t *testing.T) {
 	}
 }
 
+func TestFindResourceMessage(t *testing.T) {
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name, reference, wantMsg string
+		notFound                 bool
+	}{
+		{"local_reference", "library.googleapis.com/Shelf", "Shelf", false},
+		{"imported_reference", "library.googleapis.com/Book", "Book", false},
+		{"unresolvable", "foo.googleapis.com/Bar", "", true},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResourceMessage(tst.reference, files["shelf.proto"])
+
+			if tst.notFound && got != nil {
+				t.Fatalf("Expected to not find the message, but found %q", got.GetName())
+			}
+
+			if !tst.notFound && got == nil {
+				t.Errorf("Got nil, expected %q", tst.wantMsg)
+			} else if !tst.notFound && got.GetName() != tst.wantMsg {
+				t.Errorf("Got %q, expected %q", got.GetName(), tst.wantMsg)
+			}
+		})
+	}
+}
+
 func TestSplitResourceTypeName(t *testing.T) {
 	for _, tst := range []struct {
 		name, input, service, typeName string
@@ -467,6 +530,226 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 					"GetOutputOrLROResponseMessage got %q, want %q",
 					got, test.want,
 				)
+			}
+		})
+	}
+}
+
+func TestFindResourceChildren(t *testing.T) {
+	publisher := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Publisher",
+		Pattern: []string{
+			"publishers/{publisher}",
+		},
+	}
+	shelf := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Shelf",
+		Pattern: []string{
+			"shelves/{shelf}",
+		},
+	}
+	book := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Book",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}",
+		},
+	}
+	edition := &apb.ResourceDescriptor{
+		Type: "library.googleapis.com/Edition",
+		Pattern: []string{
+			"publishers/{publisher}/books/{book}/editions/{edition}",
+		},
+	}
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"book.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "google/api/resource.proto";
+
+			message Book {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+				};
+
+				string name = 1;
+			}
+
+			message Edition {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Edition"
+					pattern: "publishers/{publisher}/books/{book}/editions/{edition}"
+				};
+
+				string name = 1;
+			}
+		`,
+		"shelf.proto": `
+			syntax = "proto3";
+			package test;
+
+			import "book.proto";
+			import "google/api/resource.proto";
+
+			message Shelf {
+				option (google.api.resource) = {
+					type: "library.googleapis.com/Shelf"
+					pattern: "shelves/{shelf}"
+				};
+
+				string name = 1;
+
+				repeated Book books = 2;
+			}
+		`,
+	})
+
+	for _, tst := range []struct {
+		name   string
+		parent *apb.ResourceDescriptor
+		want   []*apb.ResourceDescriptor
+	}{
+		{"has_child_same_file", book, []*apb.ResourceDescriptor{edition}},
+		{"has_child_other_file", publisher, []*apb.ResourceDescriptor{book, edition}},
+		{"no_children", shelf, nil},
+	} {
+		t.Run(tst.name, func(t *testing.T) {
+			got := FindResourceChildren(tst.parent, files["shelf.proto"])
+			if diff := cmp.Diff(tst.want, got, cmp.Comparer(proto.Equal)); diff != "" {
+				t.Errorf("got(-),want(+):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestHasFieldInfo(t *testing.T) {
+	testCases := []struct {
+		name, FieldInfo string
+		want            bool
+	}{
+		{
+			name:      "HasFieldInfo",
+			FieldInfo: "[(google.api.field_info).format = UUID4]",
+			want:      true,
+		},
+		{
+			name: "NoFieldInfo",
+			want: false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 {{.FieldInfo}};
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := HasFieldInfo(fd); got != tc.want {
+				t.Errorf("HasFieldInfo(%+v): expected %v, got %v", fd, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldInfo(t *testing.T) {
+	testCases := []struct {
+		name, FieldInfo string
+		want            *apb.FieldInfo
+	}{
+		{
+			name:      "HasFieldInfo",
+			FieldInfo: "[(google.api.field_info).format = UUID4]",
+			want:      &apb.FieldInfo{Format: apb.FieldInfo_UUID4},
+		},
+		{
+			name: "NoFieldInfo",
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 {{.FieldInfo}};
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			got := GetFieldInfo(fd)
+			if diff := cmp.Diff(got, tc.want, cmp.Comparer(proto.Equal)); diff != "" {
+				t.Errorf("GetFieldInfo(%+v): got(-),want(+):\n%s", fd, diff)
+			}
+		})
+	}
+}
+
+func TestHasFormat(t *testing.T) {
+	testCases := []struct {
+		name, Format string
+		want         bool
+	}{
+		{
+			name:   "HasFormat",
+			Format: "format: UUID4",
+			want:   true,
+		},
+		{
+			name: "NoFormat",
+			want: false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 [(google.api.field_info) = {
+					{{.Format}}
+				}];
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := HasFormat(fd); got != tc.want {
+				t.Errorf("HasFormat(%+v): expected %v, got %v", fd, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestGetFormat(t *testing.T) {
+	testCases := []struct {
+		name, Format string
+		want         apb.FieldInfo_Format
+	}{
+		{
+			name:   "HasUUID4Format",
+			Format: "format: UUID4",
+			want:   apb.FieldInfo_UUID4,
+		},
+		{
+			name: "NoFormat",
+			want: apb.FieldInfo_FORMAT_UNSPECIFIED,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+			import "google/api/field_info.proto";
+			
+			message CreateBookRequest {
+				string foo = 1 [(google.api.field_info) = {
+					{{.Format}}
+				}];
+			}
+			`, tc)
+			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			if got := GetFormat(fd); got != tc.want {
+				t.Errorf("GetFormat(%+v): expected %v, got %v", fd, tc.want, got)
 			}
 		})
 	}

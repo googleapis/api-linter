@@ -34,7 +34,7 @@ func TestFieldName(t *testing.T) {
 		{"ValidSuffixRepeatedPlural", "repeated google.protobuf.Timestamp", "sample_times", testutils.Problems{}},
 		{"ValidSuffixRepeated", "repeated google.protobuf.Timestamp", "sample_time", testutils.Problems{}},
 		{"InvalidNoSuffixRepeated", "repeated google.protobuf.Timestamp", "create", testutils.Problems{{Message: "should end"}}},
-		{"InvalidIsTypeMistake", "int32", "created", testutils.Problems{{Suggestion: "create_time"}}},
+		{"SkipNonTimestamp", "int32", "created", testutils.Problems{}},
 		{"IrrelevantWeirdType", "bytes", "created", nil},
 	}
 	for _, test := range tests {
@@ -47,7 +47,7 @@ func TestFieldName(t *testing.T) {
 			`, test)
 			field := file.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(fieldNames.Lint(file)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

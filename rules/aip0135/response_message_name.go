@@ -30,9 +30,8 @@ import (
 // message.
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "response-message-name"),
-	OnlyIf: isDeleteMethod,
+	OnlyIf: utils.IsDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		declFriendly := utils.IsDeclarativeFriendlyMethod(m)
 		resource := strings.Replace(m.GetName(), "Delete", "", 1)
 
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
@@ -41,10 +40,7 @@ var responseMessageName = &lint.MethodRule{
 		if stringset.New("Empty", "Operation").Contains(got) {
 			got = m.GetOutputType().GetFullyQualifiedName()
 		}
-		want := stringset.New(resource)
-		if !declFriendly {
-			want.Add("google.protobuf.Empty")
-		}
+		want := stringset.New(resource, "google.protobuf.Empty")
 
 		// If the return type is an Operation, use the annotated response type.
 		lro := false
@@ -63,10 +59,6 @@ var responseMessageName = &lint.MethodRule{
 			// not marked declarative-friendly)
 			msg := "Delete RPCs should have response message type of Empty or the resource, not %q."
 			suggestion := "google.protobuf.Empty"
-			if declFriendly {
-				msg = strings.Replace(msg, "Empty or ", "", 1)
-				suggestion = resource
-			}
 
 			// Customize the location based on whether an LRO is in use.
 			location := locations.MethodResponseType(m)

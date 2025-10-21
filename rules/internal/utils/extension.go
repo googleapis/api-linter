@@ -135,17 +135,23 @@ func IsResource(m *desc.MessageDescriptor) bool {
 // IsSingletonResource returns true if the given message is a singleton
 // resource according to its pattern.
 func IsSingletonResource(m *desc.MessageDescriptor) bool {
+	for _, pattern := range GetResource(m).GetPattern() {
+		if IsSingletonResourcePattern(pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsSingletonResource returns true if the given message is a singleton
+// resource according to its pattern.
+func IsSingletonResourcePattern(pattern string) bool {
 	// If the pattern ends in something other than "}", that indicates that this is a singleton.
 	//
 	// For example:
 	//   publishers/{publisher}/books/{book} -- not a singleton, many books
 	//   publishers/*/settings -- a singleton; one settings object per publisher
-	for _, pattern := range GetResource(m).GetPattern() {
-		if !strings.HasSuffix(pattern, "}") {
-			return true
-		}
-	}
-	return false
+	return !strings.HasSuffix(pattern, "}")
 }
 
 // GetResourceDefinitions returns the google.api.resource_definition annotations
@@ -158,8 +164,19 @@ func GetResourceDefinitions(f *desc.FileDescriptor) []*apb.ResourceDescriptor {
 	return nil
 }
 
+// HasResourceReference returns if the field has a google.api.resource_reference annotation.
+func HasResourceReference(f *desc.FieldDescriptor) bool {
+	if f == nil {
+		return false
+	}
+	return proto.HasExtension(f.GetFieldOptions(), apb.E_ResourceReference)
+}
+
 // GetResourceReference returns the google.api.resource_reference annotation.
 func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
+	if f == nil {
+		return nil
+	}
 	opts := f.GetFieldOptions()
 	if x := proto.GetExtension(opts, apb.E_ResourceReference); x != nil {
 		return x.(*apb.ResourceReference)
@@ -173,12 +190,23 @@ func GetResourceReference(f *desc.FieldDescriptor) *apb.ResourceReference {
 // This is especially useful for resolving google.api.resource_reference
 // annotations.
 func FindResource(reference string, file *desc.FileDescriptor) *apb.ResourceDescriptor {
+	m := FindResourceMessage(reference, file)
+	return GetResource(m)
+}
+
+// FindResourceMessage returns the message containing the first resource of type
+// matching the resource Type name being referenced. It looks within a given
+// file and its depenedencies, it cannot search within the entire protobuf
+// package. This is especially useful for resolving
+// google.api.resource_reference annotations to the message that owns a
+// resource.
+func FindResourceMessage(reference string, file *desc.FileDescriptor) *desc.MessageDescriptor {
 	files := append(file.GetDependencies(), file)
 	for _, f := range files {
 		for _, m := range f.GetMessageTypes() {
 			if r := GetResource(m); r != nil {
 				if r.GetType() == reference {
-					return r
+					return m
 				}
 			}
 		}
@@ -199,4 +227,62 @@ func SplitResourceTypeName(typ string) (service string, typeName string, ok bool
 	ok = true
 
 	return
+}
+
+// FindResourceChildren attempts to search for other resources defined in the
+// package that are parented by the given resource.
+func FindResourceChildren(parent *apb.ResourceDescriptor, file *desc.FileDescriptor) []*apb.ResourceDescriptor {
+	pats := parent.GetPattern()
+	if len(pats) == 0 {
+		return nil
+	}
+	// Use the first pattern in the resource because:
+	// 1. Patterns cannot be rearranged, so this is the true first pattern
+	// 2. The true first pattern is the one most likely to be used as a parent.
+	first := pats[0]
+
+	var children []*apb.ResourceDescriptor
+	files := append(file.GetDependencies(), file)
+	for _, f := range files {
+		for _, m := range f.GetMessageTypes() {
+			if r := GetResource(m); r != nil && r.GetType() != parent.GetType() {
+				for _, p := range r.GetPattern() {
+					if strings.HasPrefix(p, first) {
+						children = append(children, r)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return children
+}
+
+func HasFieldInfo(fd *desc.FieldDescriptor) bool {
+	return fd != nil && proto.HasExtension(fd.GetFieldOptions(), apb.E_FieldInfo)
+}
+
+func GetFieldInfo(fd *desc.FieldDescriptor) *apb.FieldInfo {
+	if !HasFieldInfo(fd) {
+		return nil
+	}
+
+	return proto.GetExtension(fd.GetFieldOptions(), apb.E_FieldInfo).(*apb.FieldInfo)
+}
+
+func HasFormat(fd *desc.FieldDescriptor) bool {
+	if !HasFieldInfo(fd) {
+		return false
+	}
+
+	fi := GetFieldInfo(fd)
+	return fi.GetFormat() != apb.FieldInfo_FORMAT_UNSPECIFIED
+}
+
+func GetFormat(fd *desc.FieldDescriptor) apb.FieldInfo_Format {
+	if !HasFormat(fd) {
+		return apb.FieldInfo_FORMAT_UNSPECIFIED
+	}
+	return GetFieldInfo(fd).GetFormat()
 }

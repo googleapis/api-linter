@@ -3,9 +3,9 @@ rule:
   aip: 146
   name: [core, '0146', any]
   summary: Avoid `google.protobuf.Any` fields.
-permalink: /146/standardized-codes
+permalink: /146/any
 redirect_from:
-  - /0146/standardized-codes
+  - /0146/any
 ---
 
 # Any

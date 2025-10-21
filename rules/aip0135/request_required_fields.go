@@ -26,10 +26,12 @@ import (
 // The delete request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-required-fields"),
-	OnlyIf: isDeleteRequestMessage,
+	OnlyIf: utils.IsDeleteRequestMessage,
 	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := stringset.New("name")
+		// * name: required by AIP-135
+		// * etag: optional or required by both AIP-135 and AIP-154
+		allowedRequiredFields := stringset.New("name", "etag")
 
 		for _, f := range m.GetFields() {
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {

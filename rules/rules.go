@@ -74,16 +74,19 @@ import (
 	"github.com/googleapis/api-linter/rules/aip0151"
 	"github.com/googleapis/api-linter/rules/aip0152"
 	"github.com/googleapis/api-linter/rules/aip0154"
+	"github.com/googleapis/api-linter/rules/aip0155"
 	"github.com/googleapis/api-linter/rules/aip0156"
 	"github.com/googleapis/api-linter/rules/aip0157"
 	"github.com/googleapis/api-linter/rules/aip0158"
 	"github.com/googleapis/api-linter/rules/aip0159"
+	"github.com/googleapis/api-linter/rules/aip0160"
 	"github.com/googleapis/api-linter/rules/aip0162"
 	"github.com/googleapis/api-linter/rules/aip0163"
 	"github.com/googleapis/api-linter/rules/aip0164"
 	"github.com/googleapis/api-linter/rules/aip0165"
 	"github.com/googleapis/api-linter/rules/aip0191"
 	"github.com/googleapis/api-linter/rules/aip0192"
+	"github.com/googleapis/api-linter/rules/aip0202"
 	"github.com/googleapis/api-linter/rules/aip0203"
 	"github.com/googleapis/api-linter/rules/aip0214"
 	"github.com/googleapis/api-linter/rules/aip0215"
@@ -122,16 +125,19 @@ var aipAddRulesFuncs = []addRulesFuncType{
 	aip0151.AddRules,
 	aip0152.AddRules,
 	aip0154.AddRules,
+	aip0155.AddRules,
 	aip0156.AddRules,
 	aip0157.AddRules,
 	aip0158.AddRules,
 	aip0159.AddRules,
+	aip0160.AddRules,
 	aip0162.AddRules,
 	aip0163.AddRules,
 	aip0164.AddRules,
 	aip0165.AddRules,
 	aip0191.AddRules,
 	aip0192.AddRules,
+	aip0202.AddRules,
 	aip0203.AddRules,
 	aip0214.AddRules,
 	aip0215.AddRules,

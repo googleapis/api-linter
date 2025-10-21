@@ -32,7 +32,7 @@ func TestReservedWords(t *testing.T) {
 			field := f.GetMessageTypes()[0].GetFields()[1]
 			want := testutils.Problems{{Message: field.GetName(), Descriptor: field}}
 			if diff := want.Diff(reservedWords.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	})

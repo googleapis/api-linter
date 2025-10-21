@@ -22,6 +22,6 @@ import (
 // Delete methods should not have an HTTP body.
 var httpBody = &lint.MethodRule{
 	Name:       lint.NewRuleName(135, "http-body"),
-	OnlyIf:     isDeleteMethod,
+	OnlyIf:     utils.IsDeleteMethod,
 	LintMethod: utils.LintNoHTTPBody,
 }

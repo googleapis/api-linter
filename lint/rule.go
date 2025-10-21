@@ -18,8 +18,8 @@ import (
 	"regexp"
 	"strings"
 
-	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // ProtoRule defines a lint rule that checks Google Protobuf APIs.

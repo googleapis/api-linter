@@ -27,12 +27,17 @@ var minimumRequiredFieldBehavior = stringset.New(
 	"OPTIONAL", "REQUIRED", "OUTPUT_ONLY", "IMMUTABLE",
 )
 
+var excusedResourceFields = stringset.New(
+	"name", // Uses https://google.aip.dev/203#identifier
+	"etag", // Prohibited by https://google.aip.dev/154
+)
+
 var fieldBehaviorRequired = &lint.MethodRule{
 	Name: lint.NewRuleName(203, "field-behavior-required"),
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		req := m.GetInputType()
 		p := m.GetFile().GetPackage()
-		ps := problems(req, p)
+		ps := problems(req, p, map[desc.Descriptor]bool{})
 		if len(ps) == 0 {
 			return nil
 		}
@@ -41,21 +46,36 @@ var fieldBehaviorRequired = &lint.MethodRule{
 	},
 }
 
-func problems(m *desc.MessageDescriptor, pkg string) []lint.Problem {
+func problems(m *desc.MessageDescriptor, pkg string, visited map[desc.Descriptor]bool) []lint.Problem {
 	var ps []lint.Problem
 
+	// Ensure the input type, or recursively visited message, is part of the
+	// same package before linting.
+	if m.GetFile().GetPackage() != pkg {
+		return nil
+	}
+
 	for _, f := range m.GetFields() {
-		if utils.IsResource(m) && f.GetName() == "name" {
+		// ignore the field if it was already visited
+		if ok := visited[f]; ok {
+			continue
+		}
+		visited[f] = true
+
+		if utils.IsResource(m) && excusedResourceFields.Contains(f.GetName()) {
 			continue
 		}
 
-		p := checkFieldBehavior(f)
-		if p != nil {
-			ps = append(ps, *p)
+		// Ignore a field if it is a OneOf (do not ignore children)
+		if f.AsFieldDescriptorProto().OneofIndex == nil {
+			p := checkFieldBehavior(f)
+			if p != nil {
+				ps = append(ps, *p)
+			}
 		}
 
-		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() && mt.GetFile().GetPackage() == pkg {
-			ps = append(ps, problems(mt, pkg)...)
+		if mt := f.GetMessageType(); mt != nil && !mt.IsMapEntry() {
+			ps = append(ps, problems(mt, pkg, visited)...)
 		}
 	}
 

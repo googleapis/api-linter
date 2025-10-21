@@ -1,46 +1,20 @@
 ---
 name: release
 on:
-  schedule:
-    - cron: 0 20 * * 3 # Wednesdays at 20:00 UTC
-  workflow_dispatch: {} # Allow manual triggering
-jobs:
-  inspect:
-    runs-on: ubuntu-latest
-    container: golang:1.18
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Get release information
-        id: release_tool
-        run: go run ./.github/release-tool/
-    outputs:
-      version: ${{ steps.release_tool.outputs.version }}
-      release_notes: ${{ steps.release_tool.outputs.release_notes }}
   release:
-    runs-on: ubuntu-latest
-    needs: inspect
-    if: ${{ needs.inspect.outputs.version }}
-    steps:
-      - name: Create the GitHub release.
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          tag_name: v${{ needs.inspect.outputs.version }}
-          release_name: api-linter ${{ needs.inspect.outputs.version }}
-          body: ${{ needs.inspect.outputs.release_notes }}
-          draft: false
-          prerelease: false
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    types:
+      - created
+
+permissions:
+  contents: write
+
+env:
+  # e.g. v1.0.0
+  TAG_NAME: ${{ github.event.release.tag_name }}
+
+jobs:
   build:
     runs-on: ubuntu-latest
-    needs:
-      - inspect
-      - release
     strategy:
       matrix:
         osarch:
@@ -55,10 +29,12 @@ jobs:
           - os: windows
             arch: amd64
     steps:
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v5
         with:
-          go-version: "1.18"
-      - uses: actions/checkout@v3
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
       # The API linter does not use these,  but we need them to build the
       # binaries.
       #
@@ -71,22 +47,21 @@ jobs:
         run: |
           go install github.com/mitchellh/gox@latest
           go get github.com/inconshreveable/mousetrap
-      - name: Set the version number in the binary (for `api-linter --version`).
-        run: |
-          cat > cmd/api-linter/version.go <<EOF
-          package main
-          const version = "${{ needs.inspect.outputs.version }}"
-          EOF
       - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
-          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
+          CGO_ENABLED=0  gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
           tar cvfz api-linter.tar.gz api-linter*
+      - name: Set raw version
+        id: raw_tag
+        # Strips the 'v' from the actual semver version.
+        run: echo "raw_version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
+        shell: bash
       - name: Upload the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} release.
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./api-linter.tar.gz
-          asset_name: api-linter-${{ needs.inspect.outputs.version }}-${{ matrix.osarch.os }}-${{ matrix.osarch.arch }}.tar.gz
+          asset_name: api-linter-${{ steps.raw_tag.outputs.raw_version }}-${{ matrix.osarch.os }}-${{ matrix.osarch.arch }}.tar.gz
           asset_content_type: application/tar+gzip

@@ -51,6 +51,18 @@ func TestResourceMustSupportGet(t *testing.T) {
 			rpc GetBook(GetBookRequest) returns (Book) {};
 			rpc UpdateBook(UpdateBookRequest) returns (Book) {};
 		`, nil},
+		{"ValidIgnoreNonResourceUpdate", `
+			rpc UpdateBook(UpdateBookRequest) returns (Other) {};
+		`, nil},
+		{"ValidIgnoreNonResourceCreate", `
+			rpc CreateBook(CreateBookRequest) returns (Other) {};
+		`, nil},
+		{"ValidIgnoreNonResourceList", `
+			rpc ListBooks(ListBooksRequest) returns (RepeatedOther) {};
+		`, nil},
+		{"ValidIgnoreStreamingLookalike", `
+			rpc CreateBook(CreateBookRequest) returns (stream Book) {};
+		`, nil},
 		{"InvalidCreateOnly", `
 			rpc CreateBook(CreateBookRequest) returns (Book) {};
 		`, []lint.Problem{
@@ -123,6 +135,12 @@ func TestResourceMustSupportGet(t *testing.T) {
 				 message ListBooksResponse {
 					repeated Book books = 1;
 					string next_page_token = 2;
+				 }
+
+				 message Other {}
+
+				 message RepeatedOther {
+					repeated Other others = 1;
 				 }
 			`, test)
 			s := file.GetServices()[0]

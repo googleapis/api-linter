@@ -22,6 +22,6 @@ import (
 // Tag Revision methods should use the HTTP POST method.
 var tagRevisionHTTPMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "tag-revision-http-method"),
-	OnlyIf:     isTagRevisionMethod,
+	OnlyIf:     utils.IsTagRevisionMethod,
 	LintMethod: utils.LintHTTPMethod("POST"),
 }

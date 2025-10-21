@@ -16,8 +16,9 @@ package aip0135
 
 import (
 	"fmt"
-	"reflect"
+	"strings"
 
+	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -26,30 +27,44 @@ import (
 
 var methodSignature = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "method-signature"),
-	OnlyIf: isDeleteMethod,
+	OnlyIf: utils.IsDeleteMethod,
 	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
 		signatures := utils.GetMethodSignatures(m)
+		in := m.GetInputType()
+
+		fields := []string{"name"}
+		if etag := in.FindFieldByName("etag"); etag != nil {
+			fields = append(fields, etag.GetName())
+		}
+		if force := in.FindFieldByName("force"); force != nil {
+			fields = append(fields, force.GetName())
+		}
+		want := strings.Join(fields, ",")
 
 		// Check if the signature is missing.
 		if len(signatures) == 0 {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Delete methods should include `(google.api.method_signature) = %q`",
-					"name",
+					want,
 				),
 				Descriptor: m,
 			}}
 		}
 
-		// Check if the signature is wrong.
-		if !reflect.DeepEqual(signatures[0], []string{"name"}) {
+		// Check if the signature contains a disallowed field or doesn't contain
+		// "name".
+		first := signatures[0]
+		fieldSet := stringset.New(fields...)
+		if !fieldSet.Contains(first...) || !stringset.New(first...).Contains("name") {
 			return []lint.Problem{{
-				Message:    `The method signature for Delete methods should be "name".`,
-				Suggestion: `option (google.api.method_signature) = "name";`,
+				Message:    fmt.Sprintf("The method signature for Delete methods should be %q.", want),
+				Suggestion: fmt.Sprintf("option (google.api.method_signature) = %q;", want),
 				Descriptor: m,
 				Location:   locations.MethodSignature(m, 0),
 			}}
 		}
+
 		return nil
 	},
 }

@@ -8,7 +8,7 @@ redirect_from:
   - /0148/use-uid
 ---
 
-# Human names
+# Use `uid` as the resource ID field
 
 This rule encourages the use of `uid` instead of `id` for resource messages, as
 mandated in [AIP-148][].

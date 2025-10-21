@@ -122,7 +122,7 @@ func TestGetPlainURI(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			rule := &HTTPRule{URI: test.uri}
 			if diff := cmp.Diff(rule.GetPlainURI(), test.plainURI); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -143,7 +143,7 @@ func TestGetVariables(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			rule := &HTTPRule{URI: test.uri}
 			if diff := cmp.Diff(rule.GetVariables(), test.vars); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -30,7 +30,7 @@ func TestNesting(t *testing.T) {
 			}
 		`)
 		if diff := (testutils.Problems{}).Diff(nesting.Lint(f)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 	t.Run("NotNested", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestNesting(t *testing.T) {
 				`, test)
 				e := f.GetEnumTypes()[0]
 				if diff := test.problems.SetDescriptor(e).Diff(nesting.Lint(f)); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}

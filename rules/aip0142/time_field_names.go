@@ -17,25 +17,23 @@ package aip0142
 import (
 	"strings"
 
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 )
 
 var fieldNames = &lint.FieldRule{
-	Name: lint.NewRuleName(142, "time-field-names"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return stringset.New("google.protobuf.Timestamp", "int32", "int64", "string").Contains(utils.GetTypeName(f))
-	},
+	Name:   lint.NewRuleName(142, "time-field-names"),
+	OnlyIf: isTimestamp,
 	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
 		// Look for common non-imperative terms.
 		mistakes := map[string]string{
 			"created":  "create_time",
+			"creation": "create_time",
 			"expired":  "expire_time",
 			"modified": "update_time",
 			"updated":  "update_time",
+			"purged":   "purge_time",
 		}
 		for got, want := range mistakes {
 			if strings.Contains(f.GetName(), got) {
@@ -49,7 +47,7 @@ var fieldNames = &lint.FieldRule{
 		}
 
 		// Look for timestamps that do not end in `_time` or, if repeated, `_times`.
-		if utils.GetTypeName(f) == "google.protobuf.Timestamp" && !strings.HasSuffix(f.GetName(), "_time") {
+		if !strings.HasSuffix(f.GetName(), "_time") {
 			if !f.IsRepeated() {
 				return []lint.Problem{{
 					Message:    "Timestamp fields should end in `_time`.",

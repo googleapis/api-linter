@@ -23,7 +23,7 @@ import (
 var requestNameBehavior = &lint.FieldRule{
 	Name: lint.NewRuleName(135, "request-name-behavior"),
 	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
+		return utils.IsDeleteRequestMessage(f.GetOwner()) && f.GetName() == "name"
 	},
 	LintField: utils.LintRequiredField,
 }
