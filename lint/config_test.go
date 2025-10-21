@@ -444,6 +444,32 @@ func TestReadConfigsFromFile(t *testing.T) {
 	}
 }
 
+func TestMatch(t *testing.T) {
+	unixTests := []struct {
+		name     string
+		path     string
+		patterns []string
+		want     bool
+	}{
+		{"single wildcard", "a/foo.proto", []string{"a/?.proto"}, false},
+		{"single wildcard match", "a/b.proto", []string{"a/?.proto"}, true},
+		{"double wildcard deep", "a/b/c/d.proto", []string{"a/**/*.proto"}, true},
+		{"no match", "x/y.proto", []string{"a/**/*.proto"}, false},
+		{"multiple patterns, one match", "a/b.proto", []string{"c/*.proto", "a/*.proto"}, true},
+		{"pattern with leading slash", "/a/b.proto", []string{"/a/**/*.proto"}, true},
+		{"no specific file extension", "a/b", []string{"a/**"}, true},
+		{"pattern with directory name", "a/b/c.proto", []string{"a/b/*.proto"}, true},
+	}
+
+	for _, test := range unixTests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := matchPath(test.path, test.patterns...); got != test.want {
+				t.Errorf("matchPath(%q, %q) = %v, want %v", test.path, test.patterns, got, test.want)
+			}
+		})
+	}
+}
+
 func createTempFile(t *testing.T, name, content string) string {
 	dir, err := os.MkdirTemp("", "config_tests")
 	if err != nil {
