@@ -36,7 +36,7 @@ Each linter rule has its own [rule documentation][], and rules can be
 To install `api-linter`, use `go install`:
 
 ```sh
-go install github.com/googleapis/api-linter/cmd/api-linter@latest
+go install github.com/googleapis/api-linter/v2/cmd/api-linter@latest
 ```
 
 It will install `api-linter` into your local Go binary directory
