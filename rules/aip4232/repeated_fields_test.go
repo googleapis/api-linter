@@ -27,10 +27,10 @@ func TestRepeatedFields(t *testing.T) {
 		SecondSig string
 		problems  testutils.Problems
 	}{
-		{"Valid", "name,paperback_only,editions", "name,editions", nil},
-		{"InvalidFirstSignature", "name,editions,paperback_only", "name,editions", testutils.Problems{{Message: "only the last"}}},
-		{"InvalidSecondSignature", "name,editions", "name,editions,paperback_only", testutils.Problems{{Message: "only the last"}}},
-		{"BothInvalid", "name,editions,paperback_only", "editions,name", testutils.Problems{{Message: "only the last"}, {Message: "only the last"}}},
+		{"Valid", "name,paperback_only,book.editions", "name,editions", nil},
+		{"InvalidFirstSignature", "name,book.shelves.shelf,paperback_only", "name,editions", testutils.Problems{{Message: "only the last"}}},
+		{"InvalidSecondSignature", "name,book.editions", "name,book.shelves.shelf,paperback_only", testutils.Problems{{Message: "only the last"}}},
+		{"BothInvalid", "name,book.shelves.shelf,paperback_only", "name,book.shelves.shelf,paperback_only", testutils.Problems{{Message: "only the last"}, {Message: "only the last"}}},
 	}
 
 	for _, test := range tests {
@@ -47,8 +47,18 @@ func TestRepeatedFields(t *testing.T) {
 					string name = 1;
 
 					bool paperback_only = 2;
-					
-					repeated int32 editions = 3;
+
+					Book book = 3;
+				}
+				message Book {
+					string name = 1;
+
+					repeated int32 editions = 2;
+
+					repeated Shelf shelves = 3;
+				}
+				message Shelf {
+					string shelf = 1;
 				}
 				message ArchiveBookResponse {}
 			`, test)

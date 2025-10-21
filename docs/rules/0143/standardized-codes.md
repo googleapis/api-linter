@@ -1,7 +1,7 @@
 ---
 rule:
   aip: 143
-  name: [core, '0143', standard-codes]
+  name: [core, '0143', standardized-codes]
   summary: Fields representing concepts with standardized codes must use them.
 permalink: /143/standardized-codes
 redirect_from:

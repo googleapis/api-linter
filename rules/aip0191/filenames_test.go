@@ -51,7 +51,7 @@ func TestFilename(t *testing.T) {
 				t.Fatalf("Failed to build file.")
 			}
 			if diff := test.problems.SetDescriptor(f).Diff(filename.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -49,7 +49,7 @@ func TestHttpUrl(t *testing.T) {
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(method).Diff(uriSuffix.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

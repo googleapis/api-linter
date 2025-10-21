@@ -22,6 +22,6 @@ import (
 // Commit messages should have a properly named request message.
 var commitRequestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "commit-request-message-name"),
-	OnlyIf:     isCommitMethod,
+	OnlyIf:     utils.IsCommitRevisionMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

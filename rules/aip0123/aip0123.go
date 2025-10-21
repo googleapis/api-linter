@@ -24,6 +24,7 @@ import (
 	"github.com/googleapis/api-linter/rules/internal/utils"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/stoewer/go-strcase"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 // AddRules accepts a register function and registers each of
@@ -39,11 +40,14 @@ func AddRules(r lint.RuleRegistry) error {
 		resourcePlural,
 		resourceReferenceType,
 		resourceSingular,
+		resourceTypeMessage,
 		resourceTypeName,
 		resourceVariables,
 		resourceDefinitionVariables,
 		resourceDefinitionPatterns,
 		resourceDefinitionTypeName,
+		resourcePatternSingular,
+		resourcePatternPlural,
 		nameNeverOptional,
 	)
 }
@@ -74,6 +78,123 @@ func getVariables(pattern string) []string {
 		answer = append(answer, match[1])
 	}
 	return answer
+}
+
+// isRootLevelResource determines if the given resource is a root-level
+// resource using the isRootLevelResourcePattern helper.
+func isRootLevelResource(resource *apb.ResourceDescriptor) bool {
+	if len(resource.GetPattern()) == 0 {
+		return false
+	}
+
+	pattern := resource.GetPattern()[0]
+
+	return isRootLevelResourcePattern(pattern)
+}
+
+// isRootLevelResourcePattern determines if the given pattern is that of a
+// root-level resource by checking how many segments it has - root-level
+// resource patterns have only two segments, thus one delimeter.
+func isRootLevelResourcePattern(pattern string) bool {
+	return strings.Count(strings.Trim(pattern, "/"), "/") <= 1
+}
+
+// getParentIDVariable is a helper that returns the parent resource ID segment
+// for a given pattern. Returns empty string if the pattern has no variables or
+// is a top-level resource.
+func getParentIDVariable(pattern string) string {
+	variables := getVariables(pattern)
+	// no variables shouldn't happen but should be safe
+	if len(variables) == 0 || isRootLevelResourcePattern(pattern) {
+		return ""
+	}
+
+	// TODO: handle if singleton is a *parent*.
+	if utils.IsSingletonResourcePattern(pattern) {
+		// Last variable is the parent's for a singleton child.
+		return variables[len(variables)-1]
+	}
+
+	return variables[len(variables)-2]
+}
+
+// nestedSingular returns the would be reduced singular form of a nested
+// resource. Use isNestedName to check eligibility before using nestedSingular.
+// This will return empty if the resource is not eligible for nested name
+// reduction.
+func nestedSingular(resource *apb.ResourceDescriptor) string {
+	if !isNestedName(resource) {
+		return ""
+	}
+	parentIDVar := getParentIDVariable(resource.GetPattern()[0])
+
+	singular := utils.GetResourceSingular(resource)
+	singularSnake := strcase.SnakeCase(singular)
+
+	return strings.TrimPrefix(singularSnake, parentIDVar+"_")
+}
+
+// nestedPlural returns the would be reduced plural form of a nested
+// resource. Use isNestedName to check eligibility before using nestedPlural.
+// This will return empty if the resource is not eligible for nested name
+// reduction.
+func nestedPlural(resource *apb.ResourceDescriptor) string {
+	if !isNestedName(resource) {
+		return ""
+	}
+
+	// use the singular variable to trim the singular prefix of the compound
+	// child colleciton name that is pluralized e.g.
+	// "users/{user}/userEvents/{user_event}" the parent singular "user" is the
+	// prefix of the child collection "userEvents".
+	parentIDVar := getParentIDVariable(resource.GetPattern()[0])
+	parentIDVar = strcase.LowerCamelCase(parentIDVar)
+
+	plural := utils.GetResourcePlural(resource)
+	return strcase.LowerCamelCase(strings.TrimPrefix(plural, parentIDVar))
+}
+
+// isNestedName determines if the resource naming could be reduced as a
+// repetitive, nested collection as per AIP-122 Nested Collections. It does this
+// by analyzing the first resource pattern defined, comparing the resource
+// singular to the resource ID segment of the parent portion of the pattern. If
+// that is a prefix of resource singular (in snake_case form as well), then the
+// resource name could be reduced. For example, given `singular: "userEvent"`
+// and `pattern: "users/{user}/userEvents/{user_event}"`, isNestedName would
+// return `true`, because the `pattern` could be reduced to
+// `"users/{user}/events/{event}"`.
+func isNestedName(resource *apb.ResourceDescriptor) bool {
+	if len(resource.GetPattern()) == 0 {
+		return false
+	}
+	// only evaluate the first pattern b.c patterns cannot be reordered
+	// and nested names must be used consistently, thus from the beginning
+	pattern := resource.GetPattern()[0]
+
+	// Can't be a nested collection if it is a top level resource.
+	if isRootLevelResourcePattern(pattern) {
+		return false
+	}
+
+	singular := utils.GetResourceSingular(resource)
+
+	// If the resource type's singular is not camelCase then it is not a
+	// multi-word type and we do not need to check for nestedness in naming.
+	singularSnake := strcase.SnakeCase(singular)
+	if strings.Count(singularSnake, "_") < 1 {
+		return false
+	}
+
+	// Second to last resource ID variable will be the parent's to compare the
+	// child resource's singular form against. This prevents us from needing to
+	// deal with pluralizations due to the child resource typically being
+	// pluralized on its own noun, not the parent noun.
+	parentIDVar := getParentIDVariable(pattern)
+
+	// For example:
+	// publisher_credit starts with publisher --> nested
+	// book_shelf does not start with library --> not nested re:naming
+	return strings.HasPrefix(singularSnake, parentIDVar)
 }
 
 // getPlainPattern returns the pattern with all variables replaced with "*".

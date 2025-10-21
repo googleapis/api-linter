@@ -27,6 +27,8 @@ func AddRules(r lint.RuleRegistry) error {
 		142,
 		fieldNames,
 		fieldType,
+		durationOffsetComment,
+		timeOffsetType,
 	)
 }
 

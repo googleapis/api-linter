@@ -205,9 +205,9 @@ func TestLintMethodHasMatchingRequestName(t *testing.T) {
 
 func TestLintMethodHasMatchingResponseName(t *testing.T) {
 	for _, test := range []struct {
-		testName    string
-		MessageName string
-		problems    testutils.Problems
+		testName     string
+		ResponseName string
+		problems     testutils.Problems
 	}{
 		{"Valid", "GetBookResponse", nil},
 		{"Invalid", "AcquireBookResponse", testutils.Problems{{Suggestion: "GetBookResponse"}}},
@@ -215,10 +215,44 @@ func TestLintMethodHasMatchingResponseName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				service Library {
-					rpc GetBook(GetBookRequest) returns ({{.MessageName}});
+					rpc GetBook(GetBookRequest) returns ({{.ResponseName}});
+				}
+				message GetBookRequest {}
+				message {{.ResponseName}} {}
+			`, test)
+			method := f.GetServices()[0].GetMethods()[0]
+			problems := LintMethodHasMatchingResponseName(method)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestLintMethodHasMatchingResponseNameLRO(t *testing.T) {
+	for _, test := range []struct {
+		testName    string
+		MessageName string
+		problems    testutils.Problems
+	}{
+		{"Valid", "GetBookResponse", nil},
+		{"Invalid", "AcquireBookResponse", testutils.Problems{{Message: "GetBookResponse"}}},
+	} {
+		t.Run(test.testName, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+
+				service Library {
+					rpc GetBook(GetBookRequest) returns (google.longrunning.Operation) {
+						option (google.longrunning.operation_info) = {
+							response_type: "{{.MessageName}}"
+							metadata_type: "OperationMetadata"
+						};
+					}
 				}
 				message GetBookRequest {}
 				message {{.MessageName}} {}
+				message OperationMetadata {}
 			`, test)
 			method := f.GetServices()[0].GetMethods()[0]
 			problems := LintMethodHasMatchingResponseName(method)
@@ -260,6 +294,7 @@ func TestLintNotOneof(t *testing.T) {
 		problems testutils.Problems
 	}{
 		{"Valid", `string foo = 1;`, nil},
+		{"ValidProto3Optional", `optional string foo = 1;`, nil},
 		{"Invalid", `oneof foo_oneof { string foo = 1; }`, testutils.Problems{{Message: "should not be a oneof"}}},
 	} {
 		t.Run(test.testName, func(t *testing.T) {

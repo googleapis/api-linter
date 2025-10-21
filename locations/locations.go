@@ -23,6 +23,8 @@
 package locations
 
 import (
+	"sync"
+
 	"github.com/jhump/protoreflect/desc"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
@@ -37,12 +39,25 @@ func pathLocation(d desc.Descriptor, path ...int) *dpb.SourceCodeInfo_Location {
 	return sourceInfoRegistry.sourceInfo(d.GetFile()).findLocation(fullPath)
 }
 
-type sourceInfo map[string]*dpb.SourceCodeInfo_Location
+type sourceInfo struct {
+	// infoMu protects the info map
+	infoMu sync.Mutex
+	info   map[string]*dpb.SourceCodeInfo_Location
+}
+
+func newSourceInfo() *sourceInfo {
+	return &sourceInfo{
+		info: map[string]*dpb.SourceCodeInfo_Location{},
+	}
+}
 
 // findLocation returns the Location for a given path.
-func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
+func (si *sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
+	si.infoMu.Lock()
+	defer si.infoMu.Unlock()
+
 	// If the path exists in the source info registry, return that object.
-	if loc, ok := si[strPath(path)]; ok {
+	if loc, ok := si.info[strPath(path)]; ok {
 		return loc
 	}
 
@@ -53,7 +68,17 @@ func (si sourceInfo) findLocation(path []int32) *dpb.SourceCodeInfo_Location {
 // The source map registry is a singleton that computes a source map for
 // any file descriptor that it is given, but then caches it to avoid computing
 // the source map for the same file descriptors over and over.
-type sourceInfoRegistryType map[*desc.FileDescriptor]sourceInfo
+type sourceInfoRegistryType struct {
+	// registryMu protects the registry map
+	registryMu sync.Mutex
+	registry   map[*desc.FileDescriptor]*sourceInfo
+}
+
+func newSourceInfoRegistryType() *sourceInfoRegistryType {
+	return &sourceInfoRegistryType{
+		registry: map[*desc.FileDescriptor]*sourceInfo{},
+	}
+}
 
 // Each location has a path defined as an []int32, but we can not
 // use slices as keys, so compile them into a string.
@@ -70,22 +95,24 @@ func strPath(segments []int32) (p string) {
 // sourceInfo compiles the source info object for a given file descriptor.
 // It also caches this into a registry, so subsequent calls using the same
 // descriptor will return the same object.
-func (sir sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) sourceInfo {
-	answer, ok := sir[fd]
+func (sir *sourceInfoRegistryType) sourceInfo(fd *desc.FileDescriptor) *sourceInfo {
+	sir.registryMu.Lock()
+	defer sir.registryMu.Unlock()
+	answer, ok := sir.registry[fd]
 	if !ok {
-		answer = sourceInfo{}
+		answer = newSourceInfo()
 
 		// This file descriptor does not yet have a source info map.
 		// Compile one.
 		for _, loc := range fd.AsFileDescriptorProto().GetSourceCodeInfo().GetLocation() {
-			answer[strPath(loc.Path)] = loc
+			answer.info[strPath(loc.Path)] = loc
 		}
 
 		// Now that we calculated all of this, cache it on the registry so it
 		// does not need to be calculated again.
-		sir[fd] = answer
+		sir.registry[fd] = answer
 	}
 	return answer
 }
 
-var sourceInfoRegistry = sourceInfoRegistryType{}
+var sourceInfoRegistry = newSourceInfoRegistryType()

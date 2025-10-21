@@ -43,7 +43,7 @@ func TestUnreachableFieldType(t *testing.T) {
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[2]
 			if diff := test.problems.SetDescriptor(field).Diff(unreachableFieldType.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

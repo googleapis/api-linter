@@ -31,7 +31,7 @@ package google.example.v1;
 
 option java_package = "com.google.example.v1";
 option java_multiple_files = true;
-// Needs `option java_outer_classname = "LibraryProto";` or similar.
+// Needs `option java_outer_classname = "LibraryProto";`
 
 message Book {}
 ```

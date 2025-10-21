@@ -16,8 +16,8 @@ field, as mandated in [AIP-148][].
 ## Details
 
 This rule looks on for fields named `uid` and complains if it does not have the
-`(google.api.field_info).format = UUID4` annotation or has a format other than
-`UUID4`.
+`(google.api.field_info).format = UUID4` annotation (see [AIP-202][]) or has a
+format other than `UUID4`.
 
 ## Examples
 
@@ -76,4 +76,5 @@ If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
 [aip-148]: https://aip.dev/148
+[aip-202]: https://aip.dev/202#format
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

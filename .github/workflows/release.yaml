@@ -5,6 +5,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: write
+
 env:
   # e.g. v1.0.0
   TAG_NAME: ${{ github.event.release.tag_name }}
@@ -26,8 +29,10 @@ jobs:
           - os: windows
             arch: amd64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
       # The API linter does not use these,  but we need them to build the
@@ -44,7 +49,7 @@ jobs:
           go get github.com/inconshreveable/mousetrap
       - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
         run: |
-          gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
+          CGO_ENABLED=0  gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
           tar cvfz api-linter.tar.gz api-linter*
       - name: Set raw version
         id: raw_tag

@@ -61,5 +61,6 @@ func packagingServiceNameEquals(serv, pkg, sep string) bool {
 
 var (
 	versionRegexp        = regexp.MustCompile(`^v[0-9]+(p[0-9]+)?((alpha|beta)[0-9]*)?$`)
+	maybeVersionRegexp   = regexp.MustCompile(`^[vV][0-9]+([a-zA-Z]+[0-9]*)*$`)
 	validCharacterRegexp = regexp.MustCompile(`^[a-z0-9\\_\\/]*$`)
 )

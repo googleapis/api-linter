@@ -103,7 +103,7 @@ func TestLocations(t *testing.T) {
 					l = test.idxFx(f, test.idx)
 				}
 				if diff := cmp.Diff(l.Span, test.wantSpan); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}
@@ -143,7 +143,7 @@ func TestMissingLocations(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			if diff := cmp.Diff(test.fx(f).Span, []int32{0, 0, 0}); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

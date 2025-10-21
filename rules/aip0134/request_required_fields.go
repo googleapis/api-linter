@@ -29,6 +29,9 @@ var requestRequiredFields = &lint.MethodRule{
 	OnlyIf: utils.IsUpdateMethod,
 	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
 		ot := utils.GetResponseType(m)
+		if ot == nil {
+			return nil
+		}
 		it := m.GetInputType()
 
 		allowedRequiredFields := stringset.New("update_mask")

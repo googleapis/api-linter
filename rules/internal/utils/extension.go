@@ -135,17 +135,23 @@ func IsResource(m *desc.MessageDescriptor) bool {
 // IsSingletonResource returns true if the given message is a singleton
 // resource according to its pattern.
 func IsSingletonResource(m *desc.MessageDescriptor) bool {
+	for _, pattern := range GetResource(m).GetPattern() {
+		if IsSingletonResourcePattern(pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsSingletonResource returns true if the given message is a singleton
+// resource according to its pattern.
+func IsSingletonResourcePattern(pattern string) bool {
 	// If the pattern ends in something other than "}", that indicates that this is a singleton.
 	//
 	// For example:
 	//   publishers/{publisher}/books/{book} -- not a singleton, many books
 	//   publishers/*/settings -- a singleton; one settings object per publisher
-	for _, pattern := range GetResource(m).GetPattern() {
-		if !strings.HasSuffix(pattern, "}") {
-			return true
-		}
-	}
-	return false
+	return !strings.HasSuffix(pattern, "}")
 }
 
 // GetResourceDefinitions returns the google.api.resource_definition annotations

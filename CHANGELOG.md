@@ -1,5 +1,262 @@
 # Changelog
 
+## [1.71.0](https://github.com/googleapis/api-linter/compare/v1.70.2...v1.71.0) (2025-08-26)
+
+
+### Features
+
+* **AIP-160:** Validate filter field name. ([#1523](https://github.com/googleapis/api-linter/issues/1523)) ([73e4f83](https://github.com/googleapis/api-linter/commit/73e4f83da2399d9067df2c15310864969a33509f))
+* **AIP-160:** Validate filter field type ([#1524](https://github.com/googleapis/api-linter/issues/1524)) ([f182a25](https://github.com/googleapis/api-linter/commit/f182a25e6ba6ff5c85a7d3300f6d94f19b36d95b))
+
+
+### Bug Fixes
+
+* **AIP-133:** skip method sig for non-standard create ([#1521](https://github.com/googleapis/api-linter/issues/1521)) ([e9306c6](https://github.com/googleapis/api-linter/commit/e9306c6f9bd46508fcaefefd3266bdd935c6f2a4))
+
+## [1.70.2](https://github.com/googleapis/api-linter/compare/v1.70.1...v1.70.2) (2025-08-06)
+
+
+### Bug Fixes
+
+* **AIP-123:** handle errant slash in pattern parsing ([#1517](https://github.com/googleapis/api-linter/issues/1517)) ([40a69bd](https://github.com/googleapis/api-linter/commit/40a69bd75b7eddfa5c16e58aa0c73e441342512e)), refs [#1514](https://github.com/googleapis/api-linter/issues/1514)
+
+
+### Documentation
+
+* **config:** fix incorrect rule flags ([#1516](https://github.com/googleapis/api-linter/issues/1516)) ([2454606](https://github.com/googleapis/api-linter/commit/2454606c87d4f5c9a12647b13c0f7e8fe945219f))
+
+## [1.70.1](https://github.com/googleapis/api-linter/compare/v1.70.0...v1.70.1) (2025-07-21)
+
+
+### Bug Fixes
+
+* **AIP-191:** fix php ruby casing strcase regression ([#1510](https://github.com/googleapis/api-linter/issues/1510)) ([6bb2d95](https://github.com/googleapis/api-linter/commit/6bb2d9519051bd75c6a668444eb312e4272ac278))
+
+## [1.70.0](https://github.com/googleapis/api-linter/compare/v1.69.2...v1.70.0) (2025-07-16)
+
+
+### Features
+
+* **AIP-142:** add relative time segments comment rule ([5fab299](https://github.com/googleapis/api-linter/commit/5fab2997d1f81bf60b55c6ae6e3e3605212c9870))
+* **AIP-142:** add time_offset type rule ([#1506](https://github.com/googleapis/api-linter/issues/1506)) ([945cff3](https://github.com/googleapis/api-linter/commit/945cff325fe38d4f8e3a7a620059a1e6b04c5107))
+* **integration-tests:** add test harness for cli invocation ([#1493](https://github.com/googleapis/api-linter/issues/1493)) ([35be28f](https://github.com/googleapis/api-linter/commit/35be28f922581bff1f8ad6d2bb9289f6c57e2657))
+
+
+### Bug Fixes
+
+* **AIP-136:** support response msg lint with resource singular aligned field name ([#1499](https://github.com/googleapis/api-linter/issues/1499)) ([8dec010](https://github.com/googleapis/api-linter/commit/8dec01076c4bbeb0506c39610e325fc25bbda6ca))
+* **AIP-158:** clarify pluralized response field finding ([#1498](https://github.com/googleapis/api-linter/issues/1498)) ([f0b7895](https://github.com/googleapis/api-linter/commit/f0b7895da8cd4b437ac0c3a9be2ac442560eeda8))
+* **AIP-203:** field-behavior-required ignore imported request types ([#1504](https://github.com/googleapis/api-linter/issues/1504)) ([bb82f00](https://github.com/googleapis/api-linter/commit/bb82f006b37c85cf255ba8bddb1bf34a07993596)), refs [#1503](https://github.com/googleapis/api-linter/issues/1503)
+* **cli:** unexpected lint warning when providing multiple files ([#1496](https://github.com/googleapis/api-linter/issues/1496)) ([7ecaa42](https://github.com/googleapis/api-linter/commit/7ecaa4200da7b5cbcbf1c273fc77d524f346ae1c)), refs [#1465](https://github.com/googleapis/api-linter/issues/1465)
+
+
+### Documentation
+
+* add comments to lint.Config and configuration page ([#1505](https://github.com/googleapis/api-linter/issues/1505)) ([39d0376](https://github.com/googleapis/api-linter/commit/39d0376281fb03f57b24efe0d82cb842e7316615))
+
+## [1.69.2](https://github.com/googleapis/api-linter/compare/v1.69.1...v1.69.2) (2025-02-20)
+
+
+### Bug Fixes
+
+* **AIP-133/AIP-134:** handle qualified lro response type name comparison ([#1475](https://github.com/googleapis/api-linter/issues/1475)) ([5e8fe24](https://github.com/googleapis/api-linter/commit/5e8fe2442327ab2a3f1833ff77824723d8331e82))
+* **cli:** only call ResolveFilenames with ProtoImportPaths if specified ([#1478](https://github.com/googleapis/api-linter/issues/1478)) ([6a0ddc6](https://github.com/googleapis/api-linter/commit/6a0ddc6d441083d60e7a6e1e35cb0f18f562021e))
+
+## [1.69.1](https://github.com/googleapis/api-linter/compare/v1.69.0...v1.69.1) (2025-02-14)
+
+
+### Bug Fixes
+
+* **cli:** resolve against cwd separately ([#1474](https://github.com/googleapis/api-linter/issues/1474)) ([6206451](https://github.com/googleapis/api-linter/commit/620645169d3e717fb24651b6cffce3a4aa85b837))
+
+
+### Documentation
+
+* **AIP-215:** fix incorrect heading for `foreign-type-reference` ([#1472](https://github.com/googleapis/api-linter/issues/1472)) ([cd0f8a1](https://github.com/googleapis/api-linter/commit/cd0f8a1accaf504572248c3a3c2a13eec39e0dd2))
+
+## [1.69.0](https://github.com/googleapis/api-linter/compare/v1.68.0...v1.69.0) (2025-02-11)
+
+
+### Features
+
+* **AIP-215:** augment foreign type checking ([#1467](https://github.com/googleapis/api-linter/issues/1467)) ([6c514fb](https://github.com/googleapis/api-linter/commit/6c514fb12f5839bb3dbf27742ca62af36466c6cf))
+
+
+### Bug Fixes
+
+* **cli:** exclude cwd from input path resolution ([#1466](https://github.com/googleapis/api-linter/issues/1466)) ([a14ed3d](https://github.com/googleapis/api-linter/commit/a14ed3de28a0d20ee82b9692d5d290d3732e690d))
+* **rules:** fix HasParent check and utilify it ([#1468](https://github.com/googleapis/api-linter/issues/1468)) ([6ac3b57](https://github.com/googleapis/api-linter/commit/6ac3b57ca3bccd15806a714239a89e751ac42428))
+
+## [1.68.0](https://github.com/googleapis/api-linter/compare/v1.67.6...v1.68.0) (2025-01-14)
+
+
+### Features
+
+* **AIP-123:** resource type name matches message ([#1452](https://github.com/googleapis/api-linter/issues/1452)) ([8f3e2ac](https://github.com/googleapis/api-linter/commit/8f3e2ac2ecdba4798a18cd8c3962ded1b0f86b6c))
+* **deps:** update to min version to Go 1.22 ([#1457](https://github.com/googleapis/api-linter/issues/1457)) ([f34f16b](https://github.com/googleapis/api-linter/commit/f34f16b865968ce58dc8140d1bb4943ae984b0f4))
+
+
+### Bug Fixes
+
+* **AIP-126:** Allow prefixed UNKNOWN value ([#1455](https://github.com/googleapis/api-linter/issues/1455)) ([9353565](https://github.com/googleapis/api-linter/commit/93535656cef91b214b6b40edc5a0eac51db89134))
+
+
+### Documentation
+
+* **AIP-148:** linkify UUID4 format in rule ([#1456](https://github.com/googleapis/api-linter/issues/1456)) ([5eb475f](https://github.com/googleapis/api-linter/commit/5eb475fb13945253c20a29b24952354cb37e3a71))
+
+## [1.67.6](https://github.com/googleapis/api-linter/compare/v1.67.5...v1.67.6) (2024-11-08)
+
+
+### Bug Fixes
+
+* **AIP-136:** allow google.api.HttpBody as body field ([#1444](https://github.com/googleapis/api-linter/issues/1444)) ([5327865](https://github.com/googleapis/api-linter/commit/5327865093c518404f621c1a7da2f81dd23997bc))
+
+## [1.67.5](https://github.com/googleapis/api-linter/compare/v1.67.4...v1.67.5) (2024-11-05)
+
+
+### Bug Fixes
+
+* **deps:** upgrade webrick dep ([#1441](https://github.com/googleapis/api-linter/issues/1441)) ([30b0a84](https://github.com/googleapis/api-linter/commit/30b0a84f70c67e55b101abea3c11fc34f8ada01a))
+
+## [1.67.4](https://github.com/googleapis/api-linter/compare/v1.67.3...v1.67.4) (2024-10-22)
+
+
+### Bug Fixes
+
+* **AIP-133:** use resource field in signature suggestion ([#1439](https://github.com/googleapis/api-linter/issues/1439)) ([20c96b6](https://github.com/googleapis/api-linter/commit/20c96b624560f7646342068ccc45984b114849fa))
+
+## [1.67.3](https://github.com/googleapis/api-linter/compare/v1.67.2...v1.67.3) (2024-09-23)
+
+
+### Bug Fixes
+
+* **AIP-132:** refine List request response regex ([#1420](https://github.com/googleapis/api-linter/issues/1420)) ([5cc4d27](https://github.com/googleapis/api-linter/commit/5cc4d279c9cfc80545a9d2447b4fe13a8032b2aa))
+* **AIP-136:** ignore revision methods ([#1432](https://github.com/googleapis/api-linter/issues/1432)) ([a6ba5f3](https://github.com/googleapis/api-linter/commit/a6ba5f32458cefc42b662019d97199d0a8e86551))
+* **AIP-162:** handle LRO in response name rules ([#1431](https://github.com/googleapis/api-linter/issues/1431)) ([8bca1dd](https://github.com/googleapis/api-linter/commit/8bca1dd68ccf00c39a06da9862ac8c599029297e))
+* **internal/utils:** refine Get, Create, Update, Delete request regex ([#1422](https://github.com/googleapis/api-linter/issues/1422)) ([487328c](https://github.com/googleapis/api-linter/commit/487328ca8708521562be2921d3c4f2aabaf8a5ae))
+* **locations:** make source info access concurrent safe ([#1433](https://github.com/googleapis/api-linter/issues/1433)) ([223aa5b](https://github.com/googleapis/api-linter/commit/223aa5bb6cf4f24193ad6c6037e1b88160474f2e))
+
+
+### Documentation
+
+* **AIP-132:** fix incorrect field for AIP-217 ([#1423](https://github.com/googleapis/api-linter/issues/1423)) ([6a52a68](https://github.com/googleapis/api-linter/commit/6a52a6845bf8f240a4d9f9a305a26609a2699c17))
+* **AIP-134:** change mandated to recommended ([#1426](https://github.com/googleapis/api-linter/issues/1426)) ([338b6a9](https://github.com/googleapis/api-linter/commit/338b6a95906b61ba5a83805bce92919dd53725dc))
+
+## [1.67.2](https://github.com/googleapis/api-linter/compare/v1.67.1...v1.67.2) (2024-08-14)
+
+
+### Bug Fixes
+
+* **AIP-123:** multiword singleton reduction ([#1417](https://github.com/googleapis/api-linter/issues/1417)) ([7868552](https://github.com/googleapis/api-linter/commit/7868552ff7b27c2fa0f2ff9be3a538763f0450c5))
+* **AIP-135:** allow required etag in Delete ([#1414](https://github.com/googleapis/api-linter/issues/1414)) ([aa9587b](https://github.com/googleapis/api-linter/commit/aa9587bc7184a78109f138c809baa00018ea75e9)), refs [#1395](https://github.com/googleapis/api-linter/issues/1395)
+* **AIP-235:** allow hosting allow_missing ([#1416](https://github.com/googleapis/api-linter/issues/1416)) ([6bfbcdf](https://github.com/googleapis/api-linter/commit/6bfbcdfa8858ccdba98760d76e2d2a757855cc7b)), refs [#1404](https://github.com/googleapis/api-linter/issues/1404)
+* exit rule if response type cannot be resolved ([#1415](https://github.com/googleapis/api-linter/issues/1415)) ([6874dab](https://github.com/googleapis/api-linter/commit/6874dabb4f0d3503f267bb0ab970d62785d12727)), refs [#1399](https://github.com/googleapis/api-linter/issues/1399)
+
+
+### Documentation
+
+* **AIP-143:** fix rule name used for implementation link ([#1411](https://github.com/googleapis/api-linter/issues/1411)) ([f9cf2eb](https://github.com/googleapis/api-linter/commit/f9cf2ebc9589abfce88317b1e3318a9e1547b41a))
+
+## [1.67.1](https://github.com/googleapis/api-linter/compare/v1.67.0...v1.67.1) (2024-07-31)
+
+
+### Bug Fixes
+
+* **AIP-123:** skip resource-pattern-plural when there is no plural ([#1409](https://github.com/googleapis/api-linter/issues/1409)) ([93a601d](https://github.com/googleapis/api-linter/commit/93a601d92adbeb0c17fa8724212ee344f934a4aa))
+
+## [1.67.0](https://github.com/googleapis/api-linter/compare/v1.66.2...v1.67.0) (2024-07-26)
+
+
+### Features
+
+* **AIP-123:** enforce singular as ID segment ([#1403](https://github.com/googleapis/api-linter/issues/1403)) ([088ec19](https://github.com/googleapis/api-linter/commit/088ec196da93a9338b2abf60469cb55ecec5c34d))
+* **AIP-123:** resource collection matches plural ([#1408](https://github.com/googleapis/api-linter/issues/1408)) ([9025d3d](https://github.com/googleapis/api-linter/commit/9025d3d674df9f918483decc0f559f168737ee69))
+* **AIP-134:** update_mask must be OPTIONAL ([#1394](https://github.com/googleapis/api-linter/issues/1394)) ([9fc0d05](https://github.com/googleapis/api-linter/commit/9fc0d05f3d89905ea7d3b22c9b44fbfa79edac07))
+* **AIP-217:** add various rules for return_partial_success support ([#1406](https://github.com/googleapis/api-linter/issues/1406)) ([cf4ba12](https://github.com/googleapis/api-linter/commit/cf4ba1284bbab151275e7dedf291ffea0e488b1c))
+
+
+### Bug Fixes
+
+* docs typo ([#1401](https://github.com/googleapis/api-linter/issues/1401)) ([4acf04c](https://github.com/googleapis/api-linter/commit/4acf04c6829ffe7f57cf2997c4f9ccc956de9274))
+
+## [1.66.2](https://github.com/googleapis/api-linter/compare/v1.66.1...v1.66.2) (2024-06-04)
+
+
+### Bug Fixes
+
+* **aip-130:** identify standard and custom methods ([#1396](https://github.com/googleapis/api-linter/issues/1396)) ([be41d72](https://github.com/googleapis/api-linter/commit/be41d72e50032b45f4263779e638fc8ec0ff9013))
+
+## [1.66.1](https://github.com/googleapis/api-linter/compare/v1.66.0...v1.66.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* **AIP-136:** handle LRO response names ([#1391](https://github.com/googleapis/api-linter/issues/1391)) ([ec79f53](https://github.com/googleapis/api-linter/commit/ec79f5392829fc58a44f577dce55a936ea112988))
+
+## [1.66.0](https://github.com/googleapis/api-linter/compare/v1.65.2...v1.66.0) (2024-05-17)
+
+
+### Features
+
+* **AIP-136:** request message name ([#1386](https://github.com/googleapis/api-linter/issues/1386)) ([46a6e43](https://github.com/googleapis/api-linter/commit/46a6e43d1d6bb6a6e79131866f16f0b1dfd2e326))
+* **aip-136:** response message name ([#1387](https://github.com/googleapis/api-linter/issues/1387)) ([9e43e3f](https://github.com/googleapis/api-linter/commit/9e43e3f1c98dfe716d4c8ede6fc213239425c6ef))
+
+## [1.65.2](https://github.com/googleapis/api-linter/compare/v1.65.1...v1.65.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* **AIP-203:** resource etag should not have behavior ([#1376](https://github.com/googleapis/api-linter/issues/1376)) ([1c0f838](https://github.com/googleapis/api-linter/commit/1c0f838941e064caa0eda046a5b4f1c2b7fb2788))
+
+## [1.65.1](https://github.com/googleapis/api-linter/compare/v1.65.0...v1.65.1) (2024-04-15)
+
+
+### Bug Fixes
+
+* **ci:** build binaries with CGO_ENABLED=0 ([#1371](https://github.com/googleapis/api-linter/issues/1371)) ([f776eca](https://github.com/googleapis/api-linter/commit/f776ecaa0fbab579726120383139c13e9f57e479))
+* ignore proto3_optional fields in oneof check ([#1370](https://github.com/googleapis/api-linter/issues/1370)) ([0d6e074](https://github.com/googleapis/api-linter/commit/0d6e0742603c377e86e6abbc557d6ff20e142a46)), refs [#1323](https://github.com/googleapis/api-linter/issues/1323)
+
+## [1.65.0](https://github.com/googleapis/api-linter/compare/v1.64.0...v1.65.0) (2024-04-12)
+
+
+### Features
+
+* **AIP-133:** ignore create methods with invalid LRO response types ([#1366](https://github.com/googleapis/api-linter/issues/1366)) ([22d015a](https://github.com/googleapis/api-linter/commit/22d015afc1067f8895a2603ae859d11d33f06a36))
+
+## [1.64.0](https://github.com/googleapis/api-linter/compare/v1.63.6...v1.64.0) (2024-03-04)
+
+
+### Features
+
+* remove legacy list revisions rules ([#1348](https://github.com/googleapis/api-linter/issues/1348)) ([2bc5c57](https://github.com/googleapis/api-linter/commit/2bc5c574eb2e33aee2df502bd3b70454dbfae542))
+
+
+### Documentation
+
+* **AIP-191:** remove ambiguity in java_outer_classname ([#1345](https://github.com/googleapis/api-linter/issues/1345)) ([1d8d76d](https://github.com/googleapis/api-linter/commit/1d8d76d561e5042735c63fa23ec26c7520d11498))
+
+## [1.63.6](https://github.com/googleapis/api-linter/compare/v1.63.5...v1.63.6) (2024-02-20)
+
+
+### Bug Fixes
+
+* **AIP-4232:** support nested field of required field ([#1339](https://github.com/googleapis/api-linter/issues/1339)) ([e86a159](https://github.com/googleapis/api-linter/commit/e86a159cfecf8e19bff7d869e3c0bca9c140ce08))
+
+## [1.63.5](https://github.com/googleapis/api-linter/compare/v1.63.4...v1.63.5) (2024-02-16)
+
+
+### Bug Fixes
+
+* **AIP-4232:** correct repeated field check ([#1337](https://github.com/googleapis/api-linter/issues/1337)) ([b383639](https://github.com/googleapis/api-linter/commit/b383639288fb14c776ad644368bf22d62c83e3b7))
+
+## [1.63.4](https://github.com/googleapis/api-linter/compare/v1.63.3...v1.63.4) (2024-02-16)
+
+
+### Bug Fixes
+
+* **AIP 133-135:** fix false positive in 133-135 ([#1335](https://github.com/googleapis/api-linter/issues/1335)) ([d79af9c](https://github.com/googleapis/api-linter/commit/d79af9cc85959ce2f22d2a12f1d2fbfca0fd2e7b))
+
 ## [1.63.3](https://github.com/googleapis/api-linter/compare/v1.63.2...v1.63.3) (2024-01-25)
 
 

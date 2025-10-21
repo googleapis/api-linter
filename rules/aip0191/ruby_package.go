@@ -47,7 +47,15 @@ var rubyPackage = &lint.FileRule{
 		// Check that upper camel case is used.
 		upperCamel := []string{}
 		for _, segment := range strings.Split(ns, delim) {
-			upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
+			if maybeVersionRegexp.MatchString(segment) {
+				// The version portion of the package for Ruby should only have
+				// the first letter, the 'v', be uppercase. The rest are all
+				// lowercased.
+				upperCamel = append(upperCamel, strings.ToUpper(segment[:1])+strings.ToLower(segment[1:]))
+			} else {
+				// None versioned portions follow UpperCamel casing.
+				upperCamel = append(upperCamel, strcase.UpperCamelCase(segment))
+			}
 		}
 		if want := strings.Join(upperCamel, delim); ns != want {
 			return []lint.Problem{{

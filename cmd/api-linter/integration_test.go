@@ -125,7 +125,7 @@ func TestRules_DisabledByInlineComments(t *testing.T) {
 		for _, testConfig := range testConfigurations {
 			t.Run(test.testName+testConfig.suffix, func(t *testing.T) {
 				disableInline := fmt.Sprintf("(-- api-linter: %s=disabled --)", test.rule)
-				proto := strings.Replace(test.proto, "disable-me-here", disableInline, -1)
+				proto := strings.ReplaceAll(test.proto, "disable-me-here", disableInline)
 				_, result := runLinterWithFailureStatus(t, proto, "", testConfig.appendArgs)
 				isDisabled := !strings.Contains(result, test.rule)
 				if isDisabled != testConfig.wantDisabled {
@@ -147,7 +147,7 @@ func TestRules_DisabledByConfig(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.testName, func(t *testing.T) {
-			c := strings.Replace(config, "replace-me-here", test.rule, -1)
+			c := strings.ReplaceAll(config, "replace-me-here", test.rule)
 			result := runLinter(t, test.proto, c)
 			if strings.Contains(result, test.rule) {
 				t.Errorf("rule %q should be disabled by the user config: %q", test.rule, c)
@@ -175,6 +175,70 @@ func TestBuildErrors(t *testing.T) {
 	}
 	if diff := cmp.Diff(expected, actualLines); diff != "" {
 		t.Fatalf("unexpected errors: diff (-want +got):\n%s", diff)
+	}
+}
+
+func TestMultipleFilesFromParentDir(t *testing.T) {
+	// This test addresses a previously found bug:
+	// https://github.com/googleapis/api-linter/issues/1465
+
+	projDir, err := os.MkdirTemp("", "proj")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(projDir)
+
+	// Create the subdirectory for protos.
+	protoDir := filepath.Join(projDir, "grandparent", "parent")
+	if err := os.MkdirAll(protoDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Write the proto files.
+	// a.proto imports b.proto.
+	if err := writeFile(filepath.Join(protoDir, "a.proto"), `
+		syntax = "proto3";
+		package grandparent.parent;
+		import "grandparent/parent/b.proto";
+		message A {
+			B b_field = 1;
+		}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeFile(filepath.Join(protoDir, "b.proto"), `
+		syntax = "proto3";
+		package grandparent.parent;
+		message B {}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Change the working directory to the project root.
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(projDir); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chdir(oldWD)
+
+	args := []string{
+		"-I", "grandparent",
+		filepath.Join("grandparent", "parent", "a.proto"),
+		filepath.Join("grandparent", "parent", "b.proto"),
+	}
+
+	err = runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "already defined") {
+			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
 	}
 }
 

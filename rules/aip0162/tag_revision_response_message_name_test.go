@@ -33,7 +33,6 @@ func TestTagRevisionResponseMessageName(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
-				import "google/longrunning/operations.proto";
 				service Library {
 					rpc {{.Method}}(TagBookRevisionRequest) returns ({{.ResponseType}});
 				}
@@ -42,7 +41,41 @@ func TestTagRevisionResponseMessageName(t *testing.T) {
 			`, test)
 			m := f.GetServices()[0].GetMethods()[0]
 			if diff := test.problems.SetDescriptor(m).Diff(tagRevisionResponseMessageName.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestTagRevisionResponseMessageNameLRO(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		Method       string
+		ResponseType string
+		problems     testutils.Problems
+	}{
+		{"Valid", "TagBookRevision", "Book", nil},
+		{"Invalid", "TagBookRevision", "TagBookRevisionResponse", testutils.Problems{{Message: "Book"}}},
+		{"Irrelevant", "AcquireBook", "PurgeBooksResponse", nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.Method}}(TagBookRevisionRequest) returns (google.longrunning.Operation) {
+					  option (google.longrunning.operation_info) = {
+					    response_type: "{{.ResponseType}}"
+						metadata_type: "OperationMetadata"
+					  };
+					};
+				}
+				message TagBookRevisionRequest {}
+				message {{.ResponseType}} {}
+				message OperationMetadata {}
+			`, test)
+			m := f.GetServices()[0].GetMethods()[0]
+			if diff := test.problems.SetDescriptor(m).Diff(tagRevisionResponseMessageName.Lint(f)); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

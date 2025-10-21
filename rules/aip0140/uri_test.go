@@ -23,27 +23,35 @@ import (
 func TestURI(t *testing.T) {
 	for _, test := range []struct {
 		name     string
+		Comment  string
 		Field    string
 		problems testutils.Problems
 	}{
-		{"Valid", "uri", nil},
-		{"ValidPrefix", "uri_foo", nil},
-		{"ValidSuffix", "foo_uri", nil},
-		{"ValidIntermixed", "foo_uri_bar", nil},
-		{"Invalid", "url", testutils.Problems{{Message: "uri", Suggestion: "uri"}}},
-		{"InvalidPrefix", "url_foo", testutils.Problems{{Message: "uri", Suggestion: "uri_foo"}}},
-		{"InvalidSuffix", "foo_url", testutils.Problems{{Message: "uri", Suggestion: "foo_uri"}}},
-		{"InvalidIntermixed", "foo_url_bar", testutils.Problems{{Message: "uri", Suggestion: "foo_uri_bar"}}},
+		{"Valid", "", "uri", nil},
+		{"ValidPrefix", "", "uri_foo", nil},
+		{"ValidSuffix", "", "foo_uri", nil},
+		{"ValidIntermixed", "", "foo_uri_bar", nil},
+		{"ValidWithURIComment", "// A URI.", "uri", nil},
+		{"ValidURL", "", "url", nil},
+		{"ValidURLPrefix", "", "url_foo", nil},
+		{"ValidURLSuffix", "", "foo_url", nil},
+		{"ValidURLIntermixed", "", "foo_url_bar", nil},
+		{"ValidIntraWordURIComment", "// A URL to a curio.", "url", nil},
+		{"Invalid", "// A URI.", "url", testutils.Problems{{Message: "uri", Suggestion: "uri"}}},
+		{"InvalidPrefix", "// A uri.", "url_foo", testutils.Problems{{Message: "uri", Suggestion: "uri_foo"}}},
+		{"InvalidSuffix", "// A URI.", "foo_url", testutils.Problems{{Message: "uri", Suggestion: "foo_uri"}}},
+		{"InvalidIntermixed", "// A uri.", "foo_url_bar", testutils.Problems{{Message: "uri", Suggestion: "foo_uri_bar"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 				message Foo {
+				  {{.Comment}}
 					string {{.Field}} = 1;
 				}
 			`, test)
 			field := f.GetMessageTypes()[0].GetFields()[0]
 			if diff := test.problems.SetDescriptor(field).Diff(uri.Lint(f)); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -21,7 +21,7 @@ import (
 
 	"github.com/jhump/protoreflect/desc/builder"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func TestProblemJSON(t *testing.T) {

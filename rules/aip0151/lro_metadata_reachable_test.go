@@ -56,7 +56,7 @@ func TestLROMetadataReachable(t *testing.T) {
 				problems := lroMetadataReachable.Lint(f)
 				m := f.GetServices()[0].GetMethods()[0]
 				if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}
@@ -95,7 +95,7 @@ func TestLROMetadataReachable(t *testing.T) {
 				problems := lroMetadataReachable.Lint(files["test.proto"])
 				method := files["test.proto"].GetServices()[0].GetMethods()[0]
 				if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
-					t.Errorf(diff)
+					t.Error(diff)
 				}
 			})
 		}

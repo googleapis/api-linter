@@ -1,15 +1,26 @@
 {
-  extends: ["config:base"],
-  commitMessagePrefix: "chore: ",
+  extends: [
+    "config:base",
+    "group:all",
+    "schedule:weekly",
+    ":semanticCommitTypeAll(chore)"
+  ],
   labels: ["automerge"],
+  postUpdateOptions: ["gomodTidy"],
   packageRules: [
     {
-      // The genproto package is updated every time that any API published by
-      // Google receives an update. This is excessively irritating, and
-      // therefore we limit updates to once a month.
-      packageNames: ["google.golang.org/genproto"],
-      extends: ["schedule:monthly"],
-    },
+      matchPackageNames: [
+        "bitbucket.org/creachadair/stringset",
+        "dominikh/staticcheck-action",
+        "github.com/jhump/protoreflect",
+        "github.com/olekukonko/tablewriter",
+      ],
+      enabled: false
+    }
   ],
-  postUpdateOptions: ["gomodTidy"],
+  force: {
+    constraints: {
+      go: "1.24"
+    }
+  }
 }

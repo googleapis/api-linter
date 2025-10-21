@@ -22,6 +22,8 @@ import "github.com/googleapis/api-linter/lint"
 func AddRules(r lint.RuleRegistry) error {
 	return r.Register(
 		217,
+		returnPartialSuccessType,
+		returnPartialSuccessWithUnreachable,
 		synonyms,
 		unreachableFieldType,
 	)

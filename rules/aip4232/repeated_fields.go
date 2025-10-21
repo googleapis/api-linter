@@ -33,17 +33,21 @@ var repeatedFields = &lint.MethodRule{
 		in := m.GetInputType()
 
 		for _, sig := range sigs {
-			for i, name := range sig {
-				// Skip the last field in the signature, it can be repeated.
-				if i == len(sig)-1 {
-					break
+			for _, name := range sig {
+				if !strings.Contains(name, ".") {
+					continue
 				}
+				chain := strings.Split(name, ".")
 
-				if f := in.FindFieldByName(name); f != nil && f.IsRepeated() {
-					problems = append(problems, lint.Problem{
-						Message:    fmt.Sprintf("Field %q in method_signature %q: only the last field can be repeated.", name, strings.Join(sig, ",")),
-						Descriptor: m,
-					})
+				// Exclude the last one from the look up since it can be repeated.
+				for i := range chain[:len(chain)-1] {
+					n := strings.Join(chain[:i+1], ".")
+					if f := utils.FindFieldDotNotation(in, n); f != nil && f.IsRepeated() {
+						problems = append(problems, lint.Problem{
+							Message:    fmt.Sprintf("Field %q in method_signature %q: only the last field in a signature argument can be repeated.", name, strings.Join(sig, ",")),
+							Descriptor: m,
+						})
+					}
 				}
 			}
 		}

@@ -22,6 +22,6 @@ import (
 // Rollback methods should use the HTTP POST method.
 var rollbackHTTPMethod = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "rollback-http-method"),
-	OnlyIf:     isRollbackMethod,
+	OnlyIf:     utils.IsRollbackRevisionMethod,
 	LintMethod: utils.LintHTTPMethod("POST"),
 }

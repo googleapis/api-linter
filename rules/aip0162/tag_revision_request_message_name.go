@@ -22,6 +22,6 @@ import (
 // Tag Revision messages should have a properly named request message.
 var tagRevisionRequestMessageName = &lint.MethodRule{
 	Name:       lint.NewRuleName(162, "tag-revision-request-message-name"),
-	OnlyIf:     isTagRevisionMethod,
+	OnlyIf:     utils.IsTagRevisionMethod,
 	LintMethod: utils.LintMethodHasMatchingRequestName,
 }

@@ -21,7 +21,7 @@ comes across any fields other than:
 - The resource.
 - `int32/int64 total_size` ([AIP-132][])
 - `string next_page_token` ([AIP-158][])
-- `repeated string unavailable` ([AIP-217][])
+- `repeated string unreachable` ([AIP-217][])
 
 It only checks field names; it does not validate type correctness or
 repeated-ness.
@@ -71,4 +71,5 @@ top of the file.
 [aip-135]: https://aip.dev/135
 [aip-157]: https://aip.dev/157
 [aip-158]: https://aip.dev/158
+[aip-217]: https://aip.dev/217
 [aip.dev/not-precedent]: https://aip.dev/not-precedent

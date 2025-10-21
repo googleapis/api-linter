@@ -72,7 +72,7 @@ func TestResponseMessageName(t *testing.T) {
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}
@@ -123,7 +123,7 @@ func TestLongRunningResponse(t *testing.T) {
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 		})
 	}

@@ -49,17 +49,6 @@ func AddRules(r lint.RuleRegistry) error {
 	)
 }
 
-// get resource message type name from method
-func getResourceMsgName(m *desc.MethodDescriptor) string {
-	// Usually the response message will be the resource message, and its name will
-	// be part of method name (make a double check here to avoid the issue when
-	// method or output naming doesn't follow the right principles)
-	if strings.Contains(m.GetName()[6:], m.GetOutputType().GetName()) {
-		return m.GetOutputType().GetName()
-	}
-	return m.GetName()[6:]
-}
-
 // get resource message type name from request message
 func getResourceMsgNameFromReq(m *desc.MessageDescriptor) string {
 	// retrieve the string between the prefix "Create" and suffix "Request" from

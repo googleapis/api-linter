@@ -43,7 +43,7 @@ func TestHardcodedHyphen(t *testing.T) {
 		`, test)
 		method := f.GetServices()[0].GetMethods()[0]
 		if diff := test.problems.SetDescriptor(method).Diff(hardcodedHyphen.Lint(f)); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	}
 }

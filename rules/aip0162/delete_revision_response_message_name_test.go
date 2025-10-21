@@ -48,3 +48,39 @@ func TestDeleteRevisionResponseMessageName(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteRevisionResponseMessageNameLRO(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		MethodName   string
+		ResponseType string
+		problems     testutils.Problems
+	}{
+		{"Valid", "DeleteBookRevision", "Book", nil},
+		{"Invalid", "DeleteBookRevision", "DeleteBookRevisionResponse", testutils.Problems{{Message: "Book"}}},
+		{"Irrelevant", "DeleteBook", "DeleteBookResponse", nil},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/longrunning/operations.proto";
+				service Library {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns (google.longrunning.Operation) {
+					  option (google.longrunning.operation_info) = {
+				        response_type: "{{.ResponseType}}"
+						metadata_type: "OperationMetadata"
+					  };
+					};
+				}
+				message {{.MethodName}}Request {}
+				message {{.ResponseType}} {}
+				message OperationMetadata {}
+			`, test)
+
+			method := file.GetServices()[0].GetMethods()[0]
+			problems := deleteRevisionResponseMessageName.Lint(file)
+			if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
