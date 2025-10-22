@@ -15,15 +15,15 @@
 package aip0123
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceNameField = &lint.MessageRule{
 	Name:   lint.NewRuleName(123, "resource-name-field"),
 	OnlyIf: utils.IsResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		f := "name"
 		if nf := utils.GetResource(m).GetNameField(); nf != "" {
 			f = nf

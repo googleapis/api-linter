@@ -3,7 +3,7 @@ package aip0132
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestParentRequired(t *testing.T) {
@@ -27,7 +27,7 @@ func TestRequestParentRequired(t *testing.T) {
 				}
 			`, test)
 			problems := requestParentRequired.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(f.Messages().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

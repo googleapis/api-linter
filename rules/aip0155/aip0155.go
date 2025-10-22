@@ -16,7 +16,7 @@
 package aip0155
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 // AddRules adds all of the AIP-155 rules to the provided registry.

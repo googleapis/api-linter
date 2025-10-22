@@ -17,25 +17,24 @@ package aip0128
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceReconcilingField = &lint.MessageRule{
 	Name:   lint.NewRuleName(128, "resource-reconciling-field"),
 	OnlyIf: isDeclarativeFriendlyResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		f := m.FindFieldByName("reconciling")
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		f := m.Fields().ByName("reconciling")
 		if f == nil {
 			return []lint.Problem{{
-				Message:    fmt.Sprintf("Declarative-friendly %q has no `reconciling` field.", m.GetName()),
+				Message:    fmt.Sprintf("Declarative-friendly %q has no `reconciling` field.", m.Name()),
 				Descriptor: m,
 			}}
 		}
 
-		if f.GetType() != builder.FieldTypeBool().GetType() || f.IsRepeated() {
+		if f.Kind() != protoreflect.BoolKind || f.IsList() {
 			return []lint.Problem{{
 				Message:    "The `reconciling` field should be a singular bool.",
 				Descriptor: f,

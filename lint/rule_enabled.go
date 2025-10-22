@@ -17,7 +17,7 @@ package lint
 import (
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -26,22 +26,22 @@ import (
 var defaultDisabledRules = []string{"cloud"}
 
 // Disable all rules for deprecated descriptors.
-func disableDeprecated(d desc.Descriptor) bool {
+func disableDeprecated(d protoreflect.Descriptor) bool {
 	switch v := d.(type) {
-	case *desc.EnumDescriptor:
-		return v.GetEnumOptions().GetDeprecated()
-	case *desc.EnumValueDescriptor:
-		return v.GetEnumValueOptions().GetDeprecated()
-	case *desc.FieldDescriptor:
-		return v.GetFieldOptions().GetDeprecated()
-	case *desc.FileDescriptor:
-		return v.GetFileOptions().GetDeprecated()
-	case *desc.MessageDescriptor:
-		return v.GetMessageOptions().GetDeprecated()
-	case *desc.MethodDescriptor:
-		return v.GetMethodOptions().GetDeprecated()
-	case *desc.ServiceDescriptor:
-		return v.GetServiceOptions().GetDeprecated()
+	case protoreflect.EnumDescriptor:
+		return v.Options().(*dpb.EnumOptions).GetDeprecated()
+	case protoreflect.EnumValueDescriptor:
+		return v.Options().(*dpb.EnumValueOptions).GetDeprecated()
+	case protoreflect.FieldDescriptor:
+		return v.Options().(*dpb.FieldOptions).GetDeprecated()
+	case protoreflect.FileDescriptor:
+		return v.Options().(*dpb.FileOptions).GetDeprecated()
+	case protoreflect.MessageDescriptor:
+		return v.Options().(*dpb.MessageOptions).GetDeprecated()
+	case protoreflect.MethodDescriptor:
+		return v.Options().(*dpb.MethodOptions).GetDeprecated()
+	case protoreflect.ServiceDescriptor:
+		return v.Options().(*dpb.ServiceOptions).GetDeprecated()
 	}
 	return false
 }
@@ -51,12 +51,12 @@ func disableDeprecated(d desc.Descriptor) bool {
 // This pattern is a hook for internal extension, by creating an additional
 // file in this package that can add an additional check:
 //
-//	func disableForInternalReason(d desc.Descriptor) bool { ... }
+//	func disableForInternalReason(d protoreflect.Descriptor) bool { ... }
 //
 //	func init() {
 //	  descriptorDisableChecks = append(descriptorDisableChecks, disableForInternalReason)
 //	}
-var descriptorDisableChecks = []func(d desc.Descriptor) bool{
+var descriptorDisableChecks = []func(d protoreflect.Descriptor) bool{
 	disableDeprecated,
 }
 
@@ -65,7 +65,7 @@ var descriptorDisableChecks = []func(d desc.Descriptor) bool{
 //
 // Note, if the given source code location is not nil, it will be used to
 // augment the set of commentLines.
-func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location,
+func ruleIsEnabled(rule ProtoRule, d protoreflect.Descriptor, l *dpb.SourceCodeInfo_Location,
 	aliasMap map[string]string, ignoreCommentDisables bool) bool {
 	// If the rule is disabled because of something on the descriptor itself
 	// (e.g. a deprecated annotation), address that.
@@ -88,7 +88,7 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Loca
 	//
 	// Do not pass the source code location here, the source location in relation
 	// to the parent is not helpful.
-	if parent := d.GetParent(); parent != nil {
+	if parent := d.Parent(); parent != nil {
 		return ruleIsEnabled(rule, parent, nil, aliasMap, ignoreCommentDisables)
 	}
 
@@ -97,7 +97,7 @@ func ruleIsEnabled(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Loca
 
 // ruleIsDisabledByComments returns true if the rule has been disabled
 // by comments in the file or leading the element.
-func ruleIsDisabledByComments(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
+func ruleIsDisabledByComments(rule ProtoRule, d protoreflect.Descriptor, l *dpb.SourceCodeInfo_Location, aliasMap map[string]string) bool {
 	// Some rules have a legacy name. We add it to the check list.
 	ruleName := string(rule.GetName())
 	names := []string{ruleName, aliasMap[ruleName]}
@@ -106,7 +106,7 @@ func ruleIsDisabledByComments(rule ProtoRule, d desc.Descriptor, l *dpb.SourceCo
 	if l != nil {
 		commentLines = append(commentLines, strings.Split(l.GetLeadingComments(), "\n")...)
 	}
-	if f, ok := d.(*desc.FileDescriptor); ok {
+	if f, ok := d.(protoreflect.FileDescriptor); ok {
 		commentLines = append(commentLines, strings.Split(fileHeader(f), "\n")...)
 	} else {
 		commentLines = append(commentLines, strings.Split(getLeadingComments(d), "\n")...)

@@ -109,7 +109,7 @@ func TestResolveImports(t *testing.T) {
 				}
 			},
 			want: func(_ string) []string {
-				return []string{"."} // "test_dir" should be covered by "."
+				return []string{".", "test_dir"}
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestResolveImports(t *testing.T) {
 				}
 			},
 			want: func(_ string) []string {
-				return []string{"."}
+				return []string{".", "test_dir"}
 			},
 		},
 		{
@@ -150,7 +150,7 @@ func TestResolveImports(t *testing.T) {
 				}
 			},
 			want: func(externalDir string) []string {
-				return []string{".", externalDir}
+				return []string{".", "./relative_dir", "test_dir", externalDir}
 			},
 		},
 		{
@@ -160,7 +160,7 @@ func TestResolveImports(t *testing.T) {
 			},
 			setup: defaultSetup,
 			want: func(_ string) []string {
-				return []string{"."} // Should still resolve to just "." as non_existent_dir is relative to CWD
+				return []string{".", "non_existent_dir"}
 			},
 		},
 		{

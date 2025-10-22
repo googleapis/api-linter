@@ -17,17 +17,17 @@ package aip0133
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Create method should use the resource as the output message
 var outputName = &lint.MethodRule{
 	Name:   lint.NewRuleName(133, "response-message-name"),
 	OnlyIf: utils.IsCreateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		want := utils.GetResourceMessageName(m, "Create")
 
 		// Load the response type, resolving the
@@ -37,7 +37,7 @@ var outputName = &lint.MethodRule{
 			// If we can't resolve it, let the AIP-151 rule warn about this.
 			return nil
 		}
-		got := resp.GetName()
+		got := resp.Name()
 
 		// Rule check: Establish that for methods such as `CreateFoo`, the response
 		// message should be named `Foo`
@@ -45,7 +45,7 @@ var outputName = &lint.MethodRule{
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if got != want && got != "" {
+		if string(got) != want && got != "" {
 			return []lint.Problem{{
 				Message: fmt.Sprintf(
 					"Create RPCs should have the corresponding resource as the response message, such as %q.",

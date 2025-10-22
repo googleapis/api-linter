@@ -17,18 +17,19 @@ package aip0122
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var embeddedResource = &lint.MessageRule{
 	Name:   lint.NewRuleName(122, "embedded-resource"),
 	OnlyIf: utils.IsResource,
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		var problems []lint.Problem
-		for _, f := range m.GetFields() {
-			mt := f.GetMessageType()
+		for i := 0; i < m.Fields().Len(); i++ {
+			f := m.Fields().Get(i)
+			mt := f.Message()
 			if mt == nil || !utils.IsResource(mt) {
 				continue
 			}
@@ -38,8 +39,8 @@ var embeddedResource = &lint.MessageRule{
 				continue
 			}
 
-			suggestion := fmt.Sprintf(`string %s = %d [(google.api.resource_reference).type = %q];`, f.GetName(), f.GetNumber(), r.GetType())
-			if f.IsRepeated() {
+			suggestion := fmt.Sprintf(`string %s = %d [(google.api.resource_reference).type = %q];`, f.Name(), f.Number(), r.GetType())
+			if f.IsList() {
 				suggestion = fmt.Sprintf("repeated %s", suggestion)
 			}
 			problems = append(problems, lint.Problem{

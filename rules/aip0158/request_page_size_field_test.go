@@ -15,66 +15,58 @@
 package aip0158
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequestPaginationPageSize(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName      string
-		messageName   string
-		messageFields []field
-		isOneof       bool
-		problems      testutils.Problems
-		problemDesc   func(m *desc.MessageDescriptor) desc.Descriptor
+		testName    string
+		MessageName string
+		Fields      string
+		problems    testutils.Problems
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			"Valid",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeInt32()}, {"page_token", builder.FieldTypeString()}},
-			false,
+			"int32 page_size = 1; string page_token = 2;",
 			testutils.Problems{},
 			nil,
 		},
 		{
 			"MissingField",
 			"ListFooRequest",
-			[]field{{"page_token", builder.FieldTypeString()}},
-			false,
+			"string page_token = 1;",
 			testutils.Problems{{Message: "page_size"}},
 			nil,
 		},
 		{
 			"InvalidType",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeDouble()}},
-			false,
+			"double page_size = 1;",
 			testutils.Problems{{Suggestion: "int32"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("page_size")
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
+				return m.Fields().ByName("page_size")
 			},
 		},
 		{
 			"IrrelevantMessage",
 			"ListFooPageToken",
-			[]field{{"page_token", builder.FieldTypeString()}},
-			false,
+			"string page_token = 1;",
 			nil,
 			nil,
 		},
 		{
 			"InvalidIsOneof",
 			"ListFooRequest",
-			[]field{{"page_size", builder.FieldTypeInt32()}},
-			/* isOneof */ true,
+			"oneof page_size_oneof { int32 page_size = 1; }",
 			testutils.Problems{{Message: "oneof"}},
-			func(m *desc.MessageDescriptor) desc.Descriptor {
-				return m.FindFieldByName("page_size")
+			func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
+				return m.Fields().ByName("page_size")
 			},
 		},
 	}
@@ -82,31 +74,19 @@ func TestRequestPaginationPageSize(t *testing.T) {
 	// Run each test individually.
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Create an appropriate message descriptor.
-			messageBuilder := builder.NewMessage(test.messageName)
-
-			for _, f := range test.messageFields {
-				fb := builder.NewField(f.fieldName, f.fieldType)
-				if test.isOneof {
-					messageBuilder.AddOneOf(builder.NewOneOf(fmt.Sprintf("%s_oneof", f.fieldName)).AddChoice(fb))
-				} else {
-					messageBuilder.AddField(fb)
+			f := testutils.ParseProto3Tmpl(t, `
+				message {{.MessageName}} {
+					{{.Fields}}
 				}
-			}
-
-			message, err := messageBuilder.Build()
-			if err != nil {
-				t.Fatalf("Could not build %s message.", test.messageName)
-			}
-
+			`, test)
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = message
+			var problemDesc protoreflect.Descriptor = f.Messages().Get(0)
 			if test.problemDesc != nil {
-				problemDesc = test.problemDesc(message)
+				problemDesc = test.problemDesc(f.Messages().Get(0))
 			}
 
 			// Run the lint rule, and establish that it returns the correct problems.
-			problems := requestPaginationPageSize.Lint(message.GetFile())
+			problems := requestPaginationPageSize.Lint(f)
 			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

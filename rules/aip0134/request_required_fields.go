@@ -18,37 +18,38 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The update request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "request-required-fields"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
 		ot := utils.GetResponseType(m)
 		if ot == nil {
 			return nil
 		}
-		it := m.GetInputType()
+		it := m.Input()
 
 		allowedRequiredFields := stringset.New("update_mask")
 
-		for _, f := range it.GetFields() {
+		for i := 0; i < it.Fields().Len(); i++ {
+			f := it.Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// Skip the check with the field that is the resource, which for
 			// Standard Update, is the output type.
-			if t := f.GetMessageType(); t != nil && t.GetName() == ot.GetName() {
+			if t := f.Message(); t != nil && t.Name() == ot.Name() {
 				continue
 			}
 			// add a problem.
-			if !allowedRequiredFields.Contains(string(f.GetName())) {
+			if !allowedRequiredFields.Contains(string(f.Name())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Update RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Update RPCs must only require fields explicitly described in AIPs, not %q.", f.Name()),
 					Descriptor: f,
 				})
 			}

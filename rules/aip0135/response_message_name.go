@@ -19,10 +19,10 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Delete messages should use google.protobuf.Empty,
@@ -31,21 +31,24 @@ import (
 var responseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(135, "response-message-name"),
 	OnlyIf: utils.IsDeleteMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		resource := strings.Replace(m.GetName(), "Delete", "", 1)
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		resource := strings.Replace(string(m.Name()), "Delete", "", 1)
 
 		// Rule check: Establish that for methods such as `DeleteFoo`, the response
 		// message is `google.protobuf.Empty` or `Foo`.
-		got := m.GetOutputType().GetName()
-		if stringset.New("Empty", "Operation").Contains(got) {
-			got = m.GetOutputType().GetFullyQualifiedName()
+		got := m.Output().Name()
+		if stringset.New("Empty", "Operation").Contains(string(got)) {
+			got = protoreflect.Name(string(m.Output().FullName()))
 		}
 		want := stringset.New(resource, "google.protobuf.Empty")
 
 		// If the return type is an Operation, use the annotated response type.
 		lro := false
-		if utils.IsOperation(m.GetOutputType()) {
-			got = utils.GetOperationInfo(m).GetResponseType()
+		var gotLRO string
+		if utils.IsOperation(m.Output()) {
+			if info := utils.GetOperationInfo(m); info != nil {
+				gotLRO = info.GetResponseType()
+			}
 			lro = true
 		}
 
@@ -54,29 +57,25 @@ var responseMessageName = &lint.MethodRule{
 		// Note: If `got` is empty string, this is an unannotated LRO.
 		// The AIP-151 rule will whine about that, and this rule should not as it
 		// would be confusing.
-		if !want.Contains(got) && got != "" {
-			// Customize the error message (by including Empty iff the resource is
-			// not marked declarative-friendly)
-			msg := "Delete RPCs should have response message type of Empty or the resource, not %q."
-			suggestion := "google.protobuf.Empty"
-
-			// Customize the location based on whether an LRO is in use.
-			location := locations.MethodResponseType(m)
-			if lro {
-				location = locations.MethodOperationInfo(m)
-				suggestion = "" // We can not offer a precise enough location to make a suggestion.
+		if lro {
+			if !want.Contains(gotLRO) && gotLRO != "" {
+				// LRO case
+				return []lint.Problem{{
+					Message:    fmt.Sprintf("Delete RPCs should have response message type of Empty or the resource, not %q.", gotLRO),
+					Descriptor: m,
+					Location:   locations.MethodOperationInfo(m),
+				}}
 			}
-
-			// Create and return the problem.
-			problem := lint.Problem{
-				Message:    fmt.Sprintf(msg, got),
-				Descriptor: m,
-				Location:   location,
+		} else {
+			if !want.Contains(string(got)) && got != "" {
+				// Non-LRO case
+				return []lint.Problem{{
+					Message:    fmt.Sprintf("Delete RPCs should have response message type of Empty or the resource, not %q.", got),
+					Suggestion: "google.protobuf.Empty",
+					Descriptor: m,
+					Location:   locations.MethodResponseType(m),
+				}}
 			}
-			if len(suggestion) > 0 {
-				problem.Suggestion = suggestion
-			}
-			return []lint.Problem{problem}
 		}
 
 		return nil

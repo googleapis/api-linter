@@ -17,18 +17,18 @@ package aip0134
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Update methods should have a proper HTTP pattern.
 var httpNameField = &lint.MethodRule{
 	Name:   lint.NewRuleName(134, "http-uri-name"),
 	OnlyIf: utils.IsUpdateMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
-		fieldName := strcase.SnakeCase(m.GetName()[6:])
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		fieldName := strcase.SnakeCase(string(m.Name()[6:]))
 		want := fmt.Sprintf("%s.name", fieldName)
 		return utils.LintHTTPURIHasVariable(m, want)
 	},

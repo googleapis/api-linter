@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResourcePatternPluralSimple(t *testing.T) {
@@ -44,7 +44,7 @@ func TestResourcePatternPluralSimple(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -99,7 +99,7 @@ func TestResourcePatternPluralNested(t *testing.T) {
 					string name = 1;
 				}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(resourcePatternPlural.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

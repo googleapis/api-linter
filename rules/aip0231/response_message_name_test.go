@@ -17,7 +17,7 @@ package aip0231
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestOutputName(t *testing.T) {
@@ -51,7 +51,7 @@ func TestOutputName(t *testing.T) {
 				message {{.OutputName}} {}
 			`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services().Get(0).Methods().Get(0)
 
 			problems := outputName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {

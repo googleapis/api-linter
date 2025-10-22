@@ -18,20 +18,20 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/v2/locations"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var uriSuffix = &lint.MethodRule{
 	Name: lint.NewRuleName(136, "http-uri-suffix"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return utils.IsCustomMethod(m) && httpNameVariable.LintMethod(m) == nil && httpParentVariable.LintMethod(m) == nil
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		for _, httpRule := range utils.GetHTTPRules(m) {
 			var want string
 
@@ -52,12 +52,12 @@ var uriSuffix = &lint.MethodRule{
 			// ----------------------------------------------------------------------
 			// If the URI contains `{name=` or `{parent=`, expect `:verb`.
 			if strings.Contains(httpRule.URI, ":batch") {
-				rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+				rpcSlice := strings.Split(strcase.SnakeCase(string(m.Name())), "_")
 				want = ":" + strcase.LowerCamelCase(rpcSlice[0]+"_"+rpcSlice[1])
 			} else {
 				for key := range httpRule.GetVariables() {
 					if key == "name" || key == "parent" || strings.HasSuffix(key, ".name") {
-						rpcSlice := strings.Split(strcase.SnakeCase(m.GetName()), "_")
+						rpcSlice := strings.Split(strcase.SnakeCase(string(m.Name())), "_")
 						want = ":" + rpcSlice[0]
 						break
 					}
@@ -67,15 +67,15 @@ var uriSuffix = &lint.MethodRule{
 			// AIP-162 introduces some special cases around revisions, where
 			// `ListFooRevisions` gets a suffix of `:listRevisions` (and the same for
 			// `Delete` and `Tag`).
-			n := m.GetName()
-			if strings.HasPrefix(n, "List") && strings.HasSuffix(m.GetName(), "Revisions") {
+			n := string(m.Name())
+			if strings.HasPrefix(n, "List") && strings.HasSuffix(n, "Revisions") {
 				want = ":listRevisions"
 			}
-			if strings.HasSuffix(m.GetName(), "Revision") {
-				if strings.HasPrefix(m.GetName(), "Tag") {
+			if strings.HasSuffix(n, "Revision") {
+				if strings.HasPrefix(n, "Tag") {
 					want = ":tagRevision"
 				}
-				if strings.HasPrefix(m.GetName(), "Delete") {
+				if strings.HasPrefix(n, "Delete") {
 					want = ":deleteRevision"
 				}
 			}
@@ -95,7 +95,7 @@ var uriSuffix = &lint.MethodRule{
 
 			// Nothing else applied; expect `:verbNoun`.
 			if len(want) == 0 {
-				want = ":" + strcase.LowerCamelCase(strcase.SnakeCase(m.GetName()))
+				want = ":" + strcase.LowerCamelCase(strcase.SnakeCase(n))
 			}
 
 			// Do we have the suffix we expect?

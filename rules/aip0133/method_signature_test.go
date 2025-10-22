@@ -17,7 +17,7 @@ package aip0133
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestMethodSignature(t *testing.T) {
@@ -82,7 +82,7 @@ func TestMethodSignature(t *testing.T) {
 				  };
 				}
 			`, test)
-			m := f.GetServices()[0].GetMethods()[0]
+			m := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(methodSignature.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
@@ -198,7 +198,7 @@ func TestMethodSignature(t *testing.T) {
 			{
 				Message:    "not_book,book",
 				Suggestion: `option (google.api.method_signature) = "not_book,book_id";`,
-				Descriptor: file.GetServices()[0].GetMethods()[0],
+				Descriptor: file.Services().Get(0).Methods().Get(0),
 			},
 		}
 		if diff := want.Diff(methodSignature.Lint(file)); diff != "" {

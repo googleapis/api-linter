@@ -18,10 +18,9 @@ package aip0140
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-140 rules to the provided registry.
@@ -45,6 +44,6 @@ func toLowerSnakeCase(s string) string {
 }
 
 // isStringField returns true if the field is a string field.
-func isStringField(f *desc.FieldDescriptor) bool {
-	return f.GetType() == builder.FieldTypeString().GetType()
+func isStringField(f protoreflect.FieldDescriptor) bool {
+	return f.Kind() == protoreflect.StringKind
 }

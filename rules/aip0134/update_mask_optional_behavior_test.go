@@ -17,7 +17,7 @@ package aip0134
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUpdateMaskOptionalBehavior(t *testing.T) {
@@ -41,7 +41,7 @@ func TestUpdateMaskOptionalBehavior(t *testing.T) {
 				}
 				message Book {}
 			`, test)
-			field := file.GetMessageTypes()[0].FindFieldByName("update_mask")
+			field := file.Messages().Get(0).Fields().ByName("update_mask")
 			problems := updateMaskOptionalBehavior.Lint(file)
 			if diff := test.problems.SetDescriptor(field).Diff(problems); diff != "" {
 				t.Error(diff)

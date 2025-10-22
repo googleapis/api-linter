@@ -17,7 +17,7 @@ package aip0151
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestLROMetadata(t *testing.T) {
@@ -48,7 +48,7 @@ func TestLROMetadata(t *testing.T) {
 				message {{.MethodName}}Request {}
 			`, test)
 			problems := lroMetadata.Lint(f)
-			d := f.GetServices()[0].GetMethods()[0]
+			d := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(d).Diff(problems); diff != "" {
 				t.Error(diff)
 			}

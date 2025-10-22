@@ -17,7 +17,7 @@ package aip0215
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 // Tests our regexp normalizes strings to the expected path.
@@ -143,7 +143,7 @@ func TestForeignTypeReference(t *testing.T) {
 				`,
 			}, tc)
 			file := files["calling.proto"]
-			field := file.GetMessageTypes()[0].GetFields()[1]
+			field := file.Messages().Get(0).Fields().Get(1)
 			if diff := tc.problems.SetDescriptor(field).Diff(foreignTypeReference.Lint(file)); diff != "" {
 				t.Error(diff)
 			}

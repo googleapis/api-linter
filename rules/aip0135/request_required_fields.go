@@ -18,30 +18,31 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // The delete request message should not have unrecognized fields.
 var requestRequiredFields = &lint.MessageRule{
 	Name:   lint.NewRuleName(135, "request-required-fields"),
 	OnlyIf: utils.IsDeleteRequestMessage,
-	LintMessage: func(m *desc.MessageDescriptor) (problems []lint.Problem) {
+	LintMessage: func(m protoreflect.MessageDescriptor) (problems []lint.Problem) {
 		// Rule check: Establish that there are no unexpected fields.
 		// * name: required by AIP-135
 		// * etag: optional or required by both AIP-135 and AIP-154
 		allowedRequiredFields := stringset.New("name", "etag")
 
-		for _, f := range m.GetFields() {
+		for i := 0; i < m.Fields().Len(); i++ {
+			f := m.Fields().Get(i)
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
 			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
-			if !allowedRequiredFields.Contains(string(f.GetName())) {
+			if !allowedRequiredFields.Contains(string(f.Name())) {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("Delete RPCs must only require fields explicitly described in AIPs, not %q.", f.GetName()),
+					Message:    fmt.Sprintf("Delete RPCs must only require fields explicitly described in AIPs, not %q.", f.Name()),
 					Descriptor: f,
 				})
 			}

@@ -15,24 +15,24 @@
 package aip0127
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var hasAnnotation = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "http-annotation"),
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		hasHTTPRule := len(utils.GetHTTPRules(m)) > 0
-		if hasHTTPRule && m.IsClientStreaming() && m.IsServerStreaming() {
+		if hasHTTPRule && m.IsStreamingClient() && m.IsStreamingServer() {
 			return []lint.Problem{{
 				Message:    "Bi-directional streaming RPCs should omit `google.api.http`.",
 				Descriptor: m,
 				Location:   locations.MethodHTTPRule(m),
 			}}
 		}
-		if !hasHTTPRule && !(m.IsClientStreaming() && m.IsServerStreaming()) {
+		if !hasHTTPRule && !(m.IsStreamingClient() && m.IsStreamingServer()) {
 			return []lint.Problem{{
 				Message:    "RPCs must include HTTP definitions using the `google.api.http` annotation.",
 				Descriptor: m,

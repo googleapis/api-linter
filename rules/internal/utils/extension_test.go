@@ -19,13 +19,14 @@ import (
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestGetFieldBehavior(t *testing.T) {
-	fd := testutils.ParseProto3String(t, `
+	f := testutils.ParseProto3String(t, `
 		import "google/api/field_behavior.proto";
 
 		message Book {
@@ -38,7 +39,7 @@ func TestGetFieldBehavior(t *testing.T) {
 			string summary = 3;
 		}
 	`)
-	msg := fd.GetMessageTypes()[0]
+	msg := f.Messages().Get(0)
 	tests := []struct {
 		fieldName      string
 		fieldBehaviors stringset.Set
@@ -49,7 +50,7 @@ func TestGetFieldBehavior(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.fieldName, func(t *testing.T) {
-			f := msg.FindFieldByName(test.fieldName)
+			f := msg.Fields().ByName(protoreflect.Name(test.fieldName))
 			if diff := cmp.Diff(GetFieldBehavior(f), test.fieldBehaviors); diff != "" {
 				t.Error(diff)
 			}
@@ -83,7 +84,7 @@ func TestGetMethodSignatures(t *testing.T) {
 				message Book {}
 				message GetBookRequest {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := cmp.Diff(GetMethodSignatures(method), test.want); diff != "" {
 				t.Error(diff)
 			}
@@ -92,7 +93,7 @@ func TestGetMethodSignatures(t *testing.T) {
 }
 
 func TestGetOperationInfo(t *testing.T) {
-	fd := testutils.ParseProto3String(t, `
+	f := testutils.ParseProto3String(t, `
 		import "google/longrunning/operations.proto";
 		service Library {
 			rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -104,7 +105,7 @@ func TestGetOperationInfo(t *testing.T) {
 		}
 		message WriteBookRequest {}
 	`)
-	lro := GetOperationInfo(fd.GetServices()[0].GetMethods()[0])
+	lro := GetOperationInfo(f.Services().Get(0).Methods().Get(0))
 	if got, want := lro.ResponseType, "WriteBookResponse"; got != want {
 		t.Errorf("Response type - got %q, want %q.", got, want)
 	}
@@ -114,14 +115,14 @@ func TestGetOperationInfo(t *testing.T) {
 }
 
 func TestGetOperationInfoNone(t *testing.T) {
-	fd := testutils.ParseProto3String(t, `
+	f := testutils.ParseProto3String(t, `
 		service Library {
 			rpc GetBook(GetBookRequest) returns (Book);
 		}
 		message GetBookRequest {}
 		message Book {}
 	`)
-	lro := GetOperationInfo(fd.GetServices()[0].GetMethods()[0])
+	lro := GetOperationInfo(f.Services().Get(0).Methods().Get(0))
 	if lro != nil {
 		t.Errorf("Got %v, expected nil LRO annotation.", lro)
 	}
@@ -139,7 +140,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			fd := testutils.ParseProto3Tmpl(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {
 					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -153,7 +154,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 				message WriteBookResponse {}
 			`, test)
 
-			typ := GetOperationResponseType(fd.GetServices()[0].GetMethods()[0])
+			typ := GetOperationResponseType(f.Services().Get(0).Methods().Get(0))
 
 			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) response_type message", test.valid)
@@ -163,7 +164,7 @@ func TestGetOperationInfoResponseType(t *testing.T) {
 				return
 			}
 
-			if got, want := typ.GetName(), test.ResponseType; got != want {
+			if got, want := typ.Name(), protoreflect.Name(test.ResponseType); got != want {
 				t.Errorf("Response type - got %q, want %q.", got, want)
 			}
 		})
@@ -182,7 +183,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			fd := testutils.ParseProto3Tmpl(t, `
+			f := testutils.ParseProto3Tmpl(t, `
 				import "google/longrunning/operations.proto";
 				service Library {
 					rpc WriteBook(WriteBookRequest) returns (google.longrunning.Operation) {
@@ -196,7 +197,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 				message WriteBookMetadata {}
 			`, test)
 
-			typ := GetMetadataType(fd.GetServices()[0].GetMethods()[0])
+			typ := GetMetadataType(f.Services().Get(0).Methods().Get(0))
 
 			if validType := typ != nil; validType != test.valid {
 				t.Fatalf("Expected valid(%v) metadata_type message", test.valid)
@@ -206,7 +207,7 @@ func TestGetOperationInfoMetadataType(t *testing.T) {
 				return
 			}
 
-			if got, want := typ.GetName(), test.MetadataType; got != want {
+			if got, want := typ.Name(), protoreflect.Name(test.MetadataType); got != want {
 				t.Errorf("Metadata type - got %q, want %q.", got, want)
 			}
 		})
@@ -224,7 +225,7 @@ func TestGetResource(t *testing.T) {
 				};
 			}
 		`)
-		resource := GetResource(f.GetMessageTypes()[0])
+		resource := GetResource(f.Messages().Get(0))
 		if got, want := resource.GetType(), "library.googleapis.com/Book"; got != want {
 			t.Errorf("Got %q, expected %q.", got, want)
 		}
@@ -234,7 +235,7 @@ func TestGetResource(t *testing.T) {
 	})
 	t.Run("Absent", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, "message Book {}")
-		if got := GetResource(f.GetMessageTypes()[0]); got != nil {
+		if got := GetResource(f.Messages().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil.`, got)
 		}
 	})
@@ -302,14 +303,14 @@ func TestGetResourceReference(t *testing.T) {
 				}];
 			}
 		`)
-		ref := GetResourceReference(f.GetMessageTypes()[0].GetFields()[0])
+		ref := GetResourceReference(f.Messages().Get(0).Fields().Get(0))
 		if got, want := ref.GetType(), "library.googleapis.com/Book"; got != want {
 			t.Errorf("Got %q, expected %q.", got, want)
 		}
 	})
 	t.Run("Absent", func(t *testing.T) {
 		f := testutils.ParseProto3String(t, "message GetBookRequest { string name = 1; }")
-		if got := GetResourceReference(f.GetMessageTypes()[0].GetFields()[0]); got != nil {
+		if got := GetResourceReference(f.Messages().Get(0).Fields().Get(0)); got != nil {
 			t.Errorf(`Got "%v", expected nil`, got)
 		}
 	})
@@ -425,13 +426,13 @@ func TestFindResourceMessage(t *testing.T) {
 			got := FindResourceMessage(tst.reference, files["shelf.proto"])
 
 			if tst.notFound && got != nil {
-				t.Fatalf("Expected to not find the message, but found %q", got.GetName())
+				t.Fatalf("Expected to not find the message, but found %q", got.Name())
 			}
 
 			if !tst.notFound && got == nil {
 				t.Errorf("Got nil, expected %q", tst.wantMsg)
-			} else if !tst.notFound && got.GetName() != tst.wantMsg {
-				t.Errorf("Got %q, expected %q", got.GetName(), tst.wantMsg)
+			} else if !tst.notFound && string(got.Name()) != tst.wantMsg {
+				t.Errorf("Got %q, expected %q", got.Name(), tst.wantMsg)
 			}
 		})
 	}
@@ -479,8 +480,7 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 				option (google.longrunning.operation_info) = {
 					response_type: "Book"
 				};
-		};
-		`, "Book"},
+		};`, "Book"},
 		{"LROMissingResponse", `
 			rpc CreateBook(CreateBookRequest) returns (google.longrunning.Operation) {
 		};
@@ -519,11 +519,11 @@ func TestGetOutputOrLROResponseMessage(t *testing.T) {
 				message Operation {
 				}
 			`, test)
-			method := file.GetServices()[0].GetMethods()[0]
+			method := file.Services().Get(0).Methods().Get(0)
 			resp := GetResponseType(method)
 			got := ""
 			if resp != nil {
-				got = resp.GetName()
+				got = string(resp.Name())
 			}
 			if got != test.want {
 				t.Errorf(
@@ -572,7 +572,6 @@ func TestFindResourceChildren(t *testing.T) {
 					type: "library.googleapis.com/Book"
 					pattern: "publishers/{publisher}/books/{book}"
 				};
-
 				string name = 1;
 			}
 
@@ -642,12 +641,12 @@ func TestHasFieldInfo(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
-			
+
 			message CreateBookRequest {
 				string foo = 1 {{.FieldInfo}};
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := HasFieldInfo(fd); got != tc.want {
 				t.Errorf("HasFieldInfo(%+v): expected %v, got %v", fd, tc.want, got)
 			}
@@ -673,12 +672,12 @@ func TestGetFieldInfo(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
-			
+
 			message CreateBookRequest {
 				string foo = 1 {{.FieldInfo}};
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			got := GetFieldInfo(fd)
 			if diff := cmp.Diff(got, tc.want, cmp.Comparer(proto.Equal)); diff != "" {
 				t.Errorf("GetFieldInfo(%+v): got(-),want(+):\n%s", fd, diff)
@@ -706,14 +705,14 @@ func TestHasFormat(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
-			
+
 			message CreateBookRequest {
 				string foo = 1 [(google.api.field_info) = {
 					{{.Format}}
 				}];
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := HasFormat(fd); got != tc.want {
 				t.Errorf("HasFormat(%+v): expected %v, got %v", fd, tc.want, got)
 			}
@@ -740,14 +739,14 @@ func TestGetFormat(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_info.proto";
-			
+
 			message CreateBookRequest {
 				string foo = 1 [(google.api.field_info) = {
 					{{.Format}}
 				}];
 			}
 			`, tc)
-			fd := file.FindMessage("CreateBookRequest").FindFieldByName("foo")
+			fd := file.Messages().ByName("CreateBookRequest").Fields().ByName("foo")
 			if got := GetFormat(fd); got != tc.want {
 				t.Errorf("GetFormat(%+v): expected %v, got %v", fd, tc.want, got)
 			}

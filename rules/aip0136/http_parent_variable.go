@@ -18,17 +18,17 @@ import (
 	"strings"
 
 	pluralize "github.com/gertd/go-pluralize"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var httpParentVariable = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-parent-variable"),
 	OnlyIf: utils.IsCustomMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		p := pluralize.NewClient()
 		for _, http := range utils.GetHTTPRules(m) {
 			vars := http.GetVariables()
@@ -43,7 +43,7 @@ var httpParentVariable = &lint.MethodRule{
 
 				// Does the RPC name end in the singular or plural name of the resource?
 				// If not, complain.
-				snakeName := strcase.SnakeCase(m.GetName())
+				snakeName := strcase.SnakeCase(string(m.Name()))
 				if !strings.HasSuffix(snakeName, plural) && !strings.HasSuffix(snakeName, singular) {
 					return []lint.Problem{{
 						Message:    "The parent variable should only be used if the RPC noun matches the URI.",

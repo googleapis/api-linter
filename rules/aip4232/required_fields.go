@@ -19,25 +19,26 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // All fields annotated as REQUIRED must be in every method_signature.
 var requiredFields = &lint.MethodRule{
 	Name:   lint.NewRuleName(4232, "required-fields"),
 	OnlyIf: hasMethodSignatures,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		var problems []lint.Problem
 		sigs := utils.GetMethodSignatures(m)
-		in := m.GetInputType()
+		in := m.Input()
 
 		requiredFields := []string{}
-		for _, f := range in.GetFields() {
+		for i := 0; i < in.Fields().Len(); i++ {
+			f := in.Fields().Get(i)
 			if utils.GetFieldBehavior(f).Contains("REQUIRED") {
-				requiredFields = append(requiredFields, f.GetName())
+				requiredFields = append(requiredFields, string(f.Name()))
 			}
 		}
 		for i, sig := range sigs {

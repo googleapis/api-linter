@@ -17,7 +17,7 @@ package aip0192
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestOnlyLeadingComments(t *testing.T) {
@@ -84,7 +84,7 @@ func TestOnlyLeadingComments(t *testing.T) {
 				
 			`, test)
 			problems := onlyLeadingComments.Lint(file)
-			if diff := test.problems.SetDescriptor(file.GetMessageTypes()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Messages().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

@@ -15,20 +15,20 @@
 package aip0203
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	fpb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceNameIdentifier = &lint.MessageRule{
 	Name: lint.NewRuleName(203, "resource-name-identifier"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
-		return utils.IsResource(m) && m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m))) != nil
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		return utils.IsResource(m) && m.Fields().ByName(protoreflect.Name(utils.GetResourceNameField(utils.GetResource(m)))) != nil
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
-		f := m.FindFieldByName(utils.GetResourceNameField(utils.GetResource(m)))
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		f := m.Fields().ByName(protoreflect.Name(utils.GetResourceNameField(utils.GetResource(m))))
 		fb := utils.GetFieldBehavior(f)
 		if len(fb) == 0 || !fb.Contains(fpb.FieldBehavior_IDENTIFIER.String()) {
 			return []lint.Problem{{

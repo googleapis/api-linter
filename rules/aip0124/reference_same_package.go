@@ -17,16 +17,16 @@ package aip0124
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var referenceSamePackage = &lint.FieldRule{
 	Name:   lint.NewRuleName(124, "reference-same-package"),
 	OnlyIf: isUnknownType,
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		// Get the type we are checking for.
 		ref := utils.GetResourceReference(f)
 		urt := ref.GetType()
@@ -35,10 +35,11 @@ var referenceSamePackage = &lint.FieldRule{
 		}
 
 		// Iterate over each dependency file and check for a matching resource.
-		for _, file := range getNonPkgDependencies(f.GetFile(), f.GetFile().GetPackage()) {
+		for _, file := range getNonPkgDependencies(f.ParentFile(), f.ParentFile().Package()) {
 			// If we find a message with a resource annotation matching our universal
 			// resource type, then it is in the wrong package.
-			for _, message := range file.GetMessageTypes() {
+			for i := 0; i < file.Messages().Len(); i++ {
+				message := file.Messages().Get(i)
 				if res := utils.GetResource(message); res != nil && res.GetType() == urt {
 					return []lint.Problem{{
 						Message:    fmt.Sprintf("Resource type %q should be declared in the same package as it is referenced.", urt),
@@ -65,10 +66,10 @@ var referenceSamePackage = &lint.FieldRule{
 }
 
 // getNonPkgDependencies returns dependencies in other packages.
-func getNonPkgDependencies(file *desc.FileDescriptor, pkg string) map[string]*desc.FileDescriptor {
-	answer := map[string]*desc.FileDescriptor{}
+func getNonPkgDependencies(file protoreflect.FileDescriptor, pkg protoreflect.FullName) map[string]protoreflect.FileDescriptor {
+	answer := map[string]protoreflect.FileDescriptor{}
 	for name, dep := range utils.GetAllDependencies(file) {
-		if dep.GetPackage() != pkg {
+		if dep.Package() != pkg {
 			answer[name] = dep
 		}
 	}

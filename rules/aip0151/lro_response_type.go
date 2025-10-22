@@ -17,17 +17,17 @@ package aip0151
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/locations"
+	"github.com/googleapis/api-linter/v2/locations"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var lroResponse = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "lro-response-type"),
 	OnlyIf: isAnnotatedLRO,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		lro := utils.GetOperationInfo(m)
 
 		// Ensure the response type is set.
@@ -40,7 +40,7 @@ var lroResponse = &lint.MethodRule{
 		}
 
 		// Unless this is a Delete method, the response type should not be Empty.
-		if strings.HasPrefix(m.GetName(), "Delete") || strings.HasPrefix(m.GetName(), "BatchDelete") {
+		if strings.HasPrefix(string(m.Name()), "Delete") || strings.HasPrefix(string(m.Name()), "BatchDelete") {
 			return nil
 		}
 		if t := lro.GetResponseType(); t == "Empty" || t == "google.protobuf.Empty" {

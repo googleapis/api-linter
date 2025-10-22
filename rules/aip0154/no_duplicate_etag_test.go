@@ -17,7 +17,7 @@ package aip0154
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoDuplicateEtag(t *testing.T) {
@@ -51,8 +51,8 @@ func TestNoDuplicateEtag(t *testing.T) {
 					string etag = 2;
 				}
 			`, test)
-			m := f.GetMessageTypes()
-			if diff := test.problems.SetDescriptor(m[0].FindFieldByName("etag")).Diff(noDuplicateEtag.Lint(f)); diff != "" {
+			m := f.Messages()
+			if diff := test.problems.SetDescriptor(m.Get(0).Fields().ByName("etag")).Diff(noDuplicateEtag.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
 		})

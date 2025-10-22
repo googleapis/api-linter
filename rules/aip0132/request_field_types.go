@@ -15,12 +15,12 @@
 package aip0132
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var knownFields = map[string]func(*desc.FieldDescriptor) []lint.Problem{
+var knownFields = map[string]func(protoreflect.FieldDescriptor) []lint.Problem{
 	"filter":       utils.LintSingularStringField,
 	"order_by":     utils.LintSingularStringField,
 	"show_deleted": utils.LintSingularBoolField,
@@ -29,10 +29,13 @@ var knownFields = map[string]func(*desc.FieldDescriptor) []lint.Problem{
 // List fields should have the correct type.
 var requestFieldTypes = &lint.FieldRule{
 	Name: lint.NewRuleName(132, "request-field-types"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return utils.IsListRequestMessage(f.GetOwner()) && knownFields[f.GetName()] != nil
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return utils.IsListRequestMessage(m) && knownFields[string(f.Name())] != nil
+		}
+		return false
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		return knownFields[f.GetName()](f)
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		return knownFields[string(f.Name())](f)
 	},
 }

@@ -18,35 +18,44 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 var lroResponseReachable = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "lro-response-reachable"),
 	OnlyIf: isAnnotatedLRO,
-	LintMethod: func(m *desc.MethodDescriptor) (problems []lint.Problem) {
+	LintMethod: func(m protoreflect.MethodDescriptor) (problems []lint.Problem) {
 		return checkReachable(m, utils.GetOperationInfo(m).GetResponseType())
 	},
 }
 
-func checkReachable(m *desc.MethodDescriptor, name string) []lint.Problem {
+func checkReachable(m protoreflect.MethodDescriptor, name string) []lint.Problem {
 	// Ignore types defined in other packages.
 	if name == "" || strings.Contains(name, ".") {
 		return nil
 	}
 
 	// Make this the fully qualified type name.
-	f := m.GetFile()
-	if pkg := f.GetPackage(); pkg != "" {
-		name = pkg + "." + name
+	f := m.ParentFile()
+	if pkg := f.Package(); pkg != "" {
+		name = string(pkg) + "." + name
 	}
 
-	// If the message is defined in the file, we are good to go.
-	for _, file := range utils.GetAllDependencies(f) {
-		if file.FindMessage(name) != nil {
+	// Build a local registry.
+	files := &protoregistry.Files{}
+	for _, fd := range utils.GetAllDependencies(m.ParentFile()) {
+		// It is safe to ignore this error. If a file is already registered,
+		// it will return an error, but that is fine.
+		_ = files.RegisterFile(fd)
+	}
+
+	// If the message is defined in the registry, we are good to go.
+	if d, err := files.FindDescriptorByName(protoreflect.FullName(name)); err == nil {
+		if _, ok := d.(protoreflect.MessageDescriptor); ok {
 			return nil
 		}
 	}

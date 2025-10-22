@@ -15,33 +15,33 @@
 package aip0132
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/genproto/googleapis/api/annotations"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // List methods should reference the target resource via `child_type` or the
 // parent directly via `type`.
 var resourceReferenceType = &lint.MethodRule{
 	Name: lint.NewRuleName(132, "resource-reference-type"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
-		p := m.GetInputType().FindFieldByName("parent")
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
+		p := m.Input().Fields().ByName("parent")
 
-		var resource *annotations.ResourceDescriptor
+		var resource *apb.ResourceDescriptor
 		resourceField := utils.GetListResourceMessage(m)
 		if resourceField != nil {
 			resource = utils.GetResource(resourceField)
 		}
 		return utils.IsListMethod(m) && p != nil && utils.GetResourceReference(p) != nil && resource != nil
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// The first repeated message field must be the paginated resource.
-		repeated := utils.GetRepeatedMessageFields(m.GetOutputType())
-		resource := utils.GetResource(repeated[0].GetMessageType())
+		repeated := utils.GetRepeatedMessageFields(m.Output())
+		resource := utils.GetResource(repeated[0].Message())
 
-		parent := m.GetInputType().FindFieldByName("parent")
+		parent := m.Input().Fields().ByName("parent")
 		ref := utils.GetResourceReference(parent)
 
 		if resource.GetType() == ref.GetType() {

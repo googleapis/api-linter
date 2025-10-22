@@ -17,8 +17,7 @@ package aip0191
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc/builder"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestFilename(t *testing.T) {
@@ -46,10 +45,10 @@ func TestFilename(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := builder.NewFile(test.filename).Build()
-			if err != nil {
-				t.Fatalf("Failed to build file.")
-			}
+			files := testutils.ParseProtoStrings(t, map[string]string{
+				test.filename: "",
+			})
+			f := files[test.filename]
 			if diff := test.problems.SetDescriptor(f).Diff(filename.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

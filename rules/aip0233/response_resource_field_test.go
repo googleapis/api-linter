@@ -17,8 +17,8 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestResponseResourceField(t *testing.T) {
@@ -27,7 +27,7 @@ func TestResponseResourceField(t *testing.T) {
 		testName    string
 		Src         string
 		problems    testutils.Problems
-		problemDesc func(m *desc.MessageDescriptor) desc.Descriptor
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
 	}{
 		{
 			testName: "Valid",
@@ -43,7 +43,7 @@ func TestResponseResourceField(t *testing.T) {
 			testName: "MissingField",
 			Src:      `string response = 1;`,
 			problems: testutils.Problems{{Message: "Message \"BatchCreateBooksResponse\" has no \"Book\" type field"}},
-			problemDesc: func(m *desc.MessageDescriptor) desc.Descriptor {
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
 				return m
 			},
 		},
@@ -59,10 +59,10 @@ func TestResponseResourceField(t *testing.T) {
 				message Book {
 				}`, test)
 
-			m := file.GetMessageTypes()[0]
+			m := file.Messages().Get(0)
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor = m.GetFields()[0]
+			var problemDesc protoreflect.Descriptor = m.Fields().Get(0)
 			if test.problemDesc != nil {
 				problemDesc = test.problemDesc(m)
 			}

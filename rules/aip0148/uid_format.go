@@ -15,19 +15,18 @@
 package aip0148
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var uidFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "uid-format"),
-	OnlyIf: func(fd *desc.FieldDescriptor) bool {
-		return fd.GetType() == descriptorpb.FieldDescriptorProto_TYPE_STRING && fd.GetName() == uidStr
+	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
+		return fd.Kind() == protoreflect.StringKind && fd.Name() == uidStr
 	},
-	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		if !utils.HasFormat(fd) || utils.GetFormat(fd) != annotations.FieldInfo_UUID4 {
 			return []lint.Problem{{
 				Message:    "The `uid` field must have a `(google.api.field_info).format = UUID4` annotation.",

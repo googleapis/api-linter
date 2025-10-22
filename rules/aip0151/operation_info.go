@@ -15,15 +15,15 @@
 package aip0151
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var lroAnnotationExists = &lint.MethodRule{
 	Name:   lint.NewRuleName(151, "operation-info"),
 	OnlyIf: isLRO,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		if utils.GetOperationInfo(m) == nil {
 			return []lint.Problem{{
 				Message:    "Methods returning an LRO must include the operation_info annotation.",

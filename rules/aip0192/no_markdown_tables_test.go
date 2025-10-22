@@ -17,7 +17,7 @@ package aip0192
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNoMarkdownTables(t *testing.T) {
@@ -41,7 +41,7 @@ func TestNoMarkdownTables(t *testing.T) {
 			  // {{.Comment}}
 			  message Foo {}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			if diff := test.problems.SetDescriptor(m).Diff(noMarkdownTables.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

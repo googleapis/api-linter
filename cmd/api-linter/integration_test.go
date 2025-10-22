@@ -25,6 +25,41 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestLocationFoundWithoutSourceInfo_Fixed(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "test-source-location")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	outPath := filepath.Join(tempDir, "lint-output.yaml")
+
+	args := []string{
+		"--descriptor-set-in=internal/testdata/source_location.protoset",
+		"--disable-rule", "all",
+		"--enable-rule", "core::0140::lower-snake",
+		"-o", outPath,
+		"internal/testdata/source_location.proto",
+	}
+
+	// We run the CLI. We don't check the error because we care about the output content.
+	runCLI(args)
+
+	outBytes, readErr := os.ReadFile(outPath)
+	if readErr != nil {
+		t.Fatalf("Failed to read linter output file: %v", readErr)
+	}
+	output := string(outBytes)
+
+	// Assert that the output contains the correct line number.
+	expectedOutput := "line_number: 7"
+	if !strings.Contains(output, expectedOutput) {
+		t.Fatalf("Fix failed. Expected output to contain %q, but it didn't.\nOutput:\n%s", expectedOutput, output)
+	}
+
+	t.Log("Successfully verified the fix. Linter reports location on the correct line.")
+}
+
 // Each case must be positive when the rule in test
 // is enabled. It must also contain a "disable-me-here"
 // comment at the place where you want the rule to be
@@ -180,7 +215,7 @@ func TestBuildErrors(t *testing.T) {
 
 func TestMultipleFilesFromParentDir(t *testing.T) {
 	// This test addresses a previously found bug:
-	// https://github.com/googleapis/api-linter/issues/1465
+	// https://github.com/googleapis/api-linter/v2/issues/1465
 
 	projDir, err := os.MkdirTemp("", "proj")
 	if err != nil {
@@ -198,8 +233,8 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	// a.proto imports b.proto.
 	if err := writeFile(filepath.Join(protoDir, "a.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
-		import "grandparent/parent/b.proto";
+		package parent;
+		import "parent/b.proto";
 		message A {
 			B b_field = 1;
 		}
@@ -209,7 +244,7 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 
 	if err := writeFile(filepath.Join(protoDir, "b.proto"), `
 		syntax = "proto3";
-		package grandparent.parent;
+		package parent;
 		message B {}
 	`); err != nil {
 		t.Fatal(err)
@@ -236,6 +271,108 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	if err != nil && !errors.Is(err, ExitForLintFailure) {
 		if strings.Contains(err.Error(), "already defined") {
 			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
+	}
+}
+
+func TestImportFromAnotherRoot(t *testing.T) {
+	// This test case is based on a scenario described in:
+	// https://github.com/googleapis/api-linter/pull/1519
+	//
+	// It checks that the linter can correctly resolve imports when
+	// one import is in a directory provided by `-I` and another
+	// is relative to the working directory. i.e.
+	//
+	// .
+	// ├── api
+	// │   ├── common
+	// │   │   └── common.proto
+	// │   └── v1
+	// │       └── test.proto
+	// └── third_party
+	//     └── google
+	//         └── api
+	//             └── field_behavior.proto
+
+	projDir, err := os.MkdirTemp("", "proj")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(projDir)
+
+	// Create the subdirectory for protos.
+	apiV1Dir := filepath.Join(projDir, "api", "v1")
+	if err := os.MkdirAll(apiV1Dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	apiCommonDir := filepath.Join(projDir, "api", "common")
+	if err := os.MkdirAll(apiCommonDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	thirdPartyDir := filepath.Join(projDir, "third_party", "other", "api")
+	if err := os.MkdirAll(thirdPartyDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Write the proto files.
+	if err := writeFile(filepath.Join(apiV1Dir, "test.proto"), `
+		syntax = "proto3";
+
+		package api.v1;
+
+		import "other/api/useful.proto";
+		import "api/common/common.proto";
+
+		message Test {
+		  other.api.Bar bar = 1;
+		  api.common.Foo foo = 2;
+		}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeFile(filepath.Join(apiCommonDir, "common.proto"), `
+		syntax = "proto3";
+
+		package api.common;
+
+		message Foo {}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writeFile(filepath.Join(thirdPartyDir, "useful.proto"), `
+		syntax = "proto3";
+
+		package other.api;
+
+		message Bar{}
+	`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Change the working directory to the project root.
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(projDir); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chdir(oldWD)
+
+	args := []string{
+		"-I", "third_party",
+		filepath.Join("api", "v1", "test.proto"),
+	}
+
+	err = runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "not found") {
+			t.Errorf("Linter failed with unexpected 'file not found' error: %v", err)
 		} else {
 			t.Fatalf("Linter failed with unexpected error: %v", err)
 		}
@@ -353,4 +490,25 @@ func writeFile(path, content string) error {
 		return err
 	}
 	return os.WriteFile(path, []byte(content), 0o644)
+}
+
+func TestDeduplicatesRepeatedDescriptors_DescriptorSets(t *testing.T) {
+	args := []string{
+		"--descriptor-set-in", "internal/testdata/a.protoset",
+		"--descriptor-set-in", "internal/testdata/b.protoset",
+		"a.proto",
+		"b.proto",
+	}
+
+	err := runCLI(args)
+
+	if err != nil && !errors.Is(err, ExitForLintFailure) {
+		if strings.Contains(err.Error(), "already defined") {
+			t.Errorf("Linter failed with unexpected 'symbol already defined' error: %v", err)
+		} else if strings.Contains(err.Error(), "file appears multiple times") {
+			t.Errorf("Linter failed with unexpected 'file appears multiple times' error: %v", err)
+		} else {
+			t.Fatalf("Linter failed with unexpected error: %v", err)
+		}
+	}
 }

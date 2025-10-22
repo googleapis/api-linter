@@ -16,7 +16,7 @@
 package aip0203
 
 import (
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 // AddRules adds all of the AIP-203 rules to the provided registry.

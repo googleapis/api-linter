@@ -17,8 +17,8 @@ package aip0121
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 // TestResourceMustSupportGet tests the resourceMustSupportGet
@@ -143,7 +143,7 @@ func TestResourceMustSupportGet(t *testing.T) {
 					repeated Other others = 1;
 				 }
 			`, test)
-			s := file.GetServices()[0]
+			s := file.Services().Get(0)
 			got := resourceMustSupportGet.Lint(file)
 			if diff := test.problems.SetDescriptor(s).Diff(got); diff != "" {
 				t.Error(diff)

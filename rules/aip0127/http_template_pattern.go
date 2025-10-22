@@ -19,10 +19,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var (
@@ -45,16 +45,16 @@ type resourceReference struct {
 
 // Returns a list of resourceReferences for each variable in all the method's
 // HTTPRule's.
-func methodResourceReferences(m *desc.MethodDescriptor) []resourceReference {
+func methodResourceReferences(m protoreflect.MethodDescriptor) []resourceReference {
 	resourceRefs := []resourceReference{}
 	for _, httpRule := range utils.GetHTTPRules(m) {
-		resourceRefs = append(resourceRefs, httpResourceReferences(httpRule, m.GetInputType())...)
+		resourceRefs = append(resourceRefs, httpResourceReferences(httpRule, m.Input())...)
 	}
 	return resourceRefs
 }
 
 // Returns a resourceReference for every variable in the given HTTPRule.
-func httpResourceReferences(httpRule *utils.HTTPRule, msg *desc.MessageDescriptor) []resourceReference {
+func httpResourceReferences(httpRule *utils.HTTPRule, msg protoreflect.MessageDescriptor) []resourceReference {
 	resourceRefs := []resourceReference{}
 	for fieldPath, template := range httpRule.GetVariables() {
 		// Find the (sub-)field in the message corresponding to the variable's
@@ -99,8 +99,8 @@ func anyMatch(regex *regexp.Regexp, strs []string) bool {
 
 // Checks whether the HTTP pattern specified in `resourceRef` matches any of the
 // patterns defined for that resource.
-func checkHTTPPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resourceReference) []lint.Problem {
-	annotation := utils.FindResource(resourceRef.resourceRefName, m.GetFile())
+func checkHTTPPatternMatchesResource(m protoreflect.MethodDescriptor, resourceRef resourceReference) []lint.Problem {
+	annotation := utils.FindResource(resourceRef.resourceRefName, m.ParentFile())
 	if annotation == nil {
 		return []lint.Problem{}
 	}
@@ -120,10 +120,10 @@ func checkHTTPPatternMatchesResource(m *desc.MethodDescriptor, resourceRef resou
 
 var httpTemplatePattern = &lint.MethodRule{
 	Name: lint.NewRuleName(127, "http-template-pattern"),
-	OnlyIf: func(m *desc.MethodDescriptor) bool {
+	OnlyIf: func(m protoreflect.MethodDescriptor) bool {
 		return len(methodResourceReferences(m)) > 0
 	},
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		problems := []lint.Problem{}
 
 		resourceRefs := methodResourceReferences(m)

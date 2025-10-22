@@ -17,7 +17,7 @@ package aip0151
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestAnnotationExistsValid(t *testing.T) {
@@ -47,7 +47,7 @@ func TestAnnotationExistsInvalid(t *testing.T) {
 		message WriteBookRequest {}
 	`)
 	want := testutils.Problems{{
-		Descriptor: f.GetServices()[0].GetMethods()[0],
+		Descriptor: f.Services().Get(0).Methods().Get(0),
 		Message:    "operation_info annotation",
 	}}
 	if diff := want.Diff(lroAnnotationExists.Lint(f)); diff != "" {

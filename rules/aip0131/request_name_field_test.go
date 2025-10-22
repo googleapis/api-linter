@@ -17,7 +17,7 @@ package aip0131
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestNameFieldType(t *testing.T) {
@@ -40,7 +40,7 @@ func TestRequestNameFieldType(t *testing.T) {
 			}`, test)
 
 			problems := requestNameField.Lint(f)
-			if diff := test.problems.SetDescriptor(f.GetMessageTypes()[0].GetFields()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(f.Messages().Get(0).Fields().Get(0)).Diff(problems); diff != "" {
 				t.Errorf("Problems did not match: %v", diff)
 			}
 		})

@@ -17,7 +17,7 @@ package aip0156
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestForbiddenMethods(t *testing.T) {
@@ -47,7 +47,7 @@ func TestForbiddenMethods(t *testing.T) {
 			message {{.MethodName}}Request {}
 			message Settings{}
 		`, test)
-		method := f.GetServices()[0].GetMethods()[0]
+		method := f.Services().Get(0).Methods().Get(0)
 		problems := forbiddenMethods.Lint(f)
 		if diff := test.problems.SetDescriptor(method).Diff(problems); diff != "" {
 			t.Error(diff)

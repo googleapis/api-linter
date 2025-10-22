@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHttpVerb(t *testing.T) {
@@ -53,7 +53,7 @@ func TestHttpVerb(t *testing.T) {
 
 			// Run the method, ensure we get what we expect.
 			problems := httpVerb.Lint(file)
-			if diff := test.problems.SetDescriptor(file.GetServices()[0].GetMethods()[0]).Diff(problems); diff != "" {
+			if diff := test.problems.SetDescriptor(file.Services().Get(0).Methods().Get(0)).Diff(problems); diff != "" {
 				t.Error(diff)
 			}
 		})

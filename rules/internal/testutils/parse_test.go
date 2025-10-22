@@ -18,7 +18,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestParseProtoStrings(t *testing.T) {
@@ -37,30 +37,30 @@ func TestParseProtoStrings(t *testing.T) {
 			google.protobuf.Timestamp create_time = 3;
 		}
 	`})["test.proto"]
-	if !fd.IsProto3() {
+	if fd.Syntax() != protoreflect.Proto3 {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
 	tests := []struct {
 		name       string
-		descriptor desc.Descriptor
+		descriptor protoreflect.Descriptor
 	}{
-		{"Foo", fd.GetMessageTypes()[0]},
-		{"bar", fd.GetMessageTypes()[0].GetFields()[0]},
-		{"baz", fd.GetMessageTypes()[0].GetFields()[1]},
-		{"Spam", fd.GetMessageTypes()[1]},
-		{"eggs", fd.GetMessageTypes()[1].GetFields()[0]},
-		{"create_time", fd.GetMessageTypes()[1].GetFields()[1]},
+		{"Foo", fd.Messages().Get(0)},
+		{"bar", fd.Messages().Get(0).Fields().Get(0)},
+		{"baz", fd.Messages().Get(0).Fields().Get(1)},
+		{"Spam", fd.Messages().Get(1)},
+		{"eggs", fd.Messages().Get(1).Fields().Get(0)},
+		{"create_time", fd.Messages().Get(1).Fields().Get(1)},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if got, want := test.descriptor.GetName(), test.name; got != want {
+			if got, want := string(test.descriptor.Name()), test.name; got != want {
 				t.Errorf("Got %q, expected %q.", got, want)
 			}
 		})
 	}
 }
 
-func TestParseProtoStringError(t *testing.T) {
+func TestParseProtoStringsError(t *testing.T) {
 	canary := &testing.T{}
 
 	// t.Fatalf will exit the goroutine, so to test this,
@@ -83,6 +83,68 @@ func TestParseProtoStringError(t *testing.T) {
 	}
 }
 
+func TestParseProtoString(t *testing.T) {
+	fd := ParseProtoString(t, `
+		syntax = "proto3";
+
+		import "google/protobuf/timestamp.proto";
+
+		message Foo {
+			int32 bar = 1;
+			int64 baz = 2;
+		}
+
+		message Spam {
+			string eggs = 2;
+			google.protobuf.Timestamp create_time = 3;
+		}
+	`)
+	if fd.Syntax() != protoreflect.Proto3 {
+		t.Errorf("Expected a proto3 file descriptor.")
+	}
+	tests := []struct {
+		name       string
+		descriptor protoreflect.Descriptor
+	}{
+		{"Foo", fd.Messages().Get(0)},
+		{"bar", fd.Messages().Get(0).Fields().Get(0)},
+		{"baz", fd.Messages().Get(0).Fields().Get(1)},
+		{"Spam", fd.Messages().Get(1)},
+		{"eggs", fd.Messages().Get(1).Fields().Get(0)},
+		{"create_time", fd.Messages().Get(1).Fields().Get(1)},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got, want := string(test.descriptor.Name()), test.name; got != want {
+				t.Errorf("Got %q, expected %q.", got, want)
+			}
+		})
+	}
+}
+
+func TestParseProtoStringError(t *testing.T) {
+	canary := &testing.T{}
+
+	// t.Fatalf will exit the goroutine, so to test this,
+	// we run the test in a different goroutine.
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ParseProtoString(canary, `
+			syntax = "proto3";
+			message Foo {}
+			The quick brown fox jumped over the lazy dogs.
+		`)
+	}()
+	wg.Wait()
+
+	// Verify that the testing.T object was given a failure.
+	if !canary.Failed() {
+		t.Errorf("Expected syntax error to cause a fatal error.")
+	}
+}
+
 func TestParseProto3String(t *testing.T) {
 	fd := ParseProto3String(t, `
 		message Foo {
@@ -94,7 +156,7 @@ func TestParseProto3String(t *testing.T) {
 			string eggs = 2;
 		}
 	`)
-	if !fd.IsProto3() {
+	if fd.Syntax() != protoreflect.Proto3 {
 		t.Errorf("Expected a proto3 file descriptor.")
 	}
 }
@@ -116,15 +178,15 @@ func TestParseProto3Tmpl(t *testing.T) {
 					string {{.Field2Name}} = 2;
 				}
 			`, test)
-			if !fd.IsProto3() {
+			if fd.Syntax() != protoreflect.Proto3 {
 				t.Errorf("Expected a proto3 file descriptor.")
 			}
-			msg := fd.GetMessageTypes()[0]
-			if got, want := msg.GetName(), test.MessageName; got != want {
+			msg := fd.Messages().Get(0)
+			if got, want := string(msg.Name()), test.MessageName; got != want {
 				t.Errorf("Got %q for message name, expected %q.", got, want)
 			}
 			for i, fn := range []string{test.Field1Name, test.Field2Name} {
-				if got, want := msg.GetFields()[i].GetName(), fn; got != want {
+				if got, want := string(msg.Fields().Get(i).Name()), fn; got != want {
 					t.Errorf("Got %q for field name %d; expected %q.", got, i+1, want)
 				}
 			}

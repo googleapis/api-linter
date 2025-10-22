@@ -17,7 +17,7 @@ package aip0233
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResponseMessageName(t *testing.T) {
@@ -70,7 +70,7 @@ func TestResponseMessageName(t *testing.T) {
 				message {{.Response}}{}
 				`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services().Get(0).Methods().Get(0)
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
@@ -123,7 +123,7 @@ func TestLongRunningResponse(t *testing.T) {
 				message BatchCreateBooksResponse{}
 				`, test)
 
-			m := file.GetServices()[0].GetMethods()[0]
+			m := file.Services().Get(0).Methods().Get(0)
 
 			problems := responseMessageName.Lint(file)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {

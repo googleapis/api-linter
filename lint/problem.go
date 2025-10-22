@@ -17,7 +17,7 @@ package lint
 import (
 	"encoding/json"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -44,11 +44,11 @@ type Problem struct {
 	//
 	// If `Location` is not specified, then the starting location of
 	// the descriptor is used as the location of the problem.
-	Descriptor desc.Descriptor
+	Descriptor protoreflect.Descriptor
 
 	// Location provides the location of the problem.
 	//
-	// If unset, this defaults to the value of `Descriptor.GetSourceInfo()`.
+	// If unset, the location of the descriptor is used.
 	// This should almost always be set if `Suggestion` is set. The best way to
 	// do this is by using the helper methods in `location.go`.
 	Location *dpb.SourceCodeInfo_Location
@@ -76,11 +76,29 @@ func (p Problem) MarshalYAML() (interface{}, error) {
 
 // Marshal defines how to represent a serialized Problem.
 func (p Problem) marshal() interface{} {
-	// The descriptor is always set, and location may be set.
-	// If they are both set, prefer the location.
-	loc := p.Location
-	if loc == nil && p.Descriptor != nil {
-		loc = p.Descriptor.GetSourceInfo()
+	var fl fileLocation
+	if p.Location != nil {
+		// If Location is set, use it.
+		fl = fileLocationFromPBLocation(p.Location, p.Descriptor)
+	} else if p.Descriptor != nil {
+		// Otherwise, use the descriptor's location.
+		// This is the protobuf-go idiomatic way to get the source location.
+		// Note: ParentFile() called on a FileDescriptor returns itself.
+		loc := p.Descriptor.ParentFile().SourceLocations().ByDescriptor(p.Descriptor)
+		fl = fileLocation{
+			Path: p.Descriptor.ParentFile().Path(),
+			Start: position{
+				Line:   loc.StartLine + 1,
+				Column: loc.StartColumn + 1,
+			},
+			End: position{
+				Line:   loc.EndLine + 1,
+				Column: loc.EndColumn,
+			},
+		}
+	} else {
+		// Default location if no descriptor.
+		fl = fileLocationFromPBLocation(nil, nil)
 	}
 
 	// Return a marshal-able structure.
@@ -94,7 +112,7 @@ func (p Problem) marshal() interface{} {
 	}{
 		p.Message,
 		p.Suggestion,
-		fileLocationFromPBLocation(loc, p.Descriptor),
+		fl,
 		p.RuleID,
 		p.GetRuleURI(),
 		p.category,
@@ -125,7 +143,7 @@ type fileLocation struct {
 
 // fileLocationFromPBLocation returns a new fileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
-func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descriptor) fileLocation {
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
 	if l != nil {
@@ -134,7 +152,7 @@ func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d desc.Descripto
 
 	var fl fileLocation
 	if d != nil {
-		fl = fileLocation{Path: d.GetFile().GetName()}
+		fl = fileLocation{Path: d.ParentFile().Path()}
 	}
 
 	// If `span` has four ints; they correspond to

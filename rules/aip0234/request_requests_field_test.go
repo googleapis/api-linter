@@ -17,8 +17,8 @@ package aip0234
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func TestRequestRequestsField(t *testing.T) {
@@ -73,11 +73,11 @@ func TestRequestRequestsField(t *testing.T) {
 				`, test)
 
 			// Determine the descriptor that a failing test will attach to.
-			var problemDesc desc.Descriptor
-			if requests := file.GetMessageTypes()[0].FindFieldByName("requests"); requests != nil {
+			var problemDesc protoreflect.Descriptor
+			if requests := file.Messages().Get(0).Fields().ByName("requests"); requests != nil {
 				problemDesc = requests
 			} else {
-				problemDesc = file.GetMessageTypes()[0]
+				problemDesc = file.Messages().Get(0)
 			}
 
 			problems := requestRequestsField.Lint(file)

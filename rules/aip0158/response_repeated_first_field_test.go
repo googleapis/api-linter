@@ -17,7 +17,7 @@ package aip0158
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestResponseRepeatedFirstField(t *testing.T) {
@@ -46,8 +46,8 @@ func TestResponseRepeatedFirstField(t *testing.T) {
 			`, test)
 
 			// Determine the descriptor that a failing test will attach to.
-			if m := f.GetMessageTypes()[1]; len(m.GetFields()) > 0 {
-				test.problems.SetDescriptor(m.GetFields()[0])
+			if m := f.Messages().Get(1); m.Fields().Len() > 0 {
+				test.problems.SetDescriptor(m.Fields().Get(0))
 			}
 
 			// Run the lint rule and establish we get the correct problems.

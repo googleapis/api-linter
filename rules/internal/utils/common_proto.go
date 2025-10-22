@@ -17,12 +17,12 @@ package utils
 import (
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // IsCommonProto returns true if a proto file is considered "common".
-func IsCommonProto(f *desc.FileDescriptor) bool {
-	p := f.GetPackage()
+func IsCommonProto(f protoreflect.FileDescriptor) bool {
+	p := string(f.Package())
 	for _, prefix := range []string{"google.api", "google.protobuf", "google.rpc", "google.longrunning"} {
 		if strings.HasPrefix(p, prefix) {
 			return true

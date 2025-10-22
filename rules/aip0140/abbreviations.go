@@ -18,12 +18,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var expectedAbbreviations = map[string]string{
@@ -36,7 +36,7 @@ var expectedAbbreviations = map[string]string{
 
 var abbreviations = &lint.DescriptorRule{
 	Name: lint.NewRuleName(140, "abbreviations"),
-	LintDescriptor: func(d desc.Descriptor) (problems []lint.Problem) {
+	LintDescriptor: func(d protoreflect.Descriptor) (problems []lint.Problem) {
 		// Determine the correct case function to use.
 		// Most things in protobuf are PascalCase; the two exceptions are
 		// fields (snake case) and enum values (UPPER_CAMEL_CASE).
@@ -45,16 +45,16 @@ var abbreviations = &lint.DescriptorRule{
 		// we are checking for single words only.
 		var caseFunc func(string) string = cases.Title(language.AmericanEnglish).String
 		switch d.(type) {
-		case *desc.FieldDescriptor:
+		case protoreflect.FieldDescriptor:
 			caseFunc = strings.ToLower
-		case *desc.EnumValueDescriptor:
+		case protoreflect.EnumValueDescriptor:
 			caseFunc = strings.ToUpper
 		}
 
 		// Iterate over each abbreviation and determine whether the descriptor's
 		// name includes the long name.
 		for long, short := range expectedAbbreviations {
-			for _, segment := range strings.Split(strcase.SnakeCase(d.GetName()), "_") {
+			for _, segment := range strings.Split(strcase.SnakeCase(string(d.Name())), "_") {
 				if segment == long {
 					problems = append(problems, lint.Problem{
 						Message: fmt.Sprintf(
@@ -62,7 +62,7 @@ var abbreviations = &lint.DescriptorRule{
 							caseFunc(short),
 							caseFunc(long),
 						),
-						Suggestion: strings.ReplaceAll(d.GetName(), caseFunc(long), caseFunc(short)),
+						Suggestion: strings.ReplaceAll(string(d.Name()), caseFunc(long), caseFunc(short)),
 						Descriptor: d,
 						Location:   locations.DescriptorName(d),
 					})

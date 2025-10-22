@@ -16,17 +16,16 @@ package utils
 
 import (
 	"regexp"
+	"strings"
 
-	"github.com/jhump/protoreflect/desc"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // HasHTTPRules returns true when the given method descriptor is annotated with
 // a google.api.http option.
-func HasHTTPRules(m *desc.MethodDescriptor) bool {
-	got := proto.GetExtension(m.GetMethodOptions(), apb.E_Http).(*apb.HttpRule)
-	return got != nil
+func HasHTTPRules(m protoreflect.MethodDescriptor) bool {
+	return m.Options().ProtoReflect().Has(apb.E_Http.TypeDescriptor())
 }
 
 // GetHTTPRules returns a slice of HTTP rules for a given method descriptor.
@@ -35,21 +34,26 @@ func HasHTTPRules(m *desc.MethodDescriptor) bool {
 // and then flattens the values in `additional_bindings`.
 // This allows rule authors to simply range over all of the HTTP rules,
 // since the common case is to want to apply the checks to all of them.
-func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
+func GetHTTPRules(m protoreflect.MethodDescriptor) []*HTTPRule {
 	rules := []*HTTPRule{}
-
-	// Get the method options.
-	opts := m.GetMethodOptions()
+	opts := m.Options()
+	if !opts.ProtoReflect().Has(apb.E_Http.TypeDescriptor()) {
+		return rules
+	}
 
 	// Get the "primary" rule (the direct google.api.http annotation).
-	if x := proto.GetExtension(opts, apb.E_Http); x != nil {
-		httpRule := x.(*apb.HttpRule)
-		if parsedRule := parseRule(httpRule); parsedRule != nil {
-			rules = append(rules, parsedRule)
+	ext := opts.ProtoReflect().Get(apb.E_Http.TypeDescriptor()).Message()
+	if parsedRule := parseRule(ext); parsedRule != nil {
+		rules = append(rules, parsedRule)
+	}
 
-			// Add any additional bindings and flatten them into `rules`.
-			for _, binding := range httpRule.GetAdditionalBindings() {
-				rules = append(rules, parseRule(binding))
+	// Add any additional bindings.
+	additionalBindingsDesc := ext.Descriptor().Fields().ByName("additional_bindings")
+	if additionalBindingsDesc != nil {
+		bindings := ext.Get(additionalBindingsDesc).List()
+		for i := 0; i < bindings.Len(); i++ {
+			if parsedRule := parseRule(bindings.Get(i).Message()); parsedRule != nil {
+				rules = append(rules, parsedRule)
 			}
 		}
 	}
@@ -58,31 +62,46 @@ func GetHTTPRules(m *desc.MethodDescriptor) []*HTTPRule {
 	return rules
 }
 
-func parseRule(rule *apb.HttpRule) *HTTPRule {
-	oneof := map[string]string{
-		"GET":    rule.GetGet(),
-		"POST":   rule.GetPost(),
-		"PUT":    rule.GetPut(),
-		"PATCH":  rule.GetPatch(),
-		"DELETE": rule.GetDelete(),
-	}
-	if custom := rule.GetCustom(); custom != nil {
-		oneof[custom.GetKind()] = custom.GetPath()
-	}
-	for method, uri := range oneof {
-		if uri != "" {
-			return &HTTPRule{
-				Method:       method,
-				URI:          uri,
-				Body:         rule.GetBody(),
-				ResponseBody: rule.GetResponseBody(),
+func parseRule(rule protoreflect.Message) *HTTPRule {
+	var method, uri, body, responseBody string
+	rule.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		switch fd.Name() {
+		case "body":
+			body = v.String()
+		case "response_body":
+			responseBody = v.String()
+		case "get", "put", "post", "delete", "patch":
+			if v.String() != "" {
+				method = strings.ToUpper(string(fd.Name()))
+				uri = v.String()
 			}
+		case "custom":
+			custom := v.Message()
+			custom.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+				switch fd.Name() {
+				case "kind":
+					method = v.String()
+				case "path":
+					uri = v.String()
+				}
+				return true
+			})
+		}
+		return true
+	})
+
+	if uri != "" {
+		return &HTTPRule{
+			Method:       method,
+			URI:          uri,
+			Body:         body,
+			ResponseBody: responseBody,
 		}
 	}
 	return nil
 }
 
-// HTTPRule defines a parsed, easier-to-query equivalent to `apb.HttpRule`.
+// HTTPRule defines a parsed, easier-to-query equivalent to `annotations.HttpRule`.
 type HTTPRule struct {
 	// The HTTP method. Guaranteed to be in all caps.
 	// This is set to "CUSTOM" if the Custom property is set.

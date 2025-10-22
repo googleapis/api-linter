@@ -15,15 +15,18 @@
 package aip0235
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var requestNamesReference = &lint.FieldRule{
 	Name: lint.NewRuleName(235, "request-names-reference"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return isBatchDeleteRequestMessage(f.GetOwner()) && f.GetName() == "names"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
+			return isBatchDeleteRequestMessage(m) && f.Name() == "names"
+		}
+		return false
 	},
 	LintField: utils.LintFieldResourceReference,
 }

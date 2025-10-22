@@ -15,19 +15,19 @@
 package aip0203
 
 import (
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var resourceIdentifierOnly = &lint.FieldRule{
 	Name: lint.NewRuleName(203, "resource-identifier-only"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		return utils.GetFieldBehavior(f).Contains("IDENTIFIER")
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		m := f.GetParent().(*desc.MessageDescriptor)
-		if nf := utils.GetResourceNameField(utils.GetResource(m)); utils.IsResource(m) && f.GetName() == nf {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		m := f.Parent().(protoreflect.MessageDescriptor)
+		if nf := utils.GetResourceNameField(utils.GetResource(m)); utils.IsResource(m) && string(f.Name()) == nf {
 			return nil
 		}
 

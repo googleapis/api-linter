@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
@@ -43,7 +43,7 @@ func TestGetHTTPRules(t *testing.T) {
 			`, struct{ M string }{M: strings.ToLower(method)})
 
 			// Get the rules.
-			resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0])
+			resp := GetHTTPRules(file.Services().Get(0).Methods().Get(0))
 
 			// Establish that we get back both HTTP rules, in order.
 			if got, want := resp[0].URI, "/v1/publishers/*/books/*"; got != want {
@@ -70,14 +70,14 @@ func TestGetHTTPRulesEmpty(t *testing.T) {
 		message FrobBookRequest {}
 		message FrobBookResponse {}
 	`)
-	if resp := GetHTTPRules(file.GetServices()[0].GetMethods()[0]); len(resp) > 0 {
+	if resp := GetHTTPRules(file.Services().Get(0).Methods().Get(0)); len(resp) > 0 {
 		t.Errorf("Got %v; expected no rules.", resp)
 	}
 }
 
 func TestParseRuleEmpty(t *testing.T) {
 	http := &apb.HttpRule{}
-	if got := parseRule(http); got != nil {
+	if got := parseRule(http.ProtoReflect()); got != nil {
 		t.Errorf("Got %v, expected nil.", got)
 	}
 }
@@ -98,7 +98,7 @@ func TestGetHTTPRulesCustom(t *testing.T) {
 		message FrobBookRequest {}
 		message FrobBookResponse {}
 	`)
-	rule := GetHTTPRules(file.GetServices()[0].GetMethods()[0])[0]
+	rule := GetHTTPRules(file.Services().Get(0).Methods().Get(0))[0]
 	if got, want := rule.Method, "HEAD"; got != want {
 		t.Errorf("Got %q; expected %q.", got, want)
 	}
@@ -160,7 +160,7 @@ func TestHasHTTPRules(t *testing.T) {
 		t.Run(tst.name, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
-					
+
 				service Foo {
 					rpc ListFoos (ListFoosRequest) returns (ListFoosResponse) {
 						{{ .Annotation }}
@@ -172,7 +172,7 @@ func TestHasHTTPRules(t *testing.T) {
 			`, tst)
 			want := tst.Annotation != ""
 
-			got := HasHTTPRules(file.GetServices()[0].GetMethods()[0])
+			got := HasHTTPRules(file.Services().Get(0).Methods().Get(0))
 
 			if got != want {
 				t.Errorf("Got %v, expected %v", got, want)

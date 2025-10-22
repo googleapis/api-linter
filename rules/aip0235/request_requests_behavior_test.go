@@ -17,7 +17,7 @@ package aip0235
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestRequestsBehavior(t *testing.T) {
@@ -40,7 +40,7 @@ func TestRequestRequestsBehavior(t *testing.T) {
 					repeated string {{.FieldName}} = 1{{.FieldBehavior}};
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(requestRequestsBehavior.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

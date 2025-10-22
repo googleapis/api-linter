@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
+	"github.com/googleapis/api-linter/v2/lint"
 )
 
 // formatGitHubActionOutput returns lint errors in GitHub actions format.

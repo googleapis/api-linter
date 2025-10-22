@@ -19,19 +19,19 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/data"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/data"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noPrepositions = &lint.FieldRule{
 	Name: lint.NewRuleName(140, "prepositions"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return !stringset.New("order_by", "group_by", "hour_of_day", "day_of_week").Contains(f.GetName())
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return !stringset.New("order_by", "group_by", "hour_of_day", "day_of_week").Contains(string(f.Name()))
 	},
-	LintField: func(f *desc.FieldDescriptor) (problems []lint.Problem) {
-		for _, word := range strings.Split(f.GetName(), "_") {
+	LintField: func(f protoreflect.FieldDescriptor) (problems []lint.Problem) {
+		for _, word := range strings.Split(string(f.Name()), "_") {
 			if data.Prepositions.Contains(word) {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Avoid using %q in field names.", word),

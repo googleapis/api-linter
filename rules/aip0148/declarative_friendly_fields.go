@@ -19,20 +19,20 @@ import (
 	"strings"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var declarativeFriendlyRequired = &lint.MessageRule{
 	Name: lint.NewRuleName(148, "declarative-friendly-fields"),
-	OnlyIf: func(m *desc.MessageDescriptor) bool {
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
 		if resource := utils.DeclarativeFriendlyResource(m); resource == m {
 			return true
 		}
 		return false
 	},
-	LintMessage: func(m *desc.MessageDescriptor) []lint.Problem {
+	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		singleton := utils.IsSingletonResource(m)
 		// Define the fields that are expected.
 		missingFields := stringset.New()
@@ -40,7 +40,7 @@ var declarativeFriendlyRequired = &lint.MessageRule{
 			if singleton && singletonExceptions.Contains(name) {
 				continue
 			}
-			f := m.FindFieldByName(name)
+			f := m.Fields().ByName(protoreflect.Name(name))
 			if f == nil || utils.GetTypeName(f) != typ {
 				missingFields.Add(fmt.Sprintf("%s %s", typ, name))
 			}

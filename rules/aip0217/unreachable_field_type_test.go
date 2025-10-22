@@ -17,7 +17,7 @@ package aip0217
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestUnreachableFieldType(t *testing.T) {
@@ -41,7 +41,7 @@ func TestUnreachableFieldType(t *testing.T) {
 				message ErrorMetadata {}
 				message Book {}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[2]
+			field := f.Messages().Get(0).Fields().Get(2)
 			if diff := test.problems.SetDescriptor(field).Diff(unreachableFieldType.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

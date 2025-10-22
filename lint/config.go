@@ -136,7 +136,9 @@ func (c Config) matchPath(path string) bool {
 }
 
 func matchPath(path string, pathPatterns ...string) bool {
+	path = filepath.ToSlash(path)
 	for _, pattern := range pathPatterns {
+		pattern = filepath.ToSlash(pattern)
 		if matched, _ := doublestar.Match(pattern, path); matched {
 			return true
 		}

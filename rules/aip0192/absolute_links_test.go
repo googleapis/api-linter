@@ -17,7 +17,7 @@ package aip0192
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestAbsoluteLinks(t *testing.T) {
@@ -35,7 +35,7 @@ func TestAbsoluteLinks(t *testing.T) {
 			  // This is [a link]({{.URI}}).
 				message Foo {}
 			`, test)
-			m := f.GetMessageTypes()[0]
+			m := f.Messages().Get(0)
 			problems := absoluteLinks.Lint(f)
 			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
 				t.Error(diff)

@@ -17,7 +17,7 @@ package aip0123
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestNameNeverOptional(t *testing.T) {
@@ -46,7 +46,7 @@ func TestNameNeverOptional(t *testing.T) {
 					{{.Label}} string {{.FieldName}} = 1;
 				}
 			`, test)
-			field := f.GetMessageTypes()[0].GetFields()[0]
+			field := f.Messages().Get(0).Fields().Get(0)
 			if diff := test.problems.SetDescriptor(field).Diff(nameNeverOptional.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -17,7 +17,7 @@ package aip0231
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHttpUrl(t *testing.T) {
@@ -47,7 +47,7 @@ func TestHttpUrl(t *testing.T) {
 				message {{.MethodName}}Request {}
 				message {{.MethodName}}Response {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(uriSuffix.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

@@ -17,16 +17,16 @@ package aip0162
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var rollbackResponseMessageName = &lint.MethodRule{
 	Name:   lint.NewRuleName(162, "rollback-response-message-name"),
 	OnlyIf: utils.IsRollbackRevisionMethod,
-	LintMethod: func(m *desc.MethodDescriptor) []lint.Problem {
+	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		// Rule check: Establish that for methods such as `RollbackBook`, the response
 		// message is `Book`.
 		want, ok := utils.ExtractRevisionResource(m)
@@ -37,7 +37,7 @@ var rollbackResponseMessageName = &lint.MethodRule{
 		if response == nil {
 			return nil
 		}
-		got := response.GetName()
+		got := string(response.Name())
 		loc := locations.MethodResponseType(m)
 		suggestion := want
 

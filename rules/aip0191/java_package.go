@@ -18,18 +18,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 var javaPackage = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-package"),
-	OnlyIf: func(f *desc.FileDescriptor) bool {
-		return hasPackage(f) && !strings.HasSuffix(f.GetPackage(), ".master")
+	OnlyIf: func(f protoreflect.FileDescriptor) bool {
+		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
 	},
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		javaPkg := f.GetFileOptions().GetJavaPackage()
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
+		javaPkg := f.Options().(*dpb.FileOptions).GetJavaPackage()
 		if javaPkg == "" {
 			return []lint.Problem{{
 				Message:    "Proto files must set `option java_package`.",
@@ -37,10 +38,10 @@ var javaPackage = &lint.FileRule{
 				Location:   locations.FilePackage(f),
 			}}
 		}
-		if !strings.HasSuffix(javaPkg, f.GetPackage()) {
+		if !strings.HasSuffix(javaPkg, string(f.Package())) {
 			return []lint.Problem{{
 				Message:    "The Java Package should mirror the proto package.",
-				Suggestion: fmt.Sprintf(`option java_package = "com.%s";`, f.GetPackage()),
+				Suggestion: fmt.Sprintf(`option java_package = "com.%s";`, f.Package()),
 				Descriptor: f,
 				Location:   locations.FileJavaPackage(f),
 			}}

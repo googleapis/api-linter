@@ -17,19 +17,19 @@ package aip0154
 import (
 	"fmt"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldType = &lint.FieldRule{
 	Name: lint.NewRuleName(154, "field-type"),
-	OnlyIf: func(f *desc.FieldDescriptor) bool {
-		return f.GetName() == "etag"
+	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
+		return string(f.Name()) == "etag"
 	},
-	LintField: func(f *desc.FieldDescriptor) []lint.Problem {
-		if t := utils.GetTypeName(f); t != "string" || f.IsRepeated() {
+	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
+		if t := utils.GetTypeName(f); t != "string" || f.IsList() {
 			return []lint.Problem{{
 				Message:    fmt.Sprintf("The etag field should be a singular string, not %s.", t),
 				Descriptor: f,

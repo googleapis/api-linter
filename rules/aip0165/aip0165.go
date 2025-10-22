@@ -18,8 +18,8 @@ package aip0165
 import (
 	"regexp"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // AddRules adds all of the AIP-165 rules to the provided registry.
@@ -52,16 +52,16 @@ var (
 )
 
 // Returns true if this is a AIP-165 Purge method, false otherwise.
-func isPurgeMethod(m *desc.MethodDescriptor) bool {
-	return purgeMethodRegexp.MatchString(m.GetName())
+func isPurgeMethod(m protoreflect.MethodDescriptor) bool {
+	return purgeMethodRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-165 Purge request message, false otherwise.
-func isPurgeRequestMessage(m *desc.MessageDescriptor) bool {
-	return purgeReqMessageRegexp.MatchString(m.GetName())
+func isPurgeRequestMessage(m protoreflect.MessageDescriptor) bool {
+	return purgeReqMessageRegexp.MatchString(string(m.Name()))
 }
 
 // Returns true if this is an AIP-165 Purge response message, false otherwise.
-func isPurgeResponseMessage(m *desc.MessageDescriptor) bool {
-	return purgeRespMessageRegexp.MatchString(m.GetName())
+func isPurgeResponseMessage(m protoreflect.MessageDescriptor) bool {
+	return purgeRespMessageRegexp.MatchString(string(m.Name()))
 }

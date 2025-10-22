@@ -17,7 +17,7 @@ package aip0135
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestHttpNameField(t *testing.T) {
@@ -48,7 +48,7 @@ func TestHttpNameField(t *testing.T) {
 				message Book {}
 				message {{.MethodName}}Request {}
 			`, test)
-			method := f.GetServices()[0].GetMethods()[0]
+			method := f.Services().Get(0).Methods().Get(0)
 			if diff := test.problems.SetDescriptor(method).Diff(httpNameField.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

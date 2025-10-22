@@ -17,7 +17,7 @@ package aip0133
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestRequestIDField(t *testing.T) {
@@ -53,7 +53,7 @@ func TestRequestIDField(t *testing.T) {
 					Book book = 3;
 				}
 			`, test)
-			m := f.FindMessage("CreateBookRequest")
+			m := f.Messages().ByName("CreateBookRequest")
 			if diff := test.problems.SetDescriptor(m).Diff(requestIDField.Lint(f)); diff != "" {
 				t.Error(diff)
 			}

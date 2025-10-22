@@ -17,7 +17,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/googleapis/api-linter/rules/internal/testutils"
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestGetTypeName(t *testing.T) {
@@ -32,7 +32,7 @@ func TestGetTypeName(t *testing.T) {
 					FORMAT_UNSPECIFIED = 0;
 				}
 			`, struct{ Type string }{ty})
-			field := file.GetMessageTypes()[0].GetFields()[0]
+			field := file.Messages().Get(0).Fields().Get(0)
 			if got, want := GetTypeName(field), ty; got != want {
 				t.Errorf("Got %q, expected %q.", got, want)
 			}

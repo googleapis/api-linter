@@ -18,11 +18,10 @@ import (
 	"fmt"
 
 	"bitbucket.org/creachadair/stringset"
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	apb "google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var stringOnlyFormats = stringset.New(
@@ -34,10 +33,10 @@ var stringOnlyFormats = stringset.New(
 
 var stringOnlyFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(202, "string-only-format"),
-	OnlyIf: func(fd *desc.FieldDescriptor) bool {
-		return utils.HasFormat(fd) && fd.GetType() != descriptorpb.FieldDescriptorProto_TYPE_STRING
+	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
+		return utils.HasFormat(fd) && fd.Kind() != protoreflect.StringKind
 	},
-	LintField: func(fd *desc.FieldDescriptor) []lint.Problem {
+	LintField: func(fd protoreflect.FieldDescriptor) []lint.Problem {
 		// Field being linted is not a string, check that it isn't using a string-only format.
 		if format := utils.GetFormat(fd).String(); stringOnlyFormats.Contains(format) {
 			return []lint.Problem{{

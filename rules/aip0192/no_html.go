@@ -17,18 +17,18 @@ package aip0192
 import (
 	"regexp"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var noHTML = &lint.DescriptorRule{
 	Name: lint.NewRuleName(192, "no-html"),
-	OnlyIf: func(d desc.Descriptor) bool {
-		return d.GetSourceInfo() != nil
+	OnlyIf: func(d protoreflect.Descriptor) bool {
+		return len(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments) > 0
 	},
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
-		for _, comment := range utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments()).External {
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
+		for _, comment := range utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments).External {
 			if htmlTag.MatchString(comment) {
 				return []lint.Problem{{
 					Message:    "Comments must not include raw HTML.",

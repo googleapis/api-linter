@@ -17,16 +17,16 @@ package aip0192
 import (
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/rules/internal/utils"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var deprecatedComment = &lint.DescriptorRule{
 	Name:   lint.NewRuleName(192, "deprecated-comment"),
 	OnlyIf: isDeprecated,
-	LintDescriptor: func(d desc.Descriptor) []lint.Problem {
-		comment := utils.SeparateInternalComments(d.GetSourceInfo().GetLeadingComments())
+	LintDescriptor: func(d protoreflect.Descriptor) []lint.Problem {
+		comment := utils.SeparateInternalComments(d.ParentFile().SourceLocations().ByDescriptor(d).LeadingComments)
 		if len(comment.External) > 0 && strings.HasPrefix(comment.External[0], "Deprecated:") {
 			return nil
 		}

@@ -18,15 +18,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/googleapis/api-linter/lint"
-	"github.com/googleapis/api-linter/locations"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/locations"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var filename = &lint.FileRule{
 	Name: lint.NewRuleName(191, "filenames"),
-	LintFile: func(f *desc.FileDescriptor) []lint.Problem {
-		fn := strings.ReplaceAll(filepath.Base(f.GetName()), ".proto", "")
+	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
+		fn := strings.ReplaceAll(filepath.Base(string(f.Path())), ".proto", "")
 		if versionRegexp.MatchString(fn) {
 			return []lint.Problem{{
 				Message:    "The proto version must not be used as the filename.",
