@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.0.0](https://github.com/googleapis/api-linter/compare/v1.72.0...v2.0.0) (2025-10-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **lint:** migrate to protobuf-go
+* **locations:** migrate to protobuf-go
+* **internal:** migrate to protobuf-go
+* **rules:** migrate to protobuf-go
+* **cli:** migrate to protobuf-go
+* refactor api-linter framework with google.golang.org/protobuf ([#1513](https://github.com/googleapis/api-linter/issues/1513))
+
+### Features
+
+* **AIP-133:** allow view field in create request ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **AIP-134:** allow view field in update request ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **AIP-135:** allow view field in delete request ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **cli:** migrate to protobuf-go ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **internal:** migrate to protobuf-go ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **lint:** migrate to protobuf-go ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **locations:** migrate to protobuf-go ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* refactor api-linter framework with google.golang.org/protobuf ([#1513](https://github.com/googleapis/api-linter/issues/1513)) ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **rules:** migrate to protobuf-go ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+
+
+### Bug Fixes
+
+* **cli:** allow disabling all rules and then enabling a single rule, or multiple rules ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **cli:** resolve import path resolution ([#1545](https://github.com/googleapis/api-linter/issues/1545)) ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+* **lint:** linter config on windows ([#1551](https://github.com/googleapis/api-linter/issues/1551)) ([42e6805](https://github.com/googleapis/api-linter/commit/42e68051f30e8f22897849632d7851fa61cd064d))
+
 ## [1.72.0](https://github.com/googleapis/api-linter/compare/v1.71.0...v1.72.0) (2025-10-16)
 
 
