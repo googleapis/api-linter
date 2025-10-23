@@ -6,25 +6,25 @@ comments.
 
 ## CLI flag
 
-We can disable a rule using the `-disable-rule` flag.
+We can disable a rule using the `--disable-rule` flag.
 
 Example:
 
 Disable the rule `core::0140::lower-snake`:
 
 ```sh
-api-linter -disable-rule core::0140::lower-snake test.proto
+api-linter --disable-rule core::0140::lower-snake test.proto
 ```
 
 To disable multiple rules, specify the flag multiple times respectively:
 
 ```sh
-api-linter -disable-rule core::0140::lower-snake -disable-rule core::0131::request-name-field test.proto
+api-linter --disable-rule core::0140::lower-snake --disable-rule core::0131::request-name-field test.proto
 ```
 
 ## Configuration file
 
-The linter accepts a configuration file using the `-config` CLI switch.
+The linter accepts a configuration file using the `---config` CLI switch.
 
 Examples:
 
