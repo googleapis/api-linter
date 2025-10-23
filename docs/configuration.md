@@ -6,7 +6,7 @@ comments.
 
 ## CLI flag
 
-We can disable a rule using the `-disable-rule` flag.
+We can disable a rule using the `--disable-rule` flag.
 
 Example:
 
@@ -24,7 +24,7 @@ api-linter --disable-rule core::0140::lower-snake --disable-rule core::0131::req
 
 ## Configuration file
 
-The linter accepts a configuration file using the `-config` CLI switch.
+The linter accepts a configuration file using the `---config` CLI switch.
 
 Examples:
 
