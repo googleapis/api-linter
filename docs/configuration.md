@@ -19,7 +19,7 @@ api-linter --disable-rule core::0140::lower-snake test.proto
 To disable multiple rules, specify the flag multiple times respectively:
 
 ```sh
-api-linter --disable-rule core::0140::lower-snake -disable-rule core::0131::request-name-field test.proto
+api-linter --disable-rule core::0140::lower-snake --disable-rule core::0131::request-name-field test.proto
 ```
 
 ## Configuration file
