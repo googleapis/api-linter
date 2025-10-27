@@ -4,7 +4,8 @@ go 1.24.0
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.12
-	cloud.google.com/go/longrunning v0.6.7
+	cloud.google.com/go/iam v1.5.3
+	cloud.google.com/go/longrunning v0.7.0
 	github.com/bmatcuk/doublestar/v4 v4.9.1
 	github.com/bufbuild/protocompile v0.14.1
 	github.com/gertd/go-pluralize v0.2.1
@@ -13,18 +14,18 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.7
 	github.com/stoewer/go-strcase v1.3.1
-	golang.org/x/text v0.28.0
-	google.golang.org/genproto v0.0.0-20250811230008-5f3141c8851a
-	google.golang.org/genproto/googleapis/api v0.0.0-20250811230008-5f3141c8851a
-	google.golang.org/protobuf v1.36.7
+	golang.org/x/text v0.29.0
+	google.golang.org/genproto v0.0.0-20251022142026-3a174f9686a8
+	google.golang.org/genproto/googleapis/api v0.0.0-20251014184007-4626949a642f
+	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	golang.org/x/net v0.42.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
-	google.golang.org/grpc v1.74.2 // indirect
+	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251014184007-4626949a642f // indirect
+	google.golang.org/grpc v1.75.1 // indirect
 )

@@ -30,6 +30,7 @@ import (
 	// These imports cause the common protos to be registered with
 	// the protocol buffer registry, and therefore make the call to
 	// `proto.FileDescriptor` work for the imported files.
+	_ "cloud.google.com/go/iam/apiv1/iampb"
 	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	_ "google.golang.org/genproto/googleapis/api/httpbody"

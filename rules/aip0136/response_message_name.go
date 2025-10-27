@@ -40,6 +40,11 @@ var responseMessageName = &lint.MethodRule{
 		// Reference of the input type's `name` field. This guidance is documented
 		// in https://google.aip.dev/136#resource-based-custom-methods
 
+		// SetIamPolicy is a special case since Policy isn't an annotated resource.
+		if m.Name() == "SetIamPolicy" && m.Output().FullName() == "google.iam.v1.Policy" {
+			return nil
+		}
+
 		// Short-circuit: Output type has `Response` suffix
 		suffixFindings := utils.LintMethodHasMatchingResponseName(m)
 		if len(suffixFindings) == 0 {

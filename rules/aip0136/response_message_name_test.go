@@ -56,6 +56,25 @@ func TestResponseMessageName(t *testing.T) {
 		}
 	})
 
+	t.Run("IAM Policy exception", func(t *testing.T) {
+		file := testutils.ParseProto3Tmpl(t, `
+			package test;
+			import "google/api/resource.proto";
+			import "google/iam/v1/policy.proto";
+
+			service Library {
+				rpc SetIamPolicy(SetIamPolicyRequest) returns (google.iam.v1.Policy);
+			}
+
+			message SetIamPolicyRequest {}
+			`, nil)
+		method := file.Services().Get(0).Methods().Get(0)
+		problems := responseMessageName.Lint(file)
+		if diff := (testutils.Problems{}).SetDescriptor(method).Diff(problems); diff != "" {
+			t.Error(diff)
+		}
+	})
+
 	t.Run("Response Suffix - LRO", func(t *testing.T) {
 		// Set up the testing permutations.
 		tests := []struct {
