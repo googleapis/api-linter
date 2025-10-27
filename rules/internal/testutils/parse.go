@@ -30,13 +30,13 @@ import (
 	// These imports cause the common protos to be registered with
 	// the protocol buffer registry, and therefore make the call to
 	// `proto.FileDescriptor` work for the imported files.
+	_ "cloud.google.com/go/iam/apiv1/iampb"
 	_ "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	_ "google.golang.org/genproto/googleapis/api/httpbody"
 	_ "google.golang.org/genproto/googleapis/type/date"
 	_ "google.golang.org/genproto/googleapis/type/datetime"
 	_ "google.golang.org/genproto/googleapis/type/timeofday"
-	_ "google.golang.org/genproto/googleapis/iam/v1"
 )
 
 // ParseProtoStrings parses a map representing a proto files, and returns
