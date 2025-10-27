@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.1](https://github.com/googleapis/api-linter/compare/v2.0.0...v2.0.1) (2025-10-27)
+
+
+### Bug Fixes
+
+* **aip-136:** Allow SetIamPolicy method ([#1559](https://github.com/googleapis/api-linter/issues/1559)) ([7afac03](https://github.com/googleapis/api-linter/commit/7afac0398be3d57ab52189c413e5daab513934a8))
+
+
+### Documentation
+
+* fix missing "-" on  disable rule command and config command ([#1557](https://github.com/googleapis/api-linter/issues/1557)) ([28f0707](https://github.com/googleapis/api-linter/commit/28f070770cd023b80741747f518dab10cc9f7465))
+
 ## [2.0.0](https://github.com/googleapis/api-linter/compare/v1.72.0...v2.0.0) (2025-10-22)
 
 
