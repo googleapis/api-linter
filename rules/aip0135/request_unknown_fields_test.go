@@ -39,6 +39,8 @@ func TestUnknownFields(t *testing.T) {
 			Message: "Unexpected field",
 		}}},
 		{"Irrelevant", "RemoveBookRequest", "application_id", builder.FieldTypeString(), testutils.Problems{}},
+		{"ValidView", "DeleteBookRequest", "view", builder.FieldTypeEnum(builder.NewEnum("BookView").AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))), testutils.Problems{}},
+		{"SuffixedView", "DeleteBookRequest", "custom_view", builder.FieldTypeEnum(builder.NewEnum("BookView").AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))), testutils.Problems{}},
 	}
 
 	// Run each test individually.
