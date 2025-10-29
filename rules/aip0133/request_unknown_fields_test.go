@@ -75,6 +75,28 @@ func TestUnknownFields(t *testing.T) {
 			nil,
 		},
 		{
+			"ViewField",
+			"CreateBookRequest",
+			[]field{{"view", builder.FieldTypeEnum(
+				builder.NewEnum("BookView").
+					AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_FULL")))}},
+			testutils.Problems{},
+			nil,
+		},
+		{
+			"SuffixedViewField",
+			"CreateBookRequest",
+			[]field{{"book_view", builder.FieldTypeEnum(
+				builder.NewEnum("BookView").
+					AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_FULL")))}},
+			testutils.Problems{},
+			nil,
+		},
+		{
 			"Invalid",
 			"CreateBookRequest",
 			[]field{{"name", builder.FieldTypeString()}},

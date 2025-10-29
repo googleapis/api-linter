@@ -16,6 +16,7 @@ package aip0134
 
 import (
 	"fmt"
+	"strings"
 
 	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/lint"
@@ -36,9 +37,10 @@ var unknownFields = &lint.MessageRule{
 			"request_id",                    // AIP-155
 			"update_mask",                   // AIP-134
 			"validate_only",                 // AIP-163
+			"view",                          // AIP-157
 		)
 		for _, field := range m.GetFields() {
-			if !allowedFields.Contains(field.GetName()) {
+			if !allowedFields.Contains(field.GetName()) && !strings.HasSuffix(string(field.GetName()), "_view") {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Update RPCs must only contain fields explicitly described in AIPs, not %q.",

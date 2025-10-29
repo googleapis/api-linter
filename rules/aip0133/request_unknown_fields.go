@@ -37,6 +37,7 @@ var unknownFields = &lint.MessageRule{
 			"parent":        nil, // AIP-133
 			"request_id":    nil, // AIP-155
 			"validate_only": nil, // AIP-163
+			"view":          nil, // AIP-157
 			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))): nil,
 		}
 
@@ -46,7 +47,7 @@ var unknownFields = &lint.MessageRule{
 				continue
 			}
 			// Check the remaining fields.
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+			if _, ok := allowedFields[string(field.GetName())]; !ok && !strings.HasSuffix(string(field.GetName()), "_view") {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Create RPCs must only contain fields explicitly described in AIPs, not %q.",

@@ -16,6 +16,7 @@ package aip0135
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/googleapis/api-linter/lint"
 	"github.com/googleapis/api-linter/rules/internal/utils"
@@ -35,9 +36,10 @@ var unknownFields = &lint.MessageRule{
 			"etag":          {}, // AIP-154
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
+			"view":          {}, // AIP-157
 		}
 		for _, field := range m.GetFields() {
-			if _, ok := allowedFields[string(field.GetName())]; !ok {
+			if _, ok := allowedFields[string(field.GetName())]; !ok && !strings.HasSuffix(string(field.GetName()), "_view") {
 				problems = append(problems, lint.Problem{
 					Message: fmt.Sprintf(
 						"Unexpected field: Delete RPCs must only contain fields explicitly described in AIPs, not %q.",
