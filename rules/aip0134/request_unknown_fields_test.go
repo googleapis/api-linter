@@ -67,12 +67,20 @@ func TestUnknownFields(t *testing.T) {
 			"View",
 			"UpdateBigBookRequest",
 			"view",
-			builder.FieldTypeEnum(builder.NewEnum("BigBookView").AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))),
+			builder.FieldTypeEnum(
+				builder.NewEnum("BigBookView").
+					AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))),
 			testutils.Problems{},
 		},
 		{
 			"SuffixedView", "UpdateBigBookRequest", "custom_view",
-			builder.FieldTypeEnum(builder.NewEnum("BigBookView").AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))),
+			builder.FieldTypeEnum(
+				builder.NewEnum("BigBookView").
+					AddValue(builder.NewEnumValue("BOOK_VIEW_UNSPECIFIED")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_BASIC")).
+					AddValue(builder.NewEnumValue("BOOK_VIEW_FULL"))),
 			testutils.Problems{},
 		},
 	}
