@@ -37,7 +37,7 @@ var synonyms = &lint.MethodRule{
 				synLen := len(syn)
 				nameLen := len(name)
 				// Check for word boundary: either exact match or next char is uppercase
-				if nameLen == synLen || (nameLen > synLen && unicode.IsUpper(rune(name[synLen]))) {
+				if nameLen == synLen || unicode.IsUpper(rune(name[synLen])) {
 					return []lint.Problem{{
 						Message: fmt.Sprintf(
 							`%q can be a synonym for "Update". Should this be a Update method?`,
