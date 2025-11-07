@@ -17,6 +17,7 @@ package aip0134
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
@@ -34,7 +35,7 @@ var synonyms = &lint.MethodRule{
 		for _, syn := range []string{"Patch", "Put", "Set"} {
 			if strings.HasPrefix(name, syn) {
 				// Check for word boundary: either exact match or next char is uppercase
-				if len(name) == len(syn) || (len(name) > len(syn) && name[len(syn)] >= 'A' && name[len(syn)] <= 'Z') {
+				if len(name) == len(syn) || (len(name) > len(syn) && unicode.IsUpper(rune(name[len(syn)]))) {
 					return []lint.Problem{{
 						Message: fmt.Sprintf(
 							`%q can be a synonym for "Update". Should this be a Update method?`,
