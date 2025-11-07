@@ -33,15 +33,18 @@ var synonyms = &lint.MethodRule{
 		name := string(m.Name())
 		for _, syn := range []string{"Patch", "Put", "Set"} {
 			if strings.HasPrefix(name, syn) {
-				return []lint.Problem{{
-					Message: fmt.Sprintf(
-						`%q can be a synonym for "Update". Should this be a Update method?`,
-						syn,
-					),
-					Descriptor: m,
-					Location:   locations.DescriptorName(m),
-					Suggestion: strings.Replace(name, syn, "Update", 1),
-				}}
+				// Check for word boundary: either exact match or next char is uppercase
+				if len(name) == len(syn) || (len(name) > len(syn) && name[len(syn)] >= 'A' && name[len(syn)] <= 'Z') {
+					return []lint.Problem{{
+						Message: fmt.Sprintf(
+							`%q can be a synonym for "Update". Should this be a Update method?`,
+							syn,
+						),
+						Descriptor: m,
+						Location:   locations.DescriptorName(m),
+						Suggestion: strings.Replace(name, syn, "Update", 1),
+					}}
+				}
 			}
 		}
 		return nil
