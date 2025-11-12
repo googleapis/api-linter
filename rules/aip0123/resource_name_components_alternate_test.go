@@ -30,6 +30,9 @@ func TestResourceNameComponentsAlternate(t *testing.T) {
 		{"ValidSingleton", "user/{user}/config", testutils.Problems{}},
 		{"InvalidDoubleCollection", "author/books/{book}", testutils.Problems{{Message: "must alternate"}}},
 		{"InvalidDoubleIdentifier", "books/{author}/{book}", testutils.Problems{{Message: "must alternate"}}},
+		{"InvalidPrefixedSingleVariable", "nonCollectionPrefix/projects/{project}", testutils.Problems{{Message: "must alternate"}}},
+		{"InvalidPrefixedChildCollection", "nonCollectionPrefix/projects/{project}/locations/{location}", testutils.Problems{{Message: "must alternate"}}},
+		{"InvalidPrefixedSingleton", "nonCollectionPrefix/projects/{project}/config", testutils.Problems{{Message: "must alternate"}}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
