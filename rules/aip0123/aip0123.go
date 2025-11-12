@@ -115,7 +115,7 @@ func getParentIDVariable(pattern string) string {
 		return variables[len(variables)-1]
 	}
 
-	// If there are fewer than 2 variables, there is no parent ID variable.
+	// If there are fewer than 2 variables for a non-singleton resource, there is no parent ID variable.
 	// This can happen with invalid patterns like "prefix/collection/{id}",
 	// which will be caught by the resource-name-components-alternate rule.
 	if len(variables) < 2 {
