@@ -251,7 +251,7 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 				t.Fatalf("Error building test file: %q", err)
 			}
 			if got, want := ruleIsEnabled(test.rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
-				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+				t.Errorf("Expected the bar field to return %v from ruleIsEnabled; got %v", want, got)
 			}
 		})
 	}
