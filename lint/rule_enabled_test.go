@@ -197,9 +197,15 @@ func TestRuleIsEnabledParent(t *testing.T) {
 }
 
 func TestRuleIsEnabledDeprecated(t *testing.T) {
-	// Create a rule that we can check enabled status on.
-	rule := &FieldRule{
+	// Create a generalRule that we can check enabled status on.
+	generalRule := &FieldRule{
 		Name: RuleName("test"),
+		LintField: func(f protoreflect.FieldDescriptor) []Problem {
+			return nil
+		},
+	}
+	deprecationRule := &FieldRule{
+		Name: RuleName("core::0192::deprecated-comment"),
 		LintField: func(f protoreflect.FieldDescriptor) []Problem {
 			return nil
 		},
@@ -207,14 +213,16 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 
 	for _, test := range []struct {
 		name            string
+		rule            ProtoRule
 		msgDeprecated   bool
 		fieldDeprecated bool
 		enabled         bool
 	}{
-		{"Both", true, true, false},
-		{"Message", true, false, false},
-		{"Field", false, true, false},
-		{"Neither", false, false, true},
+		{"Both", generalRule, true, true, false},
+		{"Message", generalRule, true, false, false},
+		{"Field", generalRule, false, true, false},
+		{"Neither", generalRule, false, false, true},
+		{"DeprecationRule", deprecationRule, false, true, true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			// Build a proto with a message and field, possibly deprecated.
@@ -242,8 +250,8 @@ func TestRuleIsEnabledDeprecated(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Error building test file: %q", err)
 			}
-			if got, want := ruleIsEnabled(rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
-				t.Errorf("Expected the foo field to return %v from ruleIsEnabled; got %v", want, got)
+			if got, want := ruleIsEnabled(test.rule, f.Messages().Get(0).Fields().Get(0), nil, nil, false), test.enabled; got != want {
+				t.Errorf("Expected the bar field to return %v from ruleIsEnabled; got %v", want, got)
 			}
 		})
 	}

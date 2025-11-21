@@ -25,8 +25,18 @@ import (
 // disabled, because they are scoped to a very specific set of AIPs.
 var defaultDisabledRules = []string{"cloud"}
 
-// Disable all rules for deprecated descriptors.
-func disableDeprecated(d protoreflect.Descriptor) bool {
+// deprecationRules are rules specifically designed to lint deprecated elements.
+var deprecationRules = []string{"core::0192::deprecated-comment"}
+
+// Disable rules for deprecated descriptors, except for those designed to lint
+// deprecated descriptors.
+func disableDeprecated(d protoreflect.Descriptor, rule string) bool {
+	// Exception to rule, because it is designed to be applied to deprecated
+	// elements.
+	if matchRule(rule, deprecationRules...) {
+		return false
+	}
+
 	switch v := d.(type) {
 	case protoreflect.EnumDescriptor:
 		return v.Options().(*dpb.EnumOptions).GetDeprecated()
@@ -56,7 +66,7 @@ func disableDeprecated(d protoreflect.Descriptor) bool {
 //	func init() {
 //	  descriptorDisableChecks = append(descriptorDisableChecks, disableForInternalReason)
 //	}
-var descriptorDisableChecks = []func(d protoreflect.Descriptor) bool{
+var descriptorDisableChecks = []func(d protoreflect.Descriptor, rule string) bool{
 	disableDeprecated,
 }
 
@@ -72,7 +82,7 @@ func ruleIsEnabled(rule ProtoRule, d protoreflect.Descriptor, l *dpb.SourceCodeI
 	for _, mustDisable := range descriptorDisableChecks {
 		// The only thing the disable functions can do is force a rule to
 		// be disabled. (They can not force a rule to be enabled.)
-		if mustDisable(d) {
+		if mustDisable(d, string(rule.GetName())) {
 			return false
 		}
 	}
