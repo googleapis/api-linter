@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.0.1](https://github.com/googleapis/api-linter/compare/v2.0.0...v2.0.1) (2025-11-21)
+
+
+### Bug Fixes
+
+* **aip-0134:** check word boundaries in synonyms rule ([#1564](https://github.com/googleapis/api-linter/issues/1564)) ([f10744f](https://github.com/googleapis/api-linter/commit/f10744f099a53c208666e7c3aa2d52267ea3d19d))
+* **AIP-123:** prevent panic in getParentIDVariable with single-variable patterns ([#1565](https://github.com/googleapis/api-linter/issues/1565)) ([a09770e](https://github.com/googleapis/api-linter/commit/a09770e532ab276aeff0c4f92712442b155b8c68))
+* **aip-136:** Allow SetIamPolicy method ([#1559](https://github.com/googleapis/api-linter/issues/1559)) ([7afac03](https://github.com/googleapis/api-linter/commit/7afac0398be3d57ab52189c413e5daab513934a8))
+* **lint:** allow deprecation rule on deprecated descriptor ([#1570](https://github.com/googleapis/api-linter/issues/1570)) ([f89a1b8](https://github.com/googleapis/api-linter/commit/f89a1b82679a90aa5765be6c9a267704604994f5))
+
+
+### Documentation
+
+* fix missing "-" on  disable rule command and config command ([#1557](https://github.com/googleapis/api-linter/issues/1557)) ([28f0707](https://github.com/googleapis/api-linter/commit/28f070770cd023b80741747f518dab10cc9f7465))
+
 ## [2.0.0](https://github.com/googleapis/api-linter/compare/v1.72.0...v2.0.0) (2025-10-22)
 
 
