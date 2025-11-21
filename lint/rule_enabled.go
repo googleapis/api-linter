@@ -25,12 +25,15 @@ import (
 // disabled, because they are scoped to a very specific set of AIPs.
 var defaultDisabledRules = []string{"cloud"}
 
+// deprecationRules are rules specifically designed to lint deprecated elements.
+var deprecationRules = []string{"core::0192::deprecated-comment"}
+
 // Disable rules for deprecated descriptors, except for those designed to lint
 // deprecated descriptors.
 func disableDeprecated(d protoreflect.Descriptor, rule string) bool {
 	// Exception to rule, because it is designed to be applied to deprecated
 	// elements.
-	if matchRule(rule, "core::0192::deprecated-comment") {
+	if matchRule(rule, deprecationRules...) {
 		return false
 	}
 
