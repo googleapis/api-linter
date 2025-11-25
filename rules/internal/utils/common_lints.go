@@ -260,7 +260,7 @@ func LintHTTPURIHasNameVariable(m protoreflect.MethodDescriptor) []lint.Problem 
 
 // LintPluralMethodName checks that a collection-based method uses the plural form of the
 // resource type, or noun if response does not have a resource, being operated on.
-// If first checks if the response has a repeated resource field with `plural` defined.
+// It first checks if the response has a repeated resource field with `plural` defined.
 // If not, it attempts to check the plurality of the noun portion of the method name.
 func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.Problem {
 	var want string
