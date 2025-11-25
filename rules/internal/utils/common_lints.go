@@ -275,14 +275,14 @@ func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.P
 			continue
 		}
 
-		m := f.Message()
-		if !IsResource(m) {
-			continue
-		}
-		if p := GetResourcePlural(GetResource(m)); p != "" {
-			want = strcase.UpperCamelCase(p)
-			break
-		}
+    		msg := f.Message()
+    		if !IsResource(msg) {
+    			continue
+    		}
+    		if p := GetResourcePlural(GetResource(msg)); p != "" {
+    			want = strcase.UpperCamelCase(p)
+    			break
+    		}
 	}
 
 	pluralMethodResourceName := strings.TrimPrefix(string(m.Name()), verb)
