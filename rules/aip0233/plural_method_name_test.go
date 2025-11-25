@@ -23,41 +23,53 @@ import (
 func TestMethodPluralResourceName(t *testing.T) {
 	// Set up the testing permutations.
 	tests := []struct {
-		testName   string
-		MethodName string
-		URISuffix  string
-		problems   testutils.Problems
+		testName      string
+		MethodName    string
+		URISuffix     string
+		ResponseItems string
+		problems      testutils.Problems
 	}{
 		{
-			testName:   "Valid-BatchCreateBooks",
-			MethodName: "BatchCreateBooks",
-			URISuffix:  "books:batchCreate",
-			problems:   testutils.Problems{},
+			testName:      "Valid-BatchCreateBooks",
+			MethodName:    "BatchCreateBooks",
+			URISuffix:     "books:batchCreate",
+			ResponseItems: "repeated Book books = 1;",
+			problems:      testutils.Problems{},
 		},
 		{
-			testName:   "Valid-BatchCreateMen",
-			MethodName: "BatchCreateMen",
-			URISuffix:  "men:batchCreate",
-			problems:   testutils.Problems{},
+			testName:      "Valid-BatchCreateMen",
+			MethodName:    "BatchCreateMen",
+			URISuffix:     "men:batchCreate",
+			ResponseItems: "repeated Other men = 1;",
+			problems:      testutils.Problems{},
 		},
 		{
-			testName:   "Invalid-SingularBus",
-			MethodName: "BatchCreateBus",
-			URISuffix:  "bus:batchCreate",
+			testName:      "ValidBatchCreateTitles-NonMessageItems",
+			MethodName:    "BatchCreateTitles",
+			URISuffix:     "titles:batchCreate",
+			ResponseItems: "repeated string titles = 1;",
+			problems:      testutils.Problems{},
+		},
+		{
+			testName:      "Invalid-SingularBus",
+			MethodName:    "BatchCreateBus",
+			URISuffix:     "bus:batchCreate",
+			ResponseItems: "repeated Other buses = 1;",
 			problems: testutils.Problems{{
 				Suggestion: "BatchCreateBuses",
 			}},
 		},
 		{
-			testName:   "Invalid-SingularCorpPerson",
-			MethodName: "BatchCreateCorpPerson",
-			URISuffix:  "corpPerson:batchCreate",
+			testName:      "Invalid-SingularCorpPerson",
+			MethodName:    "BatchCreateCorpPerson",
+			URISuffix:     "corpPerson:batchCreate",
+			ResponseItems: "repeated Other corp_people = 1;",
 			problems: testutils.Problems{{
 				Suggestion: "BatchCreateCorpPeople",
 			}},
 		},
 		{
-			testName:   "Invalid-Irrelevant",
+			testName:   "Skip-NotBatchCreate",
 			MethodName: "AcquireBook",
 			URISuffix:  "book",
 			problems:   testutils.Problems{},
@@ -69,6 +81,7 @@ func TestMethodPluralResourceName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
 
 				service BookService {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
@@ -81,7 +94,20 @@ func TestMethodPluralResourceName(t *testing.T) {
 
 				message {{.MethodName}}Request {}
 
-				message {{.MethodName}}Response{}
+				message {{.MethodName}}Response {
+					{{ .ResponseItems }}
+				}
+
+				message Book {
+				  option (google.api.resource) = {
+				    type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+					singular: "book"
+					plural: "books"
+				  };
+				}
+
+				message Other {}
 				`, test)
 
 			m := file.Services().Get(0).Methods().Get(0)

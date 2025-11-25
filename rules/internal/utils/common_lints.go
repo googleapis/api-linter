@@ -16,9 +16,12 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/stoewer/go-strcase"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -254,6 +257,56 @@ func LintHTTPURIVariableCount(m protoreflect.MethodDescriptor, n int) []lint.Pro
 // have a name variable in the URI.
 func LintHTTPURIHasNameVariable(m protoreflect.MethodDescriptor) []lint.Problem {
 	return LintHTTPURIHasVariable(m, "name")
+}
+
+// LintPluralMethodName checks that a collection-based method uses the plural form of the
+// resource type, or noun if response does not have a resource, being operated on.
+// If first checks if the response has a repeated resource field with `plural` defined.
+// If not, it attempts to check the plurality of the noun portion of the method name.
+func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.Problem {
+	var want string
+
+	// First attempt to base the pluralization on the `plural` defined in
+	// the `google.api.resource` in the response, if present.
+	rf := GetResponseType(m).Fields()
+	for i := 0; i < rf.Len(); i++ {
+		f := rf.Get(i)
+		if f.Cardinality() != protoreflect.Repeated || f.Kind() != protoreflect.MessageKind {
+			continue
+		}
+
+		m := f.Message()
+		if !IsResource(m) {
+			continue
+		}
+		if p := GetResourcePlural(GetResource(m)); p != "" {
+			want = strcase.UpperCamelCase(p)
+			break
+		}
+	}
+
+	pluralMethodResourceName := strings.TrimPrefix(string(m.Name()), verb)
+	notPlural := pluralMethodResourceName != want
+
+	if want == "" {
+		pluralize := pluralize.NewClient()
+		notPlural = !pluralize.IsPlural(pluralMethodResourceName)
+		want = pluralize.Plural(pluralMethodResourceName)
+	}
+
+	if notPlural {
+		return []lint.Problem{{
+			Message: fmt.Sprintf(
+				`The resource part in method %q should not be %q, but should be its plural form %q`,
+				m.Name(), pluralMethodResourceName, want,
+			),
+			Descriptor: m,
+			Location:   locations.DescriptorName(m),
+			Suggestion: verb + want,
+		}}
+	}
+
+	return nil
 }
 
 func max(x, y int) int {
