@@ -267,20 +267,22 @@ func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.P
 
 	// First attempt to base the pluralization on the `plural` defined in
 	// the `google.api.resource` in the response, if present.
-	rf := GetResponseType(m).Fields()
-	for i := 0; i < rf.Len(); i++ {
-		f := rf.Get(i)
-		if f.Cardinality() != protoreflect.Repeated || f.Kind() != protoreflect.MessageKind {
-			continue
-		}
+	if rt := GetResponseType(m); rt != nil {
+		rf := rt.Fields()
+		for i := 0; i < rf.Len(); i++ {
+			f := rf.Get(i)
+			if f.Cardinality() != protoreflect.Repeated || f.Kind() != protoreflect.MessageKind {
+				continue
+			}
 
-		msg := f.Message()
-		if !IsResource(msg) {
-			continue
-		}
-		if p := GetResourcePlural(GetResource(msg)); p != "" {
-			want = strcase.UpperCamelCase(p)
-			break
+			msg := f.Message()
+			if !IsResource(msg) {
+				continue
+			}
+			if p := GetResourcePlural(GetResource(msg)); p != "" {
+				want = strcase.UpperCamelCase(p)
+				break
+			}
 		}
 	}
 
