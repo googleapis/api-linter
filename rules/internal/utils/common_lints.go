@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
@@ -275,14 +274,14 @@ func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.P
 			continue
 		}
 
-    		msg := f.Message()
-    		if !IsResource(msg) {
-    			continue
-    		}
-    		if p := GetResourcePlural(GetResource(msg)); p != "" {
-    			want = strcase.UpperCamelCase(p)
-    			break
-    		}
+		msg := f.Message()
+		if !IsResource(msg) {
+			continue
+		}
+		if p := GetResourcePlural(GetResource(msg)); p != "" {
+			want = strcase.UpperCamelCase(p)
+			break
+		}
 	}
 
 	pluralMethodResourceName := strings.TrimPrefix(string(m.Name()), verb)
