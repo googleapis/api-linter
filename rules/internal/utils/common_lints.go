@@ -286,12 +286,12 @@ func LintPluralMethodName(m protoreflect.MethodDescriptor, verb string) []lint.P
 	}
 
 	pluralMethodResourceName := strings.TrimPrefix(string(m.Name()), verb)
-	notPlural := pluralMethodResourceName != want
-
-	if want == "" {
-		pluralize := pluralize.NewClient()
-		notPlural = !pluralize.IsPlural(pluralMethodResourceName)
-		want = pluralize.Plural(pluralMethodResourceName)
+	var notPlural bool
+	if want != "" {
+		notPlural = pluralMethodResourceName != want
+	} else {
+		notPlural = !pluralizeClient.IsPlural(pluralMethodResourceName)
+		want = pluralizeClient.Plural(pluralMethodResourceName)
 	}
 
 	if notPlural {
