@@ -15,7 +15,7 @@ name repeatable field as a first field, as mandated in [AIP-158][].
 
 ## Details
 
-This rule looks at any response message  that has `next_page_token`
+This rule looks at any response message that has `next_page_token`
 field and complains if the first field's name is not plural.
 
 
