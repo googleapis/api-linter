@@ -311,3 +311,98 @@ func TestLintNotOneof(t *testing.T) {
 		})
 	}
 }
+
+func TestLintPluralMethodName(t *testing.T) {
+	// Set up the testing permutations.
+	tests := []struct {
+		testName       string
+		prefix         string
+		MethodName     string
+		CollectionName string
+		ResponseItems  string
+		problems       testutils.Problems
+	}{
+		{
+			testName:       "ValidBatchGetBooks",
+			prefix:         "BatchGet",
+			MethodName:     "BatchGetBooks",
+			CollectionName: "books",
+			ResponseItems:  "repeated Book books = 1;",
+			problems:       testutils.Problems{},
+		},
+		{
+			testName:       "ValidBatchGetMen",
+			prefix:         "BatchGet",
+			MethodName:     "BatchGetMen",
+			CollectionName: "men",
+			ResponseItems:  "repeated Other men = 1;",
+			problems:       testutils.Problems{},
+		},
+		{
+			testName:       "ValidBatchGetNames-NonMessageItems",
+			prefix:         "BatchGet",
+			MethodName:     "BatchGetNames",
+			CollectionName: "names",
+			ResponseItems:  "repeated string names = 1;",
+			problems:       testutils.Problems{},
+		},
+		{
+			testName:       "InvalidSingularBus",
+			prefix:         "BatchGet",
+			MethodName:     "BatchGetBus",
+			CollectionName: "buses",
+			ResponseItems:  "repeated Other buses = 1;",
+			problems:       testutils.Problems{{Message: "Buses", Suggestion: "BatchGetBuses"}},
+		},
+		{
+			testName:       "Invalid-SingularCorpPerson",
+			prefix:         "BatchGet",
+			MethodName:     "BatchGetCorpPerson",
+			CollectionName: "corpPerson",
+			ResponseItems:  "repeated Other corp_people = 1;",
+			problems:       testutils.Problems{{Message: "CorpPeople", Suggestion: "BatchGetCorpPeople"}},
+		},
+	}
+
+	// Run each test individually.
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
+
+				service Test {
+					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
+						option (google.api.http) = {
+							get: "/v1/{parent=publishers/*}/{{.CollectionName}}:batchGet"
+						};
+					}
+				}
+
+				message {{.MethodName}}Request {}
+
+				message {{.MethodName}}Response {
+					{{ .ResponseItems }}
+				}
+
+				message Book {
+				  option (google.api.resource) = {
+				    type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+					singular: "book"
+					plural: "books"
+				  };
+				}
+
+				message Other {}
+			`, test)
+
+			m := file.Services().Get(0).Methods().Get(0)
+
+			problems := LintPluralMethodName(m, test.prefix)
+			if diff := test.problems.SetDescriptor(m).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

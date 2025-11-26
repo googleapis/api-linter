@@ -26,36 +26,49 @@ func TestPluralMethodResourceName(t *testing.T) {
 		testName       string
 		MethodName     string
 		CollectionName string
+		ResponseItems  string
 		problems       testutils.Problems
 	}{
 		{
 			testName:       "ValidBatchGetBooks",
 			MethodName:     "BatchGetBooks",
 			CollectionName: "books",
+			ResponseItems:  "repeated Book books = 1;",
 			problems:       testutils.Problems{},
 		},
 		{
 			testName:       "ValidBatchGetMen",
 			MethodName:     "BatchGetMen",
 			CollectionName: "men",
+			ResponseItems:  "repeated Other men = 1;",
+			problems:       testutils.Problems{},
+		},
+		{
+			testName:       "ValidBatchGetNames-NonMessageItems",
+			MethodName:     "BatchGetNames",
+			CollectionName: "names",
+			ResponseItems:  "repeated string names = 1;",
 			problems:       testutils.Problems{},
 		},
 		{
 			testName:       "InvalidSingularBus",
 			MethodName:     "BatchGetBus",
 			CollectionName: "buses",
-			problems:       testutils.Problems{{Message: "Buses"}},
+			ResponseItems:  "repeated Other buses = 1;",
+			problems:       testutils.Problems{{Message: "Buses", Suggestion: "BatchGetBuses"}},
 		},
 		{
 			testName:       "Invalid-SingularCorpPerson",
 			MethodName:     "BatchGetCorpPerson",
 			CollectionName: "corpPerson",
-			problems:       testutils.Problems{{Message: "CorpPeople"}},
+			ResponseItems:  "repeated Other corp_people = 1;",
+			problems:       testutils.Problems{{Message: "CorpPeople", Suggestion: "BatchGetCorpPeople"}},
 		},
 		{
-			testName:       "Invalid-Irrelevant",
+			testName:       "Skip-NotBatchGet",
 			MethodName:     "GetBook",
 			CollectionName: "books",
+			ResponseItems:  "Book book = 1;",
 			problems:       testutils.Problems{},
 		},
 	}
@@ -65,6 +78,7 @@ func TestPluralMethodResourceName(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
 				import "google/api/annotations.proto";
+				import "google/api/resource.proto";
 
 				service Test {
 					rpc {{.MethodName}}({{.MethodName}}Request) returns ({{.MethodName}}Response) {
@@ -76,7 +90,20 @@ func TestPluralMethodResourceName(t *testing.T) {
 
 				message {{.MethodName}}Request {}
 
-				message {{.MethodName}}Response {}
+				message {{.MethodName}}Response {
+					{{ .ResponseItems }}
+				}
+
+				message Book {
+				  option (google.api.resource) = {
+				    type: "library.googleapis.com/Book"
+					pattern: "publishers/{publisher}/books/{book}"
+					singular: "book"
+					plural: "books"
+				  };
+				}
+
+				message Other {}
 			`, test)
 
 			m := file.Services().Get(0).Methods().Get(0)

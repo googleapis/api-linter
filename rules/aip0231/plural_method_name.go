@@ -15,11 +15,8 @@
 package aip0231
 
 import (
-	"fmt"
-
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
-	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -27,24 +24,6 @@ var pluralMethodResourceName = &lint.MethodRule{
 	Name:   lint.NewRuleName(231, "plural-method-name"),
 	OnlyIf: isBatchGetMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
-		// Note: m.Name()[8:] is used to retrieve the resource name from the
-		// method name. For example, "BatchGetFoos" -> "Foos"
-		pluralMethodResourceName := string(m.Name())[8:]
-
-		pluralize := pluralize.NewClient()
-
-		// Rule check: Establish that for methods such as `BatchGetFoos`
-		if !pluralize.IsPlural(pluralMethodResourceName) {
-			return []lint.Problem{{
-				Message: fmt.Sprintf(
-					`The resource part in method %q should not be %q, but should be its plural form %q`,
-					m.Name(), pluralMethodResourceName, pluralize.Plural(pluralMethodResourceName),
-				),
-				Descriptor: m,
-				Location:   locations.DescriptorName(m),
-			}}
-		}
-
-		return nil
+		return utils.LintPluralMethodName(m, "BatchGet")
 	},
 }
