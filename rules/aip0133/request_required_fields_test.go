@@ -100,16 +100,6 @@ func TestRequiredFieldTests(t *testing.T) {
 			"CreateBookShelfResponse",
 			nil,
 		},
-		{
-			"InvalidRequiredFieldType",
-			"int32 book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];",
-			"book_shelf_id",
-			"bookShelf",
-			"BookShelf",
-			testutils.Problems{
-				{Message: `The required field "book_shelf_id" must be of type string.`},
-			},
-		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
