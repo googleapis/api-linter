@@ -37,6 +37,15 @@ message CreateBookRequest {
 }
 ```
 
+```proto
+// Incorrect: The `book` field should be a message type (Book).
+message CreateBookRequest {
+  string parent = 1 [(google.api.field_behavior) = REQUIRED];
+  string book = 2 [(google.api.field_behavior) = REQUIRED];
+  string book_id = 3;
+}
+```
+
 **Correct** code for this rule:
 
 ```proto
