@@ -101,7 +101,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			nil,
 		},
 		{
-			"InvalidReuiredFieldType",
+			"InvalidRequiredFieldType",
 			"int32 book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];",
 			"book_shelf_id",
 			"bookShelf",
