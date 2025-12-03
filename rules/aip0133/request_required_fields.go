@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"strings"
 
-	"bitbucket.org/creachadair/stringset"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"github.com/stoewer/go-strcase"
@@ -34,14 +33,26 @@ var requestRequiredFields = &lint.MethodRule{
 		if ot == nil {
 			return nil
 		}
-		r := utils.GetResource(ot)
-		resourceMsgName := utils.GetResourceSingular(r)
+
+		var resourceMsgName string
+		if r := utils.GetResource(ot); r != nil {
+			resourceMsgName = utils.GetResourceSingular(r)
+		}
+
+		if resourceMsgName == "" {
+			if noun := utils.GetResourceMessageName(m, "Create"); noun != "" {
+				resourceMsgName = noun
+			}
+		}
+
+		snakeResourceName := strings.ToLower(strcase.SnakeCase(resourceMsgName))
 
 		// Rule check: Establish that there are no unexpected fields.
-		allowedRequiredFields := stringset.New(
-			"parent",
-			fmt.Sprintf("%s_id", strings.ToLower(strcase.SnakeCase(resourceMsgName))),
-		)
+		allowedRequiredFields := map[string]protoreflect.Kind{
+			"parent":                                protoreflect.StringKind,
+			fmt.Sprintf("%s_id", snakeResourceName): protoreflect.StringKind,
+			snakeResourceName:                       protoreflect.MessageKind,
+		}
 
 		problems := []lint.Problem{}
 		for i := 0; i < m.Input().Fields().Len(); i++ {
@@ -49,16 +60,18 @@ var requestRequiredFields = &lint.MethodRule{
 			if !utils.GetFieldBehavior(f).Contains("REQUIRED") {
 				continue
 			}
-			// Skip the check with the field that is the resource, which for
-			// Standard Create, is the output type.
-			if t := f.Message(); t != nil && t.Name() == ot.Name() {
-				continue
-			}
+
 			// Iterate remaining fields. If they're not in the allowed list,
 			// add a problem.
-			if !allowedRequiredFields.Contains(string(f.Name())) {
+			expectedKind, allowed := allowedRequiredFields[string(f.Name())]
+			if !allowed {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("Create RPCs must only require fields explicitly described in AIPs, not %q.", f.Name()),
+					Descriptor: f,
+				})
+			} else if f.Kind() != expectedKind {
+				problems = append(problems, lint.Problem{
+					Message:    fmt.Sprintf("The required field %q must be of type %v.", f.Name(), expectedKind),
 					Descriptor: f,
 				})
 			}

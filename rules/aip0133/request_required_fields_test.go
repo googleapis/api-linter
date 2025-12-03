@@ -27,6 +27,7 @@ func TestRequiredFieldTests(t *testing.T) {
 		Fields               string
 		problematicFieldName string
 		Singular             string
+		ReturnType           string
 		problems             testutils.Problems
 	}{
 		{
@@ -34,6 +35,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"",
 			"",
 			"",
+			"BookShelf",
 			nil,
 		},
 		{
@@ -41,6 +43,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"",
 			"",
 			"bookShelf",
+			"BookShelf",
 			nil,
 		},
 		{
@@ -48,6 +51,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"string book_shelf_id = 3 [(google.api.field_behavior) = OPTIONAL];",
 			"",
 			"bookShelf",
+			"BookShelf",
 			nil,
 		},
 		{
@@ -55,6 +59,7 @@ func TestRequiredFieldTests(t *testing.T) {
 			"string validate_only = 3 [(google.api.field_behavior) = OPTIONAL];",
 			"validate_only",
 			"",
+			"BookShelf",
 			nil,
 		},
 		{
@@ -62,8 +67,9 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool validate_only = 3 [(google.api.field_behavior) = REQUIRED];",
 			"validate_only",
 			"",
+			"BookShelf",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "validate_only"`},
+				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "validate_only".`},
 			},
 		},
 		{
@@ -71,8 +77,9 @@ func TestRequiredFieldTests(t *testing.T) {
 			"bool create_iam = 3 [(google.api.field_behavior) = REQUIRED];",
 			"create_iam",
 			"",
+			"BookShelf",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam"`},
+				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "create_iam".`},
 			},
 		},
 		{
@@ -80,8 +87,27 @@ func TestRequiredFieldTests(t *testing.T) {
 			"Foo foo = 3 [(google.api.field_behavior) = REQUIRED];",
 			"foo",
 			"",
+			"BookShelf",
 			testutils.Problems{
-				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "foo"`},
+				{Message: `Create RPCs must only require fields explicitly described in AIPs, not "foo".`},
+			},
+		},
+		{
+			"ValidRpcNameInference",
+			"",
+			"",
+			"bookShelf",
+			"CreateBookShelfResponse",
+			nil,
+		},
+		{
+			"InvalidReuiredFieldType",
+			"int32 book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];",
+			"book_shelf_id",
+			"bookShelf",
+			"BookShelf",
+			testutils.Problems{
+				{Message: `The required field "book_shelf_id" must be of type string.`},
 			},
 		},
 	} {
@@ -92,7 +118,7 @@ func TestRequiredFieldTests(t *testing.T) {
 				import "google/api/resource.proto";
 
 				service Library {
-					rpc CreateBookShelf(CreateBookShelfRequest) returns (BookShelf) {
+					rpc CreateBookShelf(CreateBookShelfRequest) returns ({{.ReturnType}}) {
 						option (google.api.http) = {
 							delete: "/v1/{name=publishers/*/bookShelves/*}"
 						};
@@ -119,6 +145,8 @@ func TestRequiredFieldTests(t *testing.T) {
 					];
 					{{.Fields}}
 				}
+
+				message CreateBookShelfResponse {}
 			`, test)
 			var dbr protoreflect.Descriptor = f.Messages().Get(2)
 			if test.problematicFieldName != "" {
