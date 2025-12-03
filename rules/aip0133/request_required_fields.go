@@ -34,10 +34,8 @@ var requestRequiredFields = &lint.MethodRule{
 			return nil
 		}
 
-		var resourceMsgName string
-		if r := utils.GetResource(ot); r != nil {
-			resourceMsgName = utils.GetResourceSingular(r)
-		}
+		r := utils.GetResource(ot)
+		resourceMsgName := utils.GetResourceSingular(r)
 
 		if resourceMsgName == "" {
 			if noun := utils.GetResourceMessageName(m, "Create"); noun != "" {
