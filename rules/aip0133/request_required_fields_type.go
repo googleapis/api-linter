@@ -32,12 +32,12 @@ var requestRequiredFieldsType = &lint.MethodRule{
 		ot := utils.GetResponseType(m)
 		var resourceMsgName string
 
-		// Try to get resource from responce type
+		// Try to get resource from response type
 		if r := utils.GetResource(ot); r != nil {
 			resourceMsgName = utils.GetResourceSingular(r)
 		}
 
-		// If we can't get a resource from the responce types, we can try to infer it from the method
+		// If we can't get a resource from the response types, we can try to infer it from the method
 		if resourceMsgName == "" {
 			if noun := utils.GetResourceMessageName(m, "Create"); noun != "" {
 				resourceMsgName = noun

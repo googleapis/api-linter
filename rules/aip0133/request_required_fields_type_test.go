@@ -96,7 +96,8 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 				service Library {
 					rpc CreateBookShelf(CreateBookShelfRequest) returns ({{.ReturnType}}) {
 						option (google.api.http) = {
-							delete: "/v1/{name=publishers/*/bookShelves/*}"
+							post: "/v1/{parent=publishers/*}/bookShelves",
+							body: "book_shelf"
 						};
 					}
 				}
