@@ -124,7 +124,7 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 				dbr = reqMsg.Fields().ByName(protoreflect.Name(test.problematicFieldName))
 			}
 
-			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFieldsType.Lint(f)); diff != "" {
+			if diff := test.problems.SetDescriptor(dbr).Diff(requestRequiredFieldsTypes.Lint(f)); diff != "" {
 				t.Error(diff)
 			}
 		})

@@ -25,8 +25,8 @@ import (
 )
 
 // The create request message should have standardized field types for required fields.
-var requestRequiredFieldsType = &lint.MethodRule{
-	Name:   lint.NewRuleName(133, "request-required-fields-type"),
+var requestRequiredFieldsTypes = &lint.MethodRule{
+	Name:   lint.NewRuleName(133, "request-required-fields-types"),
 	OnlyIf: utils.IsCreateMethodWithResolvedReturnType,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		ot := utils.GetResponseType(m)

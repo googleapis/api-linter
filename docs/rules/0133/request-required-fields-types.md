@@ -1,9 +1,9 @@
 ---
 rule:
   aip: 133
-  name: [core, '0133', request-required-fields-type]
+  name: [core, '0133', request-required-fields-types]
   summary: Create RPCs must have correct types for required fields.
-permalink: /133/request-required-fields-type
+permalink: /133/request-required-fields-types
 ---
 
 # Create methods: Required fields types
@@ -51,7 +51,7 @@ Remember to also include an [aip.dev/not-precedent][] comment explaining why.
 
 ```proto
 message CreateBookRequest {
-  // (-- api-linter: core::0133::request-required-fields-type=disabled
+  // (-- api-linter: core::0133::request-required-fields-types=disabled
   //     aip.dev/not-precedent: We need to use bytes for the parent because
   // reasons. --)
   bytes parent = 1;
