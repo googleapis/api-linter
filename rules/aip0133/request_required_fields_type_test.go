@@ -32,9 +32,9 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 	}{
 		{
 			"ValidStandardFields",
-			`string parent = 1 [(google.api.field_behavior) = REQUIRED];
-			 BookShelf book_shelf = 2 [(google.api.field_behavior) = REQUIRED];
-			 string book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];`,
+			`string parent = 1;
+			 BookShelf book_shelf = 2;
+			 string book_shelf_id = 3;`,
 			"",
 			"bookShelf",
 			"BookShelf",
@@ -42,9 +42,9 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 		},
 		{
 			"ValidRpcNameInference",
-			`string parent = 1 [(google.api.field_behavior) = REQUIRED];
-			 BookShelf book_shelf = 2 [(google.api.field_behavior) = REQUIRED];
-			 string book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];`,
+			`string parent = 1;
+			 BookShelf book_shelf = 2;
+			 string book_shelf_id = 3;`,
 			"",
 			"bookShelf",
 			"CreateBookShelfResponse",
@@ -52,9 +52,9 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 		},
 		{
 			"InvalidParentType",
-			`int32 parent = 1 [(google.api.field_behavior) = REQUIRED];
-			 BookShelf book_shelf = 2 [(google.api.field_behavior) = REQUIRED];
-			 string book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];`,
+			`int32 parent = 1;
+			 BookShelf book_shelf = 2;
+			 string book_shelf_id = 3;`,
 			"parent",
 			"bookShelf",
 			"BookShelf",
@@ -64,9 +64,9 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 		},
 		{
 			"InvalidResourceIdType",
-			`string parent = 1 [(google.api.field_behavior) = REQUIRED];
-			 BookShelf book_shelf = 2 [(google.api.field_behavior) = REQUIRED];
-			 int32 book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];`,
+			`string parent = 1;
+			 BookShelf book_shelf = 2;
+			 int32 book_shelf_id = 3;`,
 			"book_shelf_id",
 			"bookShelf",
 			"BookShelf",
@@ -76,9 +76,9 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 		},
 		{
 			"InvalidResourceType",
-			`string parent = 1 [(google.api.field_behavior) = REQUIRED];
-			 string book_shelf = 2 [(google.api.field_behavior) = REQUIRED];
-			 string book_shelf_id = 3 [(google.api.field_behavior) = REQUIRED];`,
+			`string parent = 1;
+			 string book_shelf = 2;
+			 string book_shelf_id = 3;`,
 			"book_shelf",
 			"bookShelf",
 			"BookShelf",

@@ -27,8 +27,8 @@ following required fields have the wrong type:
 ```proto
 // Incorrect: The `book` field should be a message type (Book).
 message CreateBookRequest {
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
-  string book = 2 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1;
+  string book = 2;
   string book_id = 3;
 }
 ```
@@ -38,8 +38,8 @@ message CreateBookRequest {
 ```proto
 // Correct.
 message CreateBookRequest {
-  string parent = 1 [(google.api.field_behavior) = REQUIRED];
-  Book book = 2 [(google.api.field_behavior) = REQUIRED];
+  string parent = 1;
+  Book book = 2;
   string book_id = 3;
 }
 ```
@@ -54,8 +54,8 @@ message CreateBookRequest {
   // (-- api-linter: core::0133::request-required-fields-type=disabled
   //     aip.dev/not-precedent: We need to use bytes for the parent because
   // reasons. --)
-  bytes parent = 1 [(google.api.field_behavior) = REQUIRED];
-  Book book = 2 [(google.api.field_behavior) = REQUIRED];
+  bytes parent = 1;
+  Book book = 2;
   string book_id = 3;
 }
 ```
