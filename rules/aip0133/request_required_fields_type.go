@@ -50,10 +50,10 @@ var requestRequiredFieldsType = &lint.MethodRule{
 		// We can check for each field explicitly since we can infer what each field should be
 
 		// Check for `parent`.
-		if parentField := reqFields.ByName("parent"); parentField != nil && utils.GetFieldBehavior(parentField).Contains("REQUIRED") {
+		if parentField := reqFields.ByName("parent"); parentField != nil {
 			if parentField.Kind() != protoreflect.StringKind {
 				problems = append(problems, lint.Problem{
-					Message:    `The required field "parent" must be of type string.`,
+					Message:    `The field "parent" must be of type string.`,
 					Descriptor: parentField,
 				})
 			}
@@ -64,20 +64,20 @@ var requestRequiredFieldsType = &lint.MethodRule{
 		resourceFieldName := protoreflect.Name(snakeResourceName)
 
 		// Check for `<resource>_id`.
-		if idField := reqFields.ByName(resourceIdFieldName); idField != nil && utils.GetFieldBehavior(idField).Contains("REQUIRED") {
+		if idField := reqFields.ByName(resourceIdFieldName); idField != nil {
 			if idField.Kind() != protoreflect.StringKind {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("The required field %q must be of type string.", idField.Name()),
+					Message:    fmt.Sprintf("The field %q must be of type string.", idField.Name()),
 					Descriptor: idField,
 				})
 			}
 		}
 
 		// Check for `<resource>`.
-		if resourceField := reqFields.ByName(resourceFieldName); resourceField != nil && utils.GetFieldBehavior(resourceField).Contains("REQUIRED") {
+		if resourceField := reqFields.ByName(resourceFieldName); resourceField != nil {
 			if resourceField.Kind() != protoreflect.MessageKind {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("The required field %q must be of type message.", resourceField.Name()),
+					Message:    fmt.Sprintf("The field %q must be of type message.", resourceField.Name()),
 					Descriptor: resourceField,
 				})
 			}
