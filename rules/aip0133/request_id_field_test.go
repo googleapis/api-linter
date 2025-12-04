@@ -24,13 +24,16 @@ func TestRequestIDField(t *testing.T) {
 	problems := testutils.Problems{{Message: "`string book_id`"}}
 	for _, test := range []struct {
 		name     string
+		Style    string
 		IDField  string
 		problems testutils.Problems
 	}{
-		{"Valid", "string book_id = 2;", nil},
-		{"InvalidMissing", "", problems},
-		{"InvalidType", "bytes book_id = 2;", problems},
-		{"InvalidRepeated", "repeated string book_id = 2;", problems},
+		{"Valid", "style: DECLARATIVE_FRIENDLY", "string book_id = 2;", nil},
+		{"InvalidMissing", "style: DECLARATIVE_FRIENDLY", "", problems},
+		{"InvalidType", "style: DECLARATIVE_FRIENDLY", "bytes book_id = 2;", problems},
+		{"InvalidRepeated", "style: DECLARATIVE_FRIENDLY", "repeated string book_id = 2;", problems},
+		{"ValidNotDeclarativeFriendly", "", "", nil},
+		{"ValidNotDeclarativeFriendlyWithRequestId", "", "string request_id = 2;", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
@@ -44,6 +47,7 @@ func TestRequestIDField(t *testing.T) {
 					option (google.api.resource) = {
 						type: "library.googleapis.com/Book"
 						pattern: "publishers/{publisher}/books/{book}"
+						{{.Style}}
 					};
 				}
 
