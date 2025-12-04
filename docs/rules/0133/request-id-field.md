@@ -15,8 +15,13 @@ client-specified ID field, as mandated in [AIP-133][].
 
 ## Details
 
-This rule looks at any `Create` method connected to a resource and complains if
-it lacks a client-specified ID (e.g. `string book_id`) field.
+This rule looks at any `Create` method connected to a declarative-friendly
+resource (one with `style: DECLARATIVE_FRIENDLY` in its `google.api.resource`
+annotation) and complains if it lacks a client-specified ID (e.g. `string
+book_id`) field.
+
+**Note:** This rule only applies to declarative-friendly resources. Resources
+without the `DECLARATIVE_FRIENDLY` style are not checked by this rule.
 
 ## Examples
 
@@ -24,6 +29,15 @@ it lacks a client-specified ID (e.g. `string book_id`) field.
 
 ```proto
 // Incorrect.
+// Book is a declarative-friendly resource.
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "publishers/{publisher}/books/{book}"
+    style: DECLARATIVE_FRIENDLY
+  };
+}
+
 message CreateBookRequest {
   string parent = 1 [(google.api.resource_reference) = {
     child_type: "library.googleapis.com/Book"
@@ -39,6 +53,15 @@ message CreateBookRequest {
 
 ```proto
 // Correct.
+// Book is a declarative-friendly resource.
+message Book {
+  option (google.api.resource) = {
+    type: "library.googleapis.com/Book"
+    pattern: "publishers/{publisher}/books/{book}"
+    style: DECLARATIVE_FRIENDLY
+  };
+}
+
 message CreateBookRequest {
   string parent = 1 [(google.api.resource_reference) = {
     child_type: "library.googleapis.com/Book"
@@ -47,7 +70,6 @@ message CreateBookRequest {
   string book_id = 2;
 
   Book book = 3;
-
 }
 ```
 
