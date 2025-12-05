@@ -23,31 +23,33 @@ import (
 func TestStateFieldOutputOnly(t *testing.T) {
 	tests := []struct {
 		name          string
+		MessageName   string
 		FieldName     string
 		FieldType     string
 		FieldBehavior string
 		problems      testutils.Problems
 	}{
 		// Accepted
-		{"ValidState", "state", "State", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
-		{"ValidOtherFieldName", "country", "State", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
-		{"ValidStateSuffix", "state", "WritersBlockState", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
+		{"ValidState", "Book", "state", "State", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
+		{"ValidOtherFieldName", "Book", "country", "State", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
+		{"ValidStateSuffix", "Book", "state", "WritersBlockState", "[(google.api.field_behavior) = OUTPUT_ONLY]", testutils.Problems{}},
 
 		// No Annotation
-		{"InvalidState", "state", "State", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
-		{"InvalidWithSuffix", "state", "WritersBlockState", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
-		{"InvalidWithFieldName", "city", "State", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
+		{"InvalidState", "Book", "state", "State", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
+		{"InvalidWithSuffix", "Book", "state", "WritersBlockState", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
+		{"InvalidWithFieldName", "Book", "city", "State", "", testutils.Problems{{Message: "OUTPUT_ONLY"}}},
 
 		// Ignored
-		{"NotAStateField", "state", "StateOfDespair", "", testutils.Problems{}},
-		{"NotAnEnum", "state", "StateOfState", "", testutils.Problems{}},
+		{"NotAStateField", "Book", "state", "StateOfDespair", "", testutils.Problems{}},
+		{"NotAnEnum", "Book", "state", "StateOfState", "", testutils.Problems{}},
+		{"StateInRespose", "ArchiveBookResponse", "state", "State", "", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
 			import "google/api/field_behavior.proto";
 
-			message Book {
+			message {{.MessageName}} {
 				enum State {
 					STATE_UNSPECIFIED = 0;
 					ACTIVE = 1;
