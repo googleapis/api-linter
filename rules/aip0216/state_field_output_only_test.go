@@ -42,7 +42,7 @@ func TestStateFieldOutputOnly(t *testing.T) {
 		// Ignored
 		{"NotAStateField", "Book", "state", "StateOfDespair", "", testutils.Problems{}},
 		{"NotAnEnum", "Book", "state", "StateOfState", "", testutils.Problems{}},
-		{"StateInRespose", "ArchiveBookResponse", "state", "State", "", testutils.Problems{}},
+		{"StateInResponse", "ArchiveBookResponse", "state", "State", "", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
