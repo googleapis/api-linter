@@ -25,8 +25,10 @@ import (
 )
 
 var requestIDField = &lint.MessageRule{
-	Name:   lint.NewRuleName(133, "request-id-field"),
-	OnlyIf: utils.IsCreateRequestMessage,
+	Name: lint.NewRuleName(133, "request-id-field"),
+	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		return utils.IsCreateRequestMessage(m) && utils.IsDeclarativeFriendlyMessage(m)
+	},
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "Create")) + "_id"
 		if field := m.Fields().ByName(protoreflect.Name(idField)); field == nil || utils.GetTypeName(field) != "string" || field.IsList() {
