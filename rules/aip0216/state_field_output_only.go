@@ -36,6 +36,11 @@ var stateFieldOutputOnly = &lint.FieldRule{
 			return false
 		}
 
+		// State fields in response messages are exempt.
+		if strings.HasSuffix(string(f.Parent().Name()), "Response") {
+			return false
+		}
+
 		return true
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
