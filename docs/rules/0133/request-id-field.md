@@ -16,12 +16,8 @@ client-specified ID field, as mandated in [AIP-133][].
 ## Details
 
 This rule looks at any `Create` method connected to a declarative-friendly
-resource (one with `style: DECLARATIVE_FRIENDLY` in its `google.api.resource`
-annotation) and complains if it lacks a client-specified ID (e.g. `string
+resource and complains if it lacks a client-specified ID (e.g. `string
 book_id`) field.
-
-**Note:** This rule only applies to declarative-friendly resources. Resources
-without the `DECLARATIVE_FRIENDLY` style are not checked by this rule.
 
 ## Examples
 

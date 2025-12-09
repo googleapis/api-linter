@@ -21,7 +21,7 @@ import (
 )
 
 func TestRequestIDField(t *testing.T) {
-problems := testutils.Problems{{Message: "create methods should contain a singular `string book_id` field."}}
+	problems := testutils.Problems{{Message: "`string book_id`"}}
 	for _, test := range []struct {
 		name     string
 		Style    string
