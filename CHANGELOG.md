@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.1.0](https://github.com/googleapis/api-linter/compare/v2.0.0...v2.1.0) (2025-12-10)
+
+
+### Features
+
+* **AIP-133:** add type check for required fields ([#1580](https://github.com/googleapis/api-linter/issues/1580)) ([2969fca](https://github.com/googleapis/api-linter/commit/2969fca9cd46a982d5a4416816d3bd22baf23f2e))
+
+
+### Bug Fixes
+
+* **aip-0134:** check word boundaries in synonyms rule ([#1564](https://github.com/googleapis/api-linter/issues/1564)) ([f10744f](https://github.com/googleapis/api-linter/commit/f10744f099a53c208666e7c3aa2d52267ea3d19d))
+* **AIP-123:** prevent panic in getParentIDVariable with single-variable patterns ([#1565](https://github.com/googleapis/api-linter/issues/1565)) ([a09770e](https://github.com/googleapis/api-linter/commit/a09770e532ab276aeff0c4f92712442b155b8c68))
+* **AIP-133:** avoid returning an error when return type is a message ([#1578](https://github.com/googleapis/api-linter/issues/1578)) ([3222ce4](https://github.com/googleapis/api-linter/commit/3222ce4033a5484bc40ef720aa3732733bdfedae))
+* **aip-136:** Allow SetIamPolicy method ([#1559](https://github.com/googleapis/api-linter/issues/1559)) ([7afac03](https://github.com/googleapis/api-linter/commit/7afac0398be3d57ab52189c413e5daab513934a8))
+* **AIP-216:** avoid linting state-like fields in response message ([#1582](https://github.com/googleapis/api-linter/issues/1582)) ([1760e49](https://github.com/googleapis/api-linter/commit/1760e4935162cb59436e843109f3a19009349379))
+* **lint:** allow deprecation rule on deprecated descriptor ([#1570](https://github.com/googleapis/api-linter/issues/1570)) ([f89a1b8](https://github.com/googleapis/api-linter/commit/f89a1b82679a90aa5765be6c9a267704604994f5))
+* make Batch naming resource plural aware ([#1573](https://github.com/googleapis/api-linter/issues/1573)) ([c820a1c](https://github.com/googleapis/api-linter/commit/c820a1cd0dbfa6b29cb86ef9a5ca6e672d403c30))
+
+
+### Documentation
+
+* **AIP-133:** remove declarative-friendly  requirement from spec ([#1581](https://github.com/googleapis/api-linter/issues/1581)) ([6a388a4](https://github.com/googleapis/api-linter/commit/6a388a4c835b6be3ddab6b353396a9f3256cee56))
+* **AIP-158:** clarify response plural first docs ([#1571](https://github.com/googleapis/api-linter/issues/1571)) ([98a8702](https://github.com/googleapis/api-linter/commit/98a8702dda9e08274083b53ece8977e9d61bd134))
+* fix missing "-" on  disable rule command and config command ([#1557](https://github.com/googleapis/api-linter/issues/1557)) ([28f0707](https://github.com/googleapis/api-linter/commit/28f070770cd023b80741747f518dab10cc9f7465))
+
 ## [2.0.0](https://github.com/googleapis/api-linter/compare/v1.72.0...v2.0.0) (2025-10-22)
 
 
