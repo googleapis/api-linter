@@ -10,8 +10,8 @@ redirect_from:
 
 # Client-specified IDs
 
-This rule enforces that declarative-friendly create methods include a
-client-specified ID field, as mandated in [AIP-133][].
+This rule enforces that create methods include a client-specified ID field, as
+mandated in [AIP-133][].
 
 ## Details
 
@@ -47,7 +47,6 @@ message CreateBookRequest {
   string book_id = 2;
 
   Book book = 3;
-
 }
 ```
 
