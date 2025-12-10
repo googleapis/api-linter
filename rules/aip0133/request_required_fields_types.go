@@ -16,7 +16,6 @@ package aip0133
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
@@ -59,7 +58,7 @@ var requestRequiredFieldsTypes = &lint.MethodRule{
 			}
 		}
 
-		snakeResourceName := strings.ToLower(strcase.SnakeCase(resourceMsgName))
+		snakeResourceName := strcase.SnakeCase(resourceMsgName)
 		resourceIdFieldName := protoreflect.Name(fmt.Sprintf("%s_id", snakeResourceName))
 		resourceFieldName := protoreflect.Name(snakeResourceName)
 

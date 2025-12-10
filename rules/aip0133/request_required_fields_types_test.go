@@ -31,59 +31,59 @@ func TestRequestRequiredFieldsType(t *testing.T) {
 		problems             testutils.Problems
 	}{
 		{
-			"ValidStandardFields",
-			`string parent = 1;
+			name: "ValidStandardFields",
+			Fields: `string parent = 1;
 			 BookShelf book_shelf = 2;
 			 string book_shelf_id = 3;`,
-			"",
-			"bookShelf",
-			"BookShelf",
-			nil,
+			problematicFieldName: "",
+			Singular:             "bookShelf",
+			ReturnType:           "BookShelf",
+			problems:             nil,
 		},
 		{
-			"ValidRpcNameInference",
-			`string parent = 1;
+			name: "ValidRpcNameInference",
+			Fields: `string parent = 1;
 			 BookShelf book_shelf = 2;
 			 string book_shelf_id = 3;`,
-			"",
-			"bookShelf",
-			"CreateBookShelfResponse",
-			nil,
+			problematicFieldName: "",
+			Singular:             "bookShelf",
+			ReturnType:           "CreateBookShelfResponse",
+			problems:             nil,
 		},
 		{
-			"InvalidParentType",
-			`int32 parent = 1;
+			name: "InvalidParentType",
+			Fields: `int32 parent = 1;
 			 BookShelf book_shelf = 2;
 			 string book_shelf_id = 3;`,
-			"parent",
-			"bookShelf",
-			"BookShelf",
-			testutils.Problems{
+			problematicFieldName: "parent",
+			Singular:             "bookShelf",
+			ReturnType:           "BookShelf",
+			problems: testutils.Problems{
 				{Message: `The field "parent" must be of type string.`},
 			},
 		},
 		{
-			"InvalidResourceIdType",
-			`string parent = 1;
+			name: "InvalidResourceIdType",
+			Fields: `string parent = 1;
 			 BookShelf book_shelf = 2;
 			 int32 book_shelf_id = 3;`,
-			"book_shelf_id",
-			"bookShelf",
-			"BookShelf",
-			testutils.Problems{
-				{Message: `The field "book_shelf_id" must be of type string.`},
+			problematicFieldName: "book_shelf_id",
+			Singular:             "bookShelf",
+			ReturnType:           "BookShelf",
+			problems: testutils.Problems{
+				{Message: `The resource ID field "book_shelf_id" must be of type string.`},
 			},
 		},
 		{
-			"InvalidResourceType",
-			`string parent = 1;
+			name: "InvalidResourceType",
+			Fields: `string parent = 1;
 			 string book_shelf = 2;
 			 string book_shelf_id = 3;`,
-			"book_shelf",
-			"bookShelf",
-			"BookShelf",
-			testutils.Problems{
-				{Message: `The field "book_shelf" must be of type message.`},
+			problematicFieldName: "book_shelf",
+			Singular:             "bookShelf",
+			ReturnType:           "BookShelf",
+			problems: testutils.Problems{
+				{Message: `The resource field "book_shelf" must be of type message.`},
 			},
 		},
 	} {
