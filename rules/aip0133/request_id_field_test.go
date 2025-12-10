@@ -31,6 +31,8 @@ func TestRequestIDField(t *testing.T) {
 		{"InvalidMissing", "", problems},
 		{"InvalidType", "bytes book_id = 2;", problems},
 		{"InvalidRepeated", "repeated string book_id = 2;", problems},
+		// request_id (AIP-155) is NOT a substitute for {resource}_id (AIP-133)
+		{"InvalidRequestIdOnly", "string request_id = 2;", problems},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
