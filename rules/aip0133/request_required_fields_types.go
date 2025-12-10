@@ -67,7 +67,7 @@ var requestRequiredFieldsTypes = &lint.MethodRule{
 		if idField := reqFields.ByName(resourceIdFieldName); idField != nil {
 			if idField.Kind() != protoreflect.StringKind {
 				problems = append(problems, lint.Problem{
-					Message:    fmt.Sprintf("The field %q must be of type string.", idField.Name()),
+					Message:    fmt.Sprintf("The resource ID field %q must be of type string.", idField.Name()),
 					Descriptor: idField,
 				})
 			}
