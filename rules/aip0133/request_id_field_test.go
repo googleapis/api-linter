@@ -31,6 +31,9 @@ func TestRequestIDField(t *testing.T) {
 		{"InvalidMissing", "", problems},
 		{"InvalidType", "bytes book_id = 2;", problems},
 		{"InvalidRepeated", "repeated string book_id = 2;", problems},
+		// request_id allowlist: skip check if request_id is present (AIP-133 exceptions)
+		{"ValidRequestIdOnly", "string request_id = 2;", nil},
+		{"ValidBothIds", "string book_id = 2; string request_id = 4;", nil},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `

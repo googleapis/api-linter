@@ -28,6 +28,13 @@ var requestIDField = &lint.MessageRule{
 	Name:   lint.NewRuleName(133, "request-id-field"),
 	OnlyIf: utils.IsCreateRequestMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
+		// If request_id field exists, skip this check. This accommodates
+		// AIP-133 exception cases (data plane resources that don't require
+		// client-specified IDs) that may use request_id for idempotency (AIP-155).
+		if m.Fields().ByName("request_id") != nil {
+			return nil
+		}
+
 		idField := strcase.SnakeCase(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "Create")) + "_id"
 		if field := m.Fields().ByName(protoreflect.Name(idField)); field == nil || utils.GetTypeName(field) != "string" || field.IsList() {
 			return []lint.Problem{{

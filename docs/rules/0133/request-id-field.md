@@ -18,6 +18,14 @@ mandated in [AIP-133][].
 This rule looks at any `Create` method connected to a resource and complains if
 it lacks a client-specified ID (e.g. `string book_id`) field.
 
+**Note:** This rule does not apply if the request contains a `request_id` field.
+This accommodates [AIP-133 exception cases][user-specified-ids] for data plane
+resources that may use `request_id` for idempotency ([AIP-155][]) without
+requiring a client-specified resource ID.
+
+[user-specified-ids]: https://google.aip.dev/133#user-specified-ids
+[aip-155]: https://google.aip.dev/155
+
 ## Examples
 
 **Incorrect** code for this rule:
