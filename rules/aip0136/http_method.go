@@ -27,10 +27,12 @@ var httpMethod = &lint.MethodRule{
 	Name:   lint.NewRuleName(136, "http-method"),
 	OnlyIf: utils.IsCustomMethod,
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
+		// ExpungeFoo is still a custom method, but delete is expected as a
+		// hard delete (AIP-164).
 		// DeleteFooRevision is still a custom method, but delete is expected
 		// (enforced in AIP-162 rules).
 		n := string(m.Name())
-		if strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision") {
+		if strings.HasPrefix(n, "Expunge") || (strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision")) {
 			return nil
 		}
 

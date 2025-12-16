@@ -36,6 +36,7 @@ func TestHttpMethod(t *testing.T) {
 		{"InvalidDelete", "ArchiveBook", "delete", "", testutils.Problems{{Message: "POST or GET"}}},
 		{"IrrelevantPatch", "UpdateBook", "patch", "", nil},
 		{"IrrelevantDelete", "DeleteBook", "delete", "", nil},
+		{"SkipExpunge", "ExpungeBook", "delete", "", nil},
 	}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
