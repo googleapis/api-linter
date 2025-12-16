@@ -32,7 +32,9 @@ var httpMethod = &lint.MethodRule{
 		// DeleteFooRevision is still a custom method, but delete is expected
 		// (enforced in AIP-162 rules).
 		n := string(m.Name())
-		if strings.HasPrefix(n, "Expunge") || (strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision")) {
+		isExpunge := strings.HasPrefix(n, "Expunge")
+		isDeleteRevision := strings.HasPrefix(n, "Delete") && strings.HasSuffix(n, "Revision")
+		if isExpunge || isDeleteRevision {
 			return nil
 		}
 
