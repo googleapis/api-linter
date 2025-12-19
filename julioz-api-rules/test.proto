@@ -1,0 +1,23 @@
+// This is a test proto file for the api-linter custom rule plugin
+// (-- api-linter: core::0191::proto-package=disabled --)
+syntax = "proto3";
+
+package julioz_api_rules.v1;
+
+option java_package = "com.julioz_api_rules.v1";
+option java_multiple_files = true;
+option java_outer_classname = "TestProto";
+
+// This message should fail our rule since it doesn't start with "Julio"
+// (-- api-linter: core::0123::resource-annotation=disabled --)
+message TestMessage {
+  // The name of the test message
+  string name = 1;
+}
+
+// This message should pass our rule
+// (-- api-linter: core::0123::resource-annotation=disabled --)
+message JulioTestMessage {
+  // The ID of the test message
+  int32 id = 1;
+} 
