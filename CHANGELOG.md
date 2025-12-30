@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/googleapis/api-linter/compare/v2.1.0...v2.1.1) (2025-12-30)
+
+
+### Bug Fixes
+
+* **AIP-136:** allow Expunge to use http delete ([#1584](https://github.com/googleapis/api-linter/issues/1584)) ([95f20bd](https://github.com/googleapis/api-linter/commit/95f20bd9096640ec35dabfc7a53edd1e4195e1d6))
+
 ## [2.1.0](https://github.com/googleapis/api-linter/compare/v2.0.0...v2.1.0) (2025-12-10)
 
 
