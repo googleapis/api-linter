@@ -104,7 +104,7 @@ var reservedWordsSet = stringset.New(
 	"short",        // Java, JavaScript
 	"static",       // Java, JavaScript
 	"strictfp",     // Java
-	"super",        // Java, JavaScript
+	"super",        // Java, JavaScript, Rust
 	"switch",       // Java, JavaScript
 	"synchronized", // Java, JavaScript
 	"this",         // Java, JavaScript
@@ -120,4 +120,7 @@ var reservedWordsSet = stringset.New(
 	"while",        // Java, JavaScript, Python
 	"with",         // JavaScript, Python
 	"yield",        // JavaScript, Python
+	"crate",        // Rust
+	"self",         // Rust
+	"Self",         // Rust
 )
