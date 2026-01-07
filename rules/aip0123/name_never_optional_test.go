@@ -69,6 +69,6 @@ func TestNameNeverOptional_SkipProto2(t *testing.T) {
 		}
 	`)
 	if got := nameNeverOptional.Lint(f); len(got) > 0 {
-		t.Errorf("expected proto2 file to be skipped, got findngs %v", got)
+t.Errorf("expected proto2 file to be skipped, got findings %v", got)
 	}
 }
