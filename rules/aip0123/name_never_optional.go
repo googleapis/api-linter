@@ -24,6 +24,12 @@ import (
 var nameNeverOptional = &lint.MessageRule{
 	Name: lint.NewRuleName(123, "name-never-optional"),
 	OnlyIf: func(m protoreflect.MessageDescriptor) bool {
+		// Skip check for proto2 where specifying the `required` or `optional`
+		// label is necessary, and where `optional` makes sense in that context.
+		if m.ParentFile().Syntax() == protoreflect.Proto2 {
+			return false
+		}
+
 		f := "name"
 		if nf := utils.GetResource(m).GetNameField(); nf != "" {
 			f = nf

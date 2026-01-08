@@ -53,3 +53,22 @@ func TestNameNeverOptional(t *testing.T) {
 		})
 	}
 }
+
+func TestNameNeverOptional_SkipProto2(t *testing.T) {
+	f := testutils.ParseProtoString(t, `
+		syntax = "proto2";
+
+		import "google/api/resource.proto";
+		message Book {
+			option (google.api.resource) = {
+				type: "library.googleapis.com/Book"
+				pattern: "publishers/{publisher}/books/{book}"
+			};
+
+			optional string name = 1;
+		}
+	`)
+	if got := nameNeverOptional.Lint(f); len(got) > 0 {
+		t.Errorf("expected proto2 file to be skipped, got findings %v", got)
+	}
+}
