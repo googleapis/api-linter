@@ -40,4 +40,4 @@ var noMarkdownHeadings = &lint.DescriptorRule{
 	},
 }
 
-var heading = regexp.MustCompile(`^\s*[#]+ `)
+var heading = regexp.MustCompile(`^\s?[#]+ `)
