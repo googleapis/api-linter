@@ -6,7 +6,7 @@ require (
 	bitbucket.org/creachadair/stringset v0.0.12
 	cloud.google.com/go/iam v1.5.3
 	cloud.google.com/go/longrunning v0.8.0
-	github.com/bmatcuk/doublestar/v4 v4.9.1
+	github.com/bmatcuk/doublestar/v4 v4.9.2
 	github.com/bufbuild/protocompile v0.14.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.7.0
@@ -14,7 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/pflag v1.0.10
 	github.com/stoewer/go-strcase v1.3.1
-	golang.org/x/text v0.32.0
+	golang.org/x/text v0.33.0
 	google.golang.org/genproto v0.0.0-20251222181119-0a764e51fe1b
 	google.golang.org/genproto/googleapis/api v0.0.0-20251222181119-0a764e51fe1b
 	google.golang.org/protobuf v1.36.11
