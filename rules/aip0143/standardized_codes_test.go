@@ -22,29 +22,79 @@ import (
 
 func TestFieldNames(t *testing.T) {
 	tests := []struct {
-		FieldName string
-		problems  testutils.Problems
+		FieldName         string
+		ResourceReference string
+		problems          testutils.Problems
 	}{
-		{"something_random", testutils.Problems{}},
-		{"content_type", testutils.Problems{{Suggestion: "mime_type"}}},
-		{"country", testutils.Problems{{Suggestion: "region_code"}}},
-		{"country_code", testutils.Problems{{Suggestion: "region_code"}}},
-		{"region_code", testutils.Problems{}},
-		{"currency", testutils.Problems{{Suggestion: "currency_code"}}},
-		{"currency_code", testutils.Problems{}},
-		{"language", testutils.Problems{{Suggestion: "language_code"}}},
-		{"language_code", testutils.Problems{}},
-		{"mime", testutils.Problems{{Suggestion: "mime_type"}}},
-		{"mimetype", testutils.Problems{{Suggestion: "mime_type"}}},
-		{"mime_type", testutils.Problems{}},
-		{"timezone", testutils.Problems{{Suggestion: "time_zone"}}},
-		{"time_zone", testutils.Problems{}},
+		{
+			FieldName: "something_random",
+			problems:  testutils.Problems{},
+		},
+		{
+			FieldName: "content_type",
+			problems:  testutils.Problems{{Suggestion: "mime_type"}},
+		},
+		{
+			FieldName: "country",
+			problems:  testutils.Problems{{Suggestion: "region_code"}},
+		},
+		{
+			FieldName: "country_code",
+			problems:  testutils.Problems{{Suggestion: "region_code"}},
+		},
+		{
+			FieldName: "region_code",
+			problems:  testutils.Problems{},
+		},
+		{
+			FieldName: "currency",
+			problems:  testutils.Problems{{Suggestion: "currency_code"}},
+		},
+		{
+			FieldName: "currency_code",
+			problems:  testutils.Problems{},
+		},
+		{
+			FieldName: "language",
+			problems:  testutils.Problems{{Suggestion: "language_code"}},
+		},
+		{
+			FieldName: "language_code",
+			problems:  testutils.Problems{},
+		},
+		{
+			FieldName: "mime",
+			problems:  testutils.Problems{{Suggestion: "mime_type"}},
+		},
+		{
+			FieldName: "mimetype",
+			problems:  testutils.Problems{{Suggestion: "mime_type"}},
+		},
+		{
+			FieldName: "mime_type",
+			problems:  testutils.Problems{},
+		},
+		{
+			FieldName: "timezone",
+			problems:  testutils.Problems{{Suggestion: "time_zone"}},
+		},
+		{
+			FieldName: "time_zone",
+			problems:  testutils.Problems{},
+		},
+		{
+			// Skip when field represents a resource name.
+			FieldName:         "language",
+			ResourceReference: `[(google.api.resource_reference).type = "example.com/Language"]`,
+			problems:          testutils.Problems{},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.FieldName, func(t *testing.T) {
 			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
 				message Foo {
-					string {{.FieldName}} = 1;
+					string {{.FieldName}} = 1 {{.ResourceReference}};
 				}
 			`, test)
 			field := file.Messages().Get(0).Fields().Get(0)
