@@ -15,8 +15,8 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stoewer/go-strcase v1.3.1
 	golang.org/x/text v0.33.0
-	google.golang.org/genproto v0.0.0-20251222181119-0a764e51fe1b
-	google.golang.org/genproto/googleapis/api v0.0.0-20251222181119-0a764e51fe1b
+	google.golang.org/genproto v0.0.0-20260120221211-b8f7ae30c516
+	google.golang.org/genproto/googleapis/api v0.0.0-20260120221211-b8f7ae30c516
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -26,6 +26,6 @@ require (
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251213004720-97cd9d5aeac2 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260120174246-409b4a993575 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 )
