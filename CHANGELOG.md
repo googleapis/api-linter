@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.2.0](https://github.com/googleapis/api-linter/compare/v2.1.0...v2.2.0) (2026-01-22)
+
+
+### Features
+
+* **API-140:** Add Rust super-reserved identifiers ([#1591](https://github.com/googleapis/api-linter/issues/1591)) ([d9d7d7e](https://github.com/googleapis/api-linter/commit/d9d7d7e78428bf62cf497ed61e90e336c52d4289))
+
+
+### Bug Fixes
+
+* **AIP-123:** ignore proto2 optional name ([#1590](https://github.com/googleapis/api-linter/issues/1590)) ([d89b3f6](https://github.com/googleapis/api-linter/commit/d89b3f6a4d22d5ad1579041e9cb0057061c9abe2))
+* **AIP-136:** allow Expunge to use http delete ([#1584](https://github.com/googleapis/api-linter/issues/1584)) ([95f20bd](https://github.com/googleapis/api-linter/commit/95f20bd9096640ec35dabfc7a53edd1e4195e1d6))
+* **AIP-143:** ignore standard code names for resources ([#1596](https://github.com/googleapis/api-linter/issues/1596)) ([a89f537](https://github.com/googleapis/api-linter/commit/a89f5373027c39998550e82138bf696393579c20))
+* **AIP-192:** limit spaces matched for header detection ([#1593](https://github.com/googleapis/api-linter/issues/1593)) ([dc2e75b](https://github.com/googleapis/api-linter/commit/dc2e75bd92f40f3311b63d4f8879627a54161e58))
+
 ## [2.1.0](https://github.com/googleapis/api-linter/compare/v2.0.0...v2.1.0) (2025-12-10)
 
 
