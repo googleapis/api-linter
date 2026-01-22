@@ -19,11 +19,15 @@ import (
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 var fieldNames = &lint.FieldRule{
 	Name: lint.NewRuleName(143, "standardized-codes"),
+	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
+		return !utils.HasResourceReference(fd)
+	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		variants := map[string]string{
 			"content_type": "mime_type",
