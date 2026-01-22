@@ -14,7 +14,10 @@
         "bitbucket.org/creachadair/stringset",
         "dominikh/staticcheck-action",
         "github.com/olekukonko/tablewriter",
+        // ruby, webrick, and jekyll are pinned by the github-pages gem.
         "ruby",
+        "webrick",
+        "jekyll",
       ],
       enabled: false
     }
