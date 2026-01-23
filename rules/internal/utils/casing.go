@@ -36,8 +36,7 @@ func toCamelCase(s string, makeNextUpper bool, makeNextLower bool) string {
 			asLower = append(asLower, r)
 		} else if isUpper(r) {
 			if makeNextLower {
-				r = r | ' '           // make lowercase
-				makeNextLower = false //nolint:ineffassign
+				r = r | ' ' // make lowercase
 			}
 			asLower = append(asLower, r)
 		} else if isNumber(r) {
