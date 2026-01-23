@@ -151,7 +151,7 @@ func nestedPlural(resource *apb.ResourceDescriptor) string {
 	}
 
 	// use the singular variable to trim the singular prefix of the compound
-	// child colleciton name that is pluralized e.g.
+	// child collection name that is pluralized e.g.
 	// "users/{user}/userEvents/{user_event}" the parent singular "user" is the
 	// prefix of the child collection "userEvents".
 	parentIDVar := getParentIDVariable(resource.GetPattern()[0])

@@ -60,7 +60,7 @@ type Problem struct {
 	// The category for this problem, based on user configuration.
 	category string
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 

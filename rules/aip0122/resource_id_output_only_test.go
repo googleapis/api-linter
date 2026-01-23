@@ -47,7 +47,7 @@ func TestResourceIdOutputOnly(t *testing.T) {
 			}
 		`, test)
 		field := f.Messages().Get(0).Fields().Get(1)
-		if diff := test.problems.SetDescriptor(field).Diff(resourceIdOutputOnly.Lint(f)); diff != "" {
+		if diff := test.problems.SetDescriptor(field).Diff(resourceIDOutputOnly.Lint(f)); diff != "" {
 			t.Error(diff)
 		}
 	}

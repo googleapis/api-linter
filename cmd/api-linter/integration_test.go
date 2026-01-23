@@ -43,7 +43,7 @@ func TestLocationFoundWithoutSourceInfo_Fixed(t *testing.T) {
 	}
 
 	// We run the CLI. We don't check the error because we care about the output content.
-	runCLI(args)
+	_ = runCLI(args)
 
 	outBytes, readErr := os.ReadFile(outPath)
 	if readErr != nil {
@@ -258,7 +258,7 @@ func TestMultipleFilesFromParentDir(t *testing.T) {
 	if err := os.Chdir(projDir); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chdir(oldWD)
+	defer func() { _ = os.Chdir(oldWD) }()
 
 	args := []string{
 		"-I", "grandparent",
@@ -361,7 +361,7 @@ func TestImportFromAnotherRoot(t *testing.T) {
 	if err := os.Chdir(projDir); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chdir(oldWD)
+	defer func() { _ = os.Chdir(oldWD) }()
 
 	args := []string{
 		"-I", "third_party",

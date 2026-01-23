@@ -1,5 +1,17 @@
----
+version: "2"
 linters:
   enable:
-    - goimports
     - misspell
+    - staticcheck
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - -QF1001  # apply De Morgan's law
+  exclusions:
+    presets:
+      - comments
+      - std-error-handling
+formatters:
+  enable:
+    - goimports

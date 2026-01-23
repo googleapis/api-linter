@@ -51,7 +51,7 @@ type FileRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.FileDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -83,7 +83,7 @@ type MessageRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.MessageDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -120,7 +120,7 @@ type FieldRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.FieldDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -160,7 +160,7 @@ type ServiceRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.ServiceDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -195,7 +195,7 @@ type MethodRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.MethodDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -233,7 +233,7 @@ type EnumRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.EnumDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -269,7 +269,7 @@ type EnumValueRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.EnumValueDescriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 
@@ -312,7 +312,7 @@ type DescriptorRule struct {
 	// is applicable.
 	OnlyIf func(protoreflect.Descriptor) bool
 
-	//lint:ignore U1000 ignored via golint previously
+	//nolint:unused // field is required to prevent positional parameters
 	noPositional struct{}
 }
 

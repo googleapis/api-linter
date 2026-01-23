@@ -43,7 +43,7 @@ var abbreviations = &lint.DescriptorRule{
 		//
 		// We do not need to worry about word separators though, since
 		// we are checking for single words only.
-		var caseFunc func(string) string = cases.Title(language.AmericanEnglish).String
+		caseFunc := cases.Title(language.AmericanEnglish).String
 		switch d.(type) {
 		case protoreflect.FieldDescriptor:
 			caseFunc = strings.ToLower

@@ -22,7 +22,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var resourceIdOutputOnly = &lint.FieldRule{
+var resourceIDOutputOnly = &lint.FieldRule{
 	Name: lint.NewRuleName(122, "resource-id-output-only"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		var idName string
@@ -42,8 +42,8 @@ var resourceIdOutputOnly = &lint.FieldRule{
 			idName += "_id"
 		}
 
-		isId := f.Name() == "uid" || f.Name() == protoreflect.Name(idName)
-		return isRes && isId
+		isID := f.Name() == "uid" || f.Name() == protoreflect.Name(idName)
+		return isRes && isID
 	},
 	LintField: func(f protoreflect.FieldDescriptor) []lint.Problem {
 		behaviors := utils.GetFieldBehavior(f)

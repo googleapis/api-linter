@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-      - v1 
+      - v1
       - v2
 jobs:
   unit-tests:
@@ -26,11 +26,10 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
-      - name: staticcheck
-        uses: dominikh/staticcheck-action@v1.3.1
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: "2025.1.1"
-          install-go: false
+          version: v2.8
   quality-checker:
     runs-on: ubuntu-latest
     steps:

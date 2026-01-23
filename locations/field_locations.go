@@ -20,7 +20,7 @@ import (
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
-// FieldOption returns the precise location for the given extension defintion on
+// FieldOption returns the precise location for the given extension definition on
 // the given field. This is useful for writing rules against custom extensions.
 //
 // Example: locations.FieldOption(field, fieldbehaviorpb.E_FieldBehavior)
