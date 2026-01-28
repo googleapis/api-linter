@@ -59,11 +59,11 @@ var requestRequiredFieldsTypes = &lint.MethodRule{
 		}
 
 		snakeResourceName := strcase.SnakeCase(resourceMsgName)
-		resourceIdFieldName := protoreflect.Name(fmt.Sprintf("%s_id", snakeResourceName))
+		resourceIDFieldName := protoreflect.Name(fmt.Sprintf("%s_id", snakeResourceName))
 		resourceFieldName := protoreflect.Name(snakeResourceName)
 
 		// Check for `<resource>_id`.
-		if idField := reqFields.ByName(resourceIdFieldName); idField != nil {
+		if idField := reqFields.ByName(resourceIDFieldName); idField != nil {
 			if idField.Kind() != protoreflect.StringKind {
 				problems = append(problems, lint.Problem{
 					Message:    fmt.Sprintf("The resource ID field %q must be of type string.", idField.Name()),

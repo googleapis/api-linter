@@ -21,7 +21,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var requestIdFormat = &lint.FieldRule{
+var requestIDFormat = &lint.FieldRule{
 	Name: lint.NewRuleName(155, "request-id-format"),
 	OnlyIf: func(fd protoreflect.FieldDescriptor) bool {
 		return fd.Kind() == protoreflect.StringKind &&

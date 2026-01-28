@@ -29,7 +29,7 @@ func AddRules(r lint.RuleRegistry) error {
 		nameSuffix,
 		noSelfLinks,
 		resourceReferenceType,
-		resourceIdOutputOnly,
+		resourceIDOutputOnly,
 		embeddedResource,
 	)
 }

@@ -15,11 +15,12 @@
 package aip0216
 
 import (
+	"strings"
+
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"strings"
 )
 
 var stateFieldOutputOnly = &lint.FieldRule{

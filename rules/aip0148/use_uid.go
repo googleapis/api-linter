@@ -28,7 +28,7 @@ const (
 	uidStr = "uid"
 )
 
-var useUid = &lint.FieldRule{
+var useUID = &lint.FieldRule{
 	Name: lint.NewRuleName(148, "use-uid"),
 	OnlyIf: func(f protoreflect.FieldDescriptor) bool {
 		if m, ok := f.Parent().(protoreflect.MessageDescriptor); ok {
