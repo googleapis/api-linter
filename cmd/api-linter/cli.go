@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/bufbuild/protocompile"
@@ -221,9 +222,20 @@ func (c *cli) getDescriptorsFromDescriptorSet() ([]protoreflect.FileDescriptor, 
 	files.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
 		if filesToLint[fd.Path()] {
 			fileDescriptors = append(fileDescriptors, fd)
+			delete(filesToLint, fd.Path())
 		}
 		return true // continue iteration
 	})
+
+	if len(filesToLint) > 0 {
+		var missing []string
+		for f := range filesToLint {
+			missing = append(missing, f)
+		}
+		sort.Strings(missing)
+		return nil, fmt.Errorf("files not found in descriptor set(s): %s", strings.Join(missing, ", "))
+	}
+
 	return fileDescriptors, nil
 }
 

@@ -570,6 +570,15 @@ func TestSkipCompilation_Errors(t *testing.T) {
 			},
 			wantErrString: "no descriptor set found",
 		},
+		{
+			name: "FileNotFound",
+			args: []string{
+				"--descriptor-set-in=internal/testdata/dummy.protoset",
+				"--skip-compilation",
+				"missing.proto",
+			},
+			wantErrString: "files not found in descriptor set(s): missing.proto",
+		},
 	}
 
 	for _, tc := range tests {
