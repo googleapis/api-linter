@@ -83,8 +83,8 @@ func newCli(args []string) *cli {
 	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.BoolVar(&versionFlag, "version", false, "Print version and exit.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.") // TODO: replace the full flag name with descriptor-set-inports?
-	fs.BoolVar(&skipCompilationFlag, "skip-compilation", false, "Skip the compilation of the proto files and instead use the provided descriptor set to look up the files to lint.")
+	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
+	fs.BoolVar(&skipCompilationFlag, "skip-compilation", false, "Skip the compilation of the proto files and instead use the provided descriptor set to look up the files to lint. When using this flag, the provided descriptor set must contain the files to be linted and should have been compiled with --include_source_info and --include_imports.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit. Honors the output-format flag.")
@@ -149,107 +149,14 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 
 	var fileDescriptors []protoreflect.FileDescriptor
+	var err error
 	if c.SkipCompilationFlag {
-		if len(c.ProtoDescPath) == 0 {
-			return fmt.Errorf("no descriptor set found")
-		}
-
-		files, err := createRegistryFromDescriptorSets(c.ProtoDescPath...)
-		if err != nil {
-			return err
-		}
-
-		// Identify the files to lint.
-		filesToLint := make(map[string]bool)
-		for _, f := range c.ProtoFiles {
-			filesToLint[f] = true
-		}
-
-		// Iterate over the files in the registry and append them to fileDescriptors.
-		files.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-			if filesToLint[fd.Path()] {
-				fileDescriptors = append(fileDescriptors, fd)
-			}
-			return true // continue iteration
-		})
+		fileDescriptors, err = c.getDescriptorsFromDescriptorSet()
 	} else {
-		// --- TODO: create wrapper function here
-		// Create resolver for descriptor sets.
-		descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
-		if err != nil {
-			return err
-		}
-
-		// Create resolver for source files.
-		imports := resolveImports(c.ProtoImportPaths)
-		sourceResolver := &protocompile.SourceResolver{
-			ImportPaths: imports,
-		}
-
-		// This combines resolvers, prioritizing the source resolver and falling
-		// back to the descriptor set resolver. This approach provides more accurate
-		// descriptor information when the descriptor set lacks source details
-		resolvers := []protocompile.Resolver{sourceResolver}
-		if descResolver != nil {
-			resolvers = append(resolvers, descResolver)
-		}
-
-		// The previous parser (`jhump/protoreflect`) reported all parse errors it
-		// found. The default behavior of the new parser (`protocompile`) is to
-		// stop on the first error.
-		//
-		// To preserve the original behavior, we provide a custom reporter that
-		// collects all errors and allows the compiler to continue. The previous
-		// parser also had no distinct concept of warnings, so we pass a nil
-		// warning handler to maintain the same behavior of ignoring them.
-		var collectedErrors []error
-		rep := reporter.NewReporter(func(err reporter.ErrorWithPos) error {
-			collectedErrors = append(collectedErrors, err)
-			return nil // Returning nil signals the compiler to continue.
-		}, nil)
-
-		compiler := protocompile.Compiler{
-			Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver(resolvers)),
-			SourceInfoMode: protocompile.SourceInfoExtraOptionLocations,
-			Reporter:       rep,
-		}
-
-		// Compile each file individually to avoid possible collisions
-		// between a linted file that imports other files that are also being linted.
-		// Otherwise, both the import resolver and the file will be "duplicated".
-		var compiledFiles linker.Files
-		for _, protoFile := range c.ProtoFiles {
-			// The compiler returns a slice of files, even for a single input file.
-			f, err := compiler.Compile(context.Background(), protoFile)
-			// After compilation, check if the handler collected any errors.
-			// This is the primary source of truth for parse errors when using a
-			// custom reporter that continues on error.
-			if len(collectedErrors) > 0 {
-				errorStrings := make([]string, len(collectedErrors))
-				for i, e := range collectedErrors {
-					errorStrings[i] = e.Error()
-				}
-				return errors.New(strings.Join(errorStrings, "\n"))
-			}
-
-			// If the reporter has no errors, but the compiler still returned one,
-			// it's a fatal, non-recoverable error.
-			if err != nil {
-				return err
-			}
-			// Append the compiled file(s) to the slice.
-			compiledFiles = append(compiledFiles, f...)
-		}
-		files := compiledFiles
-
-		// The compiler returns a slice of `*linker.File`, which is the compiler's
-		// internal representation. We convert this to a slice of the standard
-		// `protoreflect.FileDescriptor` interface, which the linter engine expects.
-		for _, f := range files {
-			fileDescriptors = append(fileDescriptors, f)
-		}
-
-		// ----- TODO: end wrapper function
+		fileDescriptors, err = c.getDescriptorsFromSource()
+	}
+	if err != nil {
+		return err
 	}
 
 	// Create a linter to lint the file descriptors.
@@ -291,6 +198,112 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 	}
 
 	return nil
+}
+
+func (c *cli) getDescriptorsFromDescriptorSet() ([]protoreflect.FileDescriptor, error) {
+	if len(c.ProtoDescPath) == 0 {
+		return nil, fmt.Errorf("no descriptor set found")
+	}
+
+	files, err := createRegistryFromDescriptorSets(c.ProtoDescPath...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Identify the files to lint.
+	filesToLint := make(map[string]bool)
+	for _, f := range c.ProtoFiles {
+		filesToLint[f] = true
+	}
+
+	var fileDescriptors []protoreflect.FileDescriptor
+	// Iterate over the files in the registry and append them to fileDescriptors.
+	files.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		if filesToLint[fd.Path()] {
+			fileDescriptors = append(fileDescriptors, fd)
+		}
+		return true // continue iteration
+	})
+	return fileDescriptors, nil
+}
+
+func (c *cli) getDescriptorsFromSource() ([]protoreflect.FileDescriptor, error) {
+	// Create resolver for descriptor sets.
+	descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create resolver for source files.
+	imports := resolveImports(c.ProtoImportPaths)
+	sourceResolver := &protocompile.SourceResolver{
+		ImportPaths: imports,
+	}
+
+	// This combines resolvers, prioritizing the source resolver and falling
+	// back to the descriptor set resolver. This approach provides more accurate
+	// descriptor information when the descriptor set lacks source details
+	resolvers := []protocompile.Resolver{sourceResolver}
+	if descResolver != nil {
+		resolvers = append(resolvers, descResolver)
+	}
+
+	// The previous parser (`jhump/protoreflect`) reported all parse errors it
+	// found. The default behavior of the new parser (`protocompile`) is to
+	// stop on the first error.
+	//
+	// To preserve the original behavior, we provide a custom reporter that
+	// collects all errors and allows the compiler to continue. The previous
+	// parser also had no distinct concept of warnings, so we pass a nil
+	// warning handler to maintain the same behavior of ignoring them.
+	var collectedErrors []error
+	rep := reporter.NewReporter(func(err reporter.ErrorWithPos) error {
+		collectedErrors = append(collectedErrors, err)
+		return nil // Returning nil signals the compiler to continue.
+	}, nil)
+
+	compiler := protocompile.Compiler{
+		Resolver:       protocompile.WithStandardImports(protocompile.CompositeResolver(resolvers)),
+		SourceInfoMode: protocompile.SourceInfoExtraOptionLocations,
+		Reporter:       rep,
+	}
+
+	// Compile each file individually to avoid possible collisions
+	// between a linted file that imports other files that are also being linted.
+	// Otherwise, both the import resolver and the file will be "duplicated".
+	var compiledFiles linker.Files
+	for _, protoFile := range c.ProtoFiles {
+		// The compiler returns a slice of files, even for a single input file.
+		f, err := compiler.Compile(context.Background(), protoFile)
+		// After compilation, check if the handler collected any errors.
+		// This is the primary source of truth for parse errors when using a
+		// custom reporter that continues on error.
+		if len(collectedErrors) > 0 {
+			errorStrings := make([]string, len(collectedErrors))
+			for i, e := range collectedErrors {
+				errorStrings[i] = e.Error()
+			}
+			return nil, errors.New(strings.Join(errorStrings, "\n"))
+		}
+
+		// If the reporter has no errors, but the compiler still returned one,
+		// it's a fatal, non-recoverable error.
+		if err != nil {
+			return nil, err
+		}
+		// Append the compiled file(s) to the slice.
+		compiledFiles = append(compiledFiles, f...)
+	}
+	files := compiledFiles
+
+	var fileDescriptors []protoreflect.FileDescriptor
+	// The compiler returns a slice of `*linker.File`, which is the compiler's
+	// internal representation. We convert this to a slice of the standard
+	// `protoreflect.FileDescriptor` interface, which the linter engine expects.
+	for _, f := range files {
+		fileDescriptors = append(fileDescriptors, f)
+	}
+	return fileDescriptors, nil
 }
 
 func anyProblems(results []lint.Response) bool {
