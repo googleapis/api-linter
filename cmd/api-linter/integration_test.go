@@ -512,3 +512,74 @@ func TestDeduplicatesRepeatedDescriptors_DescriptorSets(t *testing.T) {
 		}
 	}
 }
+
+func TestSkipCompilation_Success(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{
+			name: "SingleFile",
+			args: []string{
+				"--descriptor-set-in=internal/testdata/dummy.protoset",
+				"--skip-compilation",
+				"dummy.proto",
+			},
+		},
+		{
+			name: "MultipleDescriptorSets",
+			args: []string{
+				"--descriptor-set-in=internal/testdata/a.protoset",
+				"--descriptor-set-in=internal/testdata/dummy.protoset",
+				"--skip-compilation",
+				"a.proto",
+				"dummy.proto",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := runCLI(tc.args)
+			if err != nil && !errors.Is(err, ExitForLintFailure) {
+				t.Errorf("runCLI() unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestSkipCompilation_Errors(t *testing.T) {
+	tests := []struct {
+		name          string
+		args          []string
+		wantErrString string
+	}{
+		{
+			name: "NoFileToLint",
+			args: []string{
+				"--descriptor-set-in=internal/testdata/dummy.protoset",
+				"--skip-compilation",
+			},
+			wantErrString: "no file to lint",
+		},
+		{
+			name: "NoDescriptorSet",
+			args: []string{
+				"--skip-compilation",
+				"dummy.proto",
+			},
+			wantErrString: "no descriptor set found",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := runCLI(tc.args)
+			if err == nil {
+				t.Errorf("runCLI() expected error containing %q, got nil", tc.wantErrString)
+			} else if !strings.Contains(err.Error(), tc.wantErrString) {
+				t.Errorf("runCLI() expected error containing %q, got %q", tc.wantErrString, err.Error())
+			}
+		})
+	}
+}
