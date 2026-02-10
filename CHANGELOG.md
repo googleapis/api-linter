@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/googleapis/api-linter/compare/v2.2.0...v2.3.0) (2026-02-10)
+
+
+### Features
+
+* **cli:** add support for linting descriptor sets only via --skip-compilation ([#1600](https://github.com/googleapis/api-linter/issues/1600)) ([d33d4a7](https://github.com/googleapis/api-linter/commit/d33d4a746f473ef9e749b0011067e460701c2396))
+
 ## [2.2.0](https://github.com/googleapis/api-linter/compare/v2.1.0...v2.2.0) (2026-01-22)
 
 
