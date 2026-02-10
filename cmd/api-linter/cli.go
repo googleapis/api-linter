@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/bufbuild/protocompile"
@@ -84,7 +84,7 @@ func newCli(args []string) *cli {
 	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.BoolVar(&versionFlag, "version", false, "Print version and exit.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
+	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.\nAlso used as the source of proto files to lint when --skip-compilation is enabled.")
 	fs.BoolVar(&skipCompilationFlag, "skip-compilation", false, "Skip the compilation of the proto files and instead use the provided descriptor set to look up the files to lint. When using this flag, the provided descriptor set must contain the files to be linted and should have been compiled with --include_source_info and --include_imports.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
@@ -211,29 +211,21 @@ func (c *cli) getDescriptorsFromDescriptorSet() ([]protoreflect.FileDescriptor, 
 		return nil, err
 	}
 
-	// Identify the files to lint.
-	filesToLint := make(map[string]bool)
-	for _, f := range c.ProtoFiles {
-		filesToLint[f] = true
-	}
-
 	var fileDescriptors []protoreflect.FileDescriptor
 	// Iterate over the files in the registry and append them to fileDescriptors.
 	files.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-		if filesToLint[fd.Path()] {
+		if slices.Contains(c.ProtoFiles, fd.Path()) {
 			fileDescriptors = append(fileDescriptors, fd)
-			delete(filesToLint, fd.Path())
 		}
 		return true // continue iteration
 	})
 
-	if len(filesToLint) > 0 {
-		var missing []string
-		for f := range filesToLint {
-			missing = append(missing, f)
+	if len(fileDescriptors) < len(c.ProtoFiles) {
+		var filenames []string
+		for _, fd := range fileDescriptors {
+			filenames = append(filenames, fd.Path())
 		}
-		sort.Strings(missing)
-		return nil, fmt.Errorf("files not found in descriptor set(s): %s", strings.Join(missing, ", "))
+		return nil, fmt.Errorf("files found in descriptors %v, files request for linting %v", filenames, c.ProtoFiles)
 	}
 
 	return fileDescriptors, nil
@@ -354,6 +346,7 @@ func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, 
 	if err != nil {
 		return nil, err
 	}
+	// Returning nil is safe as callers check for nil before using the resolver.
 	if files == nil {
 		return nil, nil
 	}

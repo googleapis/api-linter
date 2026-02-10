@@ -513,6 +513,32 @@ func TestDeduplicatesRepeatedDescriptors_DescriptorSets(t *testing.T) {
 	}
 }
 
+func TestLintSourceWithoutDescriptorSet(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "test-source-no-desc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	protoFileName := "simple.proto"
+	protoFilePath := filepath.Join(tempDir, protoFileName)
+	content := `syntax = "proto3"; package test; message Simple {}`
+	if err := os.WriteFile(protoFilePath, []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Run without --descriptor-set-in
+	args := []string{
+		"-I", tempDir,
+		protoFileName,
+	}
+
+	// Should succeed without error (and definitely no panic)
+	if err := runCLI(args); err != nil {
+		t.Fatalf("runCLI() unexpected error: %v", err)
+	}
+}
+
 func TestSkipCompilation_Success(t *testing.T) {
 	tests := []struct {
 		name string
@@ -575,9 +601,10 @@ func TestSkipCompilation_Errors(t *testing.T) {
 			args: []string{
 				"--descriptor-set-in=internal/testdata/dummy.protoset",
 				"--skip-compilation",
+				"dummy.proto",
 				"missing.proto",
 			},
-			wantErrString: "files not found in descriptor set(s): missing.proto",
+			wantErrString: "files found in descriptors [dummy.proto], files request for linting [dummy.proto missing.proto]",
 		},
 	}
 
