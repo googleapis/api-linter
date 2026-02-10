@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/bufbuild/protocompile"
@@ -46,6 +47,7 @@ type cli struct {
 	ProtoImportPaths          []string
 	ProtoFiles                []string
 	ProtoDescPath             []string
+	SkipCompilationFlag       bool
 	EnabledRules              []string
 	DisabledRules             []string
 	ListRulesFlag             bool
@@ -67,6 +69,7 @@ func newCli(args []string) *cli {
 	var versionFlag bool
 	var protoImportFlag []string
 	var protoDescFlag []string
+	var skipCompilationFlag bool
 	var ruleEnableFlag []string
 	var ruleDisableFlag []string
 	var listRulesFlag bool
@@ -81,7 +84,8 @@ func newCli(args []string) *cli {
 	fs.BoolVar(&setExitStatusOnLintFailure, "set-exit-status", false, "Return exit status 1 when lint errors are found.")
 	fs.BoolVar(&versionFlag, "version", false, "Print version and exit.")
 	fs.StringArrayVarP(&protoImportFlag, "proto-path", "I", nil, "The folder for searching proto imports.\nMay be specified multiple times; directories will be searched in order.\nThe current working directory is always used.")
-	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.")
+	fs.StringArrayVar(&protoDescFlag, "descriptor-set-in", nil, "The file containing a FileDescriptorSet for searching proto imports.\nMay be specified multiple times.\nAlso used as the source of proto files to lint when --skip-compilation is enabled.")
+	fs.BoolVar(&skipCompilationFlag, "skip-compilation", false, "Skip the compilation of the proto files and instead use the provided descriptor set to look up the files to lint. When using this flag, the provided descriptor set must contain the files to be linted and should have been compiled with --include_source_info and --include_imports.")
 	fs.StringArrayVar(&ruleEnableFlag, "enable-rule", nil, "Enable a rule with the given name.\nMay be specified multiple times.")
 	fs.StringArrayVar(&ruleDisableFlag, "disable-rule", nil, "Disable a rule with the given name.\nMay be specified multiple times.")
 	fs.BoolVar(&listRulesFlag, "list-rules", false, "Print the rules and exit. Honors the output-format flag.")
@@ -101,6 +105,7 @@ func newCli(args []string) *cli {
 		ExitStatusOnLintFailure:   setExitStatusOnLintFailure,
 		ProtoImportPaths:          protoImportFlag,
 		ProtoDescPath:             protoDescFlag,
+		SkipCompilationFlag:       skipCompilationFlag,
 		EnabledRules:              ruleEnableFlag,
 		DisabledRules:             ruleDisableFlag,
 		ProtoFiles:                fs.Args(),
@@ -144,10 +149,93 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 		})
 	}
 
+	var fileDescriptors []protoreflect.FileDescriptor
+	var err error
+	if c.SkipCompilationFlag {
+		fileDescriptors, err = c.getDescriptorsFromDescriptorSet()
+	} else {
+		fileDescriptors, err = c.getDescriptorsFromSource()
+	}
+	if err != nil {
+		return err
+	}
+
+	// Create a linter to lint the file descriptors.
+	l := lint.New(rules, configs, lint.Debug(c.DebugFlag), lint.IgnoreCommentDisables(c.IgnoreCommentDisablesFlag))
+	results, err := l.LintProtos(fileDescriptors...)
+	if err != nil {
+		return err
+	}
+
+	// Determine the output for writing the results.
+	// Stdout is the default output.
+	w := os.Stdout
+	if c.OutputPath != "" {
+		var err error
+		w, err = os.Create(c.OutputPath)
+		if err != nil {
+			return err
+		}
+		defer w.Close()
+	}
+
+	// Determine the format for printing the results.
+	// YAML format is the default.
+	marshal := getOutputFormatFunc(c.FormatType)
+
+	// Print the results.
+	b, err := marshal(results)
+	if err != nil {
+		return err
+	}
+	if _, err = w.Write(b); err != nil {
+		return err
+	}
+
+	// Return error on lint failure which subsequently
+	// exits with a non-zero status code
+	if c.ExitStatusOnLintFailure && anyProblems(results) {
+		return ExitForLintFailure
+	}
+
+	return nil
+}
+
+func (c *cli) getDescriptorsFromDescriptorSet() ([]protoreflect.FileDescriptor, error) {
+	if len(c.ProtoDescPath) == 0 {
+		return nil, fmt.Errorf("no descriptor set found")
+	}
+
+	files, err := createRegistryFromDescriptorSets(c.ProtoDescPath...)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileDescriptors []protoreflect.FileDescriptor
+	// Iterate over the files in the registry and append them to fileDescriptors.
+	files.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		if slices.Contains(c.ProtoFiles, fd.Path()) {
+			fileDescriptors = append(fileDescriptors, fd)
+		}
+		return true // continue iteration
+	})
+
+	if len(fileDescriptors) < len(c.ProtoFiles) {
+		var filenames []string
+		for _, fd := range fileDescriptors {
+			filenames = append(filenames, fd.Path())
+		}
+		return nil, fmt.Errorf("files found in descriptors %v, files requested for linting %v", filenames, c.ProtoFiles)
+	}
+
+	return fileDescriptors, nil
+}
+
+func (c *cli) getDescriptorsFromSource() ([]protoreflect.FileDescriptor, error) {
 	// Create resolver for descriptor sets.
 	descResolver, err := loadFileDescriptorsAsResolver(c.ProtoDescPath...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create resolver for source files.
@@ -199,66 +287,27 @@ func (c *cli) lint(rules lint.RuleRegistry, configs lint.Configs) error {
 			for i, e := range collectedErrors {
 				errorStrings[i] = e.Error()
 			}
-			return errors.New(strings.Join(errorStrings, "\n"))
+			return nil, errors.New(strings.Join(errorStrings, "\n"))
 		}
 
 		// If the reporter has no errors, but the compiler still returned one,
 		// it's a fatal, non-recoverable error.
 		if err != nil {
-			return err
+			return nil, err
 		}
 		// Append the compiled file(s) to the slice.
 		compiledFiles = append(compiledFiles, f...)
 	}
 	files := compiledFiles
 
+	var fileDescriptors []protoreflect.FileDescriptor
 	// The compiler returns a slice of `*linker.File`, which is the compiler's
 	// internal representation. We convert this to a slice of the standard
 	// `protoreflect.FileDescriptor` interface, which the linter engine expects.
-	var fileDescriptors []protoreflect.FileDescriptor
 	for _, f := range files {
 		fileDescriptors = append(fileDescriptors, f)
 	}
-
-	// Create a linter to lint the file descriptors.
-	l := lint.New(rules, configs, lint.Debug(c.DebugFlag), lint.IgnoreCommentDisables(c.IgnoreCommentDisablesFlag))
-	results, err := l.LintProtos(fileDescriptors...)
-	if err != nil {
-		return err
-	}
-
-	// Determine the output for writing the results.
-	// Stdout is the default output.
-	w := os.Stdout
-	if c.OutputPath != "" {
-		var err error
-		w, err = os.Create(c.OutputPath)
-		if err != nil {
-			return err
-		}
-		defer w.Close()
-	}
-
-	// Determine the format for printing the results.
-	// YAML format is the default.
-	marshal := getOutputFormatFunc(c.FormatType)
-
-	// Print the results.
-	b, err := marshal(results)
-	if err != nil {
-		return err
-	}
-	if _, err = w.Write(b); err != nil {
-		return err
-	}
-
-	// Return error on lint failure which subsequently
-	// exits with a non-zero status code
-	if c.ExitStatusOnLintFailure && anyProblems(results) {
-		return ExitForLintFailure
-	}
-
-	return nil
+	return fileDescriptors, nil
 }
 
 func anyProblems(results []lint.Response) bool {
@@ -293,6 +342,18 @@ func (r *resolver) FindFileByPath(path string) (protocompile.SearchResult, error
 // object. It then wraps this object in our custom resolver so that it can be
 // used by the protocompile.Compiler to resolve imports.
 func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, error) {
+	files, err := createRegistryFromDescriptorSets(filePaths...)
+	if err != nil {
+		return nil, err
+	}
+	// Returning nil is safe as callers check for nil before using the resolver.
+	if files == nil {
+		return nil, nil
+	}
+	return &resolver{files: files}, nil
+}
+
+func createRegistryFromDescriptorSets(filePaths ...string) (*protoregistry.Files, error) {
 	if len(filePaths) == 0 {
 		return nil, nil
 	}
@@ -318,7 +379,7 @@ func loadFileDescriptorsAsResolver(filePaths ...string) (protocompile.Resolver, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create protoregistry.Files: %w", err)
 	}
-	return &resolver{files: files}, nil
+	return files, nil
 }
 
 func readFileDescriptorSet(filePath string) (*dpb.FileDescriptorSet, error) {
