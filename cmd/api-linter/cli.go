@@ -225,7 +225,7 @@ func (c *cli) getDescriptorsFromDescriptorSet() ([]protoreflect.FileDescriptor, 
 		for _, fd := range fileDescriptors {
 			filenames = append(filenames, fd.Path())
 		}
-		return nil, fmt.Errorf("files found in descriptors %v, files request for linting %v", filenames, c.ProtoFiles)
+		return nil, fmt.Errorf("files found in descriptors %v, files requested for linting %v", filenames, c.ProtoFiles)
 	}
 
 	return fileDescriptors, nil

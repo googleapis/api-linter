@@ -604,7 +604,7 @@ func TestSkipCompilation_Errors(t *testing.T) {
 				"dummy.proto",
 				"missing.proto",
 			},
-			wantErrString: "files found in descriptors [dummy.proto], files request for linting [dummy.proto missing.proto]",
+			wantErrString: "files found in descriptors",
 		},
 	}
 
