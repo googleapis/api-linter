@@ -72,5 +72,5 @@ message Book {
 If you need to violate this rule for an entire file, place the comment at the
 top of the file.
 
-[aip-140]: https://aip.dev/140
+[aip-140]: https://aip.dev/140#case
 [aip.dev/not-precedent]: https://aip.dev/not-precedent
