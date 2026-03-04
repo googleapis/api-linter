@@ -55,6 +55,7 @@ func TestJavaMultipleFiles_SkipEditionsBeyond2024(t *testing.T) {
 		Syntax:  proto.String("editions"),
 		Edition: descriptorpb.Edition_EDITION_2024.Enum(),
 		Name:    proto.String("test.proto"),
+		Package: proto.String("test"),
 	}
 	in, err := protodesc.NewFile(fdp, nil)
 	if err != nil {
