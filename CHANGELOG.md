@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/googleapis/api-linter/compare/v2.3.0...v2.3.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* **AIP-191:** skip java_multiple_files for edition &gt;= 2024 ([#1608](https://github.com/googleapis/api-linter/issues/1608)) ([75338d8](https://github.com/googleapis/api-linter/commit/75338d8d538c4cf4db39f2768262f16194674e07))
+
 ## [2.3.0](https://github.com/googleapis/api-linter/compare/v2.2.0...v2.3.0) (2026-02-10)
 
 
