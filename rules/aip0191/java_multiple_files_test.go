@@ -18,6 +18,9 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestJavaMultipleFiles(t *testing.T) {
@@ -41,5 +44,25 @@ func TestJavaMultipleFiles(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+	}
+}
+
+func TestJavaMultipleFiles_SkipEditionsBeyond2024(t *testing.T) {
+	// Note: We cannot use our testutils.ParseProtoTmpl helpers because
+	// protocompile does not support edition 2024 and will crash. So,
+	// we build descriptors manually.
+	fdp := &descriptorpb.FileDescriptorProto{
+		Syntax:  proto.String("editions"),
+		Edition: descriptorpb.Edition_EDITION_2024.Enum(),
+		Name:    proto.String("test.proto"),
+		Package: proto.String("test"),
+	}
+	in, err := protodesc.NewFile(fdp, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := javaMultipleFiles.Lint(in)
+	if len(got) != 0 {
+		t.Errorf("expected no findings, got %v", got)
 	}
 }
