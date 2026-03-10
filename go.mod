@@ -1,6 +1,6 @@
 module github.com/googleapis/api-linter/v2
 
-go 1.24.0
+go 1.25.0
 
 require (
 	bitbucket.org/creachadair/stringset v0.0.12
@@ -15,17 +15,17 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stoewer/go-strcase v1.3.1
 	golang.org/x/text v0.34.0
-	google.golang.org/genproto v0.0.0-20260209200024-4cfbd4190f57
-	google.golang.org/genproto/googleapis/api v0.0.0-20260209200024-4cfbd4190f57
+	google.golang.org/genproto v0.0.0-20260226221140-a57be14db171
+	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260203192932-546029d2fa20 // indirect
+	golang.org/x/sys v0.40.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260217215200-42d3e9bedb6d // indirect
 	google.golang.org/grpc v1.78.0 // indirect
 )
