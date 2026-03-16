@@ -19,6 +19,10 @@ import (
 	"testing"
 
 	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestJavaOuterClassname(t *testing.T) {
@@ -47,5 +51,32 @@ func TestJavaOuterClassname(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+	}
+}
+
+func newEdition2024File(t *testing.T, opts *descriptorpb.FileOptions) protoreflect.FileDescriptor {
+	t.Helper()
+	fdp := &descriptorpb.FileDescriptorProto{
+		Syntax:  proto.String("editions"),
+		Edition: descriptorpb.Edition_EDITION_2024.Enum(),
+		Name:    proto.String("test.proto"),
+		Package: proto.String("test"),
+		Options: opts,
+	}
+	in, err := protodesc.NewFile(fdp, nil)
+	if err != nil {
+		t.Fatalf("protodesc.NewFile: %v", err)
+	}
+	return in
+}
+
+func TestJavaOuterClassname_SkipEditionsBeyond2024(t *testing.T) {
+	// Note: We cannot use our testutils.ParseProtoTmpl helpers because
+	// protocompile does not support edition 2024 and will crash. So,
+	// we build descriptors manually.
+	in := newEdition2024File(t, nil)
+	got := javaOuterClassname.Lint(in)
+	if len(got) != 0 {
+		t.Errorf("expected no findings, got %v", got)
 	}
 }

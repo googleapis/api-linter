@@ -19,6 +19,11 @@ This rule looks at each proto file, and complains if the `java_outer_classname`
 file annotation is not present, or set to something other than the common class
 name based on the proto's filename.
 
+> **NOTE:** Starting with Protobuf Edition 2024, the default behavior for this option 
+> automatically aligns with this rule. Therefore, this rule ignores missing options in 
+> Edition 2024+ files, but will still complain if the option is explicitly set to an 
+> incorrect value.
+
 ## Examples
 
 **Incorrect** code for this rule:
@@ -47,6 +52,20 @@ package google.example.v1;
 option java_package = "com.google.example.v1";
 option java_multiple_files = true;
 option java_outer_classname = "LibraryProto";
+
+message Book {}
+```
+
+**Correct** code for this rule (Edition 2024):
+
+```proto
+// Correct.
+edition = "2024";
+
+package google.example.v1;
+
+option java_package = "com.google.example.v1";
+// java_outer_classname is omitted, using the compiler default.
 
 message Book {}
 ```
