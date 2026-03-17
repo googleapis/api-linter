@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.1](https://github.com/googleapis/api-linter/compare/v2.3.0...v2.3.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* **AIP-191:** amend logic java_outer_classname for edition &gt;= 2024 ([#1613](https://github.com/googleapis/api-linter/issues/1613)) ([dc57c9d](https://github.com/googleapis/api-linter/commit/dc57c9d5a82cb7bf75b8f15b2f23aa4e1ac54534))
+* **AIP-191:** skip java_multiple_files for edition &gt;= 2024 ([#1608](https://github.com/googleapis/api-linter/issues/1608)) ([75338d8](https://github.com/googleapis/api-linter/commit/75338d8d538c4cf4db39f2768262f16194674e07))
+
 ## [2.3.0](https://github.com/googleapis/api-linter/compare/v2.2.0...v2.3.0) (2026-02-10)
 
 
