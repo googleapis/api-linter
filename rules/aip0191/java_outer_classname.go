@@ -22,6 +22,7 @@ import (
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
 	"github.com/stoewer/go-strcase"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
@@ -29,7 +30,13 @@ import (
 var javaOuterClassname = &lint.FileRule{
 	Name: lint.NewRuleName(191, "java-outer-classname"),
 	OnlyIf: func(f protoreflect.FileDescriptor) bool {
-		return hasPackage(f) && !strings.HasSuffix(string(f.Package()), ".master")
+		if !hasPackage(f) || strings.HasSuffix(string(f.Package()), ".master") {
+			return false
+		}
+		// This rule applies if the file is a pre-2024 edition,
+		// or if it's a 2024+ edition and `java_outer_classname` is explicitly set.
+		return protodesc.ToFileDescriptorProto(f).GetEdition() < dpb.Edition_EDITION_2024 ||
+			f.Options().(*dpb.FileOptions).GetJavaOuterClassname() != ""
 	},
 	LintFile: func(f protoreflect.FileDescriptor) []lint.Problem {
 		filename := filepath.Base(string(f.Path()))
