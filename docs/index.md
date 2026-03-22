@@ -80,7 +80,7 @@ Usage of api-linter:
       --version                         Print version and exit.
 ```
 
-## License
+## License 
 
 This software is made available under the [Apache 2.0][] license.
 
