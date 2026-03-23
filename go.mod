@@ -15,8 +15,8 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stoewer/go-strcase v1.3.1
 	golang.org/x/text v0.35.0
-	google.golang.org/genproto v0.0.0-20260316180232-0b37fe3546d5
-	google.golang.org/genproto/googleapis/api v0.0.0-20260316180232-0b37fe3546d5
+	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7
+	google.golang.org/genproto/googleapis/api v0.0.0-20260319201613-d00831a3d3e7
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
