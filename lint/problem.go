@@ -124,7 +124,7 @@ func (p Problem) GetRuleURI() string {
 	return getRuleURL(string(p.RuleID), ruleURLMappings)
 }
 
-// Position describes a one-based Position in a source code file.
+// Position describes a one-based position in a source code file.
 // They are one-indexed, as a human counts lines or columns.
 type Position struct {
 	Line   int `json:"line_number" yaml:"line_number"`
@@ -141,7 +141,7 @@ type FileLocation struct {
 	Path  string   `json:"path" yaml:"path"`
 }
 
-// FileLocationFromPBLocation returns a new fileLocation object based on a
+// FileLocationFromPBLocation returns a new FileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
 func FileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) FileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
