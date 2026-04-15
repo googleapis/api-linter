@@ -18,6 +18,12 @@ references as mandated in [AIP-121][].
 This rule scans the fields of every resource and ensures that any references to
 other resources do not create a mutable cycle between them.
 
+A field is considered "mutable" in this context if it is client-settable. This
+includes fields marked as `IMMUTABLE`, because they can be set at creation time,
+which could effectively lead to a cycle when the resource is created. Only
+`OUTPUT_ONLY` fields (which are server-managed) are exempt from this rule as
+they break the mutation cycle.
+
 ## Examples
 
 **Incorrect** code for this rule:
