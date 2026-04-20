@@ -94,6 +94,19 @@ func TestNoMutableCycles(t *testing.T) {
 			}},
 		},
 		{
+			"InvalidStartingImmutableCycle",
+			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
+			`[
+				(google.api.resource_reference).type = "library.googleapis.com/Book",
+				(google.api.field_behavior) = IMMUTABLE
+			]`,
+			"",
+			"",
+			testutils.Problems{{
+				Message: "Note: IMMUTABLE fields do not prevent cycles because they can be set at creation time",
+			}},
+		},
+		{
 			"ValidOutputOnlyCyclicReference",
 			`[(google.api.resource_reference).type = "library.googleapis.com/Publisher"]`,
 			`[

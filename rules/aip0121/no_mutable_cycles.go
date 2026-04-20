@@ -75,6 +75,11 @@ func findCycles(start string, node protoreflect.MessageDescriptor, seen stringse
 				p.Descriptor = f
 				p.Location = locations.FieldResourceReference(f)
 
+				// Ensure we don't overwrite the message if the field is IMMUTABLE
+				if utils.GetFieldBehavior(f).Contains("IMMUTABLE") && !strings.Contains(p.Message, "Note: IMMUTABLE") {
+					p.Message += "\nNote: IMMUTABLE fields do not prevent cycles because they can be set at creation time, which could effectively lead to a cycle when the resource is created."
+				}
+
 				problems = append(problems, p)
 			}
 		}
