@@ -53,8 +53,12 @@ func findCycles(start string, node protoreflect.MessageDescriptor, seen stringse
 		}
 		if ref.GetType() == start {
 			cycle := strings.Join(append(chain, start), " > ")
+			msg := "mutable resource reference introduces a reference cycle:\n" + cycle
+			if utils.GetFieldBehavior(f).Contains("IMMUTABLE") {
+				msg += "\nNote: IMMUTABLE fields do not prevent cycles because they can be set at creation time, which could effectively lead to a cycle when the resource is created."
+			}
 			problems = append(problems, lint.Problem{
-				Message:    "mutable resource reference introduces a reference cycle:\n" + cycle,
+				Message:    msg,
 				Descriptor: f,
 				Location:   locations.FieldResourceReference(f),
 			})
@@ -70,6 +74,11 @@ func findCycles(start string, node protoreflect.MessageDescriptor, seen stringse
 				p := probs[0]
 				p.Descriptor = f
 				p.Location = locations.FieldResourceReference(f)
+
+				// Ensure we don't overwrite the message if the field is IMMUTABLE
+				if utils.GetFieldBehavior(f).Contains("IMMUTABLE") && !strings.Contains(p.Message, "Note: IMMUTABLE") {
+					p.Message += "\nNote: IMMUTABLE fields do not prevent cycles because they can be set at creation time, which could effectively lead to a cycle when the resource is created."
+				}
 
 				problems = append(problems, p)
 			}
