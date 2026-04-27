@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/v2/lint"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // formatGitHubActionOutput returns lint errors in GitHub actions format.
@@ -34,8 +35,8 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 			fmt.Fprintf(&buf, "::error file=%s", response.FilePath)
 
 			if problem.Location != nil {
-				loc := lint.FileLocationFromPBLocation(problem.Location, nil)
-				fmt.Fprintf(&buf, ",line=%d,endLine=%d,col=%d,endColumn=%d", loc.Start.Line, loc.End.Line, loc.Start.Column, loc.End.Column)
+				start, end := fileLocationFromPBLocation(problem.Location)
+				fmt.Fprintf(&buf, ",line=%d,endLine=%d,col=%d,endColumn=%d", start.Line, end.Line, start.Column, end.Column)
 			}
 
 			// GitHub uses :: as control characters (which are also used to delimit
@@ -53,4 +54,30 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 	}
 
 	return buf.Bytes()
+}
+
+type position struct {
+	Line   int
+	Column int
+}
+
+// Implementation copied from lint/problem.go
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) (start, end position) {
+	start = position{
+		Line:   int(l.Span[0]) + 1,
+		Column: int(l.Span[1]) + 1,
+	}
+
+	if len(l.Span) == 4 {
+		end = position{
+			Line:   int(l.Span[2]) + 1,
+			Column: int(l.Span[3]),
+		}
+	} else {
+		end = position{
+			Line:   int(l.Span[0]) + 1,
+			Column: int(l.Span[2]),
+		}
+	}
+	return start, end
 }
