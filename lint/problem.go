@@ -76,36 +76,36 @@ func (p Problem) MarshalYAML() (interface{}, error) {
 
 // Marshal defines how to represent a serialized Problem.
 func (p Problem) marshal() interface{} {
-	var fl FileLocation
+	var fl fileLocation
 	if p.Location != nil {
 		// If Location is set, use it.
-		fl = FileLocationFromPBLocation(p.Location, p.Descriptor)
+		fl = fileLocationFromPBLocation(p.Location, p.Descriptor)
 	} else if p.Descriptor != nil {
 		// Otherwise, use the descriptor's location.
 		// This is the protobuf-go idiomatic way to get the source location.
 		// Note: ParentFile() called on a FileDescriptor returns itself.
 		loc := p.Descriptor.ParentFile().SourceLocations().ByDescriptor(p.Descriptor)
-		fl = FileLocation{
+		fl = fileLocation{
 			Path: p.Descriptor.ParentFile().Path(),
-			Start: Position{
+			Start: position{
 				Line:   loc.StartLine + 1,
 				Column: loc.StartColumn + 1,
 			},
-			End: Position{
+			End: position{
 				Line:   loc.EndLine + 1,
 				Column: loc.EndColumn,
 			},
 		}
 	} else {
 		// Default location if no descriptor.
-		fl = FileLocationFromPBLocation(nil, nil)
+		fl = fileLocationFromPBLocation(nil, nil)
 	}
 
 	// Return a marshal-able structure.
 	return struct {
 		Message    string       `json:"message" yaml:"message"`
 		Suggestion string       `json:"suggestion,omitempty" yaml:"suggestion,omitempty"`
-		Location   FileLocation `json:"location" yaml:"location"`
+		Location   fileLocation `json:"location" yaml:"location"`
 		RuleID     RuleName     `json:"rule_id" yaml:"rule_id"`
 		RuleDocURI string       `json:"rule_doc_uri" yaml:"rule_doc_uri"`
 		Category   string       `json:"category,omitempty" yaml:"category,omitempty"`
@@ -124,35 +124,35 @@ func (p Problem) GetRuleURI() string {
 	return getRuleURL(string(p.RuleID), ruleURLMappings)
 }
 
-// Position describes a one-based position in a source code file.
+// position describes a one-based position in a source code file.
 // They are one-indexed, as a human counts lines or columns.
-type Position struct {
+type position struct {
 	Line   int `json:"line_number" yaml:"line_number"`
 	Column int `json:"column_number" yaml:"column_number"`
 }
 
-// FileLocation describes a location in a source code file.
+// fileLocation describes a location in a source code file.
 //
 // Note: Positions are one-indexed, as a human counts lines or columns
 // in a file.
-type FileLocation struct {
-	Start Position `json:"start_position" yaml:"start_position"`
-	End   Position `json:"end_position" yaml:"end_position"`
+type fileLocation struct {
+	Start position `json:"start_position" yaml:"start_position"`
+	End   position `json:"end_position" yaml:"end_position"`
 	Path  string   `json:"path" yaml:"path"`
 }
 
-// FileLocationFromPBLocation returns a new FileLocation object based on a
+// fileLocationFromPBLocation returns a new fileLocation object based on a
 // protocol buffer SourceCodeInfo_Location
-func FileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) FileLocation {
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.Descriptor) fileLocation {
 	// Spans are guaranteed by protobuf to have either three or four ints.
 	span := []int32{0, 0, 1}
 	if l != nil {
 		span = l.Span
 	}
 
-	var fl FileLocation
+	var fl fileLocation
 	if d != nil {
-		fl = FileLocation{Path: d.ParentFile().Path()}
+		fl = fileLocation{Path: d.ParentFile().Path()}
 	}
 
 	// If `span` has four ints; they correspond to
@@ -161,11 +161,11 @@ func FileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.D
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
 	if len(span) == 4 {
-		fl.Start = Position{
+		fl.Start = position{
 			Line:   int(span[0]) + 1,
 			Column: int(span[1]) + 1,
 		}
-		fl.End = Position{
+		fl.End = position{
 			Line:   int(span[2]) + 1,
 			Column: int(span[3]),
 		}
@@ -177,11 +177,11 @@ func FileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location, d protoreflect.D
 	//
 	// We add one because spans are zero-indexed, but not to the end column
 	// because we want the ending position to be inclusive and not exclusive.
-	fl.Start = Position{
+	fl.Start = position{
 		Line:   int(span[0]) + 1,
 		Column: int(span[1]) + 1,
 	}
-	fl.End = Position{
+	fl.End = position{
 		Line:   int(span[0]) + 1,
 		Column: int(span[2]),
 	}
