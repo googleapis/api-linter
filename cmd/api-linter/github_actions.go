@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/googleapis/api-linter/v2/lint"
+	dpb "google.golang.org/protobuf/types/descriptorpb"
 )
 
 // formatGitHubActionOutput returns lint errors in GitHub actions format.
@@ -32,23 +33,10 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 			// https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
 			fmt.Fprintf(&buf, "::error file=%s", response.FilePath)
+
 			if problem.Location != nil {
-				// Some findings are *line level* and only have start positions but no
-				// starting column. Construct a switch fallthrough to emit as many of
-				// the location indicators are included.
-				switch len(problem.Location.Span) {
-				case 4:
-					fmt.Fprintf(&buf, ",endColumn=%d", problem.Location.Span[3])
-					fallthrough
-				case 3:
-					fmt.Fprintf(&buf, ",endLine=%d", problem.Location.Span[2])
-					fallthrough
-				case 2:
-					fmt.Fprintf(&buf, ",col=%d", problem.Location.Span[1])
-					fallthrough
-				case 1:
-					fmt.Fprintf(&buf, ",line=%d", problem.Location.Span[0])
-				}
+				start, end := fileLocationFromPBLocation(problem.Location)
+				fmt.Fprintf(&buf, ",line=%d,endLine=%d,col=%d,endColumn=%d", start.Line, end.Line, start.Column, end.Column)
 			}
 
 			// GitHub uses :: as control characters (which are also used to delimit
@@ -56,14 +44,40 @@ func formatGitHubActionOutput(responses []lint.Response) []byte {
 			// with two Armenian full stops which are indistinguishable to my eye.
 			runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops := "։։"
 			title := strings.ReplaceAll(string(problem.RuleID), "::", runeThatLooksLikeTwoColonsButIsActuallyTwoArmenianFullStops)
-			message := strings.ReplaceAll(problem.Message, "\n", "\\n")
+			message := strings.ReplaceAll(problem.Message, "\n", "%0A")
 			uri := problem.GetRuleURI()
 			if uri != "" {
-				message += "\\n\\n" + uri
+				message += "%0A%0A" + uri
 			}
 			fmt.Fprintf(&buf, ",title=%s::%s\n", title, message)
 		}
 	}
 
 	return buf.Bytes()
+}
+
+type position struct {
+	Line   int
+	Column int
+}
+
+// Implementation copied from lint/problem.go
+func fileLocationFromPBLocation(l *dpb.SourceCodeInfo_Location) (start, end position) {
+	start = position{
+		Line:   int(l.Span[0]) + 1,
+		Column: int(l.Span[1]) + 1,
+	}
+
+	if len(l.Span) == 4 {
+		end = position{
+			Line:   int(l.Span[2]) + 1,
+			Column: int(l.Span[3]),
+		}
+	} else {
+		end = position{
+			Line:   int(l.Span[0]) + 1,
+			Column: int(l.Span[2]),
+		}
+	}
+	return start, end
 }
