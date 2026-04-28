@@ -35,12 +35,14 @@ func AddRules(r lint.RuleRegistry) error {
 var termsWithSingleLetterWords = []string{
 	"AStar", "BTree", "RTree", "MTree", "QTree",
 	"NGram", "NAry", "NWay", "KWay", "QLearning",
-	"XAxis", "YAxis", "ZAxis", "KMeans", "PValue",
-	"TTest", "TValue", "ZScore", "FTest", "FScore",
-	"HIndex", "INode", "VNode", "LValue", "RValue",
-	"PCode", "SExpression", "ETag", "IFrame", "VCard",
-	"CName", "QName", "OAuth", "ABTest", "DPad",
-	"ZIndex", "ZOrder", "ZBuffer", "XRay",
+	"XAxis", "YAxis", "ZAxis", "KMeans", "PlanA",
+	"PlanB", "PValue", "TTest", "TValue",
+	"TypeIError", "TypeIIError", "ZScore",
+	"FTest", "FScore", "HIndex", "INode", "VNode",
+	"LValue", "RValue", "PCode", "SExpression", "ETag",
+	"IFrame", "VCard", "CName", "QName", "OAuth",
+	"ABTest", "DPad", "ZIndex", "ZOrder", "ZBuffer",
+	"XRay",
 }
 
 // validNameRegex validates that a string is a valid UpperCamelCase name
@@ -50,7 +52,7 @@ var validNameRegex = regexp.MustCompile(`^(?:` +
 	`[A-Z][a-z0-9]+|` +
 	// Or an allowlisted term containing single letter "words".
 	`(?:` + strings.Join(termsWithSingleLetterWords, "|") + `)[a-z0-9]*` +
-`)+$`)
+	`)+$`)
 
 // isValidCamelCase checks if the given name follows AIP-190 case requirements.
 func isValidCamelCase(name string) bool {

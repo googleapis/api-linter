@@ -29,6 +29,10 @@ func TestIsValidCamelCase(t *testing.T) {
 		{"ValidHttpABTestingService", "HttpABTestingService", true},
 		// Multiple allowlist entries with trailing lowercase letters.
 		{"ValidABTestETaggingRequest", "ABTestETaggingRequest", true},
+		// Single letter words can also appear at the end of an allowlisted term.
+		{"ValidPlanB", "ExecutePlanB", true},
+		// We sometimes require leading and trailing context for single letters .
+		{"ValidTypeIIError", "TypeIIErrorResponse", true},
 		{"ValidXRay", "XRay", true},
 		{"ValidOAuth", "OAuth", true},
 		{"ValidABTest", "ABTest", true},
