@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/googleapis/api-linter/compare/v2.3.1...v2.4.0) (2026-05-11)
+
+
+### Features
+
+* **AIP-190:** UpperCamelCase service, method and message names. ([#1623](https://github.com/googleapis/api-linter/issues/1623)) ([9c6635b](https://github.com/googleapis/api-linter/commit/9c6635b6cc1fdcadf6e498cc75e4ce3d541ce5af))
+
 ## [2.3.1](https://github.com/googleapis/api-linter/compare/v2.3.0...v2.3.1) (2026-03-17)
 
 
