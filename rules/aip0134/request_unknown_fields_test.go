@@ -35,6 +35,11 @@ func TestUnknownFields(t *testing.T) {
 			testutils.Problems{},
 		},
 		{
+			"ReadMask", "UpdateBigBookRequest", "read_mask",
+			"google.protobuf.FieldMask",
+			testutils.Problems{},
+		},
+		{
 			"ValidateOnly", "UpdateBigBookRequest", "validate_only",
 			"bool",
 			testutils.Problems{},
