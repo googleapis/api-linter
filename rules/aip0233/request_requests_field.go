@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -52,8 +52,8 @@ var requestRequestsField = &lint.MessageRule{
 		// Rule check: Ensure that the standard create request message field is the
 		// correct type. Note: Retrieve the resource name from the the batch create
 		// request, for example: "BatchCreateBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Create%sRequest",
-			pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchCreate")))
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchCreate")
+		rightTypeName := fmt.Sprintf("Create%sRequest", utils.ResourceSingular(pluralName, m))
 		if requests.Message() == nil || requests.Message().Name() != protoreflect.Name(rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Create Request should be a %q type`, rightTypeName),

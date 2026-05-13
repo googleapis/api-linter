@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -29,8 +29,8 @@ var resourceField = &lint.MessageRule{
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// The singular form the resource message name; the first letter capitalized.
-		plural := strings.TrimSuffix(strings.TrimPrefix(string(m.Name()), "BatchGet"), "Response")
-		resourceMsgName := pluralize.NewClient().Singular(plural)
+		pluralName := strings.TrimSuffix(strings.TrimPrefix(string(m.Name()), "BatchGet"), "Response")
+		resourceMsgName := utils.ResourceSingular(pluralName, m)
 
 		for i := 0; i < m.Fields().Len(); i++ {
 			fieldDesc := m.Fields().Get(i)
