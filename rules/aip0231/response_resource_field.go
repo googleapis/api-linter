@@ -29,7 +29,7 @@ var resourceField = &lint.MessageRule{
 	OnlyIf: isBatchGetResponseMessage,
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// The singular form the resource message name; the first letter capitalized.
-		pluralName := strings.TrimSuffix(strings.TrimPrefix(string(m.Name()), "BatchGet"), "Response")
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchGet")
 		resourceMsgName := utils.ResourceSingular(pluralName, m)
 
 		for i := 0; i < m.Fields().Len(); i++ {

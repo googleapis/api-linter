@@ -144,3 +144,38 @@ func TestResourceSingular(t *testing.T) {
 		})
 	}
 }
+
+func TestResourceSingularImportedFile(t *testing.T) {
+	// Verify that ResourceSingular finds the resource annotation in a
+	// directly imported file, not just the same file.
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"resource.proto": `
+			syntax = "proto3";
+			import "google/api/resource.proto";
+
+			message ImpressionMetadata {
+				option (google.api.resource) = {
+					type: "example.com/ImpressionMetadata"
+					pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+					singular: "impressionMetadata"
+					plural: "impressionMetadata"
+				};
+			}
+		`,
+		"service.proto": `
+			syntax = "proto3";
+			import "resource.proto";
+
+			message BatchUpdateImpressionMetadataRequest {
+				string parent = 1;
+			}
+		`,
+	})
+
+	serviceFile := files["service.proto"]
+	m := serviceFile.Messages().Get(0)
+	got := ResourceSingular("ImpressionMetadata", m)
+	if got != "ImpressionMetadata" {
+		t.Errorf("ResourceSingular(\"ImpressionMetadata\") = %q, want \"ImpressionMetadata\"", got)
+	}
+}

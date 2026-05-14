@@ -54,9 +54,8 @@ func ResourceSingular(pluralName string, m protoreflect.MessageDescriptor) strin
 		if s := findResourceSingularInFile(pluralName, f); s != "" {
 			return s
 		}
-		// Also search directly imported files, since the resource message
-		// is often defined in a separate file (e.g. impression_metadata.proto)
-		// from the service file (impression_metadata_service.proto).
+		// Search direct imports only (not transitive); sufficient for standard proto
+		// layouts where the resource is in a sibling file imported by the service file.
 		imports := f.Imports()
 		for i := 0; i < imports.Len(); i++ {
 			if s := findResourceSingularInFile(pluralName, imports.Get(i).FileDescriptor); s != "" {
