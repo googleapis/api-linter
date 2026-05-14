@@ -16,6 +16,8 @@ package utils
 
 import (
 	"testing"
+
+	"github.com/googleapis/api-linter/v2/rules/internal/testutils"
 )
 
 func TestPluralize(t *testing.T) {
@@ -39,5 +41,184 @@ func TestPluralize(t *testing.T) {
 				t.Errorf("Plural(%s) got %s, but want %s", test.word, got, test.pluralizedWord)
 			}
 		})
+	}
+}
+
+func TestResourceSingular(t *testing.T) {
+	tests := []struct {
+		testName   string
+		pluralName string
+		src        string
+		want       string
+	}{
+		{
+			testName:   "AnnotationInSameFile",
+			pluralName: "ImpressionMetadata",
+			src: `
+				import "google/api/resource.proto";
+
+				message BatchUpdateImpressionMetadataRequest {
+					string parent = 1;
+				}
+				message ImpressionMetadata {
+					option (google.api.resource) = {
+						type: "example.com/ImpressionMetadata"
+						pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+						singular: "impressionMetadata"
+						plural: "impressionMetadata"
+					};
+				}
+			`,
+			want: "ImpressionMetadata",
+		},
+		{
+			testName:   "FallbackToGoPluralizeBooks",
+			pluralName: "Books",
+			src: `
+				message BatchUpdateBooksRequest {
+					string parent = 1;
+				}
+			`,
+			want: "Book",
+		},
+		{
+			testName:   "UncountableNounPluralEqualsSingular",
+			pluralName: "Metadata",
+			src: `
+				import "google/api/resource.proto";
+
+				message BatchUpdateMetadataRequest {
+					string parent = 1;
+				}
+				message Metadata {
+					option (google.api.resource) = {
+						type: "example.com/Metadata"
+						pattern: "items/{item}/metadata/{metadata}"
+						singular: "metadata"
+						plural: "metadata"
+					};
+				}
+			`,
+			want: "Metadata",
+		},
+		{
+			testName:   "MessageNameMatchesPluralName",
+			pluralName: "CursorData",
+			src: `
+				import "google/api/resource.proto";
+
+				message BatchUpdateCursorDataRequest {
+					string parent = 1;
+				}
+				message CursorData {
+					option (google.api.resource) = {
+						type: "example.com/CursorData"
+						pattern: "items/{item}/cursorData/{cursor_data}"
+						singular: "cursorDatum"
+						plural: "cursorData"
+					};
+				}
+			`,
+			want: "CursorDatum",
+		},
+		{
+			testName:   "NoAnnotationLatinWord",
+			pluralName: "Data",
+			src: `
+				message BatchUpdateDataRequest {
+					string parent = 1;
+				}
+			`,
+			want: "Datum",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3String(t, test.src)
+			m := file.Messages().Get(0)
+			got := ResourceSingular(test.pluralName, m)
+			if got != test.want {
+				t.Errorf("ResourceSingular(%q) = %q, want %q", test.pluralName, got, test.want)
+			}
+		})
+	}
+}
+
+func TestResourceSingularImportedFile(t *testing.T) {
+	// Verify that ResourceSingular finds the resource annotation in a
+	// directly imported file, not just the same file.
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"resource.proto": `
+			syntax = "proto3";
+			import "google/api/resource.proto";
+
+			message ImpressionMetadata {
+				option (google.api.resource) = {
+					type: "example.com/ImpressionMetadata"
+					pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+					singular: "impressionMetadata"
+					plural: "impressionMetadata"
+				};
+			}
+		`,
+		"service.proto": `
+			syntax = "proto3";
+			import "resource.proto";
+
+			message BatchUpdateImpressionMetadataRequest {
+				string parent = 1;
+			}
+		`,
+	})
+
+	serviceFile := files["service.proto"]
+	m := serviceFile.Messages().Get(0)
+	got := ResourceSingular("ImpressionMetadata", m)
+	if got != "ImpressionMetadata" {
+		t.Errorf("ResourceSingular(\"ImpressionMetadata\") = %q, want \"ImpressionMetadata\"", got)
+	}
+}
+
+func TestResourceSingularTransitiveImport(t *testing.T) {
+	// Verify that ResourceSingular finds the resource annotation
+	// through transitive imports (service -> common -> resource).
+	files := testutils.ParseProtoStrings(t, map[string]string{
+		"resource.proto": `
+			syntax = "proto3";
+			import "google/api/resource.proto";
+
+			message ImpressionMetadata {
+				option (google.api.resource) = {
+					type: "example.com/ImpressionMetadata"
+					pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+					singular: "impressionMetadata"
+					plural: "impressionMetadata"
+				};
+			}
+		`,
+		"common.proto": `
+			syntax = "proto3";
+			import "resource.proto";
+
+			message CommonFields {
+				string parent = 1;
+			}
+		`,
+		"service.proto": `
+			syntax = "proto3";
+			import "common.proto";
+
+			message BatchUpdateImpressionMetadataRequest {
+				string parent = 1;
+			}
+		`,
+	})
+
+	serviceFile := files["service.proto"]
+	m := serviceFile.Messages().Get(0)
+	got := ResourceSingular("ImpressionMetadata", m)
+	if got != "ImpressionMetadata" {
+		t.Errorf("ResourceSingular(\"ImpressionMetadata\") = %q, want \"ImpressionMetadata\"", got)
 	}
 }

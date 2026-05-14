@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -31,7 +31,8 @@ var responseResourceField = &lint.MessageRule{
 		// the singular form the resource name, the first letter is Capitalized.
 		// Note: Retrieve the resource name from the the batch create response,
 		// for example: "BatchCreateBooksResponse" -> "Books"
-		resourceMsgName := pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchCreate"))
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchCreate")
+		resourceMsgName := utils.ResourceSingular(pluralName, m)
 
 		for i := 0; i < m.Fields().Len(); i++ {
 			fieldDesc := m.Fields().Get(i)

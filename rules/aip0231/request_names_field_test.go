@@ -149,3 +149,72 @@ func TestNamesField(t *testing.T) {
 		})
 	}
 }
+
+func TestNamesFieldResourceAnnotation(t *testing.T) {
+	tests := []struct {
+		testName    string
+		src         string
+		problems    testutils.Problems
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
+	}{
+		{
+			testName: "Valid-ResourceSingularMetadata",
+			src: `
+				import "google/api/resource.proto";
+
+				message BatchGetImpressionMetadataRequest {
+					repeated GetImpressionMetadataRequest requests = 1;
+				}
+				message GetImpressionMetadataRequest {}
+				message ImpressionMetadata {
+					option (google.api.resource) = {
+						type: "example.com/ImpressionMetadata"
+						pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+						singular: "impressionMetadata"
+						plural: "impressionMetadata"
+					};
+				}
+			`,
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Invalid-WrongTypeWithResourceSingular",
+			src: `
+				import "google/api/resource.proto";
+
+				message BatchGetImpressionMetadataRequest {
+					repeated string requests = 1;
+				}
+				message ImpressionMetadata {
+					option (google.api.resource) = {
+						type: "example.com/ImpressionMetadata"
+						pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+						singular: "impressionMetadata"
+						plural: "impressionMetadata"
+					};
+				}
+			`,
+			problems: testutils.Problems{{Message: `The "requests" field on Batch Get Request should be a "GetImpressionMetadataRequest" type`}},
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
+				return m.Fields().ByName("requests")
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3String(t, test.src)
+			m := file.Messages().Get(0)
+
+			var problemDesc protoreflect.Descriptor = m
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(m)
+			}
+
+			problems := namesField.Lint(file)
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

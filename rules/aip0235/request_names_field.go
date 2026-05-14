@@ -16,10 +16,11 @@ package aip0235
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -78,10 +79,10 @@ var requestNamesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard delete request message field is the
-		// correct type. Note: Use m.Name()[11:len(m.Name())-7]) to retrieve
-		// the resource name from the batch delete request, for example:
-		// "BatchDeleteBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Delete%sRequest", pluralize.NewClient().Singular(string(m.Name())[11:len(m.Name())-7]))
+		// correct type. Note: Retrieve the resource name from the batch delete
+		// request, for example: "BatchDeleteBooksRequest" -> "Books"
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchDelete")
+		rightTypeName := fmt.Sprintf("Delete%sRequest", utils.ResourceSingular(pluralName, m))
 		if deleteReqMsg != nil && (deleteReqMsg.Message() == nil || deleteReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Delete Request should be a %q type`, rightTypeName),
