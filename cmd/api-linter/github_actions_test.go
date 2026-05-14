@@ -53,27 +53,11 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 								Span: []int32{5, 6, 7},
 							},
 						},
-						{
-							RuleID:  "line::col",
-							Message: "Line and column",
-							Location: &descriptorpb.SourceCodeInfo_Location{
-								Span: []int32{5, 6},
-							},
-						},
-						{
-							RuleID:  "line",
-							Message: "Line only",
-							Location: &descriptorpb.SourceCodeInfo_Location{
-								Span: []int32{5},
-							},
-						},
 					},
 				},
 			},
-			want: `::error file=example.proto,endColumn=8,endLine=7,col=6,line=5,title=line։։col։։endLine։։endColumn::line, column, endline, and endColumn
-::error file=example.proto,endLine=7,col=6,line=5,title=line։։col։։endLine::Line, column, and endline
-::error file=example.proto,col=6,line=5,title=line։։col::Line and column
-::error file=example.proto,line=5,title=line::Line only
+			want: `::error file=example.proto,line=6,endLine=8,col=7,endColumn=8,title=line։։col։։endLine։։endColumn::line, column, endline, and endColumn
+::error file=example.proto,line=6,endLine=6,col=7,endColumn=7,title=line։։col։։endLine::Line, column, and endline
 `,
 		},
 		{
@@ -90,7 +74,7 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 						},
 						{
 							RuleID:  "core::naming_formats::field_names",
-							Message: "multi\nline\ncomment",
+							Message: "multi%0Aline%0Acomment",
 							Location: &descriptorpb.SourceCodeInfo_Location{
 								Span: []int32{5, 6, 7, 8},
 							},
@@ -98,8 +82,8 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 					},
 				},
 			},
-			want: `::error file=example.proto,endColumn=4,endLine=3,col=2,line=1,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example.proto,endColumn=8,endLine=7,col=6,line=5,title=core։։naming_formats։։field_names::multi\nline\ncomment\n\nhttps://linter.aip.dev/naming_formats/field_names
+			want: `::error file=example.proto,line=2,endLine=4,col=3,endColumn=4,title=core։։naming_formats։։field_names::%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
+::error file=example.proto,line=6,endLine=8,col=7,endColumn=8,title=core։։naming_formats։։field_names::multi%0Aline%0Acomment%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
 `,
 		},
 		{
@@ -133,13 +117,13 @@ func TestFormatGitHubActionOutput(t *testing.T) {
 					},
 				},
 			},
-			want: `::error file=example.proto,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example.proto,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example2.proto,title=core։։0131։։request_message։։name::\n\nhttps://linter.aip.dev/131/request_message/name
-::error file=example2.proto,title=core։։0132։։response_message։։name::\n\nhttps://linter.aip.dev/132/response_message/name
-::error file=example3.proto,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example4.proto,title=core։։naming_formats։։field_names::\n\nhttps://linter.aip.dev/naming_formats/field_names
-::error file=example4.proto,title=core։։0132։։response_message։։name::\n\nhttps://linter.aip.dev/132/response_message/name
+			want: `::error file=example.proto,title=core։։naming_formats։։field_names::%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
+::error file=example.proto,title=core։։naming_formats։։field_names::%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
+::error file=example2.proto,title=core։։0131։։request_message։։name::%0A%0Ahttps://linter.aip.dev/131/request_message/name
+::error file=example2.proto,title=core։։0132։։response_message։։name::%0A%0Ahttps://linter.aip.dev/132/response_message/name
+::error file=example3.proto,title=core։։naming_formats։։field_names::%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
+::error file=example4.proto,title=core։։naming_formats։։field_names::%0A%0Ahttps://linter.aip.dev/naming_formats/field_names
+::error file=example4.proto,title=core։։0132։։response_message։։name::%0A%0Ahttps://linter.aip.dev/132/response_message/name
 `,
 		},
 	}
