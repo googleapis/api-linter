@@ -40,9 +40,9 @@ func ToSingular(s string) string {
 //
 // It searches for a resource message with a google.api.resource annotation
 // whose singular matches the expected singular of pluralName. This search
-// covers messages in the same file as well as directly imported files, since
-// the resource message is commonly defined in a separate file from the service
-// and request/response messages.
+// covers the file's entire import graph (recursively), since the resource
+// message may be defined in a separate file from the service and
+// request/response messages.
 //
 // If a matching resource annotation is found, its singular is returned (in
 // UpperCamelCase). Otherwise, it falls back to the go-pluralize library.
@@ -51,20 +51,31 @@ func ToSingular(s string) string {
 // go-pluralize converts to "Metadatum" using Latin grammar rules).
 func ResourceSingular(pluralName string, m protoreflect.MessageDescriptor) string {
 	if f := m.ParentFile(); f != nil {
-		if s := findResourceSingularInFile(pluralName, f); s != "" {
+		if s := findResourceSingularRecursive(pluralName, f, make(map[string]bool)); s != "" {
 			return s
 		}
-		// Search direct imports only (not transitive); sufficient for standard proto
-		// layouts where the resource is in a sibling file imported by the service file.
-		imports := f.Imports()
-		for i := 0; i < imports.Len(); i++ {
-			if s := findResourceSingularInFile(pluralName, imports.Get(i).FileDescriptor); s != "" {
-				return s
-			}
+	}
+	return pluralizeClient.Singular(pluralName)
+}
+
+// findResourceSingularRecursive searches a file and its transitive imports
+// for a resource whose singular annotation matches the given pluralName.
+func findResourceSingularRecursive(pluralName string, f protoreflect.FileDescriptor, visited map[string]bool) string {
+	if f == nil || visited[string(f.Path())] {
+		return ""
+	}
+	visited[string(f.Path())] = true
+
+	if s := findResourceSingularInFile(pluralName, f); s != "" {
+		return s
+	}
+	imports := f.Imports()
+	for i := 0; i < imports.Len(); i++ {
+		if s := findResourceSingularRecursive(pluralName, imports.Get(i).FileDescriptor, visited); s != "" {
+			return s
 		}
 	}
-
-	return pluralizeClient.Singular(pluralName)
+	return ""
 }
 
 // findResourceSingularInFile searches all messages in a file for a resource
