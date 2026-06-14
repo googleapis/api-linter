@@ -22,6 +22,8 @@ jobs:
             arch: amd64
           - os: linux
             arch: arm
+          - os: linux
+            arch: arm64
           - os: darwin
             arch: amd64
           - os: darwin
