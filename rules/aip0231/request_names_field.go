@@ -16,10 +16,11 @@ package aip0231
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -78,10 +79,10 @@ var namesField = &lint.MessageRule{
 		}
 
 		// Rule check: Ensure that the standard get request message field is the
-		// correct type. Note: Use m.Name()[8:len(m.Name())-7]) to retrieve
-		// the resource name from the batch get request, for example:
-		// "BatchGetBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Get%sRequest", pluralize.NewClient().Singular(string(m.Name())[8:len(m.Name())-7]))
+		// correct type. Note: Retrieve the resource name from the batch get
+		// request, for example: "BatchGetBooksRequest" -> "Books"
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchGet")
+		rightTypeName := fmt.Sprintf("Get%sRequest", utils.ResourceSingular(pluralName, m))
 		if getReqMsg != nil && (getReqMsg.Message() == nil || getReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),

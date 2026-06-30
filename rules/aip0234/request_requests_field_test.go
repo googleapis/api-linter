@@ -87,3 +87,60 @@ func TestRequestRequestsField(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestRequestsFieldResourceAnnotation(t *testing.T) {
+	// Test that the rule respects google.api.resource singular annotation
+	// for words that go-pluralize would incorrectly singularize (e.g.
+	// "Metadata" -> "Metadatum").
+	tests := []struct {
+		testName string
+		Field    string
+		problems testutils.Problems
+	}{
+		{
+			testName: "Valid-ResourceSingularMetadata",
+			Field:    "repeated UpdateImpressionMetadataRequest requests",
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Invalid-WrongTypeWithResourceSingular",
+			Field:    "repeated int32 requests",
+			problems: testutils.Problems{{
+				Suggestion: "UpdateImpressionMetadataRequest",
+			}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+
+				message BatchUpdateImpressionMetadataRequest {
+					{{.Field}} = 1;
+				}
+				message UpdateImpressionMetadataRequest {}
+				message ImpressionMetadata {
+					option (google.api.resource) = {
+						type: "example.googleapis.com/ImpressionMetadata"
+						pattern: "dataProviders/{data_provider}/impressionMetadata/{impression_metadata}"
+						singular: "impressionMetadata"
+						plural: "impressionMetadata"
+					};
+				}
+				`, test)
+
+			var problemDesc protoreflect.Descriptor
+			if requests := file.Messages().Get(0).Fields().ByName("requests"); requests != nil {
+				problemDesc = requests
+			} else {
+				problemDesc = file.Messages().Get(0)
+			}
+
+			problems := requestRequestsField.Lint(file)
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -52,8 +52,8 @@ var requestRequestsField = &lint.MessageRule{
 		// Rule check: Ensure that the standard update request message field is the
 		// correct type. Note: Retrieve the resource name from the the batch update
 		// request, for example: "BatchUpdateBooksRequest" -> "Books"
-		rightTypeName := fmt.Sprintf("Update%sRequest",
-			pluralize.NewClient().Singular(strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchUpdate")))
+		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchUpdate")
+		rightTypeName := fmt.Sprintf("Update%sRequest", utils.ResourceSingular(pluralName, m))
 		if requests.Message() == nil || requests.Message().Name() != protoreflect.Name(rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Update Request should be a %q type`, rightTypeName),
