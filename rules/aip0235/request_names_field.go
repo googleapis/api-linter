@@ -82,7 +82,7 @@ var requestNamesField = &lint.MessageRule{
 		// correct type. Note: Retrieve the resource name from the batch delete
 		// request, for example: "BatchDeleteBooksRequest" -> "Books"
 		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchDelete")
-		rightTypeName := fmt.Sprintf("Delete%sRequest", utils.ResourceSingular(pluralName, m))
+		rightTypeName := fmt.Sprintf("Delete%sRequest", utils.DeriveResourceSingular(pluralName, m))
 		if deleteReqMsg != nil && (deleteReqMsg.Message() == nil || deleteReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Delete Request should be a %q type`, rightTypeName),

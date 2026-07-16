@@ -82,7 +82,7 @@ var namesField = &lint.MessageRule{
 		// correct type. Note: Retrieve the resource name from the batch get
 		// request, for example: "BatchGetBooksRequest" -> "Books"
 		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchGet")
-		rightTypeName := fmt.Sprintf("Get%sRequest", utils.ResourceSingular(pluralName, m))
+		rightTypeName := fmt.Sprintf("Get%sRequest", utils.DeriveResourceSingular(pluralName, m))
 		if getReqMsg != nil && (getReqMsg.Message() == nil || getReqMsg.Message().Name() != protoreflect.Name(rightTypeName)) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Get Request should be a %q type`, rightTypeName),

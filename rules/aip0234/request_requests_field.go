@@ -53,7 +53,7 @@ var requestRequestsField = &lint.MessageRule{
 		// correct type. Note: Retrieve the resource name from the the batch update
 		// request, for example: "BatchUpdateBooksRequest" -> "Books"
 		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchUpdate")
-		rightTypeName := fmt.Sprintf("Update%sRequest", utils.ResourceSingular(pluralName, m))
+		rightTypeName := fmt.Sprintf("Update%sRequest", utils.DeriveResourceSingular(pluralName, m))
 		if requests.Message() == nil || requests.Message().Name() != protoreflect.Name(rightTypeName) {
 			problems = append(problems, lint.Problem{
 				Message:    fmt.Sprintf(`The "requests" field on Batch Update Request should be a %q type`, rightTypeName),

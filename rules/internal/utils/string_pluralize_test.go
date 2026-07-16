@@ -44,7 +44,7 @@ func TestPluralize(t *testing.T) {
 	}
 }
 
-func TestResourceSingular(t *testing.T) {
+func TestDeriveResourceSingular(t *testing.T) {
 	tests := []struct {
 		testName   string
 		pluralName string
@@ -137,16 +137,16 @@ func TestResourceSingular(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			file := testutils.ParseProto3String(t, test.src)
 			m := file.Messages().Get(0)
-			got := ResourceSingular(test.pluralName, m)
+			got := DeriveResourceSingular(test.pluralName, m)
 			if got != test.want {
-				t.Errorf("ResourceSingular(%q) = %q, want %q", test.pluralName, got, test.want)
+				t.Errorf("DeriveResourceSingular(%q) = %q, want %q", test.pluralName, got, test.want)
 			}
 		})
 	}
 }
 
-func TestResourceSingularImportedFile(t *testing.T) {
-	// Verify that ResourceSingular finds the resource annotation in a
+func TestDeriveResourceSingularImportedFile(t *testing.T) {
+	// Verify that DeriveResourceSingular finds the resource annotation in a
 	// directly imported file, not just the same file.
 	files := testutils.ParseProtoStrings(t, map[string]string{
 		"resource.proto": `
@@ -174,14 +174,15 @@ func TestResourceSingularImportedFile(t *testing.T) {
 
 	serviceFile := files["service.proto"]
 	m := serviceFile.Messages().Get(0)
-	got := ResourceSingular("ImpressionMetadata", m)
-	if got != "ImpressionMetadata" {
-		t.Errorf("ResourceSingular(\"ImpressionMetadata\") = %q, want \"ImpressionMetadata\"", got)
+	want := "ImpressionMetadata"
+	got := DeriveResourceSingular(want, m)
+	if got != want {
+		t.Errorf("DeriveResourceSingular(%q) = %q, want %q", want, got, want)
 	}
 }
 
-func TestResourceSingularTransitiveImport(t *testing.T) {
-	// Verify that ResourceSingular finds the resource annotation
+func TestDeriveResourceSingularTransitiveImport(t *testing.T) {
+	// Verify that DeriveResourceSingular finds the resource annotation
 	// through transitive imports (service -> common -> resource).
 	files := testutils.ParseProtoStrings(t, map[string]string{
 		"resource.proto": `
@@ -217,8 +218,9 @@ func TestResourceSingularTransitiveImport(t *testing.T) {
 
 	serviceFile := files["service.proto"]
 	m := serviceFile.Messages().Get(0)
-	got := ResourceSingular("ImpressionMetadata", m)
-	if got != "ImpressionMetadata" {
-		t.Errorf("ResourceSingular(\"ImpressionMetadata\") = %q, want \"ImpressionMetadata\"", got)
+	want := "ImpressionMetadata"
+	got := DeriveResourceSingular(want, m)
+	if got != want {
+		t.Errorf("DeriveResourceSingular(%q) = %q, want %q", want, got, want)
 	}
 }

@@ -32,7 +32,7 @@ var responseResourceField = &lint.MessageRule{
 		// Note: Retrieve the resource name from the the batch update response,
 		// for example: "BatchUpdateBooksResponse" -> "Books"
 		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchUpdate")
-		resourceMsgName := utils.ResourceSingular(pluralName, m)
+		resourceMsgName := utils.DeriveResourceSingular(pluralName, m)
 
 		for i := 0; i < m.Fields().Len(); i++ {
 			fieldDesc := m.Fields().Get(i)

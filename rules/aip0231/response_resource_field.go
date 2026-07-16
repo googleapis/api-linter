@@ -30,7 +30,7 @@ var resourceField = &lint.MessageRule{
 	LintMessage: func(m protoreflect.MessageDescriptor) []lint.Problem {
 		// The singular form the resource message name; the first letter capitalized.
 		pluralName := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Response"), "BatchGet")
-		resourceMsgName := utils.ResourceSingular(pluralName, m)
+		resourceMsgName := utils.DeriveResourceSingular(pluralName, m)
 
 		for i := 0; i < m.Fields().Len(); i++ {
 			fieldDesc := m.Fields().Get(i)
