@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.4.0](https://github.com/googleapis/api-linter/compare/v2.3.1...v2.4.0) (2026-08-03)
+
+
+### Features
+
+* **AIP-190:** UpperCamelCase service, method and message names. ([#1623](https://github.com/googleapis/api-linter/issues/1623)) ([9c6635b](https://github.com/googleapis/api-linter/commit/9c6635b6cc1fdcadf6e498cc75e4ce3d541ce5af))
+
+
+### Bug Fixes
+
+* Respect google.api.resource singular annotation in batch method rules ([#1629](https://github.com/googleapis/api-linter/issues/1629)) ([a77b0b9](https://github.com/googleapis/api-linter/commit/a77b0b90449d5038d775f60994a7c68a4d3f8bc9))
+
 ## [2.3.1](https://github.com/googleapis/api-linter/compare/v2.3.0...v2.3.1) (2026-03-17)
 
 
