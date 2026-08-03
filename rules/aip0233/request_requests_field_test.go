@@ -98,3 +98,61 @@ func TestRequestRequestsField(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestRequestsFieldResourceAnnotation(t *testing.T) {
+	tests := []struct {
+		testName    string
+		Field       string
+		problems    testutils.Problems
+		problemDesc func(m protoreflect.MessageDescriptor) protoreflect.Descriptor
+	}{
+		{
+			testName: "Valid-ResourceSingularMetadata",
+			Field:    "repeated CreateImpressionMetadataRequest requests = 1;",
+			problems: testutils.Problems{},
+		},
+		{
+			testName: "Invalid-WrongTypeWithResourceSingular",
+			Field:    "repeated int32 requests = 1;",
+			problems: testutils.Problems{{
+				Suggestion: "CreateImpressionMetadataRequest",
+			}},
+			problemDesc: func(m protoreflect.MessageDescriptor) protoreflect.Descriptor {
+				return m.Fields().ByName("requests")
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			file := testutils.ParseProto3Tmpl(t, `
+				import "google/api/resource.proto";
+
+				message BatchCreateImpressionMetadataRequest {
+					{{.Field}}
+				}
+				message CreateImpressionMetadataRequest {}
+				message ImpressionMetadata {
+					option (google.api.resource) = {
+						type: "example.com/ImpressionMetadata"
+						pattern: "dataProviders/{dp}/impressionMetadata/{im}"
+						singular: "impressionMetadata"
+						plural: "impressionMetadata"
+					};
+				}
+				`, test)
+
+			m := file.Messages().Get(0)
+
+			var problemDesc protoreflect.Descriptor = m
+			if test.problemDesc != nil {
+				problemDesc = test.problemDesc(m)
+			}
+
+			problems := requestRequestsField.Lint(file)
+			if diff := test.problems.SetDescriptor(problemDesc).Diff(problems); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

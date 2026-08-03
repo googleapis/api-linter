@@ -31,12 +31,14 @@ jobs:
           - os: windows
             arch: amd64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ github.event.release.tag_name }}
-      - uses: actions/setup-go@v6
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version-file: 'go.mod'
+          cache: false
       # The API linter does not use these,  but we need them to build the
       # binaries.
       #
@@ -59,7 +61,7 @@ jobs:
         run: echo "raw_version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
         shell: bash
       - name: Upload the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} release.
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:

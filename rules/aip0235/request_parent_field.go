@@ -30,7 +30,7 @@ var requestParentField = &lint.MessageRule{
 		// from the request name, then get the resource annotation from that,
 		// and then inspect the pattern there (oy!).
 		plural := strings.TrimPrefix(strings.TrimSuffix(string(m.Name()), "Request"), "BatchDelete")
-		singular := utils.ToSingular(plural)
+		singular := utils.DeriveResourceSingular(plural, m)
 		if msg := utils.FindMessage(m.ParentFile(), singular); msg != nil {
 			if !utils.HasParent(utils.GetResource(msg)) {
 				return false
