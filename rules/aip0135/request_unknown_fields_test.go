@@ -32,6 +32,7 @@ func TestUnknownFields(t *testing.T) {
 		{"Force", "DeleteBookRequest", "force", "bool", testutils.Problems{}},
 		{"Etag", "DeleteBookRequest", "etag", "string", testutils.Problems{}},
 		{"AllowMissing", "DeleteBookRequest", "allow_missing", "bool", testutils.Problems{}},
+		{"ReadMask", "DeleteBookRequest", "read_mask", "google.protobuf.FieldMask", testutils.Problems{}},
 		{"RequestId", "DeleteBookRequest", "request_id", "string", testutils.Problems{}},
 		{"ValidateOnly", "DeleteBookRequest", "validate_only", "bool", testutils.Problems{}},
 		{"ValidView", "DeleteBookRequest", "view", "BookView", testutils.Problems{}},
@@ -45,6 +46,7 @@ func TestUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				import "google/protobuf/field_mask.proto";
 				enum BookView {
 					BOOK_VIEW_UNSPECIFIED = 0;
 					BOOK_VIEW_BASIC = 1;
