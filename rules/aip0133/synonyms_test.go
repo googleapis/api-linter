@@ -29,6 +29,9 @@ func TestSynonyms(t *testing.T) {
 		{"InsertBook", testutils.Problems{{Suggestion: "CreateBook"}}},
 		{"MakeBook", testutils.Problems{{Suggestion: "CreateBook"}}},
 		{"PostBook", testutils.Problems{{Suggestion: "CreateBook"}}},
+		{"PosterBoy", testutils.Problems{}},
+		{"MakerSpace", testutils.Problems{}},
+		{"InsertionSort", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		t.Run(test.MethodName, func(t *testing.T) {

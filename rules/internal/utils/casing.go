@@ -14,6 +14,29 @@
 
 package utils
 
+import (
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+// HasWordBoundaryPrefix reports whether the UpperCamelCase identifier s begins with
+// prefix on a word boundary (i.e. s equals prefix or the character immediately
+// following prefix is uppercase).
+//
+// Both s and prefix are case-sensitive. If prefix is empty or s does not start with
+// prefix, it returns false.
+func HasWordBoundaryPrefix(s, prefix string) bool {
+	if prefix == "" || !strings.HasPrefix(s, prefix) {
+		return false
+	}
+	if len(s) == len(prefix) {
+		return true
+	}
+	r, _ := utf8.DecodeRuneInString(s[len(prefix):])
+	return unicode.IsUpper(r)
+}
+
 // ToUpperCamelCase returns the UpperCamelCase of a string, including removing
 // delimiters (_,-,., ) and using them to denote a new word.
 func ToUpperCamelCase(s string) string {
