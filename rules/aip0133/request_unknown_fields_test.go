@@ -72,6 +72,14 @@ func TestUnknownFields(t *testing.T) {
 			"",
 		},
 		{
+			"ReadMaskField",
+			"CreateBookRequest",
+			"read_mask",
+			"google.protobuf.FieldMask",
+			testutils.Problems{},
+			"",
+		},
+		{
 			"ViewField",
 			"CreateBookRequest",
 			"view",
@@ -117,6 +125,7 @@ func TestUnknownFields(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			f := testutils.ParseProto3Tmpl(t, `
+				import "google/protobuf/field_mask.proto";
 				enum BookView {
 					BOOK_VIEW_UNSPECIFIED = 0;
 					BOOK_VIEW_BASIC = 1;
