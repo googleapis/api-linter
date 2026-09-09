@@ -36,7 +36,7 @@ var synonyms = &lint.MethodRule{
 			if utils.HasWordBoundaryPrefix(name, syn) {
 				return []lint.Problem{{
 					Message: fmt.Sprintf(
-						`%q can be a synonym for "Update". Should this be a Update method?`,
+						`%q can be a synonym for "Update". Should this be an Update method?`,
 						syn,
 					),
 					Descriptor: m,
