@@ -17,10 +17,10 @@ package aip0134
 import (
 	"fmt"
 	"strings"
-	"unicode"
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -33,21 +33,16 @@ var synonyms = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		name := string(m.Name())
 		for _, syn := range []string{"Patch", "Put", "Set"} {
-			if strings.HasPrefix(name, syn) {
-				synLen := len(syn)
-				nameLen := len(name)
-				// Check for word boundary: either exact match or next char is uppercase
-				if nameLen == synLen || unicode.IsUpper(rune(name[synLen])) {
-					return []lint.Problem{{
-						Message: fmt.Sprintf(
-							`%q can be a synonym for "Update". Should this be a Update method?`,
-							syn,
-						),
-						Descriptor: m,
-						Location:   locations.DescriptorName(m),
-						Suggestion: strings.Replace(name, syn, "Update", 1),
-					}}
-				}
+			if utils.HasWordBoundaryPrefix(name, syn) {
+				return []lint.Problem{{
+					Message: fmt.Sprintf(
+						`%q can be a synonym for "Update". Should this be an Update method?`,
+						syn,
+					),
+					Descriptor: m,
+					Location:   locations.DescriptorName(m),
+					Suggestion: strings.Replace(name, syn, "Update", 1),
+				}}
 			}
 		}
 		return nil
