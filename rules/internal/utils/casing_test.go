@@ -132,7 +132,102 @@ func TestToUpperCamelCase(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			got := ToUpperCamelCase(test.input)
 			if got != test.want {
-				t.Errorf("ToLowerCamelCase(%q) = %q, got %q", test.input, test.want, got)
+				t.Errorf("ToUpperCamelCase(%q) = %q, got %q", test.input, test.want, got)
+			}
+		})
+	}
+}
+
+func TestHasWordBoundaryPrefix(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		s      string
+		prefix string
+		want   bool
+	}{
+		{
+			name:   "ExactMatch",
+			s:      "Read",
+			prefix: "Read",
+			want:   true,
+		},
+		{
+			name:   "WordBoundaryUppercase",
+			s:      "ReadBook",
+			prefix: "Read",
+			want:   true,
+		},
+		{
+			name:   "WordBoundaryAcronym",
+			s:      "ReadHTTPStream",
+			prefix: "Read",
+			want:   true,
+		},
+		{
+			name:   "NonBoundaryLowercaseSuffix",
+			s:      "ReadyPackage",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "NonBoundaryIngSuffix",
+			s:      "ReadingRoom",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "DifferentPrefix",
+			s:      "GetBook",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "ShorterThanPrefix",
+			s:      "Re",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "EmptyString",
+			s:      "",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "EmptyPrefix",
+			s:      "Read",
+			prefix: "",
+			want:   false,
+		},
+		{
+			name:   "BothEmpty",
+			s:      "",
+			prefix: "",
+			want:   false,
+		},
+		{
+			name:   "DigitSuffix",
+			s:      "Read2Book",
+			prefix: "Read",
+			want:   false,
+		},
+		{
+			name:   "MultibyteUpper",
+			s:      "ReadÜber",
+			prefix: "Read",
+			want:   true,
+		},
+		{
+			name:   "MultibyteLower",
+			s:      "Readüber",
+			prefix: "Read",
+			want:   false,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got := HasWordBoundaryPrefix(test.s, test.prefix)
+			if got != test.want {
+				t.Errorf("HasWordBoundaryPrefix(%q, %q) = %v, want %v", test.s, test.prefix, got, test.want)
 			}
 		})
 	}

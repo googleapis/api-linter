@@ -20,6 +20,7 @@ import (
 
 	"github.com/googleapis/api-linter/v2/lint"
 	"github.com/googleapis/api-linter/v2/locations"
+	"github.com/googleapis/api-linter/v2/rules/internal/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -29,7 +30,7 @@ var synonyms = &lint.MethodRule{
 	LintMethod: func(m protoreflect.MethodDescriptor) []lint.Problem {
 		name := string(m.Name())
 		for _, syn := range []string{"Acquire", "Fetch", "Lookup", "Read", "Retrieve"} {
-			if strings.HasPrefix(name, syn) {
+			if utils.HasWordBoundaryPrefix(name, syn) {
 				return []lint.Problem{{
 					Message: fmt.Sprintf(
 						`%q can be a synonym for "Get". Should this be a Get method?`,

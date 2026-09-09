@@ -31,6 +31,12 @@ func TestSynonyms(t *testing.T) {
 		{"LookupBook", testutils.Problems{{Suggestion: "GetBook"}}},
 		{"ReadBook", testutils.Problems{{Suggestion: "GetBook"}}},
 		{"RetrieveBook", testutils.Problems{{Suggestion: "GetBook"}}},
+		{"ReadyPackage", testutils.Problems{}},
+		{"ReadingRoom", testutils.Problems{}},
+		{"LookupsReport", testutils.Problems{}},
+		{"AcquirerAccount", testutils.Problems{}},
+		{"FetchingDog", testutils.Problems{}},
+		{"RetrieverConfig", testutils.Problems{}},
 	}
 	for _, test := range tests {
 		file := testutils.ParseProto3Tmpl(t, `
