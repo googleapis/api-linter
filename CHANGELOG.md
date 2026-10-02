@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/googleapis/api-linter/compare/v2.4.0...v2.4.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **AIP-126:** reject leading and trailing underscores in enum values ([#1647](https://github.com/googleapis/api-linter/issues/1647)) ([836098d](https://github.com/googleapis/api-linter/commit/836098d530b3e59a354de1e8fe52f651155a9e04))
+
 ## [2.4.0](https://github.com/googleapis/api-linter/compare/v2.3.1...v2.4.0) (2026-09-09)
 
 
