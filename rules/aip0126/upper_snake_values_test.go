@@ -23,6 +23,8 @@ func TestUpperSnake(t *testing.T) {
 		{"InvalidOneWord", []string{"one"}, testutils.Problems{{Suggestion: "ONE"}}},
 		{"InvalidTwoWordsCamel", []string{"oneTwo"}, testutils.Problems{{Suggestion: "ONE_TWO"}}},
 		{"InvalidTwoWordsLowerSnake", []string{"one_two"}, testutils.Problems{{Suggestion: "ONE_TWO"}}},
+		{"InvalidLeadingUnderscore", []string{"_FOO"}, testutils.Problems{{Suggestion: "FOO"}}},
+		{"InvalidTrailingUnderscore", []string{"BAR_"}, testutils.Problems{{Suggestion: "BAR"}}},
 		{"OneProblem", []string{"one_two", "THREE_FOUR"}, testutils.Problems{{Suggestion: "ONE_TWO"}}},
 		{
 			"TwoProblems",

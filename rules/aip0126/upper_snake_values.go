@@ -31,5 +31,5 @@ var enumValueUpperSnakeCase = &lint.EnumRule{
 }
 
 func toUpperSnakeCase(s string) string {
-	return strings.ToUpper(strcase.SnakeCase(s))
+	return strings.Trim(strings.ToUpper(strcase.SnakeCase(s)), "_")
 }
