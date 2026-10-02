@@ -16,7 +16,8 @@ This rule enforces that all enum values be in upper snake case, as mandated in
 ## Details
 
 This rule finds all enumerations and ensures that each value is provided in
-`UPPER_SNAKE_CASE`.
+`UPPER_SNAKE_CASE`: uppercase letters and numbers, with words separated by a
+single underscore. Leading and trailing underscores are not allowed.
 
 ## Examples
 
@@ -27,6 +28,8 @@ This rule finds all enumerations and ensures that each value is provided in
 enum Format {
   FORMAT_UNSPECIFIED = 0;
   hardcover = 1;  // Should be "HARDCOVER".
+  _FOO = 2;       // Should be "FOO".
+  BAR_ = 3;       // Should be "BAR".
 }
 ```
 
@@ -37,6 +40,8 @@ enum Format {
 enum Format {
   FORMAT_UNSPECIFIED = 0;
   HARDCOVER = 1;
+  FOO = 2;
+  BAR = 3;
 }
 ```
 
