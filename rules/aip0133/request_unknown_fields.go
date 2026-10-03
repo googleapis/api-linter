@@ -35,6 +35,7 @@ var unknownFields = &lint.MessageRule{
 		// Rule check: Establish that there are no unexpected fields.
 		allowedFields := stringset.New(
 			"parent",        // AIP-133
+			"read_mask",     // AIP-157
 			"request_id",    // AIP-155
 			"validate_only", // AIP-163
 			"view",          // AIP-157
