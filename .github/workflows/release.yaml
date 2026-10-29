@@ -4,18 +4,26 @@ on:
   release:
     types:
       - created
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag name (e.g. v2.4.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 env:
   # e.g. v1.0.0
-  TAG_NAME: ${{ github.event.release.tag_name }}
+  TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
+  GH_REPO: ${{ github.repository }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         osarch:
           - os: linux
@@ -30,10 +38,17 @@ jobs:
             arch: arm64
           - os: windows
             arch: amd64
+    env:
+      OS: ${{ matrix.osarch.os }}
+      ARCH: ${{ matrix.osarch.arch }}
     steps:
+      - name: Verify release exists
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh release view "$TAG_NAME" > /dev/null
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ inputs.tag_name || github.event.release.tag_name }}
           persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
@@ -51,20 +66,22 @@ jobs:
         run: |
           go install github.com/mitchellh/gox@latest
           go get github.com/inconshreveable/mousetrap
-      - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
-        run: |
-          CGO_ENABLED=0  gox -osarch ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} -output api-linter ./... && \
-          tar cvfz api-linter.tar.gz api-linter*
       - name: Set raw version
         id: raw_tag
         # Strips the 'v' from the actual semver version.
         run: echo "raw_version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
         shell: bash
+      - name: Build for the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} platform.
+        env:
+          RAW_VERSION: ${{ steps.raw_tag.outputs.raw_version }}
+        run: |
+          CGO_ENABLED=0 gox -osarch "${OS}/${ARCH}" -output api-linter ./... && \
+          tar cvfz "api-linter-${RAW_VERSION}-${OS}-${ARCH}.tar.gz" api-linter*
       - name: Upload the ${{ matrix.osarch.os }}/${{ matrix.osarch.arch }} release.
         env:
           GITHUB_TOKEN: ${{ github.token }}
           RAW_VERSION: ${{ steps.raw_tag.outputs.raw_version }}
         run: |
           gh release upload "$TAG_NAME" \
-            "./api-linter.tar.gz#api-linter-${RAW_VERSION}-${{ matrix.osarch.os }}-${{ matrix.osarch.arch }}.tar.gz" \
+            "./api-linter-${RAW_VERSION}-${OS}-${ARCH}.tar.gz" \
             --clobber
