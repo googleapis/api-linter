@@ -35,6 +35,7 @@ var unknownFields = &lint.MessageRule{
 			"force":         {}, // AIP-135
 			"allow_missing": {}, // AIP-135
 			"etag":          {}, // AIP-154
+			"read_mask":     {}, // AIP-157
 			"request_id":    {}, // AIP-155
 			"validate_only": {}, // AIP-163
 			"view":          {}, // AIP-157
