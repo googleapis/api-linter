@@ -5,18 +5,18 @@ go 1.26.0
 require (
 	bitbucket.org/creachadair/stringset v0.0.12
 	cloud.google.com/go/iam v1.15.1
-	cloud.google.com/go/longrunning v1.4.1
+	cloud.google.com/go/longrunning v1.5.0
 	github.com/bmatcuk/doublestar/v4 v4.10.4
 	github.com/bufbuild/protocompile v0.14.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/go-cmp v0.7.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/stoewer/go-strcase v1.3.1
-	golang.org/x/text v0.43.0
-	google.golang.org/genproto v0.0.0-20261026165753-2ffab32bce7e
-	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
+	golang.org/x/text v0.44.0
+	google.golang.org/genproto v0.0.0-20261110000943-09e21b237f2c
+	google.golang.org/genproto/googleapis/api v0.0.0-20261110000943-09e21b237f2c
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -24,8 +24,8 @@ require (
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	golang.org/x/net v0.61.0 // indirect
-	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261104224025-d1e00e9f33ab // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 )
