@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	apb "google.golang.org/genproto/googleapis/api/annotations"
 )
 
 func TestMethodRequestType(t *testing.T) {
@@ -67,6 +68,36 @@ func TestMethodHTTPRule(t *testing.T) {
 	// Four character span: start line, start column, end line, end column.
 	if diff := cmp.Diff(loc.GetSpan(), []int32{5, 4, 7, 6}); diff != "" {
 		t.Error(diff)
+	}
+}
+
+func TestMethodHTTPRuleWithRouting(t *testing.T) {
+	f := parse(t, `
+		import "google/api/annotations.proto";
+		import "google/api/routing.proto";
+		service Library {
+		  rpc GetBook(GetBookRequest) returns (Book) {
+		    option (google.api.http) = {
+		      get: "/v1/{name=publishers/*/books/*}"
+		    };
+		    option (google.api.routing) = {
+		      routing_parameters { field: "name" }
+		    };
+		  }
+		}
+		message GetBookRequest {
+		  string name = 1;
+		}
+		message Book {}
+	`)
+	m := f.Services().Get(0).Methods().Get(0)
+	// The google.api.http rule, not the google.api.routing rule after it.
+	if diff := cmp.Diff(MethodHTTPRule(m).GetSpan(), []int32{6, 4, 8, 6}); diff != "" {
+		t.Errorf("MethodHTTPRule: %s", diff)
+	}
+	routing := int(apb.E_Routing.TypeDescriptor().Number())
+	if diff := cmp.Diff(MethodOption(m, routing).GetSpan(), []int32{9, 4, 11, 6}); diff != "" {
+		t.Errorf("MethodOption(routing): %s", diff)
 	}
 }
 
