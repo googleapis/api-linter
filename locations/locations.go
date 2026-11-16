@@ -23,6 +23,8 @@
 package locations
 
 import (
+	"strconv"
+	"strings"
 	"sync"
 
 	"google.golang.org/protobuf/reflect/protodesc"
@@ -83,14 +85,19 @@ func newSourceInfoRegistryType() *sourceInfoRegistryType {
 
 // Each location has a path defined as an []int32, but we can not
 // use slices as keys, so compile them into a string.
-func strPath(segments []int32) (p string) {
+//
+// Segments are written as decimal numbers: string(segment) would treat them
+// as runes, and map every number that is not a valid code point (such as the
+// google.api.http and google.api.routing extension numbers) to U+FFFD.
+func strPath(segments []int32) string {
+	var b strings.Builder
 	for i, segment := range segments {
 		if i > 0 {
-			p += ","
+			b.WriteByte(',')
 		}
-		p += string(segment)
+		b.WriteString(strconv.Itoa(int(segment)))
 	}
-	return
+	return b.String()
 }
 
 // sourceInfo compiles the source info object for a given file descriptor.
